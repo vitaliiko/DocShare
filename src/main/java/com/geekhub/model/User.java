@@ -1,7 +1,11 @@
 package com.geekhub.model;
 
+import org.hibernate.annotations.*;
+import org.hibernate.annotations.CascadeType;
+
 import javax.persistence.*;
 import javax.persistence.Entity;
+import javax.persistence.Table;
 import java.util.Set;
 
 @Entity
@@ -19,7 +23,8 @@ public class User {
     private String password;
     @Column(unique = true)
     private String login;
-    @OneToMany
+    @OneToMany()
+    @Cascade({CascadeType.SAVE_UPDATE, CascadeType.DELETE})
     private Set<Message> messageSet;
 
     public Integer getId() {
