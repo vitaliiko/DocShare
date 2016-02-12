@@ -6,25 +6,13 @@ import java.util.Date;
 
 @Entity
 @Table
-public class Message {
-    @Id
-    @GeneratedValue
-    @Column
-    private Integer id;
+public class Message extends MappedEntity {
     @ManyToOne
     private User user;
     @Column
     private String text;
     @Column
     private Date date;
-
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
 
     public User getUser() {
         return user;

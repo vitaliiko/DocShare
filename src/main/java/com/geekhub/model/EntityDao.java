@@ -2,7 +2,7 @@ package com.geekhub.model;
 
 import java.util.List;
 
-public interface EntityDao<T> {
+public interface EntityDao<T extends MappedEntity> {
 
     List<T> getAllEntities(Class<T> clazz, String orderParameter);
 

@@ -1,20 +1,11 @@
 package com.geekhub.model;
 
-import org.hibernate.annotations.*;
-import org.hibernate.annotations.CascadeType;
-
 import javax.persistence.*;
-import javax.persistence.Entity;
-import javax.persistence.Table;
 import java.util.Set;
 
 @Entity
 @Table
-public class User {
-    @Id
-    @GeneratedValue
-    @Column
-    private Integer id;
+public class User extends MappedEntity {
     @Column
     private String firstName;
     @Column
@@ -23,17 +14,8 @@ public class User {
     private String password;
     @Column(unique = true)
     private String login;
-    @OneToMany()
-    @Cascade({CascadeType.SAVE_UPDATE, CascadeType.DELETE})
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "user", targetEntity = Message.class)
     private Set<Message> messageSet;
-
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
 
     public String getFirstName() {
         return firstName;
