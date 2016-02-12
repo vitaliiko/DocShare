@@ -1,9 +1,7 @@
 package com.geekhub.controller;
 
-import com.geekhub.model.Message;
-import com.geekhub.model.MessageService;
-import com.geekhub.model.User;
-import com.geekhub.model.UserService;
+import com.geekhub.model.*;
+import com.geekhub.util.FriendsGroupUtil;
 import com.geekhub.util.MessageUtil;
 import com.geekhub.util.UserUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +22,8 @@ public class ChatController {
     @Autowired private UserUtil userUtil;
     @Autowired private MessageService messageService;
     @Autowired private MessageUtil messageUtil;
+    @Autowired private FriendsGroupService friendsGroupService;
+    @Autowired private FriendsGroupUtil friendsGroupUtil;
 
     @RequestMapping(value = {"/", "/index"}, method = RequestMethod.GET)
     public String index(HttpServletRequest req) {
@@ -69,22 +69,15 @@ public class ChatController {
                          String password,
                          String confirmPassword,
                          ModelMap model) {
-
-        model.addAttribute("login", login)
-                .addAttribute("firstName", firstName)
-                .addAttribute("lastName", lastName);
-
-        if (!userUtil.validateUser(login, password, confirmPassword, model)) {
-            return "signUp";
+        try {
+            User user = userUtil.createUser(login, password, confirmPassword, firstName, lastName);
+            friendsGroupUtil.createDefaultGroup(user);
+        } catch (Exception e) {
+            model.addAttribute("login", login)
+                    .addAttribute("firstName", firstName)
+                    .addAttribute("lastName", lastName)
+                    .addAttribute("errorMessage", e.getMessage());
         }
-
-        User user = new User();
-        user.setLogin(login);
-        user.setPassword(password);
-        user.setFirstName(firstName);
-        user.setLastName(lastName);
-        userService.saveUser(user);
-
         return "signIn";
     }
 

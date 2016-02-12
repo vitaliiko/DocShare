@@ -16,6 +16,10 @@ public class User extends MappedEntity {
     private String login;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "user", targetEntity = Message.class)
     private Set<Message> messageSet;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "user", targetEntity = FriendsGroup.class)
+    private Set<FriendsGroup> friendsGroupSet;
+    @ManyToMany
+    private Set<FriendsGroup> consistGroupSet;
 
     public String getFirstName() {
         return firstName;
@@ -55,5 +59,21 @@ public class User extends MappedEntity {
 
     public void setMessageSet(Set<Message> messageSet) {
         this.messageSet = messageSet;
+    }
+
+    public Set<FriendsGroup> getFriendsGroupSet() {
+        return friendsGroupSet;
+    }
+
+    public void setFriendsGroupSet(Set<FriendsGroup> friendsGroupSet) {
+        this.friendsGroupSet = friendsGroupSet;
+    }
+
+    public Set<FriendsGroup> getConsistGroupSet() {
+        return consistGroupSet;
+    }
+
+    public void setConsistGroupSet(Set<FriendsGroup> consistGroupSet) {
+        this.consistGroupSet = consistGroupSet;
     }
 }
