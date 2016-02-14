@@ -9,13 +9,15 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.SessionAttributes;
+import org.springframework.web.bind.support.SessionStatus;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.util.Calendar;
 
 @Controller
-@RequestMapping("/")
+@SessionAttributes("user")
 public class ChatController {
 
     @Autowired private UserService userService;
@@ -26,18 +28,17 @@ public class ChatController {
     @Autowired private FriendsGroupUtil friendsGroupUtil;
 
     @RequestMapping(value = {"/", "/index"}, method = RequestMethod.GET)
-    public String index(HttpServletRequest req) {
-        req.setAttribute("messages", messageService.getMessages());
+    public String index(ModelMap model) {
+        model.addAttribute("messages", messageService.getMessages());
         return "index";
     }
 
     @RequestMapping(value = {"/", "/index"}, method = RequestMethod.POST)
-    public String index(HttpSession session, String text) {
+    public String index(User user, String text) {
         Message message = new Message();
         message.setText(messageUtil.detectLink(text));
-        message.setUser((User) session.getAttribute("user"));
         message.setDate(Calendar.getInstance().getTime());
-        messageService.saveMessage(message);
+        userService.addMessage(user, message);
         return "redirect:/index";
     }
 
@@ -47,9 +48,10 @@ public class ChatController {
     }
 
     @RequestMapping(value = "/signIn", method = RequestMethod.POST)
-    public String login(String login, String password, HttpSession session, ModelMap model) {
+    public String login(String login, String password, ModelMap model, HttpSession session) {
         User user = userService.getUserByLogin(login);
         if (user != null && user.getPassword().equals(password)) {
+            model.addAttribute("user", user);
             session.setAttribute("user", user);
             return "redirect:/index";
         }
@@ -59,7 +61,8 @@ public class ChatController {
 
     @RequestMapping(value = "/signUp", method = RequestMethod.GET)
     public String signUp() {
-        return "signUp";
+        userUtil.createFriends();
+        return "signIn";
     }
 
     @RequestMapping(value = "/signUp", method = RequestMethod.POST)
@@ -82,7 +85,8 @@ public class ChatController {
     }
 
     @RequestMapping("/signOut")
-    public String signOut(HttpSession session) {
+    public String signOut(SessionStatus status, HttpSession session) {
+        status.setComplete();
         session.invalidate();
         return "signIn";
     }
@@ -93,8 +97,7 @@ public class ChatController {
     }
 
     @RequestMapping(value = "/changeName", method = RequestMethod.POST)
-    public String changeName(HttpSession session, HttpServletRequest req, String login, String firstName, String lastName) {
-        User user = (User) session.getAttribute("user");
+    public String changeName(User user, HttpServletRequest req, String login, String firstName, String lastName) {
         if (user.getLogin().equals(login) || userService.getUserByLogin(login) == null) {
             user.setLogin(login);
             user.setFirstName(firstName);
@@ -108,13 +111,12 @@ public class ChatController {
     }
 
     @RequestMapping(value = "/changePassword", method = RequestMethod.POST)
-    public String changePassword(HttpSession session,
+    public String changePassword(User user,
                                  HttpServletRequest req,
                                  String currentPassword,
                                  String newPassword,
                                  String confirmNewPassword) {
 
-        User user = (User) session.getAttribute("user");
         if (!user.getPassword().equals(currentPassword)) {
             req.setAttribute("errorMessage", "Wrong password");
         } else if (!newPassword.equals(confirmNewPassword)) {
@@ -133,10 +135,10 @@ public class ChatController {
     }
 
     @RequestMapping(value = "/removeAccount", method = RequestMethod.POST)
-    public String removeAccount(HttpSession session, HttpServletRequest req, String yes) {
+    public String removeAccount(SessionStatus status, HttpSession session, User user, HttpServletRequest req, String yes) {
         if (yes != null) {
-            User user = (User) session.getAttribute("user");
             userService.deleteUser(user);
+            status.setComplete();
             session.invalidate();
             req.setAttribute("message", "Your account removed successfully");
             return "signIn";

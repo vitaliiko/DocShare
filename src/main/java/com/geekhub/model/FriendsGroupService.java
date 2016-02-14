@@ -8,7 +8,7 @@ import java.util.List;
 @Service
 public class FriendsGroupService {
 
-    @Autowired private EntityDaoImpl<FriendsGroup> friendsGroupDao;
+    @Autowired private FriendsGroupDao friendsGroupDao;
 
     public void saveFriendsGroup(FriendsGroup friendsGroup) {
         friendsGroupDao.saveEntity(friendsGroup);

@@ -1,7 +1,9 @@
 package com.geekhub.model;
 
-import javax.persistence.*;
-import java.util.Set;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
 
 @Entity
 @Table
@@ -10,8 +12,8 @@ public class FriendsGroup extends MappedEntity {
     private User owner;
     @Column
     private String name;
-    @ManyToMany(cascade = CascadeType.ALL, mappedBy = "friendsGroup", targetEntity = User.class)
-    private Set<User> friendsSet;
+//    @ManyToMany(cascade = CascadeType.ALL, mappedBy = "friendsGroup", targetEntity = User.class)
+//    private Set<User> friendsSet;
 
     public User getOwner() {
         return owner;
@@ -29,11 +31,11 @@ public class FriendsGroup extends MappedEntity {
         this.name = name;
     }
 
-    public Set<User> getFriendsSet() {
-        return friendsSet;
-    }
-
-    public void setFriendsSet(Set<User> friendsSet) {
-        this.friendsSet = friendsSet;
-    }
+//    public Set<User> getFriendsSet() {
+//        return friendsSet;
+//    }
+//
+//    public void setFriendsSet(Set<User> friendsSet) {
+//        this.friendsSet = friendsSet;
+//    }
 }

@@ -10,7 +10,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public class EntityDaoImpl<T extends MappedEntity> implements EntityDao<T> {
+public abstract class EntityDaoImpl<T extends MappedEntity> implements EntityDao<T> {
 
     @Autowired private SessionFactory sessionFactory;
 

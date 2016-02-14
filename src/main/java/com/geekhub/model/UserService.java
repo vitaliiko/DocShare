@@ -8,7 +8,7 @@ import java.util.List;
 @Service
 public class UserService {
 
-    @Autowired EntityDaoImpl<User> userDao;
+    @Autowired UserDao userDao;
 
     public List<User> getUsers() {
         return userDao.getAllEntities(User.class, "lastName");
@@ -32,5 +32,9 @@ public class UserService {
 
     public void deleteUser(User user) {
         userDao.deleteEntity(user);
+    }
+
+    public void addMessage(User user, Message message) {
+        userDao.addMessage(user, message);
     }
 }

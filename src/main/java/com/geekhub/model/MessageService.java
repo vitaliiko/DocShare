@@ -8,7 +8,7 @@ import java.util.List;
 @Service
 public class MessageService {
 
-    @Autowired private EntityDaoImpl<Message> messageDao;
+    @Autowired private MessageDao messageDao;
 
     public List<Message> getMessages() {
         return messageDao.getAllEntities(Message.class, "date");
