@@ -37,4 +37,8 @@ public class UserService {
     public void addMessage(User user, Message message) {
         userDao.addMessage(user, message);
     }
+
+    public void addFriend(User user, String friendLogin) {
+        userDao.addFriend(user, friendLogin);
+    }
 }

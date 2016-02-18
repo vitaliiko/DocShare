@@ -10,7 +10,7 @@ import java.util.List;
 public class ChatInterceptor extends HandlerInterceptorAdapter {
 
     private final List<String> EXCLUSIONS = Arrays.asList(
-            "/signIn", "/signUp"
+            "/signIn", "/signUp", "/default"
     );
 
     @Override

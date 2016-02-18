@@ -15,7 +15,7 @@ public class User extends MappedEntity {
     private String password;
     @Column(unique = true)
     private String login;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "user", targetEntity = Message.class, fetch = FetchType.EAGER)
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private Set<Message> messageSet = new HashSet<>();
 //    @OneToMany(cascade = CascadeType.ALL, mappedBy = "user", targetEntity = FriendsGroup.class)
 //    @JoinTable(name = "friendsGroups", joinColumns = {@JoinColumn(name = "owner_id")},
@@ -24,11 +24,13 @@ public class User extends MappedEntity {
 //    @ManyToMany
 //    private Set<FriendsGroup> consistGroupSet;
 
-    @ManyToMany(cascade = CascadeType.ALL)
+    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JoinTable(name = "user_friend", joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "friend_id"))
     private Set<User> friends = new HashSet<>();
 
-    @ManyToMany(mappedBy = "friends")
-    private Set<User> inFriends = new HashSet<>();
+    @ManyToMany(mappedBy = "friends", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    private Set<User> friendsOf = new HashSet<>();
 
     public String getFirstName() {
         return firstName;
@@ -78,12 +80,12 @@ public class User extends MappedEntity {
         this.friends = friends;
     }
 
-    public Set<User> getInFriends() {
-        return inFriends;
+    public Set<User> getFriendsOf() {
+        return friendsOf;
     }
 
-    public void setInFriends(Set<User> inFriends) {
-        this.inFriends = inFriends;
+    public void setFriendsOf(Set<User> inFriends) {
+        this.friendsOf = inFriends;
     }
 
     //    public Set<FriendsGroup> getFriendsGroupSet() {

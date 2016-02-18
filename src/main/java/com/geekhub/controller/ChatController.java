@@ -7,6 +7,7 @@ import com.geekhub.util.UserUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.SessionAttributes;
@@ -28,8 +29,12 @@ public class ChatController {
     @Autowired private FriendsGroupUtil friendsGroupUtil;
 
     @RequestMapping(value = {"/", "/index"}, method = RequestMethod.GET)
-    public String index(ModelMap model) {
+    public String index(ModelMap model, User user) {
         model.addAttribute("messages", messageService.getMessages());
+        model.addAttribute("friends", user.getFriends());
+        if (user.getFriendsOf().size() > 0) {
+            model.addAttribute("friendsOf", user.getFriendsOf());
+        }
         return "index";
     }
 
@@ -61,8 +66,7 @@ public class ChatController {
 
     @RequestMapping(value = "/signUp", method = RequestMethod.GET)
     public String signUp() {
-        userUtil.createFriends();
-        return "signIn";
+        return "signUp";
     }
 
     @RequestMapping(value = "/signUp", method = RequestMethod.POST)
@@ -74,14 +78,15 @@ public class ChatController {
                          ModelMap model) {
         try {
             User user = userUtil.createUser(login, password, confirmPassword, firstName, lastName);
-            friendsGroupUtil.createDefaultGroup(user);
+            userService.saveUser(user);
+            return "signIn";
         } catch (Exception e) {
             model.addAttribute("login", login)
                     .addAttribute("firstName", firstName)
                     .addAttribute("lastName", lastName)
                     .addAttribute("errorMessage", e.getMessage());
+            return "signUp";
         }
-        return "signIn";
     }
 
     @RequestMapping("/signOut")
@@ -144,5 +149,17 @@ public class ChatController {
             return "signIn";
         }
         return "profile";
+    }
+
+    @RequestMapping(value = "/addFriend/{friend}")
+    public String addFriend(User user, @PathVariable String friend, ModelMap model) {
+        userService.addFriend(user, friend);
+        return "redirect:/index";
+    }
+
+    @RequestMapping("/default")
+    public String createDefaultUsers() {
+        userUtil.addDefaultUsers();
+        return "signIn";
     }
 }

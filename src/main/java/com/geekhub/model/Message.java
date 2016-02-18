@@ -7,7 +7,8 @@ import java.util.Date;
 @Entity
 @Table
 public class Message extends MappedEntity {
-    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @ManyToOne
+    @JoinColumn(name = "user_id")
     private User user;
     @Column
     private String text;
