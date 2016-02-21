@@ -1,14 +1,13 @@
 package com.geekhub.util;
 
-import com.geekhub.model.Message;
 import com.geekhub.model.User;
 import com.geekhub.model.UserService;
-import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class UserUtil {
@@ -16,7 +15,7 @@ public class UserUtil {
     @Autowired private UserService userService;
     @Autowired private SessionFactory sessionFactory;
 
-    private void validateUser(String login, String password, String confirmPassword) throws Exception {
+    public void validateUser(String login, String password, String confirmPassword) throws Exception {
         if (userService.getUserByLogin(login) != null) {
             throw new Exception("User with such login already exist");
         }
@@ -25,34 +24,14 @@ public class UserUtil {
         }
     }
 
-    public User createUser(String login, String password, String confirmPassword, String firstName, String lastName)
-            throws Exception {
-        validateUser(login, password, confirmPassword);
-        User user = new User();
-        user.setLogin(login);
-        user.setPassword(password);
-        user.setFirstName(firstName);
-        user.setLastName(lastName);
-        return user;
-    }
-
-    public User createUser(String login, String password, String firstName, String lastName) {
-        User user = new User();
-        user.setLogin(login);
-        user.setPassword(password);
-        user.setFirstName(firstName);
-        user.setLastName(lastName);
-        return user;
-    }
-
     public void addDefaultUsers() {
         List<User> userList = new ArrayList<>();
-        userList.add(createUser("111", "111", "111", "111"));
-        userList.add(createUser("222", "222", "111", "111"));
-        userList.add(createUser("333", "333", "111", "111"));
-        userList.add(createUser("444", "444", "111", "111"));
-        userList.add(createUser("555", "555", "111", "111"));
-        userList.forEach(user -> userService.saveUser(user));
+        userList.add(new User("111", "111", "111", "111"));
+        userList.add(new User("222", "222", "111", "111"));
+        userList.add(new User("333", "333", "111", "111"));
+        userList.add(new User("444", "444", "111", "111"));
+        userList.add(new User("555", "555", "111", "111"));
+        userList.forEach(userService::saveUser);
     }
 
 //    public void createFriends() {

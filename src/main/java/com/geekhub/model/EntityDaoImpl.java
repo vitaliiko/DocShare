@@ -21,9 +21,13 @@ public abstract class EntityDaoImpl<T extends MappedEntity> implements EntityDao
             return (List<T>) session.createCriteria(clazz)
                     .addOrder(Order.asc(orderParameter))
                     .list();
+        } catch (Exception e) {
+            System.out.println("ERROR!!!!!!!!!!!!!!!!!!!!:");
+            e.printStackTrace();
         } finally {
             session.close();
         }
+        return null;
     }
 
     @Override
@@ -31,9 +35,13 @@ public abstract class EntityDaoImpl<T extends MappedEntity> implements EntityDao
         Session session = sessionFactory.openSession();
         try {
             return (T) sessionFactory.openSession().load(clazz, id);
+        } catch (Exception e) {
+            System.out.println("ERROR!!!!!!!!!!!!!!!!!!!!:");
+            e.printStackTrace();
         } finally {
             session.close();
         }
+        return null;
     }
 
     @Override
@@ -47,9 +55,13 @@ public abstract class EntityDaoImpl<T extends MappedEntity> implements EntityDao
                 return list.get(0);
             }
             return null;
+        } catch (Exception e) {
+            System.out.println("ERROR!!!!!!!!!!!!!!!!!!!!:");
+            e.printStackTrace();
         } finally {
             session.close();
         }
+        return null;
     }
 
     @Override
@@ -59,6 +71,9 @@ public abstract class EntityDaoImpl<T extends MappedEntity> implements EntityDao
             session.beginTransaction();
             session.save(entity);
             session.getTransaction().commit();
+        } catch (Exception e) {
+            System.out.println("ERROR!!!!!!!!!!!!!!!!!!!!:");
+            e.printStackTrace();
         } finally {
             session.close();
         }
@@ -71,6 +86,9 @@ public abstract class EntityDaoImpl<T extends MappedEntity> implements EntityDao
             session.beginTransaction();
             session.update(entity);
             session.getTransaction().commit();
+        } catch (Exception e) {
+            System.out.println("ERROR!!!!!!!!!!!!!!!!!!!!:");
+            e.printStackTrace();
         } finally {
             session.close();
         }
@@ -83,6 +101,25 @@ public abstract class EntityDaoImpl<T extends MappedEntity> implements EntityDao
             session.beginTransaction();
             session.delete(entity);
             session.getTransaction().commit();
+        } catch (Exception e) {
+            System.out.println("ERROR!!!!!!!!!!!!!!!!!!!!:");
+            e.printStackTrace();
+        } finally {
+            session.close();
+        }
+    }
+
+    @Override
+    public void deleteEntity(Class<T> clazz, Integer entityId) {
+        Session session = sessionFactory.openSession();
+        try {
+            session.beginTransaction();
+            T entity = (T) session.get(clazz, entityId);
+            session.delete(entity);
+            session.getTransaction().commit();
+        } catch (Exception e) {
+            System.out.println("ERROR!!!!!!!!!!!!!!!!!!!!:");
+            e.printStackTrace();
         } finally {
             session.close();
         }

@@ -25,14 +25,16 @@
     </form>
 
     <h3>FRIENDS</h3>
-    <c:forEach var="friend" items="${friends}">
-        ${friend.login}<br/>
+    <c:forEach var="friendGroup" items="${friends}">
+        <c:forEach var="friend" items="${friendsGroup}">
+            ${friend.login}
+        </c:forEach>
     </c:forEach>
 
-    <h3>FRIENDS OF</h3>
-    <c:forEach var="friendOf" items="${friendsOf}">
-        ${friendOf.login}<br/>
-    </c:forEach>
+    <%--<h3>FRIENDS OF</h3>--%>
+    <%--<c:forEach var="friendOf" items="${friendsOf}">--%>
+        <%--${friendOf.login}<br/>--%>
+    <%--</c:forEach>--%>
 
     <jsp:include page="signOut.jsp"/>
   </body>

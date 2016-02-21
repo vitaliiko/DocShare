@@ -17,4 +17,12 @@ public class FriendsGroupService {
     public List<FriendsGroup> getFrendsGroup() {
         return friendsGroupDao.getAllEntities(FriendsGroup.class, "name");
     }
+
+    public void addFriend(Integer groupId, Integer userId) {
+        friendsGroupDao.addFriend(groupId, userId);
+    }
+
+    public void setOwner(Integer groupId, Integer userId) {
+        friendsGroupDao.setOwner(groupId, userId);
+    }
 }

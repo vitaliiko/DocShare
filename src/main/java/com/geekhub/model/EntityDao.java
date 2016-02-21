@@ -15,4 +15,6 @@ public interface EntityDao<T extends MappedEntity> {
     void updateEntity(T entity);
 
     void deleteEntity(T entity);
+
+    void deleteEntity(Class<T> clazz, Integer entityId);
 }

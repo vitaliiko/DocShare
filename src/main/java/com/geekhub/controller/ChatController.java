@@ -10,15 +10,11 @@ import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.SessionAttributes;
-import org.springframework.web.bind.support.SessionStatus;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.util.Calendar;
 
 @Controller
-@SessionAttributes("user")
 public class ChatController {
 
     @Autowired private UserService userService;
@@ -29,21 +25,23 @@ public class ChatController {
     @Autowired private FriendsGroupUtil friendsGroupUtil;
 
     @RequestMapping(value = {"/", "/index"}, method = RequestMethod.GET)
-    public String index(ModelMap model, User user) {
+    public String index(ModelMap model) {
         model.addAttribute("messages", messageService.getMessages());
-        model.addAttribute("friends", user.getFriends());
-        if (user.getFriendsOf().size() > 0) {
-            model.addAttribute("friendsOf", user.getFriendsOf());
-        }
+//        model.addAttribute("friends", user.getFriends());
+//        if (user.getFriendsOf().size() > 0) {
+//            model.addAttribute("friendsOf", user.getFriendsOf());
+//        }
         return "index";
     }
 
     @RequestMapping(value = {"/", "/index"}, method = RequestMethod.POST)
-    public String index(User user, String text) {
+    public String index(HttpSession session, String text) {
+        User user = (User) session.getAttribute("user");
+        System.out.println("ID : " + user.getId());
         Message message = new Message();
         message.setText(messageUtil.detectLink(text));
         message.setDate(Calendar.getInstance().getTime());
-        userService.addMessage(user, message);
+        userService.addMessage(user.getId(), message);
         return "redirect:/index";
     }
 
@@ -56,7 +54,7 @@ public class ChatController {
     public String login(String login, String password, ModelMap model, HttpSession session) {
         User user = userService.getUserByLogin(login);
         if (user != null && user.getPassword().equals(password)) {
-            model.addAttribute("user", user);
+//            model.addAttribute("user", user);
             session.setAttribute("user", user);
             return "redirect:/index";
         }
@@ -77,7 +75,8 @@ public class ChatController {
                          String confirmPassword,
                          ModelMap model) {
         try {
-            User user = userUtil.createUser(login, password, confirmPassword, firstName, lastName);
+            userUtil.validateUser(login, password, confirmPassword);
+            User user = new User(login, password, firstName, lastName);
             userService.saveUser(user);
             return "signIn";
         } catch (Exception e) {
@@ -90,8 +89,7 @@ public class ChatController {
     }
 
     @RequestMapping("/signOut")
-    public String signOut(SessionStatus status, HttpSession session) {
-        status.setComplete();
+    public String signOut(HttpSession session) {
         session.invalidate();
         return "signIn";
     }
@@ -102,34 +100,36 @@ public class ChatController {
     }
 
     @RequestMapping(value = "/changeName", method = RequestMethod.POST)
-    public String changeName(User user, HttpServletRequest req, String login, String firstName, String lastName) {
+    public String changeName(ModelMap model, HttpSession session, String login, String firstName, String lastName) {
+        User user = (User) session.getAttribute("user");
         if (user.getLogin().equals(login) || userService.getUserByLogin(login) == null) {
             user.setLogin(login);
             user.setFirstName(firstName);
             user.setLastName(lastName);
             userService.updateUser(user);
-            req.setAttribute("message", "Your account updated successfully");
+            model.addAttribute("message", "Your account updated successfully");
         } else {
-            req.setAttribute("errorMessage", "User with such login already exist");
+            model.addAttribute("errorMessage", "User with such login already exist");
         }
         return "profile";
     }
 
     @RequestMapping(value = "/changePassword", method = RequestMethod.POST)
-    public String changePassword(User user,
-                                 HttpServletRequest req,
+    public String changePassword(HttpSession session,
+                                 ModelMap model,
                                  String currentPassword,
                                  String newPassword,
                                  String confirmNewPassword) {
 
+        User user = (User) session.getAttribute("user");
         if (!user.getPassword().equals(currentPassword)) {
-            req.setAttribute("errorMessage", "Wrong password");
+            model.addAttribute("errorMessage", "Wrong password");
         } else if (!newPassword.equals(confirmNewPassword)) {
-            req.setAttribute("errorMessage", "Passwords doesn't match");
+            model.addAttribute("errorMessage", "Passwords doesn't match");
         } else {
             user.setPassword(newPassword);
             userService.updateUser(user);
-            req.setAttribute("message", "Your password was changed successfully");
+            model.addAttribute("message", "Your password was changed successfully");
         }
         return "profile";
     }
@@ -140,20 +140,20 @@ public class ChatController {
     }
 
     @RequestMapping(value = "/removeAccount", method = RequestMethod.POST)
-    public String removeAccount(SessionStatus status, HttpSession session, User user, HttpServletRequest req, String yes) {
+    public String removeAccount(HttpSession session, String yes, ModelMap model) {
+        User user = (User) session.getAttribute("user");
         if (yes != null) {
             userService.deleteUser(user);
-            status.setComplete();
             session.invalidate();
-            req.setAttribute("message", "Your account removed successfully");
+            model.addAttribute("message", "Your account removed successfully");
             return "signIn";
         }
         return "profile";
     }
 
     @RequestMapping(value = "/addFriend/{friend}")
-    public String addFriend(User user, @PathVariable String friend, ModelMap model) {
-        userService.addFriend(user, friend);
+    public String addFriend(@PathVariable String friend, HttpSession session) {
+        userService.addFriend((User) session.getAttribute("user"), friend);
         return "redirect:/index";
     }
 
@@ -161,5 +161,30 @@ public class ChatController {
     public String createDefaultUsers() {
         userUtil.addDefaultUsers();
         return "signIn";
+    }
+
+    @RequestMapping("/deleteMessage/{messageId}")
+    public String deleteMessage(@PathVariable Integer messageId, HttpSession session) {
+        userService.deleteMessage(((User) session.getAttribute("user")).getId(), messageId);
+        return "redirect:/index";
+    }
+
+    @RequestMapping("/createGroup")
+    public String createGroup() {
+        friendsGroupUtil.createDefaultGroup();
+        return "redirect:/setOwner";
+    }
+
+    @RequestMapping("/setOwner")
+    public String setOwner(HttpSession session) {
+        friendsGroupService.setOwner(1, ((User) session.getAttribute("user")).getId());
+        return "redirect:/index";
+    }
+
+    @RequestMapping("/addFriend/{friendId}")
+    public String addFriend(@PathVariable String friendId, ModelMap model, HttpSession session) {
+        friendsGroupService.addFriend(1, new Integer(friendId));
+//        model.addAttribute("friends", userService.getUserById(user.getId()).getFriendsGroupSet());
+        return "redirect:/index";
     }
 }

@@ -15,22 +15,39 @@ public class User extends MappedEntity {
     private String password;
     @Column(unique = true)
     private String login;
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
+    @JoinColumn(name = "user_id")
     private Set<Message> messageSet = new HashSet<>();
-//    @OneToMany(cascade = CascadeType.ALL, mappedBy = "user", targetEntity = FriendsGroup.class)
-//    @JoinTable(name = "friendsGroups", joinColumns = {@JoinColumn(name = "owner_id")},
-//            inverseJoinColumns = {@JoinColumn(name = "group_id")})
-//    private Set<FriendsGroup> friendsGroupSet;
-//    @ManyToMany
-//    private Set<FriendsGroup> consistGroupSet;
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
+    private Set<FriendsGroup> friendsGroupSet = new HashSet<>();
+    @ManyToMany(cascade = CascadeType.ALL)
+    private Set<FriendsGroup> foreignGroupSet = new HashSet<>();
 
-    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    @JoinTable(name = "user_friend", joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "friend_id"))
-    private Set<User> friends = new HashSet<>();
+//    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+//    @JoinTable(name = "user_friend", joinColumns = @JoinColumn(name = "user_id"),
+//            inverseJoinColumns = @JoinColumn(name = "friend_id"))
+//    private Set<User> friends = new HashSet<>();
+//
+//    @ManyToMany(mappedBy = "friends", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+//    private Set<User> friendsOf = new HashSet<>();
 
-    @ManyToMany(mappedBy = "friends", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    private Set<User> friendsOf = new HashSet<>();
+    public User() {
+    }
+
+    public User(String firstName, String lastName, String password, String login) {
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.password = password;
+        this.login = login;
+    }
+
+    //    public Integer getId() {
+//        return id;
+//    }
+//
+//    public void setId(Integer id) {
+//        this.id = id;
+//    }
 
     public String getFirstName() {
         return firstName;
@@ -72,37 +89,21 @@ public class User extends MappedEntity {
         this.messageSet = messageSet;
     }
 
-    public Set<User> getFriends() {
-        return friends;
+    public Set<FriendsGroup> getFriendsGroupSet() {
+        return friendsGroupSet;
     }
 
-    public void setFriends(Set<User> friends) {
-        this.friends = friends;
+    public void setFriendsGroupSet(Set<FriendsGroup> friendsGroupSet) {
+        this.friendsGroupSet = friendsGroupSet;
     }
 
-    public Set<User> getFriendsOf() {
-        return friendsOf;
+    public Set<FriendsGroup> getForeignGroupSet() {
+        return foreignGroupSet;
     }
 
-    public void setFriendsOf(Set<User> inFriends) {
-        this.friendsOf = inFriends;
+    public void setForeignGroupSet(Set<FriendsGroup> foreignGroupSet) {
+        this.foreignGroupSet = foreignGroupSet;
     }
-
-    //    public Set<FriendsGroup> getFriendsGroupSet() {
-//        return friendsGroupSet;
-//    }
-//
-//    public void setFriendsGroupSet(Set<FriendsGroup> friendsGroupSet) {
-//        this.friendsGroupSet = friendsGroupSet;
-//    }
-//
-//    public Set<FriendsGroup> getConsistGroupSet() {
-//        return consistGroupSet;
-//    }
-//
-//    public void setConsistGroupSet(Set<FriendsGroup> consistGroupSet) {
-//        this.consistGroupSet = consistGroupSet;
-//    }
 
     @Override
     public boolean equals(Object o) {

@@ -17,4 +17,8 @@ public class MessageService {
     public void saveMessage(Message message) {
         messageDao.saveEntity(message);
     }
+
+    public void deleteMessage(Integer id) {
+        messageDao.deleteEntity(Message.class, id);
+    }
 }

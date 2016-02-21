@@ -34,11 +34,15 @@ public class UserService {
         userDao.deleteEntity(user);
     }
 
-    public void addMessage(User user, Message message) {
-        userDao.addMessage(user, message);
+    public void addMessage(Integer userId, Message message) {
+        userDao.addMessage(userId, message);
     }
 
     public void addFriend(User user, String friendLogin) {
         userDao.addFriend(user, friendLogin);
+    }
+
+    public void deleteMessage(Integer userId, Integer messageId) {
+        userDao.deleteMessage(userId, messageId);
     }
 }
