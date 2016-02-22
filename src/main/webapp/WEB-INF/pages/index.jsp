@@ -16,7 +16,7 @@
     <h4>${errorMessage}</h4>
     <form action="/index" method="post">
         <label for="text">Text:</label><br/>
-        <textarea id="text" name="text" cols="100" rows="3" maxlength="256"></textarea><br/>
+        <textarea id="text" name="messageText" cols="100" rows="3" maxlength="256"></textarea><br/>
         <input type="submit" value="Submit" />
     </form>
 

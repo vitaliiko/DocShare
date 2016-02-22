@@ -27,10 +27,10 @@ public class UserUtil {
     public void addDefaultUsers() {
         List<User> userList = new ArrayList<>();
         userList.add(new User("111", "111", "111", "111"));
-        userList.add(new User("222", "222", "111", "111"));
-        userList.add(new User("333", "333", "111", "111"));
-        userList.add(new User("444", "444", "111", "111"));
-        userList.add(new User("555", "555", "111", "111"));
+        userList.add(new User("222", "222", "222", "222"));
+        userList.add(new User("333", "333", "333", "333"));
+        userList.add(new User("444", "444", "444", "444"));
+        userList.add(new User("555", "555", "555", "555"));
         userList.forEach(userService::saveUser);
     }
 

@@ -15,15 +15,16 @@ public class ChatInterceptor extends HandlerInterceptorAdapter {
 
     @Override
     public boolean preHandle(HttpServletRequest req, HttpServletResponse resp, Object handler) throws Exception {
-        String uri = req.getRequestURI();
-        boolean exclusion = EXCLUSIONS.stream()
-                .anyMatch(uri::endsWith);
-
-        if (exclusion || req.getSession().getAttribute("user") != null) {
-            return true;
-        } else {
-            resp.sendRedirect("/signIn");
-        }
-        return false;
+//        String uri = req.getRequestURI();
+//        boolean exclusion = EXCLUSIONS.stream()
+//                .anyMatch(uri::endsWith);
+//
+//        if (exclusion || req.getSession().getAttribute("user") != null) {
+//            return true;
+//        } else {
+//            resp.sendRedirect("/signIn");
+//        }
+//        return false;
+        return true;
     }
 }
