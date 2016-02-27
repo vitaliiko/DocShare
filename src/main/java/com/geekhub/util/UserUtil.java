@@ -34,6 +34,15 @@ public class UserUtil {
         userList.forEach(userService::saveUser);
     }
 
+    public void printUsers(Integer id) {
+        User user = userService.getUserById(id);
+        System.out.println("userId: " + user.getId());
+        System.out.println("Owner Groups:");
+        user.getOwnerGroupSet().forEach(System.out::println);
+        System.out.println("Foreign Groups:");
+        user.getForeignGroupSet().forEach(System.out::println);
+    }
+
 //    public void createFriends() {
 //        User friend1 = createUser("user1", "111", "111", "111");
 //        User friend2 = createUser("user2", "222", "222", "222");

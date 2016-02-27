@@ -6,7 +6,6 @@ import com.geekhub.util.MessageUtil;
 import com.geekhub.util.UserUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -156,12 +155,6 @@ public class ChatController {
         return model;
     }
 
-    @RequestMapping(value = "/addFriend/{friend}")
-    public String addFriend(@PathVariable String friend, @ModelAttribute User user) {
-        userService.addFriend(user, friend);
-        return "redirect:/index";
-    }
-
     @RequestMapping("/default")
     public String createDefaultUsers() {
         userUtil.addDefaultUsers();
@@ -174,22 +167,27 @@ public class ChatController {
         return "redirect:/index";
     }
 
-    @RequestMapping("/createGroup")
-    public String createGroup() {
-        friendsGroupUtil.createDefaultGroup();
-        return "redirect:/setOwner";
+    @RequestMapping("/createGroup/{name}")
+    public ModelAndView createGroup(@PathVariable String name) {
+        ModelAndView model = new ModelAndView("redirect:/setOwner");
+        FriendsGroup group = friendsGroupUtil.createGroup(name);
+        model.addObject("groupId", group.getId());
+        return model;
     }
 
     @RequestMapping("/setOwner")
-    public String setOwner(@ModelAttribute User user) {
-        friendsGroupService.setOwner(1, user.getId());
+    public String setOwner(@ModelAttribute User user, Integer groupId) {
+        ModelAndView model = new ModelAndView("redirect:/index");
+        friendsGroupService.setOwner(groupId, user.getId());
+        model.addObject("groupId", groupId);
         return "redirect:/index";
     }
 
     @RequestMapping("/addFriend/{friendId}")
-    public String addFriend(@PathVariable String friendId) {
-        friendsGroupService.addFriend(1, new Integer(friendId));
-//        model.addAttribute("friends", userService.getUserById(user.getId()).getFriendsGroupSet());
-        return "redirect:/index";
+    public ModelAndView addFriend(@PathVariable String friendId, @ModelAttribute User user, Integer groupId) {
+        ModelAndView model = new ModelAndView("redirect:/index");
+        friendsGroupService.addFriend(groupId, new Integer(friendId));
+        userUtil.printUsers(user.getId());
+        return model;
     }
 }

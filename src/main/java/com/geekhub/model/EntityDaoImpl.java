@@ -10,7 +10,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public abstract class EntityDaoImpl<T extends MappedEntity> implements EntityDao<T> {
+public abstract class EntityDaoImpl<T> implements EntityDao<T> {
 
     @Autowired private SessionFactory sessionFactory;
 
@@ -31,7 +31,7 @@ public abstract class EntityDaoImpl<T extends MappedEntity> implements EntityDao
     }
 
     @Override
-    public T getEntityById(Class<T> clazz, long id) {
+    public T getEntityById(Class<T> clazz, int id) {
         Session session = sessionFactory.openSession();
         try {
             return (T) sessionFactory.openSession().load(clazz, id);

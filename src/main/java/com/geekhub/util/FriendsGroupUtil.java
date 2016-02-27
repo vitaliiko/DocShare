@@ -16,4 +16,11 @@ public class FriendsGroupUtil {
         friendsGroupService.saveFriendsGroup(friendsGroup);
         return friendsGroup;
     }
+
+    public FriendsGroup createGroup(String name) {
+        FriendsGroup friendsGroup = new FriendsGroup();
+        friendsGroup.setName(name);
+        friendsGroupService.saveFriendsGroup(friendsGroup);
+        return friendsGroup;
+    }
 }

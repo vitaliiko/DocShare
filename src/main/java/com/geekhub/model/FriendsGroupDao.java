@@ -18,8 +18,10 @@ public class FriendsGroupDao extends EntityDaoImpl<FriendsGroup> {
             User user = (User) session.get(User.class, userId);
             group.getFriendsSet().add(user);
             session.update(group);
+            session.update(user);
             session.getTransaction().commit();
-            System.out.println("FRIENDS: " + group.getFriendsSet());
+            System.out.println("FRIENDS: ");
+            group.getFriendsSet().forEach(user1 -> System.out.println(user1.toString()));
         } catch (Exception e) {
             System.out.println("ERROR!!!!!!!!!!!!!!!!!!!!:");
             e.printStackTrace();
@@ -36,6 +38,7 @@ public class FriendsGroupDao extends EntityDaoImpl<FriendsGroup> {
             User user = (User) session.get(User.class, userId);
             group.setOwner(user);
             session.update(group);
+            session.update(user);
             session.getTransaction().commit();
         } catch (Exception e) {
             System.out.println("ERROR!!!!!!!!!!!!!!!!!!!!:");

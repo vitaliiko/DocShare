@@ -10,7 +10,11 @@
   <body>
 
     <c:forEach var="message" items="${messages}">
-        ${message.user.firstName} ${message.user.lastName} (${message.date}): ${message.text}<br/>
+        ${message.user.firstName} ${message.user.lastName} (${message.date}): ${message.text}
+        <c:if test="${message.user.id == user.id}">
+            <a href="/deleteMessage/${message.id}">Delete</a>
+        </c:if>
+        <br/>
     </c:forEach>
     <hr/>
     <h4>${errorMessage}</h4>
@@ -25,10 +29,11 @@
     </form>
 
     <h3>FRIENDS</h3>
-    <c:forEach var="friendGroup" items="${friends}">
-        <c:forEach var="friend" items="${friendsGroup}">
-            ${friend.login}
-        </c:forEach>
+    <c:forEach var="friendsGroup" items="${friends}">
+        ${friendsGroup}
+        <%--<c:forEach var="friend" items="${friendsGroup}">--%>
+            <%--${friend.login}--%>
+        <%--</c:forEach>--%>
     </c:forEach>
 
     <%--<h3>FRIENDS OF</h3>--%>

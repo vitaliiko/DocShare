@@ -6,30 +6,42 @@ import java.util.Set;
 
 @Entity
 @Table
-public class User extends MappedEntity {
+public class User {
+    @Id
+    @GeneratedValue
+    @Column
+    private Integer id;
+
     @Column
     private String firstName;
+
     @Column
     private String lastName;
+
     @Column
     private String password;
+
     @Column(unique = true)
     private String login;
+
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
     @JoinColumn(name = "user_id")
     private Set<Message> messageSet = new HashSet<>();
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
-    private Set<FriendsGroup> friendsGroupSet = new HashSet<>();
-    @ManyToMany(cascade = CascadeType.ALL)
-    private Set<FriendsGroup> foreignGroupSet = new HashSet<>();
 
-//    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-//    @JoinTable(name = "user_friend", joinColumns = @JoinColumn(name = "user_id"),
-//            inverseJoinColumns = @JoinColumn(name = "friend_id"))
-//    private Set<User> friends = new HashSet<>();
-//
-//    @ManyToMany(mappedBy = "friends", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-//    private Set<User> friendsOf = new HashSet<>();
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
+    @JoinColumn(name = "user_id")
+    private Set<FriendsGroup> ownerGroupSet = new HashSet<>();
+
+    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JoinTable(name = "userToGroupRelation",
+            joinColumns = {
+                    @JoinColumn(name = "userId")
+            },
+            inverseJoinColumns = {
+                    @JoinColumn(name = "groupId")
+            }
+    )
+    private Set<FriendsGroup> foreignGroupSet = new HashSet<>();
 
     public User() {
     }
@@ -41,13 +53,13 @@ public class User extends MappedEntity {
         this.login = login;
     }
 
-    //    public Integer getId() {
-//        return id;
-//    }
-//
-//    public void setId(Integer id) {
-//        this.id = id;
-//    }
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
 
     public String getFirstName() {
         return firstName;
@@ -89,12 +101,12 @@ public class User extends MappedEntity {
         this.messageSet = messageSet;
     }
 
-    public Set<FriendsGroup> getFriendsGroupSet() {
-        return friendsGroupSet;
+    public Set<FriendsGroup> getOwnerGroupSet() {
+        return ownerGroupSet;
     }
 
-    public void setFriendsGroupSet(Set<FriendsGroup> friendsGroupSet) {
-        this.friendsGroupSet = friendsGroupSet;
+    public void setOwnerGroupSet(Set<FriendsGroup> ownerGroupSet) {
+        this.ownerGroupSet = ownerGroupSet;
     }
 
     public Set<FriendsGroup> getForeignGroupSet() {
@@ -121,5 +133,10 @@ public class User extends MappedEntity {
         result = 31 * result + lastName.hashCode();
         result = 31 * result + login.hashCode();
         return result;
+    }
+
+    @Override
+    public String toString() {
+        return firstName + " " + lastName;
     }
 }

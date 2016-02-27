@@ -29,6 +29,21 @@ public class UserDao extends EntityDaoImpl<User> {
         }
     }
 
+    public void addMessage(User user, Message message) {
+        Session session = sessionFactory.openSession();
+        try {
+            session.beginTransaction();
+            user.getMessageSet().add(message);
+            session.update(user);
+            session.getTransaction().commit();
+        } catch (Exception e) {
+            System.out.println("ERROR!!!!!!!!!!!!!!!!!!!!:");
+            e.printStackTrace();
+        } finally {
+            session.close();
+        }
+    }
+
     public void deleteMessage(Integer userId, Integer messageId) {
         Session session = sessionFactory.openSession();
         try {
@@ -60,6 +75,22 @@ public class UserDao extends EntityDaoImpl<User> {
 //            }
 
             session.getTransaction().commit();
+        } finally {
+            session.close();
+        }
+    }
+
+    public void deleteUser(Integer userId) {
+        Session session = sessionFactory.openSession();
+        try {
+            session.beginTransaction();
+            User user = (User) session.get(User.class, userId);
+            user.getMessageSet().clear();
+            session.delete(user);
+            session.getTransaction().commit();
+        } catch (Exception e) {
+            System.out.println("ERROR!!!!!!!!!!!!!!!!!!!!:");
+            e.printStackTrace();
         } finally {
             session.close();
         }

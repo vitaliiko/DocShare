@@ -31,11 +31,15 @@ public class UserService {
     }
 
     public void deleteUser(User user) {
-        userDao.deleteEntity(user);
+        userDao.deleteUser(user.getId());
     }
 
     public void addMessage(Integer userId, Message message) {
         userDao.addMessage(userId, message);
+    }
+
+    public void addMessage(User user, Message message) {
+        userDao.addMessage(user, message);
     }
 
     public void addFriend(User user, String friendLogin) {
