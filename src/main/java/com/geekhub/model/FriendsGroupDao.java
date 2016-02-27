@@ -1,50 +1,40 @@
 package com.geekhub.model;
 
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
+import com.geekhub.util.DataBaseException;
+import com.geekhub.util.HibernateUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 @Repository
 public class FriendsGroupDao extends EntityDaoImpl<FriendsGroup> {
 
-    @Autowired private SessionFactory sessionFactory;
+    @Autowired private HibernateUtil hibernateUtil;
+    @Autowired private UserService userService;
 
-    public void addFriend(Integer groupId, Integer userId) {
-        Session session = sessionFactory.openSession();
-        try {
-            session.beginTransaction();
-            FriendsGroup group = (FriendsGroup) session.get(FriendsGroup.class, groupId);
-            User user = (User) session.get(User.class, userId);
-            group.getFriendsSet().add(user);
-            session.update(group);
-            session.update(user);
-            session.getTransaction().commit();
-            System.out.println("FRIENDS: ");
-            group.getFriendsSet().forEach(user1 -> System.out.println(user1.toString()));
-        } catch (Exception e) {
-            System.out.println("ERROR!!!!!!!!!!!!!!!!!!!!:");
-            e.printStackTrace();
-        } finally {
-            session.close();
-        }
+    public void addFriend(Integer groupId, Integer userId) throws DataBaseException {
+        hibernateUtil.openSessionAndBeginTransaction();
+        FriendsGroup group = getEntityById(FriendsGroup.class, groupId);
+        User user = userService.getUserById(userId);
+        group.getFriendsSet().add(user);
+        updateEntity(group);
+        hibernateUtil.commitAndCloseSession();
     }
 
-    public void setOwner(Integer groupId, Integer userId) {
-        Session session = sessionFactory.openSession();
-        try {
-            session.beginTransaction();
-            FriendsGroup group = (FriendsGroup) session.get(FriendsGroup.class, groupId);
-            User user = (User) session.get(User.class, userId);
-            group.setOwner(user);
-            session.update(group);
-            session.update(user);
-            session.getTransaction().commit();
-        } catch (Exception e) {
-            System.out.println("ERROR!!!!!!!!!!!!!!!!!!!!:");
-            e.printStackTrace();
-        } finally {
-            session.close();
-        }
+    public void deleteFriend(Integer groupId, Integer userId) throws DataBaseException {
+        hibernateUtil.openSessionAndBeginTransaction();
+        FriendsGroup group = getEntityById(FriendsGroup.class, groupId);
+        User user = userService.getUserById(userId);
+        group.getFriendsSet().remove(user);
+        updateEntity(group);
+        hibernateUtil.commitAndCloseSession();
+    }
+
+    public void setOwner(Integer groupId, Integer userId) throws DataBaseException {
+        hibernateUtil.openSessionAndBeginTransaction();
+        FriendsGroup group = getEntityById(FriendsGroup.class, groupId);
+        User user = userService.getUserById(userId);
+        group.setOwner(user);
+        updateEntity(group);
+        hibernateUtil.commitAndCloseSession();
     }
 }
