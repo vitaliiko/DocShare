@@ -31,10 +31,10 @@ public class UserUtil {
         userList.add(new User("333", "333", "333", "333"));
         userList.add(new User("444", "444", "444", "444"));
         userList.add(new User("555", "555", "555", "555"));
-        userList.forEach(userService::saveUser);
+        userService.saveUsers(userList);
     }
 
-    public void printUsers(Integer id) {
+    public void printFriends(Integer id) {
         User user = userService.getUserById(id);
         System.out.println("userId: " + user.getId());
         System.out.println("Owner Groups:");

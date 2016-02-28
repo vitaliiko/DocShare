@@ -4,6 +4,7 @@ import com.geekhub.util.DataBaseException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Collection;
 import java.util.List;
 
 @Service
@@ -23,12 +24,16 @@ public class UserService {
         return userDao.getEntity(User.class, "login", login);
     }
 
-    public void saveUser(Integer userId) throws DataBaseException {
-        userDao.saveUser(userId);
+    public Integer saveUser(User user) throws DataBaseException {
+        return userDao.saveUser(user);
     }
 
-    public void updateUser(Integer userId) throws DataBaseException {
-        userDao.updateUser(userId);
+    public void saveUsers(Collection<User> users) throws DataBaseException {
+        userDao.saveUsers(users);
+    }
+
+    public void updateUser(User user) throws DataBaseException {
+        userDao.updateUser(user);
     }
 
     public void deleteUser(Integer userId) throws DataBaseException {

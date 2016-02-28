@@ -9,11 +9,12 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.util.Calendar;
 
 @Controller
-@SessionAttributes("user")
+@SessionAttributes("userId")
 public class ChatController {
 
     @Autowired private UserService userService;
@@ -25,22 +26,17 @@ public class ChatController {
 
     @RequestMapping(value = {"/", "/index"}, method = RequestMethod.GET)
     public ModelAndView index() {
-        ModelAndView model = new ModelAndView();
+        ModelAndView model = new ModelAndView("index");
         model.addObject("messages", messageService.getMessages());
-        model.setViewName("index");
-//        model.addAttribute("friends", user.getFriends());
-//        if (user.getFriendsOf().size() > 0) {
-//            model.addAttribute("friendsOf", user.getFriendsOf());
-//        }
         return model;
     }
 
     @RequestMapping(value = {"/", "/index"}, method = RequestMethod.POST)
-    public String index(@ModelAttribute User user, @RequestParam String messageText) {
+    public String index(@ModelAttribute Integer userId, @RequestParam String messageText) {
         Message message = new Message();
         message.setText(messageUtil.detectLink(messageText));
         message.setDate(Calendar.getInstance().getTime());
-        userService.addMessage(user.getId(), message);
+        userService.addMessage(userId, message);
         return "redirect:/index";
     }
 
@@ -54,11 +50,11 @@ public class ChatController {
         User user = userService.getUserByLogin(login);
         ModelAndView model = new ModelAndView();
         if (user != null && user.getPassword().equals(password)) {
-            model.addObject("user", user)
+            model.addObject("userId", user.getId())
                     .setViewName("redirect:/index");
         } else {
-            model.addObject("errorMessage", "Wrong login or password");
-            model.setViewName("signIn");
+            model.addObject("errorMessage", "Wrong login or password")
+                    .setViewName("signIn");
         }
         return model;
     }
@@ -92,19 +88,26 @@ public class ChatController {
     }
 
     @RequestMapping("/signOut")
-    public String signOut(HttpSession session) {
+    public String signOut(HttpSession session, HttpServletRequest req) {
         session.invalidate();
+        req.removeAttribute("userId");
         return "signIn";
     }
 
     @RequestMapping(value = "/profile", method = RequestMethod.GET)
-    public String profile() {
-        return "profile";
+    public ModelAndView profile(Integer userId) {
+        User user = userService.getUserById(userId);
+        ModelAndView model = new ModelAndView("profile");
+        model.addObject("login", user.getLogin())
+                .addObject("firstName", user.getFirstName())
+                .addObject("lastName", user.getLastName());
+        return model;
     }
 
     @RequestMapping(value = "/changeName", method = RequestMethod.POST)
-    public ModelAndView changeName(@ModelAttribute User user, String login, String firstName, String lastName) {
+    public ModelAndView changeName(Integer userId, String login, String firstName, String lastName) {
         ModelAndView model = new ModelAndView("profile");
+        User user = userService.getUserById(userId);
         if (user.getLogin().equals(login) || userService.getUserByLogin(login) == null) {
             user.setLogin(login);
             user.setFirstName(firstName);
@@ -142,11 +145,12 @@ public class ChatController {
     }
 
     @RequestMapping(value = "/removeAccount", method = RequestMethod.POST)
-    public ModelAndView removeAccount(@ModelAttribute User user, String yes, HttpSession session) {
+    public ModelAndView removeAccount(Integer userId, String yes, HttpSession session, HttpServletRequest req) {
         ModelAndView model = new ModelAndView();
         if (yes != null) {
-            userService.deleteUser(user);
+            userService.deleteUser(userId);
             session.invalidate();
+            req.removeAttribute("userId");
             model.addObject("message", "Your account removed successfully")
                     .setViewName("signIn");
             return model;
@@ -162,32 +166,24 @@ public class ChatController {
     }
 
     @RequestMapping("/deleteMessage/{messageId}")
-    public String deleteMessage(@PathVariable Integer messageId, @ModelAttribute User user) {
-        userService.deleteMessage(user.getId(), messageId);
+    public String deleteMessage(@PathVariable Integer messageId, Integer userId) {
+        userService.deleteMessage(userId, messageId);
         return "redirect:/index";
     }
 
     @RequestMapping("/createGroup/{name}")
-    public ModelAndView createGroup(@PathVariable String name) {
-        ModelAndView model = new ModelAndView("redirect:/setOwner");
-        FriendsGroup group = friendsGroupUtil.createGroup(name);
-        model.addObject("groupId", group.getId());
+    public ModelAndView createGroup(@PathVariable String name, Integer userId) {
+        ModelAndView model = new ModelAndView("redirect:/index");
+        Integer id = friendsGroupService.createGroup(name, userId);
+        model.addObject("groupId", id);
         return model;
     }
 
-    @RequestMapping("/setOwner")
-    public String setOwner(@ModelAttribute User user, Integer groupId) {
-        ModelAndView model = new ModelAndView("redirect:/index");
-        friendsGroupService.setOwner(groupId, user.getId());
-        model.addObject("groupId", groupId);
-        return "redirect:/index";
-    }
-
     @RequestMapping("/addFriend/{friendId}")
-    public ModelAndView addFriend(@PathVariable String friendId, @ModelAttribute User user, Integer groupId) {
+    public ModelAndView addFriend(@PathVariable String friendId, Integer userId, Integer groupId) {
         ModelAndView model = new ModelAndView("redirect:/index");
         friendsGroupService.addFriend(groupId, new Integer(friendId));
-        userUtil.printUsers(user.getId());
+        userUtil.printFriends(userId);
         return model;
     }
 }

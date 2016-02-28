@@ -6,10 +6,21 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class FriendsGroupDao extends EntityDaoImpl<FriendsGroup> {
+public class FriendsGroupDao extends EntityDaoImpl<FriendsGroup, Integer> {
 
     @Autowired private HibernateUtil hibernateUtil;
     @Autowired private UserService userService;
+
+    public Integer createGroup(String name, Integer ownerId) {
+        hibernateUtil.openSessionAndBeginTransaction();
+        User user = userService.getUserById(ownerId);
+        FriendsGroup group = new FriendsGroup();
+        group.setOwner(user);
+        group.setName(name);
+        Integer id = saveEntity(group);
+        hibernateUtil.commitAndCloseSession();
+        return id;
+    }
 
     public void addFriend(Integer groupId, Integer userId) throws DataBaseException {
         hibernateUtil.openSessionAndBeginTransaction();

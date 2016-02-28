@@ -28,13 +28,13 @@
         <input type="submit" value="Set your account">
     </form>
 
-    <h3>FRIENDS</h3>
-    <c:forEach var="friendsGroup" items="${friends}">
-        ${friendsGroup}
-        <%--<c:forEach var="friend" items="${friendsGroup}">--%>
-            <%--${friend.login}--%>
-        <%--</c:forEach>--%>
-    </c:forEach>
+    <%--<h3>FRIENDS</h3>--%>
+    <%--<c:forEach var="friendsGroup" items="${friends}">--%>
+        <%--${friendsGroup}--%>
+        <%--&lt;%&ndash;<c:forEach var="friend" items="${friendsGroup}">&ndash;%&gt;--%>
+            <%--&lt;%&ndash;${friend.login}&ndash;%&gt;--%>
+        <%--&lt;%&ndash;</c:forEach>&ndash;%&gt;--%>
+    <%--</c:forEach>--%>
 
     <%--<h3>FRIENDS OF</h3>--%>
     <%--<c:forEach var="friendOf" items="${friendsOf}">--%>

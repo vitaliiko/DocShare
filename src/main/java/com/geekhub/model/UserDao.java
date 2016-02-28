@@ -5,8 +5,10 @@ import com.geekhub.util.HibernateUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import java.util.Collection;
+
 @Repository
-public class UserDao extends EntityDaoImpl<User> {
+public class UserDao extends EntityDaoImpl<User, Integer> {
 
     @Autowired private HibernateUtil hibernateUtil;
     @Autowired private MessageService messageService;
@@ -28,16 +30,21 @@ public class UserDao extends EntityDaoImpl<User> {
         hibernateUtil.commitAndCloseSession();
     }
 
-    public void saveUser(Integer userId) {
+    public Integer saveUser(User user) {
         hibernateUtil.openSessionAndBeginTransaction();
-        User user = getEntityById(User.class, userId);
-        saveEntity(user);
+        Integer id = saveEntity(user);
+        hibernateUtil.commitAndCloseSession();
+        return id;
+    }
+
+    public void saveUsers(Collection<User> users) {
+        hibernateUtil.openSessionAndBeginTransaction();
+        users.forEach(this::saveUser);
         hibernateUtil.commitAndCloseSession();
     }
 
-    public void updateUser(Integer userId) {
+    public void updateUser(User user) {
         hibernateUtil.openSessionAndBeginTransaction();
-        User user = getEntityById(User.class, userId);
         updateEntity(user);
         hibernateUtil.commitAndCloseSession();
     }
@@ -45,7 +52,7 @@ public class UserDao extends EntityDaoImpl<User> {
     public void deleteUser(Integer userId) throws DataBaseException {
         hibernateUtil.openSessionAndBeginTransaction();
         User user = getEntityById(User.class, userId);
-        deleteEntity(user);
+        deleteEntity(User.class, user.getId());
         hibernateUtil.commitAndCloseSession();
     }
 }

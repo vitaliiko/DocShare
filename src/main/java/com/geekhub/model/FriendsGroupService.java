@@ -11,6 +11,10 @@ public class FriendsGroupService {
 
     @Autowired private FriendsGroupDao friendsGroupDao;
 
+    public Integer createGroup(String name, Integer ownerId) {
+        return friendsGroupDao.createGroup(name, ownerId);
+    }
+
     public void saveFriendsGroup(FriendsGroup friendsGroup) throws DataBaseException {
         friendsGroupDao.saveEntity(friendsGroup);
     }

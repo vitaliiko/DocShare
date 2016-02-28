@@ -11,11 +11,11 @@
             <h4 class="form-signin-heading">${errorMessage}</h4>
             <h4 class="form-signin-heading">${message}</h4>
             <label for="login" class="sr-only">Login</label>
-            <input type="text" name="login" value="${user.login}" id="login" class="form-control" placeholder="Email address" required="" autofocus="">
+            <input type="text" name="login" value="${login}" id="login" class="form-control" placeholder="Email address" required="" autofocus="">
             <label for="firstName" class="sr-only">First Name</label>
-            <input type="text" name="firstName" value="${user.firstName}" id="firstName" class="form-control" placeholder="First Name" required="" autofocus="">
+            <input type="text" name="firstName" value="${firstName}" id="firstName" class="form-control" placeholder="First Name" required="" autofocus="">
             <label for="lastName" class="sr-only">Last Name</label>
-            <input type="text" name="lastName" id="lastName" value="${user.lastName}" class="form-control" placeholder="Last Name" required="" autofocus="">
+            <input type="text" name="lastName" id="lastName" value="${lastName}" class="form-control" placeholder="Last Name" required="" autofocus="">
             <button class="btn btn-lg btn-primary btn-block" type="submit">Save</button>
         </form>
         <hr/>
