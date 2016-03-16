@@ -1,6 +1,7 @@
 package com.geekhub.util;
 
-import com.geekhub.model.MessageService;
+import com.geekhub.service.MessageService;
+import com.geekhub.service.MessageServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

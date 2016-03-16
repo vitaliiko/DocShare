@@ -1,12 +1,21 @@
 package com.geekhub.controller;
 
-import com.geekhub.model.*;
+import com.geekhub.entity.Message;
+import com.geekhub.entity.User;
+import com.geekhub.service.FriendsGroupService;
+import com.geekhub.service.MessageService;
+import com.geekhub.service.UserService;
 import com.geekhub.util.FriendsGroupUtil;
 import com.geekhub.util.MessageUtil;
 import com.geekhub.util.UserUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
@@ -14,44 +23,39 @@ import javax.servlet.http.HttpSession;
 import java.util.Calendar;
 
 @Controller
-@SessionAttributes("userId")
 public class ChatController {
 
-    @Autowired private UserService userService;
-    @Autowired private UserUtil userUtil;
-    @Autowired private MessageService messageService;
-    @Autowired private MessageUtil messageUtil;
-    @Autowired private FriendsGroupService friendsGroupService;
-    @Autowired private FriendsGroupUtil friendsGroupUtil;
+    @Autowired
+    private UserService userService;
 
-    @RequestMapping(value = {"/", "/index"}, method = RequestMethod.GET)
-    public ModelAndView index() {
-        ModelAndView model = new ModelAndView("index");
-        model.addObject("messages", messageService.getMessages());
-        return model;
-    }
+    @Autowired
+    private UserUtil userUtil;
 
-    @RequestMapping(value = {"/", "/index"}, method = RequestMethod.POST)
-    public String index(@ModelAttribute Integer userId, @RequestParam String messageText) {
-        Message message = new Message();
-        message.setText(messageUtil.detectLink(messageText));
-        message.setDate(Calendar.getInstance().getTime());
-        userService.addMessage(userId, message);
-        return "redirect:/index";
-    }
+    @Autowired
+    private MessageService messageService;
+
+    @Autowired
+    private MessageUtil messageUtil;
+
+    @Autowired
+    private FriendsGroupService friendsGroupService;
+
+    @Autowired
+    private FriendsGroupUtil friendsGroupUtil;
+
 
     @RequestMapping(value = "/signIn", method = RequestMethod.GET)
-    public String login() {
+    public String signIn() {
         return "signIn";
     }
 
     @RequestMapping(value = "/signIn", method = RequestMethod.POST)
-    public ModelAndView login(String login, String password) {
-        User user = userService.getUserByLogin(login);
+    public ModelAndView signIn(String login, String password, HttpSession session) {
+        User user = userService.getByLogin(login);
         ModelAndView model = new ModelAndView();
         if (user != null && user.getPassword().equals(password)) {
-            model.addObject("userId", user.getId())
-                    .setViewName("redirect:/index");
+            model.setViewName("redirect:/index");
+            session.setAttribute("userId", user.getId());
         } else {
             model.addObject("errorMessage", "Wrong login or password")
                     .setViewName("signIn");
@@ -75,7 +79,7 @@ public class ChatController {
         try {
             userUtil.validateUser(login, password, confirmPassword);
             User user = new User(login, password, firstName, lastName);
-            userService.saveUser(user);
+            userService.save(user);
             model.setViewName("signIn");
         } catch (Exception e) {
             model.addObject("login", login)
@@ -88,15 +92,14 @@ public class ChatController {
     }
 
     @RequestMapping("/signOut")
-    public String signOut(HttpSession session, HttpServletRequest req) {
+    public String signOut(HttpSession session) {
         session.invalidate();
-        req.removeAttribute("userId");
         return "signIn";
     }
 
     @RequestMapping(value = "/profile", method = RequestMethod.GET)
-    public ModelAndView profile(Integer userId) {
-        User user = userService.getUserById(userId);
+    public ModelAndView profile(HttpSession session) {
+        User user = userService.getById((Long) session.getAttribute("userId"));
         ModelAndView model = new ModelAndView("profile");
         model.addObject("login", user.getLogin())
                 .addObject("firstName", user.getFirstName())
@@ -105,14 +108,14 @@ public class ChatController {
     }
 
     @RequestMapping(value = "/changeName", method = RequestMethod.POST)
-    public ModelAndView changeName(Integer userId, String login, String firstName, String lastName) {
+    public ModelAndView changeName(String login, String firstName, String lastName, HttpSession session) {
         ModelAndView model = new ModelAndView("profile");
-        User user = userService.getUserById(userId);
-        if (user.getLogin().equals(login) || userService.getUserByLogin(login) == null) {
+        User user = userService.getById((Long) session.getAttribute("userId"));
+        if (user.getLogin().equals(login) || userService.getByLogin(login) == null) {
             user.setLogin(login);
             user.setFirstName(firstName);
             user.setLastName(lastName);
-            userService.updateUser(user);
+            userService.update(user);
             model.addObject("message", "Your account updated successfully");
         } else {
             model.addObject("errorMessage", "User with such login already exist");
@@ -121,11 +124,12 @@ public class ChatController {
     }
 
     @RequestMapping(value = "/changePassword", method = RequestMethod.POST)
-    public ModelAndView changePassword(@ModelAttribute User user,
+    public ModelAndView changePassword(HttpSession session,
                                  String currentPassword,
                                  String newPassword,
                                  String confirmNewPassword) {
 
+        User user = userService.getById((Long) session.getAttribute("userId"));
         ModelAndView model = new ModelAndView("profile");
         if (!user.getPassword().equals(currentPassword)) {
             model.addObject("errorMessage", "Wrong password");
@@ -133,7 +137,7 @@ public class ChatController {
             model.addObject("errorMessage", "Passwords doesn't match");
         } else {
             user.setPassword(newPassword);
-            userService.updateUser(user);
+            userService.update(user);
             model.addObject("message", "Your password was changed successfully");
         }
         return model;
@@ -145,12 +149,11 @@ public class ChatController {
     }
 
     @RequestMapping(value = "/removeAccount", method = RequestMethod.POST)
-    public ModelAndView removeAccount(Integer userId, String yes, HttpSession session, HttpServletRequest req) {
+    public ModelAndView removeAccount(String yes, HttpSession session) {
         ModelAndView model = new ModelAndView();
         if (yes != null) {
-            userService.deleteUser(userId);
+            userService.delete((Long) session.getAttribute("userId"));
             session.invalidate();
-            req.removeAttribute("userId");
             model.addObject("message", "Your account removed successfully")
                     .setViewName("signIn");
             return model;
@@ -166,23 +169,23 @@ public class ChatController {
     }
 
     @RequestMapping("/deleteMessage/{messageId}")
-    public String deleteMessage(@PathVariable Integer messageId, Integer userId) {
-        userService.deleteMessage(userId, messageId);
+    public String deleteMessage(@PathVariable Long messageId, HttpSession session) {
+        userService.deleteMessage((Long) session.getAttribute("userId"), messageId);
         return "redirect:/index";
     }
 
     @RequestMapping("/createGroup/{name}")
-    public ModelAndView createGroup(@PathVariable String name, Integer userId) {
+    public ModelAndView createGroup(@PathVariable String name, HttpSession session) {
         ModelAndView model = new ModelAndView("redirect:/index");
-        Integer id = friendsGroupService.createGroup(name, userId);
+        Long id = friendsGroupUtil.createFriendsGroup((Long) session.getAttribute("userId"), name);
         model.addObject("groupId", id);
         return model;
     }
 
     @RequestMapping("/addFriend/{friendId}")
-    public ModelAndView addFriend(@PathVariable String friendId, Integer userId, Integer groupId) {
+    public ModelAndView addFriend(@PathVariable Long friendId, Long userId, Long groupId) {
         ModelAndView model = new ModelAndView("redirect:/index");
-        friendsGroupService.addFriend(groupId, new Integer(friendId));
+        friendsGroupService.addFriend(groupId, friendId);
         userUtil.printFriends(userId);
         return model;
     }
