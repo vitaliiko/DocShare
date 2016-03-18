@@ -3,12 +3,14 @@ package com.geekhub.service;
 import com.geekhub.dao.FriendsGroupDao;
 import com.geekhub.entity.FriendsGroup;
 import com.geekhub.entity.User;
+import org.hibernate.Hibernate;
 import org.hibernate.HibernateException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Set;
 
 @Service
 @Transactional
@@ -59,6 +61,7 @@ public class FriendsGroupServiceImpl implements FriendsGroupService {
     public boolean addFriend(Long groupId, Long friendId) throws HibernateException {
         FriendsGroup group = friendsGroupDao.getById(friendId);
         User user = userService.getById(friendId);
+        Hibernate.initialize(group.getFriendsSet());
         if (group.getFriendsSet().add(user)) {
             friendsGroupDao.update(group);
             return true;
@@ -69,5 +72,11 @@ public class FriendsGroupServiceImpl implements FriendsGroupService {
     @Override
     public FriendsGroup getByName(String groupName) throws HibernateException {
         return friendsGroupDao.get("name", groupName);
+    }
+
+    @Override
+    public Set<User> getFriendsSet(FriendsGroup group) throws HibernateException {
+        Hibernate.initialize(group.getFriendsSet());
+        return group.getFriendsSet();
     }
 }

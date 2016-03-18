@@ -78,11 +78,14 @@ public class UserDao implements EntityDao<User, Long> {
     }
 
     public FriendsGroup getFriendsGroup(Long userId, String groupName) {
-        return (FriendsGroup) sessionFactory.getCurrentSession()
+        User owner = getById(userId);
+        FriendsGroup group = (FriendsGroup) sessionFactory.getCurrentSession()
                 .createQuery("from FriendsGroup fg where fg.name = :name and fg.owner = :owner")
                 .setParameter("name", groupName)
-                .setParameter("owner", userId)
+                .setParameter("owner", owner)
                 .uniqueResult();
+        Hibernate.initialize(group.getFriendsSet());
+        return group;
     }
 
     public Set<User> getFriends(Long userId) {

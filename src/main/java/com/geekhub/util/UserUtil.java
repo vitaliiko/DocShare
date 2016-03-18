@@ -9,8 +9,10 @@ import org.hibernate.Hibernate;
 import org.hibernate.HibernateException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Set;
 
 @Service
 public class UserUtil {
@@ -45,18 +47,17 @@ public class UserUtil {
             User user = new User(value, value, value, value);
             user.getOwnerGroupSet().add(friendsGroupUtil.createDefaultGroup());
             userService.save(user);
-            addFriends(1L);
         }
+        addFriends(1L);
     }
 
     public void addFriends(Long userId) {
         List<User> userList = userService.getAll("id");
         FriendsGroup group = userService.getFriendsGroup(userId, "Friends");
-        Hibernate.initialize(group.getFriendsSet());
         userList.stream()
-                .filter(u -> u.getId().equals(userId))
+                .filter(u -> !u.getId().equals(userId))
                 .forEach(group.getFriendsSet()::add);
-        friendsGroupService.save(group);
+        friendsGroupService.update(group);
     }
 
     public void printFriends(Long id) {
