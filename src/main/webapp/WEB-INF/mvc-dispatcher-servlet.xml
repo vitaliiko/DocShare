@@ -12,13 +12,14 @@
     <context:property-placeholder location="classpath:database.properties"/>
     <msc:annotation-driven/>
     <tx:annotation-driven transaction-manager="transactionManager"/>
+    <mvc:resources mapping="/pages/**" location="/pages/"/>
 
     <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
         <property name="location" value="classpath:database.properties"/>
     </bean>
 
     <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
-        <property name="prefix" value="/WEB-INF/pages/"/>
+        <property name="prefix" value="/pages/"/>
         <property name="suffix" value=".jsp"/>
     </bean>
 
@@ -41,7 +42,7 @@
     <mvc:interceptors>
         <mvc:interceptor>
             <mvc:mapping path="/**"/>
-            <bean class="com.geekhub.controller.ChatInterceptor"/>
+            <bean class="com.geekhub.controller.MainInterceptor"/>
         </mvc:interceptor>
     </mvc:interceptors>
 
