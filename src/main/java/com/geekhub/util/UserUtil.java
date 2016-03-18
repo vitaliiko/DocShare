@@ -1,38 +1,62 @@
 package com.geekhub.util;
 
+import com.geekhub.entity.FriendsGroup;
 import com.geekhub.entity.User;
+import com.geekhub.exception.UserValidateException;
+import com.geekhub.service.FriendsGroupService;
 import com.geekhub.service.UserService;
-import com.geekhub.service.UserServiceImpl;
-import org.hibernate.SessionFactory;
+import org.hibernate.Hibernate;
+import org.hibernate.HibernateException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
 public class UserUtil {
 
-    @Autowired private UserService userService;
-    @Autowired private SessionFactory sessionFactory;
+    @Autowired
+    private UserService userService;
 
-    public void validateUser(String login, String password, String confirmPassword) throws Exception {
+    @Autowired
+    private FriendsGroupUtil friendsGroupUtil;
+
+    @Autowired
+    private FriendsGroupService friendsGroupService;
+
+    public void validateUser(String login, String password, String confirmPassword) throws UserValidateException {
         if (userService.getByLogin(login) != null) {
-            throw new Exception("User with such login already exist");
+            throw new UserValidateException("User with such login already exist");
         }
         if (!password.equals(confirmPassword)) {
-            throw new Exception("Passwords doesn't much");
+            throw new UserValidateException("Passwords doesn't much");
         }
     }
 
+    public Long createUser(String firstName, String lastName, String login, String password) throws HibernateException {
+        User user = new User(firstName, lastName, password, login);
+        user.getOwnerGroupSet().add(friendsGroupUtil.createDefaultGroup());
+        return userService.save(user);
+    }
+
     public void addDefaultUsers() {
-        List<User> userList = new ArrayList<>();
-        userList.add(new User("111", "111", "111", "111"));
-        userList.add(new User("222", "222", "222", "222"));
-        userList.add(new User("333", "333", "333", "333"));
-        userList.add(new User("444", "444", "444", "444"));
-        userList.add(new User("555", "555", "555", "555"));
-        userList.forEach(userService::save);
+        for (int i = 0; i < 10; i++) {
+            String value = String.valueOf(i) + i + i;
+            User user = new User(value, value, value, value);
+            user.getOwnerGroupSet().add(friendsGroupUtil.createDefaultGroup());
+            userService.save(user);
+            addFriends(1L);
+        }
+    }
+
+    public void addFriends(Long userId) {
+        List<User> userList = userService.getAll("id");
+        FriendsGroup group = userService.getFriendsGroup(userId, "Friends");
+        Hibernate.initialize(group.getFriendsSet());
+        userList.stream()
+                .filter(u -> u.getId().equals(userId))
+                .forEach(group.getFriendsSet()::add);
+        friendsGroupService.save(group);
     }
 
     public void printFriends(Long id) {

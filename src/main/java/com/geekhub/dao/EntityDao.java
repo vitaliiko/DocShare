@@ -1,7 +1,6 @@
 package com.geekhub.dao;
 
 import org.hibernate.HibernateException;
-import org.springframework.stereotype.Service;
 
 import java.io.Serializable;
 import java.util.List;
@@ -17,6 +16,8 @@ public interface EntityDao<T, PK extends Serializable> {
     PK save(T entity) throws HibernateException;
 
     void update(T entity) throws HibernateException;
+
+    void saveOrUpdate(T entity) throws HibernateException;
 
     void delete(T entity) throws HibernateException;
 

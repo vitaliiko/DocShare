@@ -3,9 +3,7 @@ package com.geekhub.util;
 import com.geekhub.entity.FriendsGroup;
 import com.geekhub.entity.User;
 import com.geekhub.service.FriendsGroupService;
-import com.geekhub.service.FriendsGroupServiceImpl;
 import com.geekhub.service.UserService;
-import com.sun.javafx.logging.JFRInputEvent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -20,8 +18,7 @@ public class FriendsGroupUtil {
 
     public FriendsGroup createDefaultGroup() {
         FriendsGroup friendsGroup = new FriendsGroup();
-        friendsGroup.setName("friends");
-        friendsGroupService.save(friendsGroup);
+        friendsGroup.setName("Friends");
         return friendsGroup;
     }
 

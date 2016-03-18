@@ -10,7 +10,7 @@ import java.util.List;
 public class MainInterceptor extends HandlerInterceptorAdapter {
 
     private final List<String> EXCLUSIONS = Arrays.asList(
-            "/signIn", "/signUp", "/default", "bootstrap.min.css"
+            "/signIn", "/signUp", "/defaultUsers", "bootstrap.min.css", "simple-sidebar.css"
     );
 
     @Override
@@ -19,10 +19,10 @@ public class MainInterceptor extends HandlerInterceptorAdapter {
         boolean exclusion = EXCLUSIONS.stream()
                 .anyMatch(uri::endsWith);
 
-        if (exclusion || req.getSession().getAttribute("user") != null) {
+        if (exclusion || req.getSession().getAttribute("userId") != null) {
             return true;
         } else {
-            resp.sendRedirect("/signIn");
+            resp.sendRedirect("/main/signIn");
         }
         return false;
     }

@@ -1,8 +1,6 @@
 package com.geekhub.dao;
 
 import com.geekhub.entity.Message;
-import com.geekhub.service.MessageService;
-
 import org.hibernate.HibernateException;
 import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Order;
@@ -54,6 +52,11 @@ public class MessageDao implements EntityDao<Message, Long> {
     @Override
     public void update(Message entity) throws HibernateException {
         sessionFactory.getCurrentSession().update(entity);
+    }
+
+    @Override
+    public void saveOrUpdate(Message entity) throws HibernateException {
+        sessionFactory.getCurrentSession().saveOrUpdate(entity);
     }
 
     @Override

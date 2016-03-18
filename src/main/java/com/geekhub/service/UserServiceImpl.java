@@ -1,6 +1,7 @@
 package com.geekhub.service;
 
 import com.geekhub.dao.UserDao;
+import com.geekhub.entity.FriendsGroup;
 import com.geekhub.entity.Message;
 import com.geekhub.entity.User;
 import org.hibernate.HibernateException;
@@ -9,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Set;
 
 @Service
 @Transactional
@@ -73,5 +75,15 @@ public class UserServiceImpl implements UserService {
         User user = userDao.getById(userId);
         user.getMessageSet().remove(message);
         userDao.update(user);
+    }
+
+    @Override
+    public Set<User> getFriends(Long userId) throws HibernateException {
+        return userDao.getFriends(userId);
+    }
+
+    @Override
+    public FriendsGroup getFriendsGroup(Long userId, String groupName) throws HibernateException {
+        return userDao.getFriendsGroup(userId, groupName);
     }
 }

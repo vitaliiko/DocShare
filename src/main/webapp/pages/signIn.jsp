@@ -6,7 +6,7 @@
 </head>
 <body>
 <div class="container" style="width: 300px;" align="center">
-    <form class="form-signin" action="/signIn" method="post">
+    <form class="form-signin" action="/main/signIn" method="post">
         <h2 class="form-signin-heading">Please sign in</h2>
         <h4 class="form-signin-heading">${errorMessage}</h4>
         <%--<div class="alert alert-danger">--%>
@@ -17,7 +17,7 @@
         <button class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
     </form>
 
-    <form action="/signUp">
+    <form action="/main/signUp">
         <input type="submit" class="btn btn-link" value="Sign Up">
     </form>
 </div>

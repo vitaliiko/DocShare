@@ -1,6 +1,5 @@
 package com.geekhub.controller;
 
-import com.geekhub.entity.Message;
 import com.geekhub.entity.User;
 import com.geekhub.service.FriendsGroupService;
 import com.geekhub.service.MessageService;
@@ -10,19 +9,15 @@ import com.geekhub.util.MessageUtil;
 import com.geekhub.util.UserUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.servlet.ModelAndView;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-import java.util.Calendar;
 
 @Controller
+@RequestMapping("/chat")
 public class ChatController {
 
     @Autowired
@@ -188,5 +183,11 @@ public class ChatController {
         friendsGroupService.addFriend(groupId, friendId);
         userUtil.printFriends(userId);
         return model;
+    }
+
+    @RequestMapping("/defaultUsers")
+    public ModelAndView defaultUsers() {
+        userUtil.addDefaultUsers();
+        return new ModelAndView("redirect:/user/home");
     }
 }

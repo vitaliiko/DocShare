@@ -28,7 +28,7 @@ public class FriendsGroup {
     @Column
     private String name;
 
-    @ManyToMany(fetch = FetchType.EAGER)
+    @ManyToMany
     @JoinTable(name = "userToGroupRelation",
             joinColumns = {
                     @JoinColumn(name = "groupId")

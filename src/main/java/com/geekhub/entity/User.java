@@ -34,15 +34,16 @@ public class User {
     @Column(unique = true)
     private String login;
 
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "user_id")
     private Set<Message> messageSet = new HashSet<>();
 
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "user_id")
     private Set<FriendsGroup> ownerGroupSet = new HashSet<>();
 
-    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+
+    @ManyToMany(cascade = CascadeType.ALL)
     @JoinTable(name = "userToGroupRelation",
             joinColumns = {
                     @JoinColumn(name = "userId")

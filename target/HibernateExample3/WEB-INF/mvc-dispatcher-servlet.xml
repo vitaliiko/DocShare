@@ -10,6 +10,7 @@
 
     <context:component-scan base-package="com.geekhub"/>
     <context:property-placeholder location="classpath:database.properties"/>
+    <context:annotation-config/>
     <msc:annotation-driven/>
     <tx:annotation-driven transaction-manager="transactionManager"/>
     <mvc:resources mapping="/pages/**" location="/pages/"/>
@@ -42,7 +43,7 @@
     <mvc:interceptors>
         <mvc:interceptor>
             <mvc:mapping path="/**"/>
-            <bean class="com.geekhub.controller.ChatInterceptor"/>
+            <bean class="com.geekhub.controller.MainInterceptor"/>
         </mvc:interceptor>
     </mvc:interceptors>
 

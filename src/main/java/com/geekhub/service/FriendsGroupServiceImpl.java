@@ -65,4 +65,9 @@ public class FriendsGroupServiceImpl implements FriendsGroupService {
         }
         return false;
     }
+
+    @Override
+    public FriendsGroup getByName(String groupName) throws HibernateException {
+        return friendsGroupDao.get("name", groupName);
+    }
 }

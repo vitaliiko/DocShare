@@ -56,6 +56,11 @@ public class FriendsGroupDao implements EntityDao<FriendsGroup, Long> {
     }
 
     @Override
+    public void saveOrUpdate(FriendsGroup entity) throws HibernateException {
+        sessionFactory.getCurrentSession().saveOrUpdate(entity);
+    }
+
+    @Override
     public void delete(FriendsGroup entity) throws HibernateException {
         sessionFactory.getCurrentSession().delete(entity);
     }

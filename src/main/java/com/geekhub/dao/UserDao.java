@@ -1,6 +1,8 @@
 package com.geekhub.dao;
 
+import com.geekhub.entity.FriendsGroup;
 import com.geekhub.entity.User;
+import org.hibernate.Hibernate;
 import org.hibernate.HibernateException;
 import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Order;
@@ -9,9 +11,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Set;
 
 @Repository
 @SuppressWarnings("unchecked")
+//@NamedQueries({
+//        @NamedQuery(name = "getFriends", query = "from friendsgroup fg where fg.name = :name and fg.userId = :userId")
+//})
+
 public class UserDao implements EntityDao<User, Long> {
 
     @Autowired
@@ -55,16 +62,32 @@ public class UserDao implements EntityDao<User, Long> {
     }
 
     @Override
+    public void saveOrUpdate(User entity) throws HibernateException {
+        sessionFactory.getCurrentSession().saveOrUpdate(entity);
+    }
+
+    @Override
     public void delete(User entity) throws HibernateException {
         sessionFactory.getCurrentSession().delete(entity);
     }
 
     @Override
     public void delete(Long entityId) throws HibernateException {
-        User user = (User) sessionFactory.getCurrentSession()
-                .get(clazz, entityId);
+        User user = getById(entityId);
+        sessionFactory.getCurrentSession().delete(user);
+    }
 
-        sessionFactory.getCurrentSession()
-                .delete(user);
+    public FriendsGroup getFriendsGroup(Long userId, String groupName) {
+        return (FriendsGroup) sessionFactory.getCurrentSession()
+                .createQuery("from FriendsGroup fg where fg.name = :name and fg.owner = :owner")
+                .setParameter("name", groupName)
+                .setParameter("owner", userId)
+                .uniqueResult();
+    }
+
+    public Set<User> getFriends(Long userId) {
+        FriendsGroup group = getFriendsGroup(userId, "Friends");
+        Hibernate.initialize(group.getFriendsSet());
+        return group.getFriendsSet();
     }
 }

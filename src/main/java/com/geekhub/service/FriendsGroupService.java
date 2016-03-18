@@ -8,4 +8,6 @@ import org.springframework.stereotype.Service;
 public interface FriendsGroupService extends EntityService<FriendsGroup, Long> {
 
     boolean addFriend(Long groupId, Long friendId) throws HibernateException;
+
+    FriendsGroup getByName(String groupName) throws HibernateException;
 }
