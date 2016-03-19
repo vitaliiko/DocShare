@@ -18,18 +18,32 @@
             <h4 class="form-signin-heading">Set your account</h4>
             <h4 class="form-signin-heading">${errorMessage}</h4>
             <h4 class="form-signin-heading">${message}</h4>
-            <input type="text" name="login" value="${login}" id="login" class="form-control" placeholder="Email address" required="" autofocus="">
-            <input type="text" name="firstName" value="${firstName}" id="firstName" class="form-control" placeholder="First Name" required="" autofocus="">
-            <input type="text" name="lastName" id="lastName" value="${lastName}" class="form-control" placeholder="Last Name" required="" autofocus="">
+
+            <input type="text" name="login" value="${login}" id="login"
+                   class="form-control" placeholder="Email address" required="" autofocus="">
+
+            <input type="text" name="firstName" value="${firstName}" id="firstName"
+                   class="form-control" placeholder="First Name" required="" autofocus="">
+
+            <input type="text" name="lastName" id="lastName" value="${lastName}"
+                   class="form-control" placeholder="Last Name" required="" autofocus="">
+
             <button class="btn btn-lg btn-primary btn-md" type="submit">Save</button>
         </form>
         <hr/>
 
         <form class="form-signin" action="/profile/changePassword" method="post">
             <h4 class="form-signin-heading">To change password enter your current password</h4>
-            <input type="password" name="currentPassword" id="currentPassword" class="form-control" placeholder="Password" required="">
-            <input type="password" name="newPassword" id="newPassword" class="form-control" placeholder="Password" required="">
-            <input type="password" name="confirmNewPassword" id="confirmNewPassword" class="form-control" placeholder="Password" required="">
+
+            <input type="password" name="currentPassword" id="currentPassword"
+                   class="form-control" placeholder="Password" required="">
+
+            <input type="password" name="newPassword" id="newPassword"
+                   class="form-control" placeholder="Password" required="">
+
+            <input type="password" name="confirmNewPassword" id="confirmNewPassword"
+                   class="form-control" placeholder="Password" required="">
+
             <button class="btn btn-lg btn-primary btn-md" type="submit">Save</button>
         </form>
         <hr/>
