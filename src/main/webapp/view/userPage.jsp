@@ -17,7 +17,11 @@
     <script src="${pageContext.request.contextPath}/view/bootstrap/js/sidebar_menu.js"></script>
 </head>
 <body>
+    <jsp:include page="header.jsp"/>
     <jsp:include page="sidebar.jsp"/>
-    <h3>${pageOwner.firstName} ${pageOwner.lastName}</h3>
+
+    <div class="container">
+        <h3>${pageOwner.firstName} ${pageOwner.lastName}</h3>
+    </div>
 </body>
 </html>

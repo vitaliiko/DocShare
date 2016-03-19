@@ -18,9 +18,11 @@
     <script src="${pageContext.request.contextPath}/view/bootstrap/js/sidebar_menu.js"></script>
 </head>
 <body>
-    <div id="wrapper" class="container">
-        <jsp:include page="sidebar.jsp"/>
 
+    <jsp:include page="header.jsp"/>
+    <jsp:include page="sidebar.jsp"/>
+
+    <div id="wrapper" class="container">
         <div id="page-content-wrapper">
             <table class="table table-hover tbody tr:hover td">
                 <c:forEach var="friendEntry" items="${friends}">
