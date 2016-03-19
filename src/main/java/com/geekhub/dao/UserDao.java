@@ -77,7 +77,7 @@ public class UserDao implements EntityDao<User, Long> {
         sessionFactory.getCurrentSession().delete(user);
     }
 
-    public FriendsGroup getFriendsGroup(Long userId, String groupName) {
+    public FriendsGroup getFriendsGroup(Long userId, String groupName) throws HibernateException {
         User owner = getById(userId);
         FriendsGroup group = (FriendsGroup) sessionFactory.getCurrentSession()
                 .createQuery("from FriendsGroup fg where fg.name = :name and fg.owner = :owner")
@@ -88,9 +88,22 @@ public class UserDao implements EntityDao<User, Long> {
         return group;
     }
 
-    public Set<User> getFriends(Long userId) {
+    public Set<User> getFriends(Long userId) throws HibernateException {
         FriendsGroup group = getFriendsGroup(userId, "Friends");
         Hibernate.initialize(group.getFriendsSet());
         return group.getFriendsSet();
     }
-}
+
+    public void addFriendsGroup(Long userId, String groupName) throws HibernateException {
+        User user = getById(userId);
+        Hibernate.initialize(user.getOwnerGroupSet());
+        user.getOwnerGroupSet().add(new FriendsGroup(groupName));
+        sessionFactory.getCurrentSession().update(user);
+    }
+
+    public Set<FriendsGroup> getForeignGroups(Long userId) throws HibernateException {
+        User user = getById(userId);
+        Hibernate.initialize(user.getForeignGroupSet());
+        return user.getForeignGroupSet();
+    }
+ }

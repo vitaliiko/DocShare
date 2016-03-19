@@ -5,13 +5,14 @@ import com.geekhub.entity.User;
 import com.geekhub.exception.UserValidateException;
 import com.geekhub.service.FriendsGroupService;
 import com.geekhub.service.UserService;
-import org.hibernate.Hibernate;
 import org.hibernate.HibernateException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 @Service
@@ -49,6 +50,7 @@ public class UserUtil {
             userService.save(user);
         }
         addFriends(1L);
+        addGroup(1L, "Parents");
     }
 
     public void addFriends(Long userId) {
@@ -60,12 +62,23 @@ public class UserUtil {
         friendsGroupService.update(group);
     }
 
-    public void printFriends(Long id) {
-        User user = userService.getById(id);
-        System.out.println("userId: " + user.getId());
-        System.out.println("Owner Groups:");
-        user.getOwnerGroupSet().forEach(System.out::println);
-        System.out.println("Foreign Groups:");
-        user.getForeignGroupSet().forEach(System.out::println);
+    public void addGroup(Long userId, String name) {
+        userService.addFriendsGroup(userId, name);
+        FriendsGroup group = userService.getFriendsGroup(userId, name);
+        List<User> users = userService.getAll("id");
+        users.stream()
+                .filter(u -> u.getId() > 5)
+                .forEach(group.getFriendsSet()::add);
+        friendsGroupService.update(group);
+    }
+
+    public Map<User, String> getFriendsWithGroupNames(Long userId) {
+        Set<User> friends = userService.getFriends(userId);
+        Map<User, String> friendsMap = new HashMap<>();
+        friends.forEach(f -> {
+            List<FriendsGroup> groups = friendsGroupService.getByOwnerAndFriend(userId, f);
+            friendsMap.put(f, StringUtils.collectionToDelimitedString(groups, ", "));
+        });
+        return friendsMap;
     }
 }

@@ -42,8 +42,7 @@ public class FriendsGroup {
     public FriendsGroup() {
     }
 
-    public FriendsGroup(User owner, String name) {
-        this.owner = owner;
+    public FriendsGroup(String name) {
         this.name = name;
     }
 
@@ -81,8 +80,6 @@ public class FriendsGroup {
 
     @Override
     public String toString() {
-        return "FriendsGroup{" +
-                "id=" + id +
-                '}';
+        return name;
     }
 }

@@ -24,7 +24,7 @@ public class FriendsGroupUtil {
 
     public Long createFriendsGroup(Long userId, String name) {
         User user = userService.getById(userId);
-        FriendsGroup group = new FriendsGroup(user, name);
+        FriendsGroup group = new FriendsGroup(name);
         return friendsGroupService.save(group);
     }
 }

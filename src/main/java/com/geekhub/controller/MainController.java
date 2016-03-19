@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpSession;
+import java.util.Map;
 import java.util.Set;
 
 @Controller
@@ -100,9 +101,9 @@ public class MainController {
 
     @RequestMapping("/friends")
     public ModelAndView friends(HttpSession session) {
-        Set<User> friends = userService.getFriends((Long) session.getAttribute("userId"));
+        Map<User, String> friendsMap = userUtil.getFriendsWithGroupNames((Long) session.getAttribute("userId"));
         ModelAndView model = new ModelAndView("friends");
-        model.addObject("friends", friends);
+        model.addObject("friends", friendsMap);
         return model;
     }
 }

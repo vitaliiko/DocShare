@@ -181,7 +181,6 @@ public class ChatController {
     public ModelAndView addFriend(@PathVariable Long friendId, Long userId, Long groupId) {
         ModelAndView model = new ModelAndView("redirect:/index");
         friendsGroupService.addFriend(groupId, friendId);
-        userUtil.printFriends(userId);
         return model;
     }
 

@@ -22,13 +22,16 @@
         <jsp:include page="sidebar.jsp"/>
 
         <div id="page-content-wrapper">
-            <table class="table">
-                <c:forEach var="friend" items="${friends}">
-                    <c:url var="friendPage" value="/main/userpage/${friend.id}"/>
+            <table class="table table-hover tbody tr:hover td">
+                <c:forEach var="friendEntry" items="${friends}">
+                    <c:url var="friendPage" value="/main/userpage/${friendEntry.key.id}"/>
                     <tr>
                         <td>
                             <input type="checkbox">
-                            <a href="${friendPage}"> ${friend.firstName} ${friend.lastName} </a>
+                            <a href="${friendPage}" class="btn btn-link"> ${friendEntry.key} </a>
+                        </td>
+                        <td>
+                            ${friendEntry.value}
                         </td>
                     </tr>
                 </c:forEach>

@@ -1,7 +1,8 @@
 package com.geekhub.dao;
 
 import com.geekhub.entity.FriendsGroup;
-
+import com.geekhub.entity.User;
+import com.geekhub.service.UserService;
 import org.hibernate.HibernateException;
 import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Order;
@@ -17,6 +18,10 @@ public class FriendsGroupDao implements EntityDao<FriendsGroup, Long> {
 
     @Autowired
     private SessionFactory sessionFactory;
+
+    @Autowired
+    private UserService userService;
+
     private Class<FriendsGroup> clazz = FriendsGroup.class;
 
     @Override
@@ -72,5 +77,17 @@ public class FriendsGroupDao implements EntityDao<FriendsGroup, Long> {
 
         sessionFactory.getCurrentSession()
                 .delete(friendsGroup);
+    }
+
+    public List<FriendsGroup> getByOwnerAndFriend(Long ownerId, User friend) throws HibernateException {
+        User owner = userService.getById(ownerId);
+        return sessionFactory.getCurrentSession()
+                .createQuery("from FriendsGroup fg " +
+                        "where fg.owner = :owner " +
+                        "and :friend in elements(fg.friendsSet) " +
+                        "and fg.name != 'Friends'")
+                .setParameter("owner", owner)
+                .setParameter("friend", friend)
+                .list();
     }
 }
