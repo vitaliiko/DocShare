@@ -82,11 +82,6 @@ public class MainController {
         return "signIn";
     }
 
-    @RequestMapping(value = "/friends", method = RequestMethod.GET)
-    public ModelAndView friends() {
-        return new ModelAndView("friends");
-    }
-
     @RequestMapping(value = "/search", method = RequestMethod.GET)
     public ModelAndView search(HttpSession session) {
         ModelAndView model = new ModelAndView("search");
@@ -100,6 +95,14 @@ public class MainController {
         User owner = userService.getById(ownerId);
         ModelAndView model = new ModelAndView("userPage");
         model.addObject("pageOwner", owner);
+        return model;
+    }
+
+    @RequestMapping("/friends")
+    public ModelAndView friends(HttpSession session) {
+        Set<User> friends = userService.getFriends((Long) session.getAttribute("userId"));
+        ModelAndView model = new ModelAndView("friends");
+        model.addObject("friends", friends);
         return model;
     }
 }

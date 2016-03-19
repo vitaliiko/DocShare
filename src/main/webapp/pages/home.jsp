@@ -16,7 +16,7 @@
     <script src="${pageContext.request.contextPath}/pages/bootstrap/js/sidebar_menu.js"></script>
 </head>
 <body>
-<%--<jsp:include page="home.jsp"/>--%>
+
 <div id="wrapper" class="container">
     <jsp:include page="sidebar.jsp"/>
 
