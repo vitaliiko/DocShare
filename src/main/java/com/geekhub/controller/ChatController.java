@@ -41,7 +41,7 @@ public class ChatController {
 
     @RequestMapping(value = "/signIn", method = RequestMethod.GET)
     public String signIn() {
-        return "signIn";
+        return "pages/signIn";
     }
 
     @RequestMapping(value = "/signIn", method = RequestMethod.POST)
@@ -53,14 +53,14 @@ public class ChatController {
             session.setAttribute("userId", user.getId());
         } else {
             model.addObject("errorMessage", "Wrong login or password")
-                    .setViewName("signIn");
+                    .setViewName("pages/signIn");
         }
         return model;
     }
 
     @RequestMapping(value = "/signUp", method = RequestMethod.GET)
     public String signUp() {
-        return "signUp";
+        return "pages/signUp";
     }
 
     @RequestMapping(value = "/signUp", method = RequestMethod.POST)
@@ -75,13 +75,13 @@ public class ChatController {
             userUtil.validateUser(login, password, confirmPassword);
             User user = new User(login, password, firstName, lastName);
             userService.save(user);
-            model.setViewName("signIn");
+            model.setViewName("pages/signIn");
         } catch (Exception e) {
             model.addObject("login", login)
                     .addObject("firstName", firstName)
                     .addObject("lastName", lastName)
                     .addObject("errorMessage", e.getMessage())
-                    .setViewName("signUp");
+                    .setViewName("pages/signUp");
         }
         return model;
     }
@@ -89,13 +89,13 @@ public class ChatController {
     @RequestMapping("/signOut")
     public String signOut(HttpSession session) {
         session.invalidate();
-        return "signIn";
+        return "pages/signIn";
     }
 
     @RequestMapping(value = "/profile", method = RequestMethod.GET)
     public ModelAndView profile(HttpSession session) {
         User user = userService.getById((Long) session.getAttribute("userId"));
-        ModelAndView model = new ModelAndView("profile");
+        ModelAndView model = new ModelAndView("pages/profile");
         model.addObject("login", user.getLogin())
                 .addObject("firstName", user.getFirstName())
                 .addObject("lastName", user.getLastName());
@@ -104,7 +104,7 @@ public class ChatController {
 
     @RequestMapping(value = "/changeName", method = RequestMethod.POST)
     public ModelAndView changeName(String login, String firstName, String lastName, HttpSession session) {
-        ModelAndView model = new ModelAndView("profile");
+        ModelAndView model = new ModelAndView("pages/profile");
         User user = userService.getById((Long) session.getAttribute("userId"));
         if (user.getLogin().equals(login) || userService.getByLogin(login) == null) {
             user.setLogin(login);
@@ -125,7 +125,7 @@ public class ChatController {
                                  String confirmNewPassword) {
 
         User user = userService.getById((Long) session.getAttribute("userId"));
-        ModelAndView model = new ModelAndView("profile");
+        ModelAndView model = new ModelAndView("pages/profile");
         if (!user.getPassword().equals(currentPassword)) {
             model.addObject("errorMessage", "Wrong password");
         } else if (!newPassword.equals(confirmNewPassword)) {
@@ -150,17 +150,17 @@ public class ChatController {
             userService.delete((Long) session.getAttribute("userId"));
             session.invalidate();
             model.addObject("message", "Your account removed successfully")
-                    .setViewName("signIn");
+                    .setViewName("pages/signIn");
             return model;
         }
-        model.setViewName("profile");
+        model.setViewName("pages/profile");
         return model;
     }
 
     @RequestMapping("/default")
     public String createDefaultUsers() {
         userUtil.addDefaultUsers();
-        return "signIn";
+        return "pages/signIn";
     }
 
     @RequestMapping("/deleteMessage/{messageId}")

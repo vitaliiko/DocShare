@@ -13,14 +13,14 @@
     <context:annotation-config/>
     <msc:annotation-driven/>
     <tx:annotation-driven transaction-manager="transactionManager"/>
-    <mvc:resources mapping="/pages/**" location="/pages/"/>
+    <mvc:resources mapping="/view/**" location="/view/"/>
 
     <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
         <property name="location" value="classpath:database.properties"/>
     </bean>
 
     <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
-        <property name="prefix" value="/pages/"/>
+        <property name="prefix" value="/view/"/>
         <property name="suffix" value=".jsp"/>
     </bean>
 

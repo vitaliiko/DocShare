@@ -29,12 +29,12 @@ public class MainController {
 
     @RequestMapping(value = "/home", method = RequestMethod.GET)
     public ModelAndView home() {
-        return new ModelAndView("home");
+        return new ModelAndView("pages/home");
     }
 
     @RequestMapping(value = "/signIn", method = RequestMethod.GET)
     public ModelAndView signIn() {
-        return new ModelAndView("signIn");
+        return new ModelAndView("pages/signIn");
     }
 
     @RequestMapping(value = "/signIn", method = RequestMethod.POST)
@@ -46,14 +46,14 @@ public class MainController {
             session.setAttribute("userId", user.getId());
         } else {
             model.addObject("errorMessage", "Wrong login or password")
-                    .setViewName("signIn");
+                    .setViewName("pages/signIn");
         }
         return model;
     }
 
     @RequestMapping(value = "/signUp", method = RequestMethod.GET)
     public String signUp() {
-        return "signUp";
+        return "pages/signUp";
     }
 
     @RequestMapping(value = "/signUp", method = RequestMethod.POST)
@@ -68,12 +68,12 @@ public class MainController {
         try {
             userUtil.validateUser(login, password, confirmPassword);
             userUtil.createUser(firstName, lastName, login, password);
-            model.setViewName("signIn");
+            model.setViewName("pages/signIn");
         } catch (UserValidateException e) {
             model.addObject("login", login)
                     .addObject("firstName", firstName)
                     .addObject("lastName", lastName)
-                    .setViewName("signUp");
+                    .setViewName("pages/signUp");
         }
         return model;
     }
@@ -81,7 +81,7 @@ public class MainController {
     @RequestMapping("/signOut")
     public String signOut(HttpSession session) {
         session.invalidate();
-        return "signIn";
+        return "pages/signIn";
     }
 
     @RequestMapping(value = "/search", method = RequestMethod.GET)
@@ -92,7 +92,7 @@ public class MainController {
         Map<User, Boolean> usersMap = users.stream()
                 .collect(Collectors.toMap(u -> u, u -> userUtil.areFriends(userId, u)));
 
-        ModelAndView model = new ModelAndView("search");
+        ModelAndView model = new ModelAndView("pages/search");
         model.addObject("usersMap", usersMap);
         return model;
     }
@@ -100,7 +100,7 @@ public class MainController {
     @RequestMapping("/userpage/{ownerId}")
     public ModelAndView userPage(@PathVariable Long ownerId) {
         User owner = userService.getById(ownerId);
-        ModelAndView model = new ModelAndView("userPage");
+        ModelAndView model = new ModelAndView("pages/userPage");
         model.addObject("pageOwner", owner);
         return model;
     }
@@ -108,7 +108,7 @@ public class MainController {
     @RequestMapping("/friends")
     public ModelAndView friends(HttpSession session) {
         Map<User, String> friendsMap = userUtil.getFriendsWithGroupNames((Long) session.getAttribute("userId"));
-        ModelAndView model = new ModelAndView("friends");
+        ModelAndView model = new ModelAndView("pages/friends");
         model.addObject("friends", friendsMap);
         return model;
     }

@@ -21,7 +21,7 @@ public class ProfileController {
     @RequestMapping(value = "/view", method = RequestMethod.GET)
     public ModelAndView profile(HttpSession session) {
         User user = userService.getById((Long) session.getAttribute("userId"));
-        ModelAndView model = new ModelAndView("profile");
+        ModelAndView model = new ModelAndView("pages/profile");
         model.addObject("login", user.getLogin())
                 .addObject("firstName", user.getFirstName())
                 .addObject("lastName", user.getLastName());
@@ -30,7 +30,7 @@ public class ProfileController {
 
     @RequestMapping(value = "/changeName", method = RequestMethod.POST)
     public ModelAndView changeName(String login, String firstName, String lastName, HttpSession session) {
-        ModelAndView model = new ModelAndView("profile");
+        ModelAndView model = new ModelAndView("pages/profile");
         User user = userService.getById((Long) session.getAttribute("userId"));
         if (user.getLogin().equals(login) || userService.getByLogin(login) == null) {
             user.setLogin(login);
@@ -51,7 +51,7 @@ public class ProfileController {
                                        String confirmNewPassword) {
 
         User user = userService.getById((Long) session.getAttribute("userId"));
-        ModelAndView model = new ModelAndView("profile");
+        ModelAndView model = new ModelAndView("pages/profile");
         if (!user.getPassword().equals(currentPassword)) {
             model.addObject("errorMessage", "Wrong password");
         } else if (!newPassword.equals(confirmNewPassword)) {
@@ -70,7 +70,7 @@ public class ProfileController {
         userService.delete((Long) session.getAttribute("userId"));
         session.invalidate();
         model.addObject("message", "Your account removed successfully")
-                .setViewName("signIn");
+                .setViewName("pages/signIn");
         return model;
     }
 }

@@ -6,7 +6,7 @@
   <session-factory>
       <property name="hibernate.show_sql">true</property>
       <property name="hibernate.dialect">org.hibernate.dialect.MySQL5Dialect</property>
-      <property name="hbm2ddl.auto">create</property>
+      <!--<property name="hbm2ddl.auto">create</property>-->
 
       <property name="hibernate.c3p0.min_size">5</property>
       <property name="hibernate.c3p0.max_size">20</property>
