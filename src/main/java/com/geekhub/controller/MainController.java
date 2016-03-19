@@ -7,6 +7,7 @@ import com.geekhub.util.UserUtil;
 import org.hibernate.HibernateException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
@@ -91,6 +92,14 @@ public class MainController {
         ModelAndView model = new ModelAndView("search");
         Set<User> friends = userService.getFriends((Long) session.getAttribute("userId"));
         model.addObject("users", friends);
+        return model;
+    }
+
+    @RequestMapping("/userpage/{ownerId}")
+    public ModelAndView moveToUserPage(@PathVariable Long ownerId) {
+        User owner = userService.getById(ownerId);
+        ModelAndView model = new ModelAndView("userPage");
+        model.addObject("pageOwner", owner);
         return model;
     }
 }
