@@ -2,7 +2,7 @@
 <html>
 <head>
     <title>Login</title>
-    <link href="${pageContext.request.contextPath}/pages/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="${pageContext.request.contextPath}/view/bootstrap/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
 <div class="container" style="width: 300px;" align="center">
