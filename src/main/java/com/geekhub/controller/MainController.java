@@ -13,8 +13,9 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpSession;
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
+import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/main")
@@ -85,14 +86,19 @@ public class MainController {
 
     @RequestMapping(value = "/search", method = RequestMethod.GET)
     public ModelAndView search(HttpSession session) {
+        Long userId = (Long) session.getAttribute("userId");
+
+        List<User> users = userUtil.getAllWithoutCurrentUser(userId);
+        Map<User, Boolean> usersMap = users.stream()
+                .collect(Collectors.toMap(u -> u, u -> userUtil.areFriends(userId, u)));
+
         ModelAndView model = new ModelAndView("search");
-        Set<User> friends = userService.getFriends((Long) session.getAttribute("userId"));
-        model.addObject("users", friends);
+        model.addObject("usersMap", usersMap);
         return model;
     }
 
     @RequestMapping("/userpage/{ownerId}")
-    public ModelAndView moveToUserPage(@PathVariable Long ownerId) {
+    public ModelAndView userPage(@PathVariable Long ownerId) {
         User owner = userService.getById(ownerId);
         ModelAndView model = new ModelAndView("userPage");
         model.addObject("pageOwner", owner);

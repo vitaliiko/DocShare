@@ -187,6 +187,6 @@ public class ChatController {
     @RequestMapping("/defaultUsers")
     public ModelAndView defaultUsers() {
         userUtil.addDefaultUsers();
-        return new ModelAndView("redirect:/user/home");
+        return new ModelAndView("redirect:/main/home");
     }
 }

@@ -14,6 +14,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.LongPredicate;
+import java.util.stream.Collectors;
 
 @Service
 public class UserUtil {
@@ -43,21 +45,22 @@ public class UserUtil {
     }
 
     public void addDefaultUsers() {
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < 20; i++) {
             String value = String.valueOf(i) + i + i;
             User user = new User(value, value, value, value);
             user.getOwnerGroupSet().add(friendsGroupUtil.createDefaultGroup());
             userService.save(user);
         }
-        addFriends(1L);
+        addFriends(1L, id -> id > 0 && id < 10);
         addGroup(1L, "Parents");
+        addFriends(2L, id -> id > 10 && id < 18);
     }
 
-    public void addFriends(Long userId) {
+    public void addFriends(Long userId, LongPredicate predicate) {
         List<User> userList = userService.getAll("id");
         FriendsGroup group = userService.getFriendsGroup(userId, "Friends");
         userList.stream()
-                .filter(u -> !u.getId().equals(userId))
+                .filter(u -> predicate.test(u.getId()))
                 .forEach(group.getFriendsSet()::add);
         friendsGroupService.update(group);
     }
@@ -67,7 +70,7 @@ public class UserUtil {
         FriendsGroup group = userService.getFriendsGroup(userId, name);
         List<User> users = userService.getAll("id");
         users.stream()
-                .filter(u -> u.getId() > 5)
+                .filter(u -> u.getId() > 5 && u.getId() < 9)
                 .forEach(group.getFriendsSet()::add);
         friendsGroupService.update(group);
     }
@@ -80,5 +83,16 @@ public class UserUtil {
             friendsMap.put(f, StringUtils.collectionToDelimitedString(groups, ", "));
         });
         return friendsMap;
+    }
+
+    public boolean areFriends(Long userId, User friend) {
+        Set<User> friends = userService.getFriends(userId);
+        return friends.contains(friend);
+    }
+
+    public List<User> getAllWithoutCurrentUser(Long userId) {
+        return userService.getAll("id").stream()
+                .filter(u -> !u.getId().equals(userId))
+                .collect(Collectors.toList());
     }
 }
