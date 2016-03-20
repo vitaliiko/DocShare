@@ -12,7 +12,6 @@ import org.springframework.web.servlet.ModelAndView;
 import javax.servlet.http.HttpSession;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 @Controller
 @RequestMapping("/friends")
@@ -28,7 +27,7 @@ public class FriendsController {
     @RequestMapping("/view")
     public ModelAndView friends(HttpSession session) {
         Long userId = (Long) session.getAttribute("userId");
-        Set<FriendsGroup> groupSet = userService.getFriendsGroups(userId);
+        List<FriendsGroup> groupSet = userService.getFriendsGroups(userId);
         Map<User, List<FriendsGroup>> friendsMap = userUtil.getFriendsWithGroups(userId);
         ModelAndView model = new ModelAndView("pages/friends");
         model.addObject("friends", friendsMap);

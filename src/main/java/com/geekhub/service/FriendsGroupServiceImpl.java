@@ -79,9 +79,4 @@ public class FriendsGroupServiceImpl implements FriendsGroupService {
         Hibernate.initialize(group.getFriendsSet());
         return group.getFriendsSet();
     }
-
-    @Override
-    public List<FriendsGroup> getByOwnerAndFriend(Long ownerId, User friend) throws HibernateException {
-        return friendsGroupDao.getByOwnerAndFriend(ownerId, friend);
-    }
 }

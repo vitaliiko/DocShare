@@ -12,6 +12,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Repository
 @SuppressWarnings("unchecked")
@@ -88,10 +89,12 @@ public class UserDao implements EntityDao<User, Long> {
         return group;
     }
 
-    public Set<FriendsGroup> getFriendsGroups(Long userId) throws HibernateException {
+    public List<FriendsGroup> getFriendsGroups(Long userId) throws HibernateException {
         User owner = getById(userId);
         Hibernate.initialize(owner.getOwnerGroupSet());
-        return owner.getOwnerGroupSet();
+        return owner.getOwnerGroupSet().stream()
+                .filter(fg -> !fg.getName().equals("Friends"))
+                .collect(Collectors.toList());
     }
 
     public Set<User> getFriends(Long userId) throws HibernateException {
@@ -111,5 +114,17 @@ public class UserDao implements EntityDao<User, Long> {
         User user = getById(userId);
         Hibernate.initialize(user.getForeignGroupSet());
         return user.getForeignGroupSet();
+    }
+
+    public List<FriendsGroup> getByOwnerAndFriend(Long ownerId, User friend) throws HibernateException {
+        User owner = getById(ownerId);
+        return sessionFactory.getCurrentSession()
+                .createQuery("from FriendsGroup fg " +
+                        "where fg.owner = :owner " +
+                        "and :friend in elements(fg.friendsSet) " +
+                        "and fg.name != 'Friends'")
+                .setParameter("owner", owner)
+                .setParameter("friend", friend)
+                .list();
     }
  }

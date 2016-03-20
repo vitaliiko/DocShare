@@ -16,11 +16,14 @@
     <div id="wrapper" class="container">
         <div id="page-content-wrapper">
             <table class="table table-hover tbody tr:hover td">
+                <caption>
+                    Groups <input type="button" class="btn btn-primary btn-sm" value="Add group"/>
+                </caption>
+
                 <c:forEach var="group" items="${groups}">
                     <c:url var="groupPage" value="/main/userpage/${group.id}"/>
                     <tr>
                         <td>
-                            <input type="checkbox">
                             <a href="${groupPage}" class="btn btn-link"> ${group} </a>
                         </td>
                         <td>
@@ -31,6 +34,10 @@
             </table>
 
             <table class="table table-hover tbody tr:hover td">
+                <caption>
+                    Friends <a href="/main/search" class="btn btn-primary btn-sm">Add friends</a>
+                </caption>
+
                 <c:forEach var="friendEntry" items="${friends}">
                     <c:url var="friendPage" value="/main/userpage/${friendEntry.key.id}"/>
                     <tr>

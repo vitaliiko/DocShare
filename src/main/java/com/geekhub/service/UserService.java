@@ -6,6 +6,7 @@ import com.geekhub.entity.User;
 import org.hibernate.HibernateException;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Set;
 
 @Service
@@ -25,5 +26,7 @@ public interface UserService extends EntityService<User, Long> {
 
     Set<FriendsGroup> getForeignGroups(Long userId) throws HibernateException;
 
-    public Set<FriendsGroup> getFriendsGroups(Long userId) throws HibernateException;
+    List<FriendsGroup> getFriendsGroups(Long userId) throws HibernateException;
+
+    List<FriendsGroup> getByOwnerAndFriend(Long ownerId, User friend) throws HibernateException;
 }

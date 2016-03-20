@@ -51,8 +51,10 @@ public class UserUtil {
             userService.save(user);
         }
         addFriends(1L, id -> id > 0 && id < 10);
-        addGroup(1L, "Parents");
+        addGroup(1L, "Parents", id -> id > 2 && id < 5);
+        addGroup(1L, "Fuckers", id -> id > 3 && id < 8);
         addFriends(2L, id -> id > 10 && id < 18);
+        addGroup(2L, "Fuckers", id -> id > 13 && id < 18);
     }
 
     public void addFriends(Long userId, LongPredicate predicate) {
@@ -64,12 +66,12 @@ public class UserUtil {
         friendsGroupService.update(group);
     }
 
-    public void addGroup(Long userId, String name) {
+    public void addGroup(Long userId, String name, LongPredicate predicate) {
         userService.addFriendsGroup(userId, name);
         FriendsGroup group = userService.getFriendsGroup(userId, name);
         List<User> users = userService.getAll("id");
         users.stream()
-                .filter(u -> u.getId() > 5 && u.getId() < 9)
+                .filter(u -> predicate.test(u.getId()))
                 .forEach(group.getFriendsSet()::add);
         friendsGroupService.update(group);
     }
@@ -77,7 +79,7 @@ public class UserUtil {
     public Map<User, List<FriendsGroup>> getFriendsWithGroups(Long userId) {
         Set<User> friends = userService.getFriends(userId);
         Map<User, List<FriendsGroup>> friendsMap = new HashMap<>();
-        friends.forEach(f -> friendsMap.put(f, friendsGroupService.getByOwnerAndFriend(userId, f)));
+        friends.forEach(f -> friendsMap.put(f, userService.getByOwnerAndFriend(userId, f)));
         return friendsMap;
     }
 
