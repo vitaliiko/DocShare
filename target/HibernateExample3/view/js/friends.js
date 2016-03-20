@@ -13,7 +13,15 @@ $(document).ready(function() {
         })
     });
 
-    $('#groupButton').click(function() {
-        $('#groupName').val("hello");
+    $('.group-info').click(function() {
+        var groupName = $(this).text();
+        $.ajax({
+           url: '/friends/get_group',
+           data: {groupName: groupName},
+           success: function(groupId) {
+               $('#groupName').val(groupName);
+               $('#group-action').text(groupId);
+           }
+        });
     });
 });

@@ -27,7 +27,7 @@
                     <c:url var="groupPage" value="/main/userpage/${group.id}"/>
                     <tr>
                         <td>
-                            <button type="button" name="groupButton" class="btn btn-link"
+                            <button type="button" name="groupButton" class="btn btn-link group-info"
                                     data-toggle="modal" data-target="#groupInfo"> ${group.name} </button>
                         </td>
                         <td>
@@ -46,12 +46,11 @@
                     <c:url var="friendPage" value="/main/userpage/${friendEntry.key.id}"/>
                     <tr>
                         <td>
-                            <input type="checkbox"/>
                             <a href="${friendPage}" class="btn btn-link"> ${friendEntry.key} </a>
                         </td>
                         <td>
                             <c:forEach var="group" items="${friendEntry.value}">
-                                <button type="button" name="groupButton" class="btn btn-link"
+                                <button type="button" name="groupButton" class="btn btn-link group-info"
                                         data-toggle="modal" data-target="#groupInfo"> ${group.name} </button>
                             </c:forEach>
                         </td>
@@ -70,7 +69,7 @@
                     <h4 class="modal-title">New group</h4>
                 </div>
                 <div class="modal-body">
-                    <p>Input group name</p>
+                    <p id="group-action">Input group name</p>
                     <input type="text" id="groupName" class="form-control"
                            placeholder="Group Name" required="" autofocus="">
                 </div>

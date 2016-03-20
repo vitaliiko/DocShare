@@ -5,15 +5,15 @@ import com.geekhub.entity.User;
 import com.geekhub.service.UserService;
 import com.geekhub.util.UserUtil;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpSession;
 import java.util.List;
 import java.util.Map;
 
-@Controller
+@RestController
 @RequestMapping("/friends")
 @SuppressWarnings("unchecked")
 public class FriendsController {
@@ -39,5 +39,12 @@ public class FriendsController {
     public ModelAndView create(HttpSession session, String groupName) {
         userService.addFriendsGroup((Long) session.getAttribute("userId"), groupName);
         return new ModelAndView("redirect:/friends/view");
+    }
+
+    @RequestMapping("/get_group")
+    public Long getGroup(String groupName, HttpSession session) {
+        groupName = groupName.trim();
+        FriendsGroup group = userService.getFriendsGroup((Long) session.getAttribute("userId"), groupName);
+        return group.getId();
     }
 }
