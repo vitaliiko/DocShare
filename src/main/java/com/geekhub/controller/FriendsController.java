@@ -38,6 +38,6 @@ public class FriendsController {
     @RequestMapping("/create_group")
     public ModelAndView create(HttpSession session, String groupName) {
         userService.addFriendsGroup((Long) session.getAttribute("userId"), groupName);
-        return new ModelAndView("redirect:/main/friends");
+        return new ModelAndView("redirect:/friends/view");
     }
 }
