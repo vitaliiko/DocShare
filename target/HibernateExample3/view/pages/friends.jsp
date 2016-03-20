@@ -16,6 +16,21 @@
     <div id="wrapper" class="container">
         <div id="page-content-wrapper">
             <table class="table table-hover tbody tr:hover td">
+                <c:forEach var="group" items="${groups}">
+                    <c:url var="groupPage" value="/main/userpage/${group.id}"/>
+                    <tr>
+                        <td>
+                            <input type="checkbox">
+                            <a href="${groupPage}" class="btn btn-link"> ${group} </a>
+                        </td>
+                        <td>
+
+                        </td>
+                    </tr>
+                </c:forEach>
+            </table>
+
+            <table class="table table-hover tbody tr:hover td">
                 <c:forEach var="friendEntry" items="${friends}">
                     <c:url var="friendPage" value="/main/userpage/${friendEntry.key.id}"/>
                     <tr>
@@ -24,7 +39,10 @@
                             <a href="${friendPage}" class="btn btn-link"> ${friendEntry.key} </a>
                         </td>
                         <td>
-                            ${friendEntry.value}
+                            <c:forEach var="group" items="${friendEntry.value}">
+                                <c:url var="groupPage" value="/main/userpage/${group.id}"/>
+                                <a href="${groupPage}">${group}</a>
+                            </c:forEach>
                         </td>
                     </tr>
                 </c:forEach>

@@ -82,4 +82,25 @@ public class FriendsGroup {
     public String toString() {
         return name;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        FriendsGroup group = (FriendsGroup) o;
+
+        if (id != null ? !id.equals(group.id) : group.id != null) return false;
+        if (owner != null ? !owner.equals(group.owner) : group.owner != null) return false;
+        return !(name != null ? !name.equals(group.name) : group.name != null);
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = id != null ? id.hashCode() : 0;
+        result = 31 * result + (owner != null ? owner.hashCode() : 0);
+        result = 31 * result + (name != null ? name.hashCode() : 0);
+        return result;
+    }
 }

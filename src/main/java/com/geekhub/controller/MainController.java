@@ -90,7 +90,7 @@ public class MainController {
 
         List<User> users = userUtil.getAllWithoutCurrentUser(userId);
         Map<User, Boolean> usersMap = users.stream()
-                .collect(Collectors.toMap(u -> u, u -> userUtil.areFriends(userId, u)));
+                .collect(Collectors.toMap(u -> u, u -> !userUtil.areFriends(userId, u)));
 
         ModelAndView model = new ModelAndView("pages/search");
         model.addObject("usersMap", usersMap);
@@ -105,11 +105,5 @@ public class MainController {
         return model;
     }
 
-    @RequestMapping("/friends")
-    public ModelAndView friends(HttpSession session) {
-        Map<User, String> friendsMap = userUtil.getFriendsWithGroupNames((Long) session.getAttribute("userId"));
-        ModelAndView model = new ModelAndView("pages/friends");
-        model.addObject("friends", friendsMap);
-        return model;
-    }
+
 }

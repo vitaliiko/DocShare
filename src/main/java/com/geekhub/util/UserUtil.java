@@ -8,7 +8,6 @@ import com.geekhub.service.UserService;
 import org.hibernate.HibernateException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 
 import java.util.HashMap;
 import java.util.List;
@@ -75,13 +74,10 @@ public class UserUtil {
         friendsGroupService.update(group);
     }
 
-    public Map<User, String> getFriendsWithGroupNames(Long userId) {
+    public Map<User, List<FriendsGroup>> getFriendsWithGroups(Long userId) {
         Set<User> friends = userService.getFriends(userId);
-        Map<User, String> friendsMap = new HashMap<>();
-        friends.forEach(f -> {
-            List<FriendsGroup> groups = friendsGroupService.getByOwnerAndFriend(userId, f);
-            friendsMap.put(f, StringUtils.collectionToDelimitedString(groups, ", "));
-        });
+        Map<User, List<FriendsGroup>> friendsMap = new HashMap<>();
+        friends.forEach(f -> friendsMap.put(f, friendsGroupService.getByOwnerAndFriend(userId, f)));
         return friendsMap;
     }
 

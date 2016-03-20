@@ -88,6 +88,12 @@ public class UserDao implements EntityDao<User, Long> {
         return group;
     }
 
+    public Set<FriendsGroup> getFriendsGroups(Long userId) throws HibernateException {
+        User owner = getById(userId);
+        Hibernate.initialize(owner.getOwnerGroupSet());
+        return owner.getOwnerGroupSet();
+    }
+
     public Set<User> getFriends(Long userId) throws HibernateException {
         FriendsGroup group = getFriendsGroup(userId, "Friends");
         Hibernate.initialize(group.getFriendsSet());
