@@ -72,6 +72,9 @@
                     <p id="group-action">Input group name</p>
                     <input type="text" id="groupName" class="form-control"
                            placeholder="Group Name" required="" autofocus="">
+
+                    <div id="friends-list"></div>
+
                 </div>
                 <div class="modal-footer">
                     <button type="button" id="saveGroup" class="btn btn-primary">Save</button>

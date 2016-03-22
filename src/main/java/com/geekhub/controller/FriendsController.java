@@ -42,9 +42,8 @@ public class FriendsController {
     }
 
     @RequestMapping("/get_group")
-    public Long getGroup(String groupName, HttpSession session) {
+    public FriendsGroup getGroup(String groupName, HttpSession session) {
         groupName = groupName.trim();
-        FriendsGroup group = userService.getFriendsGroup((Long) session.getAttribute("userId"), groupName);
-        return group.getId();
+        return userService.getFriendsGroup((Long) session.getAttribute("userId"), groupName);
     }
 }

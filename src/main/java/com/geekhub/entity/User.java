@@ -1,5 +1,7 @@
 package com.geekhub.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -28,21 +30,24 @@ public class User {
     @Column
     private String lastName;
 
+    @JsonIgnore
     @Column
     private String password;
 
     @Column(unique = true)
     private String login;
 
+    @JsonIgnore
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "user_id")
     private Set<Message> messageSet = new HashSet<>();
 
+    @JsonIgnore
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "user_id")
     private Set<FriendsGroup> ownerGroupSet = new HashSet<>();
 
-
+    @JsonIgnore
     @ManyToMany(cascade = CascadeType.ALL)
     @JoinTable(name = "userToGroupRelation",
             joinColumns = {
