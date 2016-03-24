@@ -9,10 +9,7 @@ import org.hibernate.HibernateException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.function.LongPredicate;
 import java.util.stream.Collectors;
 
@@ -65,14 +62,20 @@ public class UserUtil {
         userService.update(user);
     }
 
-    public void addGroup(Long userId, String name, LongPredicate predicate) {
-        userService.addFriendsGroup(userId, name);
-        FriendsGroup group = userService.getFriendsGroup(userId, name);
+    private void addGroup(Long userId, String name, LongPredicate predicate) {
+        FriendsGroup group = new FriendsGroup(name);
         List<User> users = userService.getAll("id");
         users.stream()
                 .filter(u -> predicate.test(u.getId()))
                 .forEach(group.getFriendsSet()::add);
-        friendsGroupService.update(group);
+        userService.addFriendsGroup(userId, group);
+    }
+
+    public void addFriendsGroup(Long userId, String name, List<Long> friendsIds) {
+        Set<User> friendsSet = new HashSet<>();
+        friendsIds.forEach(id -> friendsSet.add(userService.getById(id)));
+        FriendsGroup group = new FriendsGroup(name, friendsSet);
+        userService.addFriendsGroup(userId, group);
     }
 
     public Map<User, List<FriendsGroup>> getFriendsWithGroups(Long userId) {

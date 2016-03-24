@@ -101,23 +101,10 @@ public class UserDao implements EntityDao<User, Long> {
         return user.getFriends();
     }
 
-    public void addFriendsGroup(Long userId, String groupName) throws HibernateException {
+    public void addFriendsGroup(Long userId, FriendsGroup group) throws HibernateException {
         User user = getById(userId);
         Hibernate.initialize(user.getFriendsGroups());
-        if (user.getFriendsGroups().stream().noneMatch(fg -> fg.getName().equals(groupName))) {
-            user.getFriendsGroups().add(new FriendsGroup(groupName));
-        } else {
-            throw new HibernateException("Friends Group with such name already exist");
-        }
-        sessionFactory.getCurrentSession().update(user);
-    }
-
-    public void addFriendsGroup(Long userId, String groupName, List<Long> friendsIds) throws HibernateException {
-        User user = getById(userId);
-        Hibernate.initialize(user.getFriendsGroups());
-        if (user.getFriendsGroups().stream().noneMatch(fg -> fg.getName().equals(groupName))) {
-            FriendsGroup group = new FriendsGroup(groupName);
-            friendsIds.forEach(id -> group.getFriendsSet().add(getById(id)));
+        if (user.getFriendsGroups().stream().noneMatch(fg -> fg.getName().equals(group.getName()))) {
             user.getFriendsGroups().add(group);
         } else {
             throw new HibernateException("Friends Group with such name already exist");
@@ -130,8 +117,7 @@ public class UserDao implements EntityDao<User, Long> {
         return sessionFactory.getCurrentSession()
                 .createQuery("from FriendsGroup fg " +
                         "where fg.owner = :owner " +
-                        "and :friend in elements(fg.friendsSet) " +
-                        "and fg.name != 'Friends'")
+                        "and :friend in elements(fg.friendsSet)")
                 .setParameter("owner", owner)
                 .setParameter("friend", friend)
                 .list();

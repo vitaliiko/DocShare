@@ -49,6 +49,11 @@ public class FriendsGroup {
         this.name = name;
     }
 
+    public FriendsGroup(String name, Set<User> friendsSet) {
+        this.name = name;
+        this.friendsSet = friendsSet;
+    }
+
     public Long getId() {
         return id;
     }

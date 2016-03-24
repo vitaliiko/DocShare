@@ -22,9 +22,7 @@ public interface UserService extends EntityService<User, Long> {
 
     FriendsGroup getFriendsGroup(Long userId, String groupName) throws HibernateException;
 
-    void addFriendsGroup(Long userId, String groupName) throws HibernateException;
-
-    void addFriendsGroup(Long userId, String groupName, List<Long> friendsIds) throws HibernateException;
+    void addFriendsGroup(Long userId, FriendsGroup group) throws HibernateException;
 
     List<FriendsGroup> getFriendsGroups(Long userId) throws HibernateException;
 

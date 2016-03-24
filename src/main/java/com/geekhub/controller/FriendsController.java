@@ -7,9 +7,13 @@ import com.geekhub.util.UserUtil;
 import org.hibernate.HibernateException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.ModelAndView;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpSession;
 import java.util.Arrays;
 import java.util.List;
@@ -39,9 +43,10 @@ public class FriendsController {
     }
 
     @RequestMapping("/create_group")
-    public ModelAndView create(HttpSession session, String groupName, @RequestParam Long[] friends) throws HibernateException {
-        userService.addFriendsGroup((Long) session.getAttribute("userId"), groupName, Arrays.asList(friends));
-        return new ModelAndView("redirect:/friends/view");
+    @ResponseStatus(HttpStatus.OK)
+    public void create(HttpSession session, String groupName, @RequestParam("friends[]") Long[] friends)
+            throws HibernateException {
+        userUtil.addFriendsGroup((Long) session.getAttribute("userId"), groupName, Arrays.asList(friends));
     }
 
     @RequestMapping("/get_group")
@@ -64,7 +69,6 @@ public class FriendsController {
     @RequestMapping("/delete_friend")
     @ResponseStatus(HttpStatus.OK)
     public void deleteFriend(Long friendId, HttpSession session) {
-        System.out.println("FRIEND ID: " + friendId);
         userService.deleteFriend((Long) session.getAttribute("userId"), friendId);
     }
 }

@@ -74,7 +74,7 @@
                     <div class="modal-body">
                         <p id="group-action">Input group name</p>
                         <input type="text" id="groupName" class="form-control"
-                               placeholder="Group Name" required="" autofocus="">
+                               placeholder="Group Name" autofocus="">
 
                         <div id="friends-list"></div>
 

@@ -88,11 +88,6 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void addFriendsGroup(Long userId, String groupName) throws HibernateException {
-        userDao.addFriendsGroup(userId, groupName);
-    }
-
-    @Override
     public List<FriendsGroup> getFriendsGroups(Long userId) throws HibernateException {
         return userDao.getFriendsGroups(userId);
     }
@@ -103,8 +98,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void addFriendsGroup(Long userId, String groupName, List<Long> friendsIds) throws HibernateException {
-        userDao.addFriendsGroup(userId, groupName, friendsIds);
+    public void addFriendsGroup(Long userId, FriendsGroup group) throws HibernateException {
+        userDao.addFriendsGroup(userId, group);
     }
 
     @Override
