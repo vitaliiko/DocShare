@@ -37,14 +37,14 @@
                 </c:forEach>
             </table>
 
-            <table class="table table-hover tbody tr:hover td">
+            <table id="friendsTable" class="table table-hover tbody tr:hover td">
                 <caption>
                     Friends <a href="/main/search" class="btn btn-primary btn-sm">Add friends</a>
                 </caption>
 
                 <c:forEach var="friendEntry" items="${friends}">
                     <c:url var="friendPage" value="/main/userpage/${friendEntry.key.id}"/>
-                    <tr>
+                    <tr id="${friendEntry.key.id}">
                         <td>
                             <a href="${friendPage}" class="btn btn-link"> ${friendEntry.key} </a>
                         </td>
@@ -55,8 +55,8 @@
                             </c:forEach>
                         </td>
                         <td>
-                            <input type="button" class="btn btn-default"
-                                   name="removeFriendButton" value="Remove from friends"> 
+                            <input type="button" class="btn btn-default removeFriendButton"
+                                   id="${friendEntry.key.id}" value="Remove from friends">
                         </td>
                     </tr>
                 </c:forEach>

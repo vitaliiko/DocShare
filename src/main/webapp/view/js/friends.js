@@ -54,13 +54,14 @@ $(document).ready(function() {
         });
     });
 
-    $('#removeFriendButton').click(function() {
-       $.ajax({
-           url: '/friends/delete_friend',
-           data: $(this).val(),
-           success: function() {
-               $(this).closest('tr').remove();
-           }
+    $('.removeFriendButton').click(function() {
+        var friendId = this.id;
+        $.ajax({
+            url: '/friends/delete_friend',
+            data: {friendId: friendId},
+            success: function() {
+                $('table#friendsTable tr#' + friendId).remove();
+            }
         })
     });
 });

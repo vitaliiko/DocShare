@@ -64,6 +64,7 @@ public class FriendsController {
     @RequestMapping("/delete_friend")
     @ResponseStatus(HttpStatus.OK)
     public void deleteFriend(Long friendId, HttpSession session) {
+        System.out.println("FRIEND ID: " + friendId);
         userService.deleteFriend((Long) session.getAttribute("userId"), friendId);
     }
 }
