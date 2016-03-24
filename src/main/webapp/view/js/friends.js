@@ -1,6 +1,6 @@
 $(document).ready(function() {
 
-    $('#saveGroup').click(function() {
+    $('#saveGroupButton').click(function() {
         var groupName = $('#groupName').val();
         var friends = [];
         $('.check-box:checked').each(function() {
@@ -39,19 +39,24 @@ $(document).ready(function() {
     });
 
     $('#addGroupButton').click(function() {
-        $.ajax({
-            url: '/friends/get_friends',
-            dataType: 'json',
-            success: function(friends) {
-                var input = '';
-                $.each(friends, function (k, v) {
-                    input += "<input type='checkbox' class='check-box' value='" + v.id + "'>" +
-                        v.firstName + ' ' + v.lastName + '<br>';
-                });
-                $('#friends-list').html(input);
-                $('#groupName').val('');
-            }
+        $('.check-box').each(function() {
+            $(this).prop('checked', false);
         });
+        $('#groupName').val('');
+
+        //$.ajax({
+        //    url: '/friends/get_friends',
+        //    dataType: 'json',
+        //    success: function(friends) {
+        //        var input = '';
+        //        $.each(friends, function (k, v) {
+        //            input += "<input type='checkbox' class='check-box' value='" + v.id + "'>" +
+        //                v.firstName + ' ' + v.lastName + '<br>';
+        //        });
+        //        $('#friends-list').html(input);
+        //        $('#groupName').val('');
+        //    }
+        //});
     });
 
     $('.removeFriendButton').click(function() {

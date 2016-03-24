@@ -19,7 +19,7 @@
             <table id="groupTable" class="table table-hover tbody tr:hover td">
                 <caption>
                     Groups
-                    <button type="button" id="addGroupButton" class="btn btn-primary btn-sm"
+                    <button type="button" id="addGroupButton" class="btn btn-primary btn-sm group-info"
                             data-toggle="modal" data-target="#groupInfo">Add group</button>
                 </caption>
 
@@ -27,7 +27,7 @@
                     <c:url var="groupPage" value="/main/userpage/${group.id}"/>
                     <tr>
                         <td>
-                            <button type="button" name="groupButton" class="btn btn-link group-info"
+                            <button type="button" name="groupInfoButton" class="btn btn-link group-info"
                                     data-toggle="modal" data-target="#groupInfo"> ${group.name} </button>
                         </td>
                         <td>
@@ -50,7 +50,7 @@
                         </td>
                         <td>
                             <c:forEach var="group" items="${friendEntry.value}">
-                                <button type="button" name="groupButton" class="btn btn-link group-info"
+                                <button type="button" name="groupInfoButton" class="btn btn-link group-info"
                                         data-toggle="modal" data-target="#groupInfo"> ${group.name} </button>
                             </c:forEach>
                         </td>
@@ -76,11 +76,19 @@
                         <input type="text" id="groupName" class="form-control"
                                placeholder="Group Name" autofocus="">
 
-                        <div id="friends-list"></div>
+                        <div class="checkbox" id="friends-list">
+                            <c:forEach var="friendEntry" items="${friends}">
+                                <label>
+                                    <input type="checkbox" class="check-box" value="${friendEntry.key.id}">
+                                    ${friendEntry.key}
+                                </label>
+                                <br>
+                            </c:forEach>
+                        </div>
 
                     </div>
                     <div class="modal-footer">
-                        <button type="button" id="saveGroup" class="btn btn-primary">Save</button>
+                        <button type="button" id="saveGroupButton" class="btn btn-primary">Save</button>
                         <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
                     </div>
                 </div>
