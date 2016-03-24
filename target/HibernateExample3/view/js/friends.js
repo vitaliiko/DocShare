@@ -27,13 +27,14 @@ $(document).ready(function() {
             dataType: 'json',
             data: {groupName: groupName},
             success: function(group) {
-                $('#groupName').val(group.name);
-                var input = '';
+                var memberIds = [];
                 $.each(group.friendsSet, function(k, v) {
-                    input += "<input type='checkbox' value='" + v.id + "' checked>" +
-                        v.firstName + ' ' + v.lastName + '<br>';
+                    memberIds.push(v.id);
                 });
-                $('#friends-list').html(input);
+                $('.check-box').each(function() {
+                    $(this).prop('checked', $.inArray(parseInt($(this).val()), memberIds) != -1);
+                });
+                $('#groupName').val(group.name);
             }
         });
     });
