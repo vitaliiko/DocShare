@@ -106,7 +106,24 @@ public class UserDao implements EntityDao<User, Long> {
     public void addFriendsGroup(Long userId, String groupName) throws HibernateException {
         User user = getById(userId);
         Hibernate.initialize(user.getOwnerGroupSet());
-        user.getOwnerGroupSet().add(new FriendsGroup(groupName));
+        if (user.getOwnerGroupSet().stream().noneMatch(fg -> fg.getName().equals(groupName))) {
+            user.getOwnerGroupSet().add(new FriendsGroup(groupName));
+        } else {
+            throw new HibernateException("Friends Group with such name already exist");
+        }
+        sessionFactory.getCurrentSession().update(user);
+    }
+
+    public void addFriendsGroup(Long userId, String groupName, List<Long> friendsIds) throws HibernateException {
+        User user = getById(userId);
+        Hibernate.initialize(user.getOwnerGroupSet());
+        if (user.getOwnerGroupSet().stream().noneMatch(fg -> fg.getName().equals(groupName))) {
+            FriendsGroup group = new FriendsGroup(groupName);
+            friendsIds.forEach(id -> group.getFriendsSet().add(getById(id)));
+            user.getOwnerGroupSet().add(group);
+        } else {
+            throw new HibernateException("Friends Group with such name already exist");
+        }
         sessionFactory.getCurrentSession().update(user);
     }
 
@@ -126,5 +143,19 @@ public class UserDao implements EntityDao<User, Long> {
                 .setParameter("owner", owner)
                 .setParameter("friend", friend)
                 .list();
+    }
+
+    public void addFriend(Long userId, Long friendId) throws HibernateException {
+        FriendsGroup group = getFriendsGroup(userId, "Friends");
+        User friend = getById(friendId);
+        group.getFriendsSet().add(friend);
+        sessionFactory.getCurrentSession().update(group);
+    }
+
+    public void deleteFriend(Long userId, Long friendId) throws HibernateException {
+        FriendsGroup group = getFriendsGroup(userId, "Friends");
+        User friend = getById(friendId);
+        group.getFriendsSet().remove(friend);
+        sessionFactory.getCurrentSession().update(group);
     }
  }

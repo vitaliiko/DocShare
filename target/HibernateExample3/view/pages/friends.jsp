@@ -19,7 +19,7 @@
             <table id="groupTable" class="table table-hover tbody tr:hover td">
                 <caption>
                     Groups
-                    <button type="button" class="btn btn-primary btn-sm"
+                    <button type="button" id="addGroupButton" class="btn btn-primary btn-sm"
                             data-toggle="modal" data-target="#groupInfo">Add group</button>
                 </caption>
 
@@ -54,34 +54,42 @@
                                         data-toggle="modal" data-target="#groupInfo"> ${group.name} </button>
                             </c:forEach>
                         </td>
+                        <td>
+                            <input type="button" class="btn btn-default"
+                                   name="removeFriendButton" value="${friendEntry.key.id}"> Remove from friends
+                        </td>
                     </tr>
                 </c:forEach>
             </table>
         </div>
-    </div>
 
-    <div id="groupInfo" class="modal fade" role="dialog">
-        <div class="modal-dialog">
+        <div id="groupInfo" class="modal fade" role="dialog">
+            <div class="modal-dialog">
 
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal">&times;</button>
-                    <h4 class="modal-title">New group</h4>
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        <h4 class="modal-title">New group</h4>
+                    </div>
+                    <div class="modal-body">
+                        <p id="group-action">Input group name</p>
+                        <input type="text" id="groupName" class="form-control"
+                               placeholder="Group Name" required="" autofocus="">
+
+                        <div id="friends-list"></div>
+
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" id="saveGroup" class="btn btn-primary">Save</button>
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    </div>
                 </div>
-                <div class="modal-body">
-                    <p id="group-action">Input group name</p>
-                    <input type="text" id="groupName" class="form-control"
-                           placeholder="Group Name" required="" autofocus="">
-                    <div id="friends-list"></div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" id="saveGroup" class="btn btn-primary">Save</button>
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                </div>
+
             </div>
-
         </div>
     </div>
+
+
 
     <jsp:include page="../include/footer.jsp"/>
 </body>

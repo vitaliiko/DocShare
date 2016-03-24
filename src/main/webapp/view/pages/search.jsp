@@ -1,4 +1,5 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <html>
 <head>
@@ -14,11 +15,12 @@
 
     <div id="wrapper" class="container">
         <c:forEach var="userEntry" items="${usersMap}">
-            <form>
+            <form action="/friends/add_friend">
                 <c:url var="userPage" value="/main/userpage/${userEntry.key.id}"/>
                 <a href="${userPage}" class="btn btn-link">${userEntry.key}</a>
                 <c:if test="${userEntry.value}">
-                    <input type="button" class="btn btn-primary" value="Add to friend"/>
+                    <input type="hidden" name="friendId" value="${userEntry.key.id}">
+                    <input type="submit" class="btn btn-primary" value="Add to friend"/>
                 </c:if>
                 <hr>
             </form>
