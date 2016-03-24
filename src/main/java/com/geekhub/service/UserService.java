@@ -26,8 +26,6 @@ public interface UserService extends EntityService<User, Long> {
 
     void addFriendsGroup(Long userId, String groupName, List<Long> friendsIds) throws HibernateException;
 
-    Set<FriendsGroup> getForeignGroups(Long userId) throws HibernateException;
-
     List<FriendsGroup> getFriendsGroups(Long userId) throws HibernateException;
 
     List<FriendsGroup> getByOwnerAndFriend(Long ownerId, User friend) throws HibernateException;

@@ -56,7 +56,7 @@
                         </td>
                         <td>
                             <input type="button" class="btn btn-default"
-                                   name="removeFriendButton" value="${friendEntry.key.id}"> Remove from friends
+                                   name="removeFriendButton" value="Remove from friends"> 
                         </td>
                     </tr>
                 </c:forEach>

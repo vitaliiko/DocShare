@@ -5,7 +5,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
@@ -45,19 +44,19 @@ public class User {
     @JsonIgnore
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "user_id")
-    private Set<FriendsGroup> ownerGroupSet = new HashSet<>();
+    private Set<FriendsGroup> friendsGroups = new HashSet<>();
 
     @JsonIgnore
     @ManyToMany(cascade = CascadeType.ALL)
-    @JoinTable(name = "userToGroupRelation",
+    @JoinTable(name = "userToFriendRelation",
             joinColumns = {
                     @JoinColumn(name = "userId")
             },
             inverseJoinColumns = {
-                    @JoinColumn(name = "groupId")
+                    @JoinColumn(name = "friendId")
             }
     )
-    private Set<FriendsGroup> foreignGroupSet = new HashSet<>();
+    private Set<User> friends = new HashSet<>();
 
     public User() {
     }
@@ -117,20 +116,20 @@ public class User {
         this.messageSet = messageSet;
     }
 
-    public Set<FriendsGroup> getOwnerGroupSet() {
-        return ownerGroupSet;
+    public Set<FriendsGroup> getFriendsGroups() {
+        return friendsGroups;
     }
 
-    public void setOwnerGroupSet(Set<FriendsGroup> ownerGroupSet) {
-        this.ownerGroupSet = ownerGroupSet;
+    public void setFriendsGroups(Set<FriendsGroup> ownerGroupSet) {
+        this.friendsGroups = ownerGroupSet;
     }
 
-    public Set<FriendsGroup> getForeignGroupSet() {
-        return foreignGroupSet;
+    public Set<User> getFriends() {
+        return friends;
     }
 
-    public void setForeignGroupSet(Set<FriendsGroup> foreignGroupSet) {
-        this.foreignGroupSet = foreignGroupSet;
+    public void setFriends(Set<User> friends) {
+        this.friends = friends;
     }
 
     @Override

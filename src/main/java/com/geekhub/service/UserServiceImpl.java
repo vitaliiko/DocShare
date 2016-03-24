@@ -93,11 +93,6 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Set<FriendsGroup> getForeignGroups(Long userId) throws HibernateException {
-        return userDao.getForeignGroups(userId);
-    }
-
-    @Override
     public List<FriendsGroup> getFriendsGroups(Long userId) throws HibernateException {
         return userDao.getFriendsGroups(userId);
     }

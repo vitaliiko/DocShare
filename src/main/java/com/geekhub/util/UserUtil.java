@@ -39,7 +39,7 @@ public class UserUtil {
 
     public Long createUser(String firstName, String lastName, String login, String password) throws HibernateException {
         User user = new User(firstName, lastName, password, login);
-        user.getOwnerGroupSet().add(friendsGroupUtil.createDefaultGroup());
+        user.getFriendsGroups().add(friendsGroupUtil.createDefaultGroup());
         return userService.save(user);
     }
 
@@ -47,23 +47,22 @@ public class UserUtil {
         for (int i = 0; i < 20; i++) {
             String value = String.valueOf(i) + i + i;
             User user = new User(value, value, value, value);
-            user.getOwnerGroupSet().add(friendsGroupUtil.createDefaultGroup());
+            user.getFriendsGroups().add(friendsGroupUtil.createDefaultGroup());
             userService.save(user);
         }
-        addFriends(1L, id -> id > 0 && id < 10);
+        addFriends(userService.getById(1L), id -> id > 0 && id < 10);
         addGroup(1L, "Parents", id -> id > 2 && id < 5);
         addGroup(1L, "Fuckers", id -> id > 3 && id < 8);
-        addFriends(2L, id -> id > 10 && id < 18);
+        addFriends(userService.getById(2L), id -> id > 10 && id < 18);
         addGroup(2L, "Fuckers", id -> id > 13 && id < 18);
     }
 
-    public void addFriends(Long userId, LongPredicate predicate) {
+    public void addFriends(User user, LongPredicate predicate) {
         List<User> userList = userService.getAll("id");
-        FriendsGroup group = userService.getFriendsGroup(userId, "Friends");
         userList.stream()
                 .filter(u -> predicate.test(u.getId()))
-                .forEach(group.getFriendsSet()::add);
-        friendsGroupService.update(group);
+                .forEach(u -> userService.addFriend(user.getId(), u.getId()));
+        userService.update(user);
     }
 
     public void addGroup(Long userId, String name, LongPredicate predicate) {
