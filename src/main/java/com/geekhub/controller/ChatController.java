@@ -169,14 +169,6 @@ public class ChatController {
         return "redirect:/index";
     }
 
-    @RequestMapping("/createGroup/{name}")
-    public ModelAndView createGroup(@PathVariable String name, HttpSession session) {
-        ModelAndView model = new ModelAndView("redirect:/index");
-        Long id = friendsGroupUtil.createFriendsGroup((Long) session.getAttribute("userId"), name);
-        model.addObject("groupId", id);
-        return model;
-    }
-
     @RequestMapping("/addFriend/{friendId}")
     public ModelAndView addFriend(@PathVariable Long friendId, Long userId, Long groupId) {
         ModelAndView model = new ModelAndView("redirect:/index");

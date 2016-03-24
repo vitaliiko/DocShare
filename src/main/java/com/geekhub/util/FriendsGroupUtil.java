@@ -16,15 +16,4 @@ public class FriendsGroupUtil {
     @Autowired
     private UserService userService;
 
-    public FriendsGroup createDefaultGroup() {
-        FriendsGroup friendsGroup = new FriendsGroup();
-        friendsGroup.setName("Friends");
-        return friendsGroup;
-    }
-
-    public Long createFriendsGroup(Long userId, String name) {
-        User user = userService.getById(userId);
-        FriendsGroup group = new FriendsGroup(name);
-        return friendsGroupService.save(group);
-    }
 }

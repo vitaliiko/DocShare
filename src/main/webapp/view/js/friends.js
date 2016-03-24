@@ -1,5 +1,12 @@
 $(document).ready(function() {
 
+    function clearModalWindow() {
+        $('.check-box').each(function() {
+            $(this).prop('checked', false);
+        });
+        $('#groupName').val('');
+    }
+
     $('#saveGroupButton').click(function() {
         var groupName = $('#groupName').val();
         var friends = [];
@@ -14,8 +21,7 @@ $(document).ready(function() {
                     'class="btn btn-link" data-toggle="modal" data-target="#groupInfo">' + groupName +
                     '</button></td> </tr>');
                 $('#groupInfo').modal('hide');
-                $('#groupName').val('');
-                $('#friends-list').html('');
+                clearModalWindow();
             }
         })
     });
@@ -41,10 +47,7 @@ $(document).ready(function() {
     });
 
     $('#addGroupButton').click(function() {
-        $('.check-box').each(function() {
-            $(this).prop('checked', false);
-        });
-        $('#groupName').val('');
+        clearModalWindow();
 
         //$.ajax({
         //    url: '/friends/get_friends',

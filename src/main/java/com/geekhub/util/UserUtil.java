@@ -36,7 +36,6 @@ public class UserUtil {
 
     public Long createUser(String firstName, String lastName, String login, String password) throws HibernateException {
         User user = new User(firstName, lastName, password, login);
-        user.getFriendsGroups().add(friendsGroupUtil.createDefaultGroup());
         return userService.save(user);
     }
 
@@ -44,7 +43,6 @@ public class UserUtil {
         for (int i = 0; i < 20; i++) {
             String value = String.valueOf(i) + i + i;
             User user = new User(value, value, value, value);
-            user.getFriendsGroups().add(friendsGroupUtil.createDefaultGroup());
             userService.save(user);
         }
         addFriends(userService.getById(1L), id -> id > 0 && id < 10);
@@ -58,7 +56,10 @@ public class UserUtil {
         List<User> userList = userService.getAll("id");
         userList.stream()
                 .filter(u -> predicate.test(u.getId()))
-                .forEach(u -> userService.addFriend(user.getId(), u.getId()));
+                .forEach(u -> {
+                    userService.addFriend(user.getId(), u.getId());
+                    userService.addFriend(u.getId(), user.getId());
+                });
         userService.update(user);
     }
 
