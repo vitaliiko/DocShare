@@ -71,6 +71,12 @@ $(document).ready(function() {
             data: {friendId: friendId},
             success: function() {
                 $('table#friendsTable tr#' + friendId).remove();
+                var divId = 'checkBoxDiv' + friendId;
+                $('div[id="'+divId+'"]').remove();
+                //var checkBox = $('.check-box[value="'+friendId+'"]');
+                //var checkBoxId = checkBox.attr('id');
+                //checkBox.remove();
+                //$('label[for="'+checkBoxId+'"]').remove();
             }
         })
     });

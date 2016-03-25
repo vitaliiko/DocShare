@@ -78,11 +78,13 @@
 
                         <div class="checkbox" id="friends-list">
                             <c:forEach var="friendEntry" items="${friends}">
-                                <label>
-                                    <input type="checkbox" class="check-box" value="${friendEntry.key.id}">
-                                    ${friendEntry.key}
-                                </label>
-                                <br>
+                                <div id="checkBoxDiv${friendEntry.key.id}">
+                                    <label>
+                                        <input type="checkbox" class="check-box" value="${friendEntry.key.id}">
+                                        ${friendEntry.key}
+                                    </label>
+                                    <br>
+                                </div>
                             </c:forEach>
                         </div>
 
