@@ -19,7 +19,7 @@
             <table id="groupTable" class="table table-hover tbody tr:hover td">
                 <caption>
                     Groups
-                    <button type="button" id="addGroupButton" class="btn btn-primary btn-sm group-info"
+                    <button type="button" id="addGroupButton" class="btn btn-primary btn-sm group-info-btn"
                             data-toggle="modal" data-target="#groupInfo">Add group</button>
                 </caption>
 
@@ -27,7 +27,7 @@
                     <c:url var="groupPage" value="/main/userpage/${group.id}"/>
                     <tr id="${group.id}">
                         <td>
-                            <button type="button" name="groupInfoButton" class="btn btn-link group-info"
+                            <button type="button" name="groupInfoButton" class="btn btn-link group-info-btn"
                                     data-toggle="modal" data-target="#groupInfo"> ${group.name} </button>
                         </td>
                         <td>
@@ -51,7 +51,7 @@
                         </td>
                         <td>
                             <c:forEach var="group" items="${friendEntry.value}">
-                                <button type="button" name="groupInfoButton" class="btn btn-link group-info"
+                                <button type="button" name="groupInfoButton" class="btn btn-link group-info-btn"
                                         data-toggle="modal" data-target="#groupInfo"> ${group.name} </button>
                             </c:forEach>
                         </td>

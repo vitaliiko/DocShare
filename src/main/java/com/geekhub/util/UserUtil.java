@@ -72,11 +72,12 @@ public class UserUtil {
         userService.addFriendsGroup(userId, group);
     }
 
-    public void addFriendsGroup(Long userId, String name, Long[] friendsIds) {
+    public Long addFriendsGroup(Long userId, String name, Long[] friendsIds) {
         Set<User> friendsSet = new HashSet<>();
         Arrays.stream(friendsIds).forEach(id -> friendsSet.add(userService.getById(id)));
         FriendsGroup group = new FriendsGroup(name, friendsSet);
-        userService.addFriendsGroup(userId, group);
+        group.setOwner(userService.getById(userId));
+        return friendsGroupService.save(group);
     }
 
     public Map<User, List<FriendsGroup>> getFriendsWithGroups(Long userId) {

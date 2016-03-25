@@ -19,10 +19,12 @@ $(document).ready(function() {
         $.ajax({
             url: '/friends/create_group',
             data: {groupName: groupName, friends: friends},
-            success: function() {
-                $('#groupTable').append('<tr><td><button type="button" ' +
-                    'class="btn btn-link" data-toggle="modal" data-target="#groupInfo">' + groupName +
-                    '</button></td> </tr>');
+            success: function(groupId) {
+                $('#groupTable').append("<tr id='" + groupId + "'>" +
+                "<td><button type='button' name='groupInfoButton' class='btn btn-link group-info-btn'" +
+                "data-toggle='modal' data-target='#groupInfo'> " + groupName + " </button>" +
+                "</td><td><input type='button' class='btn btn-default removeGroupButton' id='" + groupId + "' value='Remove friends group'>" +
+                "</td></tr>");
                 $('#groupInfo').modal('hide');
                 clearModalWindow();
             }
@@ -50,8 +52,7 @@ $(document).ready(function() {
         })
     });
 
-    $('.group-info').click(function() {
-        var groupName = $(this).text();
+    function showGroupInfo(groupName) {
         $('#saveGroupButton').hide();
         $('#updateGroupButton').show();
         $.ajax({
@@ -71,7 +72,17 @@ $(document).ready(function() {
                 $('#groupName').val(group.name);
             }
         });
+    }
+
+    $('.group-info-btn').click(function() {
+        showGroupInfo($(this).text());
     });
+
+    $('<button/>')
+        .name('groupInfoButton')
+        .click(function() {
+            showGroupInfo($(this).text());
+        });
 
     $('#addGroupButton').click(function() {
         clearModalWindow();
