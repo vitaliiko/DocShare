@@ -34,7 +34,7 @@ $(document).ready(function() {
             data: {groupName: groupName},
             success: function(group) {
                 var memberIds = [];
-                $.each(group.friendsSet, function(k, v) {
+                $.each(group.friends, function(k, v) {
                     memberIds.push(v.id);
                 });
                 $('.check-box').each(function() {
@@ -42,6 +42,9 @@ $(document).ready(function() {
                     $(this).prop('checked', isChecked);
                 });
                 $('#groupName').val(group.name);
+            },
+            error: function() {
+                $(this).remove();
             }
         });
     });
@@ -77,7 +80,17 @@ $(document).ready(function() {
                 //var checkBoxId = checkBox.attr('id');
                 //checkBox.remove();
                 //$('label[for="'+checkBoxId+'"]').remove();
-                //$('#groupInfo').html().replace(/(?:<br[^>]*>\s*){2,}/g, '<br>');
+            }
+        })
+    });
+
+    $('.removeGroupButton').click(function() {
+        var groupId = this.id;
+        $.ajax({
+            url: '/friends/delete_group',
+            data: {groupId: groupId},
+            success: function() {
+                $('table#groupTable tr#' + groupId).remove();
             }
         })
     });

@@ -68,7 +68,7 @@ public class UserUtil {
         List<User> users = userService.getAll("id");
         users.stream()
                 .filter(u -> predicate.test(u.getId()))
-                .forEach(group.getFriendsSet()::add);
+                .forEach(group.getFriends()::add);
         userService.addFriendsGroup(userId, group);
     }
 
@@ -82,7 +82,7 @@ public class UserUtil {
     public Map<User, List<FriendsGroup>> getFriendsWithGroups(Long userId) {
         Set<User> friends = userService.getFriends(userId);
         Map<User, List<FriendsGroup>> friendsMap = new HashMap<>();
-        friends.forEach(f -> friendsMap.put(f, userService.getByOwnerAndFriend(userId, f)));
+        friends.forEach(f -> friendsMap.put(f, userService.getGroupsByOwnerAndFriend(userId, f)));
         return friendsMap;
     }
 
@@ -95,5 +95,11 @@ public class UserUtil {
         return userService.getAll("id").stream()
                 .filter(u -> !u.getId().equals(userId))
                 .collect(Collectors.toList());
+    }
+
+    public void deleteFriend(Long userId, Long friendId) {
+        userService.deleteFriend(userId, friendId);
+        List<FriendsGroup> groups = userService.getGroupsByOwnerAndFriend(userId, friendId);
+        groups.forEach(g -> g.getFriends().remove());
     }
 }

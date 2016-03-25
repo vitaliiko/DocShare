@@ -2,6 +2,7 @@ package com.geekhub.controller;
 
 import com.geekhub.entity.FriendsGroup;
 import com.geekhub.entity.User;
+import com.geekhub.service.FriendsGroupService;
 import com.geekhub.service.UserService;
 import com.geekhub.util.UserUtil;
 import org.hibernate.HibernateException;
@@ -13,7 +14,6 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.ModelAndView;
 
-import javax.annotation.Resource;
 import javax.servlet.http.HttpSession;
 import java.util.Arrays;
 import java.util.List;
@@ -30,6 +30,9 @@ public class FriendsController {
 
     @Autowired
     private UserUtil userUtil;
+
+    @Autowired
+    private FriendsGroupService friendsGroupService;
 
     @RequestMapping("/view")
     public ModelAndView friends(HttpSession session) throws HibernateException {
@@ -70,5 +73,11 @@ public class FriendsController {
     @ResponseStatus(HttpStatus.OK)
     public void deleteFriend(Long friendId, HttpSession session) {
         userService.deleteFriend((Long) session.getAttribute("userId"), friendId);
+    }
+
+    @RequestMapping("/delete_group")
+    @ResponseStatus(HttpStatus.OK)
+    public void deleteGroup(Long groupId) {
+        friendsGroupService.delete(groupId);
     }
 }

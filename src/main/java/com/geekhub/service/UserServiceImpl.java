@@ -93,8 +93,13 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<FriendsGroup> getByOwnerAndFriend(Long ownerId, User friend) throws HibernateException {
-        return userDao.getByOwnerAndFriend(ownerId, friend);
+    public List<FriendsGroup> getGroupsByOwnerAndFriend(Long ownerId, User friend) throws HibernateException {
+        return userDao.getGroupsByOwnerAndFriend(ownerId, friend);
+    }
+
+    @Override
+    public List<FriendsGroup> getGroupsByOwnerAndFriend(Long ownerId, Long friendId) throws HibernateException {
+        return userDao.getGroupsByOwnerAndFriend(ownerId, friendId);
     }
 
     @Override

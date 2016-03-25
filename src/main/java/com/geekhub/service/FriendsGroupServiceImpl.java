@@ -61,8 +61,8 @@ public class FriendsGroupServiceImpl implements FriendsGroupService {
     public boolean addFriend(Long groupId, Long friendId) throws HibernateException {
         FriendsGroup group = friendsGroupDao.getById(friendId);
         User user = userService.getById(friendId);
-        Hibernate.initialize(group.getFriendsSet());
-        if (group.getFriendsSet().add(user)) {
+        Hibernate.initialize(group.getFriends());
+        if (group.getFriends().add(user)) {
             friendsGroupDao.update(group);
             return true;
         }
@@ -76,7 +76,7 @@ public class FriendsGroupServiceImpl implements FriendsGroupService {
 
     @Override
     public Set<User> getFriendsSet(FriendsGroup group) throws HibernateException {
-        Hibernate.initialize(group.getFriendsSet());
-        return group.getFriendsSet();
+        Hibernate.initialize(group.getFriends());
+        return group.getFriends();
     }
 }

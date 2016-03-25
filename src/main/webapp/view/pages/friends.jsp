@@ -25,13 +25,14 @@
 
                 <c:forEach var="group" items="${groups}">
                     <c:url var="groupPage" value="/main/userpage/${group.id}"/>
-                    <tr>
+                    <tr id="${group.id}">
                         <td>
                             <button type="button" name="groupInfoButton" class="btn btn-link group-info"
                                     data-toggle="modal" data-target="#groupInfo"> ${group.name} </button>
                         </td>
                         <td>
-
+                            <input type="button" class="btn btn-default removeGroupButton"
+                                   id="${group.id}" value="Remove friends group">
                         </td>
                     </tr>
                 </c:forEach>
