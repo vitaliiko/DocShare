@@ -28,8 +28,6 @@ public interface UserService extends EntityService<User, Long> {
 
     List<FriendsGroup> getGroupsByOwnerAndFriend(Long ownerId, User friend) throws HibernateException;
 
-    List<FriendsGroup> getGroupsByOwnerAndFriend(Long ownerId, Long friendId) throws HibernateException;
-
     void addFriend(Long userId, Long friendId) throws HibernateException;
 
     void deleteFriend(Long userId, Long friendId) throws HibernateException;

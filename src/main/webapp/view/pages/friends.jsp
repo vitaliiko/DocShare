@@ -92,6 +92,7 @@
                     </div>
                     <div class="modal-footer">
                         <button type="button" id="saveGroupButton" class="btn btn-primary">Save</button>
+                        <button type="button" id="updateGroupButton" class="btn btn-primary">Save</button>
                         <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
                     </div>
                 </div>

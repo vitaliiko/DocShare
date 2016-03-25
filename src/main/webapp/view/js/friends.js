@@ -1,5 +1,8 @@
 $(document).ready(function() {
 
+    var friendsGroupId;
+    var oldGroupName;
+
     function clearModalWindow() {
         $('.check-box').each(function() {
             $(this).prop('checked', false);
@@ -23,16 +26,40 @@ $(document).ready(function() {
                 $('#groupInfo').modal('hide');
                 clearModalWindow();
             }
+        });
+    });
+
+    $('#updateGroupButton').click(function() {
+        var groupName = $('#groupName').val();
+        var friends = [];
+        $('.check-box:checked').each(function() {
+            friends.push($(this).val());
+        });
+        $.ajax({
+            url: '/friends/update_group',
+            contentType: 'json',
+            data: {groupId: friendsGroupId, groupName: groupName, friends: friends},
+            success: function() {
+                $('.group-info[text="'+oldGroupName+'"]').each(function() {
+                    alert($(this).text());
+                    $(this).text(groupName);
+                });
+                $('#groupInfo').modal('hide');
+                clearModalWindow();
+            }
         })
     });
 
     $('.group-info').click(function() {
         var groupName = $(this).text();
+        $('#saveGroupButton').hide();
+        $('#updateGroupButton').show();
         $.ajax({
             url: '/friends/get_group',
             dataType: 'json',
             data: {groupName: groupName},
             success: function(group) {
+                friendsGroupId = group.id;
                 var memberIds = [];
                 $.each(group.friends, function(k, v) {
                     memberIds.push(v.id);
@@ -48,6 +75,8 @@ $(document).ready(function() {
 
     $('#addGroupButton').click(function() {
         clearModalWindow();
+        $('#saveGroupButton').show();
+        $('#updateGroupButton').hide();
 
         //$.ajax({
         //    url: '/friends/get_friends',

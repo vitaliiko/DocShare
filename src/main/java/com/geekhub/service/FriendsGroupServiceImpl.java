@@ -79,4 +79,9 @@ public class FriendsGroupServiceImpl implements FriendsGroupService {
         Hibernate.initialize(group.getFriends());
         return group.getFriends();
     }
+
+    @Override
+    public List<FriendsGroup> getFriendsGroups(User owner, String groupName) throws HibernateException {
+        return friendsGroupDao.getFriendsGroups(owner, groupName);
+    }
 }

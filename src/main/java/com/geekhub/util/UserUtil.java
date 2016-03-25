@@ -72,9 +72,9 @@ public class UserUtil {
         userService.addFriendsGroup(userId, group);
     }
 
-    public void addFriendsGroup(Long userId, String name, List<Long> friendsIds) {
+    public void addFriendsGroup(Long userId, String name, Long[] friendsIds) {
         Set<User> friendsSet = new HashSet<>();
-        friendsIds.forEach(id -> friendsSet.add(userService.getById(id)));
+        Arrays.stream(friendsIds).forEach(id -> friendsSet.add(userService.getById(id)));
         FriendsGroup group = new FriendsGroup(name, friendsSet);
         userService.addFriendsGroup(userId, group);
     }
@@ -95,11 +95,5 @@ public class UserUtil {
         return userService.getAll("id").stream()
                 .filter(u -> !u.getId().equals(userId))
                 .collect(Collectors.toList());
-    }
-
-    public void deleteFriend(Long userId, Long friendId) {
-        userService.deleteFriend(userId, friendId);
-        List<FriendsGroup> groups = userService.getGroupsByOwnerAndFriend(userId, friendId);
-        groups.forEach(g -> g.getFriends().remove());
     }
 }
