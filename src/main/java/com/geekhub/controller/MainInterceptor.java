@@ -10,7 +10,7 @@ import java.util.List;
 public class MainInterceptor extends HandlerInterceptorAdapter {
 
     private final List<String> EXCLUSIONS = Arrays.asList(
-            "/signIn", "/signUp", "/defaultUsers", "bootstrap.min.css", "simple-sidebar.css"
+            "/sign_in", "/signUp", "/defaultUsers", ".css", ".css.map"
     );
 
     @Override
@@ -22,7 +22,7 @@ public class MainInterceptor extends HandlerInterceptorAdapter {
         if (exclusion || req.getSession().getAttribute("userId") != null) {
             return true;
         } else {
-            resp.sendRedirect("/main/signIn");
+            resp.sendRedirect("/main/sign_in");
         }
         return false;
     }

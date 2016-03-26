@@ -6,10 +6,12 @@ import com.geekhub.service.UserService;
 import com.geekhub.util.UserUtil;
 import org.hibernate.HibernateException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpSession;
@@ -32,23 +34,18 @@ public class MainController {
         return new ModelAndView("pages/home");
     }
 
-    @RequestMapping(value = "/signIn", method = RequestMethod.GET)
+    @RequestMapping(value = "/sign_in", method = RequestMethod.GET)
     public ModelAndView signIn() {
         return new ModelAndView("pages/signIn");
     }
 
-    @RequestMapping(value = "/signIn", method = RequestMethod.POST)
-    public ModelAndView signIn(String login, String password, HttpSession session) {
-        ModelAndView model = new ModelAndView();
+    @RequestMapping(value = "/sign_in", method = RequestMethod.POST)
+    @ResponseStatus(HttpStatus.OK)
+    public void signIn(String login, String password, HttpSession session) {
         User user = userService.getByLogin(login);
         if (user != null && user.getPassword().equals(password)) {
-            model.setViewName("redirect:/main/home");
             session.setAttribute("userId", user.getId());
-        } else {
-            model.addObject("errorMessage", "Wrong login or password")
-                    .setViewName("pages/signIn");
         }
-        return model;
     }
 
     @RequestMapping(value = "/signUp", method = RequestMethod.GET)
