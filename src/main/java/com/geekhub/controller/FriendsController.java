@@ -49,9 +49,10 @@ public class FriendsController {
     }
 
     @RequestMapping("/create_group")
-    public Long createGroup(HttpSession session, String groupName, @RequestParam("friends[]") Long[] friends)
+    @ResponseStatus(HttpStatus.OK)
+    public void createGroup(HttpSession session, String groupName, @RequestParam("friends[]") Long[] friends)
             throws HibernateException {
-        return userUtil.addFriendsGroup((Long) session.getAttribute("userId"), groupName, friends);
+        userUtil.addFriendsGroup((Long) session.getAttribute("userId"), groupName, friends);
     }
 
     @RequestMapping("/update_group")

@@ -22,7 +22,7 @@ public class FriendsGroup {
     @Column
     private String name;
 
-    @ManyToMany(cascade = CascadeType.ALL)
+    @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
     @JoinTable(name = "userToGroupRelation",
             joinColumns = {
                     @JoinColumn(name = "groupId")

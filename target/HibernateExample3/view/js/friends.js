@@ -19,11 +19,11 @@ $(document).ready(function() {
         $.ajax({
             url: '/friends/create_group',
             data: {groupName: groupName, friends: friends},
-            success: function(groupId) {
-                $('#groupTable').append("<tr id='" + groupId + "'>" +
+            success: function() {
+                $('#groupTable').append("<tr id='" + "'>" +
                 "<td><button type='button' name='groupInfoButton' class='btn btn-link group-info-btn'" +
                 "data-toggle='modal' data-target='#groupInfo'> " + groupName + " </button>" +
-                "</td><td><input type='button' class='btn btn-default removeGroupButton' id='" + groupId + "' value='Remove friends group'>" +
+                "</td><td><input type='button' class='btn btn-default removeGroupButton' id='"  + "' value='Remove friends group'>" +
                 "</td></tr>");
                 $('#groupInfo').modal('hide');
                 clearModalWindow();
@@ -52,13 +52,14 @@ $(document).ready(function() {
         })
     });
 
-    function showGroupInfo(groupName) {
+    $('.group-info-btn').click(function() {
+        clearModalWindow();
         $('#saveGroupButton').hide();
         $('#updateGroupButton').show();
         $.ajax({
             url: '/friends/get_group',
             dataType: 'json',
-            data: {groupName: groupName},
+            data: {groupName: $(this).text()},
             success: function(group) {
                 friendsGroupId = group.id;
                 var memberIds = [];
@@ -72,17 +73,7 @@ $(document).ready(function() {
                 $('#groupName').val(group.name);
             }
         });
-    }
-
-    $('.group-info-btn').click(function() {
-        showGroupInfo($(this).text());
     });
-
-    $('<button/>')
-        .name('groupInfoButton')
-        .click(function() {
-            showGroupInfo($(this).text());
-        });
 
     $('#addGroupButton').click(function() {
         clearModalWindow();

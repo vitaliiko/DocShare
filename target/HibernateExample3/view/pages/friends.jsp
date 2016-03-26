@@ -19,7 +19,7 @@
             <table id="groupTable" class="table table-hover tbody tr:hover td">
                 <caption>
                     Groups
-                    <button type="button" id="addGroupButton" class="btn btn-primary btn-sm group-info-btn"
+                    <button type="button" id="addGroupButton" class="btn btn-primary btn-sm"
                             data-toggle="modal" data-target="#groupInfo">Add group</button>
                 </caption>
 
