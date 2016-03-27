@@ -10,7 +10,7 @@ import java.util.List;
 public class MainInterceptor extends HandlerInterceptorAdapter {
 
     private final List<String> EXCLUSIONS = Arrays.asList(
-            "/sign_in", "/signUp", "/defaultUsers", ".css", ".css.map"
+            "/sign_in", "/sign_up", "/defaultUsers", ".css", ".css.map"
     );
 
     @Override

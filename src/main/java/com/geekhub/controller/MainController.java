@@ -40,20 +40,25 @@ public class MainController {
     }
 
     @RequestMapping(value = "/sign_in", method = RequestMethod.POST)
-    @ResponseStatus(HttpStatus.OK)
-    public void signIn(String login, String password, HttpSession session) {
+    public ModelAndView signIn(String login, String password, HttpSession session) {
+        ModelAndView model = new ModelAndView();
         User user = userService.getByLogin(login);
         if (user != null && user.getPassword().equals(password)) {
+            model.setViewName("redirect:/main/home");
             session.setAttribute("userId", user.getId());
+        } else {
+            model.addObject("errorMessage", "Wrong login or password")
+                    .setViewName("pages/signIn");
         }
+        return model;
     }
 
-    @RequestMapping(value = "/signUp", method = RequestMethod.GET)
+    @RequestMapping(value = "/sign_up", method = RequestMethod.GET)
     public String signUp() {
         return "pages/signUp";
     }
 
-    @RequestMapping(value = "/signUp", method = RequestMethod.POST)
+    @RequestMapping(value = "/sign_up", method = RequestMethod.POST)
     public ModelAndView signUp(String firstName,
                                String lastName,
                                String login,
@@ -66,10 +71,12 @@ public class MainController {
             userUtil.validateUser(login, password, confirmPassword);
             userUtil.createUser(firstName, lastName, login, password);
             model.setViewName("pages/signIn");
+            model.addObject("message", "Your account created successfully");
         } catch (UserValidateException e) {
             model.addObject("login", login)
                     .addObject("firstName", firstName)
                     .addObject("lastName", lastName)
+                    .addObject("errorMessage", e.getMessage())
                     .setViewName("pages/signUp");
         }
         return model;
