@@ -58,8 +58,7 @@ public class User {
     )
     private Set<User> friends = new HashSet<>();
 
-    public User() {
-    }
+    public User() {}
 
     public User(String firstName, String lastName, String password, String login) {
         this.firstName = firstName;

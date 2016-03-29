@@ -27,6 +27,7 @@
         </c:if>
     </div>
 
+    <c:url value="/j_spring_security_check" var="loginUrl" />
     <div class="container" style="width: 300px;" align="center">
         <form class="form-signin" action="/main/sign_in" method="post">
             <input type="text" name="login" class="form-control" placeholder="Email address" required="" autofocus="">

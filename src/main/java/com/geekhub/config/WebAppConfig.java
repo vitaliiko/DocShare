@@ -4,6 +4,7 @@ import com.geekhub.controller.MainInterceptor;
 import com.geekhub.entity.FriendsGroup;
 import com.geekhub.entity.Message;
 import com.geekhub.entity.User;
+import com.geekhub.security.UserDetailsServiceImpl;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.AnnotationConfiguration;
 
@@ -19,10 +20,13 @@ import org.springframework.core.io.Resource;
 import org.apache.tomcat.dbcp.dbcp.BasicDataSource;
 import org.springframework.orm.hibernate4.HibernateTransactionManager;
 import org.springframework.orm.hibernate4.LocalSessionFactoryBean;
+import org.springframework.security.authentication.encoding.ShaPasswordEncoder;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.web.servlet.ViewResolver;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
+import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 import org.springframework.web.servlet.view.InternalResourceViewResolver;
 
@@ -31,40 +35,13 @@ import java.util.Properties;
 
 @Configuration
 @ComponentScan(basePackages = "com.geekhub")
-@EnableTransactionManagement
 @PropertySource("classpath:database.properties")
 @EnableWebMvc
 public class WebAppConfig extends WebMvcConfigurerAdapter {
 
-    @Autowired
-    private Environment environment;
-
-    @Bean
-    public LocalSessionFactoryBean sessionFactory() {
-        LocalSessionFactoryBean sessionFactory = new LocalSessionFactoryBean();
-        sessionFactory.setDataSource(restDataSource());
-        sessionFactory.setHibernateProperties(hibernateProperties());
-        sessionFactory.setAnnotatedClasses(User.class, Message.class, FriendsGroup.class);
-        sessionFactory.setAnnotatedPackages("com.geekhub.entity");
-        return sessionFactory;
-    }
-
-    @Bean
-    public DataSource restDataSource() {
-        BasicDataSource dataSource = new BasicDataSource();
-        dataSource.setDriverClassName(environment.getProperty("jdbc.driverClassName"));
-        dataSource.setUrl(environment.getProperty("jdbc.url"));
-        dataSource.setUsername(environment.getProperty("jdbc.username"));
-        dataSource.setPassword(environment.getProperty("jdbc.password"));
-        return dataSource;
-    }
-
-    @Bean
-    @Autowired
-    public HibernateTransactionManager transactionManager(SessionFactory sessionFactory) {
-        HibernateTransactionManager txManager = new HibernateTransactionManager();
-        txManager.setSessionFactory(sessionFactory);
-        return txManager;
+    @Override
+    public void addResourceHandlers(ResourceHandlerRegistry registry) {
+        registry.addResourceHandler("/view/**").addResourceLocations("/view/");
     }
 
     @Bean
@@ -85,10 +62,13 @@ public class WebAppConfig extends WebMvcConfigurerAdapter {
         registry.addInterceptor(new MainInterceptor());
     }
 
-    private Properties hibernateProperties() {
-        Properties properties = new Properties();
-        properties.put("hibernate.dialect", "org.hibernate.dialect.MySQL5Dialect");
-        properties.put("hibernate.show_sql", "true");
-        return properties;
+    @Bean
+    public UserDetailsService getUserDetailsService(){
+        return new UserDetailsServiceImpl();
+    }
+
+    @Bean
+    public ShaPasswordEncoder getShaPasswordEncoder(){
+        return new ShaPasswordEncoder();
     }
 }
