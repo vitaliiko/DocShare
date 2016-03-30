@@ -40,10 +40,10 @@ public class MainController {
     }
 
     @RequestMapping(value = "/sign_in", method = RequestMethod.POST)
-    public ModelAndView signIn(String login, String password, HttpSession session) {
+    public ModelAndView signIn(String j_username, String j_password, HttpSession session) {
         ModelAndView model = new ModelAndView();
-        User user = userService.getByLogin(login);
-        if (user != null && user.getPassword().equals(password)) {
+        User user = userService.getByLogin(j_username);
+        if (user != null && user.getPassword().equals(j_password)) {
             model.setViewName("redirect:/main/home");
             session.setAttribute("userId", user.getId());
         } else {
