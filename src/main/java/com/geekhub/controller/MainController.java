@@ -31,12 +31,12 @@ public class MainController {
 
     @RequestMapping(value = "/home", method = RequestMethod.GET)
     public ModelAndView home() {
-        return new ModelAndView("pages/home");
+        return new ModelAndView("home");
     }
 
     @RequestMapping(value = "/sign_in", method = RequestMethod.GET)
     public ModelAndView signIn() {
-        return new ModelAndView("pages/signIn");
+        return new ModelAndView("signIn");
     }
 
     @RequestMapping(value = "/sign_in", method = RequestMethod.POST)
@@ -48,14 +48,14 @@ public class MainController {
             session.setAttribute("userId", user.getId());
         } else {
             model.addObject("errorMessage", "Wrong login or password")
-                    .setViewName("pages/signIn");
+                    .setViewName("signIn");
         }
         return model;
     }
 
     @RequestMapping(value = "/sign_up", method = RequestMethod.GET)
     public String signUp() {
-        return "pages/signUp";
+        return "signUp";
     }
 
     @RequestMapping(value = "/sign_up", method = RequestMethod.POST)
@@ -70,14 +70,14 @@ public class MainController {
         try {
             userUtil.validateUser(login, password, confirmPassword);
             userUtil.createUser(firstName, lastName, login, password);
-            model.setViewName("pages/signIn");
+            model.setViewName("signIn");
             model.addObject("message", "Your account created successfully");
         } catch (UserValidateException e) {
             model.addObject("login", login)
                     .addObject("firstName", firstName)
                     .addObject("lastName", lastName)
                     .addObject("errorMessage", e.getMessage())
-                    .setViewName("pages/signUp");
+                    .setViewName("signUp");
         }
         return model;
     }
@@ -85,7 +85,7 @@ public class MainController {
     @RequestMapping("/signOut")
     public String signOut(HttpSession session) {
         session.invalidate();
-        return "pages/signIn";
+        return "signIn";
     }
 
     @RequestMapping(value = "/search", method = RequestMethod.GET)
@@ -96,7 +96,7 @@ public class MainController {
         Map<User, Boolean> usersMap = users.stream()
                 .collect(Collectors.toMap(u -> u, u -> !userUtil.areFriends(userId, u)));
 
-        ModelAndView model = new ModelAndView("pages/search");
+        ModelAndView model = new ModelAndView("search");
         model.addObject("usersMap", usersMap);
         return model;
     }
@@ -104,7 +104,7 @@ public class MainController {
     @RequestMapping("/userpage/{ownerId}")
     public ModelAndView userPage(@PathVariable Long ownerId) {
         User owner = userService.getById(ownerId);
-        ModelAndView model = new ModelAndView("pages/userPage");
+        ModelAndView model = new ModelAndView("userPage");
         model.addObject("pageOwner", owner);
         return model;
     }

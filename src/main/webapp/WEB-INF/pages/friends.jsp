@@ -7,7 +7,7 @@
     <title>Friends</title>
 
     <jsp:include page="../include/include.jsp"/>
-    <script src="${pageContext.request.contextPath}/view/js/friends.js"></script>
+    <script src="${pageContext.request.contextPath}/resources/js/friends.js"></script>
 </head>
 <body>
 

@@ -42,7 +42,7 @@ public class FriendsController {
         Long userId = (Long) session.getAttribute("userId");
         List<FriendsGroup> groupSet = userService.getFriendsGroups(userId);
         Map<User, List<FriendsGroup>> friendsMap = userUtil.getFriendsWithGroups(userId);
-        ModelAndView model = new ModelAndView("pages/friends");
+        ModelAndView model = new ModelAndView("friends");
         model.addObject("friends", friendsMap);
         model.addObject("groups", groupSet);
         return model;
