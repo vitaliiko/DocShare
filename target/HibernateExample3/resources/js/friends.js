@@ -3,7 +3,7 @@ var friendsGroupId;
 var oldGroupName;
 
 $(document).ready(function() {
-    alert('hello');
+
 });
 
 function clearModalWindow() {
