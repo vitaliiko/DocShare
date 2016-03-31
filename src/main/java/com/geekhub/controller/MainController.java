@@ -69,7 +69,7 @@ public class MainController {
         ModelAndView model = new ModelAndView();
         try {
             userUtil.validateUser(login, password, confirmPassword);
-            userUtil.createUser(firstName, lastName, login, password);
+            userService.createUser(firstName, lastName, login, password);
             model.setViewName("signIn");
             model.addObject("message", "Your account created successfully");
         } catch (UserValidateException e) {
@@ -92,9 +92,9 @@ public class MainController {
     public ModelAndView search(HttpSession session) {
         Long userId = (Long) session.getAttribute("userId");
 
-        List<User> users = userUtil.getAllWithoutCurrentUser(userId);
+        List<User> users = userService.getAllWithoutCurrentUser(userId);
         Map<User, Boolean> usersMap = users.stream()
-                .collect(Collectors.toMap(u -> u, u -> !userUtil.areFriends(userId, u)));
+                .collect(Collectors.toMap(u -> u, u -> !userService.areFriends(userId, u)));
 
         ModelAndView model = new ModelAndView("search");
         model.addObject("usersMap", usersMap);
@@ -108,6 +108,4 @@ public class MainController {
         model.addObject("pageOwner", owner);
         return model;
     }
-
-
 }

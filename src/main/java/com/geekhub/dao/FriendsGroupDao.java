@@ -19,9 +19,6 @@ public class FriendsGroupDao implements EntityDao<FriendsGroup, Long> {
     @Autowired
     private SessionFactory sessionFactory;
 
-    @Autowired
-    private UserService userService;
-
     private Class<FriendsGroup> clazz = FriendsGroup.class;
 
     @Override
@@ -34,22 +31,15 @@ public class FriendsGroupDao implements EntityDao<FriendsGroup, Long> {
 
     @Override
     public FriendsGroup getById(Long id) {
-        FriendsGroup group = (FriendsGroup) sessionFactory.getCurrentSession()
-                .get(clazz, id);
-        Hibernate.initialize(group);
-        return group;
+        return (FriendsGroup) sessionFactory.getCurrentSession().get(clazz, id);
     }
 
     @Override
     public FriendsGroup get(String propertyName, Object value) {
-        List<FriendsGroup> list = (List<FriendsGroup>) sessionFactory.getCurrentSession()
+        return (FriendsGroup) sessionFactory.getCurrentSession()
                 .createCriteria(clazz)
                 .add(Restrictions.eq(propertyName, value))
-                .list();
-        if (list != null && list.size() > 0) {
-            return list.get(0);
-        }
-        return null;
+                .uniqueResult();
     }
 
     @Override
@@ -74,18 +64,25 @@ public class FriendsGroupDao implements EntityDao<FriendsGroup, Long> {
 
     @Override
     public void delete(Long entityId) {
-        FriendsGroup friendsGroup = (FriendsGroup) sessionFactory.getCurrentSession()
-                .get(clazz, entityId);
-
-        sessionFactory.getCurrentSession()
-                .delete(friendsGroup);
+        FriendsGroup friendsGroup = getById(entityId);
+        sessionFactory.getCurrentSession().delete(friendsGroup);
     }
 
-    public List<FriendsGroup> getFriendsGroups(User owner, String name) {
+    public List<FriendsGroup> getFriendsGroups(User owner, String propertyName, Object value) {
         return (List<FriendsGroup>) sessionFactory.getCurrentSession()
-                .createQuery("from FriendsGroup fg where fg.name = :name and fg.owner = :owner")
-                .setParameter("name", name)
+                .createCriteria(clazz)
+                .add(Restrictions.eq("owner", owner))
+                .add(Restrictions.eq(propertyName, value))
+                .list();
+    }
+
+    public List<FriendsGroup> getByOwnerAndFriend(User owner, User friend) {
+        return sessionFactory.getCurrentSession()
+                .createQuery("from FriendsGroup fg " +
+                        "where fg.owner = :owner " +
+                        "and :friend in elements(fg.friends)")
                 .setParameter("owner", owner)
+                .setParameter("friend", friend)
                 .list();
     }
 }

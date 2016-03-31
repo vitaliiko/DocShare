@@ -33,11 +33,6 @@ public class UserUtil {
         }
     }
 
-    public Long createUser(String firstName, String lastName, String login, String password) {
-        User user = new User(firstName, lastName, password, login);
-        return userService.save(user);
-    }
-
     public void addDefaultUsers() {
         for (int i = 0; i < 20; i++) {
             String value = String.valueOf(i) + i + i;
@@ -69,31 +64,5 @@ public class UserUtil {
                 .filter(u -> predicate.test(u.getId()))
                 .forEach(group.getFriends()::add);
         userService.addFriendsGroup(userId, group);
-    }
-
-    public Long addFriendsGroup(Long userId, String name, Long[] friendsIds) {
-        Set<User> friendsSet = new HashSet<>();
-        Arrays.stream(friendsIds).forEach(id -> friendsSet.add(userService.getById(id)));
-        FriendsGroup group = new FriendsGroup(name, friendsSet);
-        group.setOwner(userService.getById(userId));
-        return friendsGroupService.save(group);
-    }
-
-    public Map<User, List<FriendsGroup>> getFriendsWithGroups(Long userId) {
-        Set<User> friends = userService.getFriends(userId);
-        Map<User, List<FriendsGroup>> friendsMap = new HashMap<>();
-        friends.forEach(f -> friendsMap.put(f, userService.getGroupsByOwnerAndFriend(userId, f)));
-        return friendsMap;
-    }
-
-    public boolean areFriends(Long userId, User friend) {
-        Set<User> friends = userService.getFriends(userId);
-        return friends.contains(friend);
-    }
-
-    public List<User> getAllWithoutCurrentUser(Long userId) {
-        return userService.getAll("id").stream()
-                .filter(u -> !u.getId().equals(userId))
-                .collect(Collectors.toList());
     }
 }

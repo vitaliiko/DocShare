@@ -21,17 +21,5 @@ public class FriendsGroupUtil {
     @Autowired
     private UserService userService;
 
-    public void updateGroup(Long userId, Long groupId, String groupName, Long[] friendsIds) {
-        User user = userService.getById(userId);
-        FriendsGroup group = friendsGroupService.getById(groupId);
-        if (!group.getName().equals(groupName) && friendsGroupService.getFriendsGroups(user, groupName).size() == 0) {
-            group.setName(groupName);
-        } else {
-//            throw new HibernateException("Friends group with such name already exist");
-        }
-        Set<User> friendsSet = new HashSet<>();
-        Arrays.stream(friendsIds).forEach(id -> friendsSet.add(userService.getById(id)));
-        group.setFriends(friendsSet);
-        friendsGroupService.update(group);
-    }
+
 }

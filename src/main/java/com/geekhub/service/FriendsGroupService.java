@@ -16,5 +16,11 @@ public interface FriendsGroupService extends EntityService<FriendsGroup, Long> {
 
     Set<User> getFriendsSet(FriendsGroup group);
 
-    List<FriendsGroup> getFriendsGroups(User owner, String groupName);
+    List<FriendsGroup> getFriendsGroups(User owner, String propertyName, Object value);
+
+    List<FriendsGroup> getByOwnerAndFriend(User owner, User friend);
+
+    Long addFriendsGroup(Long ownerId, String name, Long[] friendsIds);
+
+    void update(Long groupId, Long ownerId, String groupName, Long[] friendsIds);
 }

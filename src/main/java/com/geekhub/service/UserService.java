@@ -6,6 +6,7 @@ import com.geekhub.entity.User;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 @Service
@@ -19,15 +20,23 @@ public interface UserService extends EntityService<User, Long> {
 
     Set<User> getFriends(Long userId);
 
-    FriendsGroup getFriendsGroup(Long userId, String groupName);
+    FriendsGroup getFriendsGroupByName(Long ownerId, String groupName);
 
-    void addFriendsGroup(Long userId, FriendsGroup group);
+    void addFriendsGroup(Long ownerId, FriendsGroup group);
 
-    List<FriendsGroup> getFriendsGroups(Long userId);
+    List<FriendsGroup> getAllFriendsGroups(Long ownerId);
 
     List<FriendsGroup> getGroupsByOwnerAndFriend(Long ownerId, User friend);
 
     void addFriend(Long userId, Long friendId);
 
     void deleteFriend(Long userId, Long friendId);
+
+    List<User> getAllWithoutCurrentUser(Long userId);
+
+    boolean areFriends(Long userId, User friend);
+
+    Map<User, List<FriendsGroup>> getFriendsGroupsMap(Long ownerId);
+
+    Long createUser(String firstName, String lastName, String login, String password);
 }

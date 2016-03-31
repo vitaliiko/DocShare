@@ -8,6 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -60,7 +62,6 @@ public class FriendsGroupServiceImpl implements FriendsGroupService {
     public boolean addFriend(Long groupId, Long friendId) {
         FriendsGroup group = friendsGroupDao.getById(friendId);
         User user = userService.getById(friendId);
-        Hibernate.initialize(group.getFriends());
         if (group.getFriends().add(user)) {
             friendsGroupDao.update(group);
             return true;
@@ -80,7 +81,36 @@ public class FriendsGroupServiceImpl implements FriendsGroupService {
     }
 
     @Override
-    public List<FriendsGroup> getFriendsGroups(User owner, String groupName) {
-        return friendsGroupDao.getFriendsGroups(owner, groupName);
+    public List<FriendsGroup> getFriendsGroups(User owner, String propertyName, Object value) {
+        return friendsGroupDao.getFriendsGroups(owner, propertyName, value);
+    }
+
+    @Override
+    public List<FriendsGroup> getByOwnerAndFriend(User owner, User friend) {
+        return friendsGroupDao.getByOwnerAndFriend(owner, friend);
+    }
+
+    @Override
+    public Long addFriendsGroup(Long ownerId, String name, Long[] friendsIds) {
+        Set<User> friendsSet = new HashSet<>();
+        Arrays.stream(friendsIds).forEach(id -> friendsSet.add(userService.getById(id)));
+        FriendsGroup group = new FriendsGroup(name, friendsSet);
+        group.setOwner(userService.getById(ownerId));
+        return friendsGroupDao.save(group);
+    }
+
+    @Override
+    public void update(Long groupId, Long ownerId, String groupName, Long[] friendsIds) {
+        User owner = userService.getById(ownerId);
+        FriendsGroup group = friendsGroupDao.getById(groupId);
+        if (!group.getName().equals(groupName) && friendsGroupDao.getFriendsGroups(owner, "name", groupName).size() == 0) {
+            group.setName(groupName);
+        } else {
+//            throw new HibernateException("Friends group with such name already exist");
+        }
+        Set<User> friendsSet = new HashSet<>();
+        Arrays.stream(friendsIds).forEach(id -> friendsSet.add(userService.getById(id)));
+        group.setFriends(friendsSet);
+        friendsGroupDao.update(group);
     }
 }

@@ -4,12 +4,16 @@ import com.geekhub.dao.UserDao;
 import com.geekhub.entity.FriendsGroup;
 import com.geekhub.entity.Message;
 import com.geekhub.entity.User;
+import org.hibernate.HibernateException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -20,6 +24,9 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private MessageService messageService;
+
+    @Autowired
+    private FriendsGroupService friendsGroupService;
 
     @Override
     public List<User> getAll(String orderParameter) {
@@ -39,6 +46,12 @@ public class UserServiceImpl implements UserService {
     @Override
     public Long save(User entity) {
         return userDao.save(entity);
+    }
+
+    @Override
+    public Long createUser(String firstName, String lastName, String login, String password) {
+        User user = new User(firstName, lastName, password, login);
+        return userDao.save(user);
     }
 
     @Override
@@ -78,36 +91,73 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Set<User> getFriends(Long userId) {
-        return userDao.getFriends(userId);
+        User user = userDao.getById(userId);
+        return user.getFriends();
     }
 
     @Override
-    public FriendsGroup getFriendsGroup(Long userId, String groupName) {
-        return userDao.getFriendsGroup(userId, groupName);
+    public FriendsGroup getFriendsGroupByName(Long ownerId, String groupName) {
+        User owner = userDao.getById(ownerId);
+        return friendsGroupService.getFriendsGroups(owner, "name", groupName).get(0);
     }
 
     @Override
-    public List<FriendsGroup> getFriendsGroups(Long userId) {
-        return userDao.getFriendsGroups(userId);
+    public List<FriendsGroup> getAllFriendsGroups(Long ownerId) {
+        User owner = userDao.getById(ownerId);
+        return owner.getFriendsGroups().stream().collect(Collectors.toList());
     }
 
     @Override
     public List<FriendsGroup> getGroupsByOwnerAndFriend(Long ownerId, User friend) {
-        return userDao.getGroupsByOwnerAndFriend(ownerId, friend);
+        User owner = userDao.getById(ownerId);
+        return friendsGroupService.getByOwnerAndFriend(owner, friend);
     }
 
     @Override
-    public void addFriendsGroup(Long userId, FriendsGroup group) {
-        userDao.addFriendsGroup(userId, group);
+    public void addFriendsGroup(Long ownerId, FriendsGroup group) {
+        User user = userDao.getById(ownerId);
+        if (user.getFriendsGroups().stream().noneMatch(fg -> fg.getName().equals(group.getName()))) {
+            user.getFriendsGroups().add(group);
+        } else {
+            throw new HibernateException("Friends Group with such name already exist");
+        }
+        userDao.update(user);
     }
 
     @Override
     public void addFriend(Long userId, Long friendId) {
-        userDao.addFriend(userId, friendId);
+        User user = userDao.getById(userId);
+        User friend = userDao.getById(friendId);
+        user.getFriends().add(friend);
+        userDao.update(user);
     }
 
     @Override
     public void deleteFriend(Long userId, Long friendId) {
-        userDao.deleteFriend(userId, friendId);
+        User user = userDao.getById(userId);
+        User friend = userDao.getById(friendId);
+        user.getFriends().remove(friend);
+        userDao.update(user);
+    }
+
+    @Override
+    public List<User> getAllWithoutCurrentUser(Long userId) {
+        return userDao.getAll("id").stream()
+                .filter(u -> !u.getId().equals(userId))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public boolean areFriends(Long userId, User friend) {
+        Set<User> friends = userDao.getById(userId).getFriends();
+        return friends.contains(friend);
+    }
+
+    @Override
+    public Map<User, List<FriendsGroup>> getFriendsGroupsMap(Long ownerId) {
+        Set<User> friends = userDao.getById(ownerId).getFriends();
+        Map<User, List<FriendsGroup>> friendsGroupsMap = new HashMap<>();
+        friends.forEach(friend -> friendsGroupsMap.put(friend, getGroupsByOwnerAndFriend(ownerId, friend)));
+        return friendsGroupsMap;
     }
 }

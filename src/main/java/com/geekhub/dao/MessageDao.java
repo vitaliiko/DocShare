@@ -33,14 +33,10 @@ public class MessageDao implements EntityDao<Message, Long> {
 
     @Override
     public Message get(String propertyName, Object value) {
-        List<Message> list = (List<Message>) sessionFactory.getCurrentSession()
+        return (Message) sessionFactory.getCurrentSession()
                 .createCriteria(clazz)
                 .add(Restrictions.eq(propertyName, value))
-                .list();
-        if (list != null && list.size() > 0) {
-            return list.get(0);
-        }
-        return null;
+                .uniqueResult();
     }
 
     @Override
@@ -65,10 +61,7 @@ public class MessageDao implements EntityDao<Message, Long> {
 
     @Override
     public void delete(Long entityId) {
-        Message message = (Message) sessionFactory.getCurrentSession()
-                .get(clazz, entityId);
-
-        sessionFactory.getCurrentSession()
-                .delete(message);
+        Message message = getById(entityId);
+        sessionFactory.getCurrentSession().delete(message);
     }
 }

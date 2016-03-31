@@ -4,7 +4,6 @@ import com.geekhub.entity.FriendsGroup;
 import com.geekhub.entity.User;
 import com.geekhub.service.FriendsGroupService;
 import com.geekhub.service.UserService;
-import com.geekhub.util.FriendsGroupUtil;
 import com.geekhub.util.UserUtil;
 import org.hibernate.HibernateException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,14 +33,11 @@ public class FriendsController {
     @Autowired
     private FriendsGroupService friendsGroupService;
 
-    @Autowired
-    private FriendsGroupUtil friendsGroupUtil;
-
     @RequestMapping("/view")
     public ModelAndView friends(HttpSession session) throws HibernateException {
         Long userId = (Long) session.getAttribute("userId");
-        List<FriendsGroup> groupSet = userService.getFriendsGroups(userId);
-        Map<User, List<FriendsGroup>> friendsMap = userUtil.getFriendsWithGroups(userId);
+        List<FriendsGroup> groupSet = userService.getAllFriendsGroups(userId);
+        Map<User, List<FriendsGroup>> friendsMap = userService.getFriendsGroupsMap(userId);
         ModelAndView model = new ModelAndView("friends");
         model.addObject("friends", friendsMap);
         model.addObject("groups", groupSet);
@@ -52,20 +48,20 @@ public class FriendsController {
     @ResponseStatus(HttpStatus.OK)
     public void createGroup(HttpSession session, String groupName, @RequestParam("friends[]") Long[] friends)
             throws HibernateException {
-        userUtil.addFriendsGroup((Long) session.getAttribute("userId"), groupName, friends);
+        friendsGroupService.addFriendsGroup((Long) session.getAttribute("userId"), groupName, friends);
     }
 
     @RequestMapping("/update_group")
     @ResponseStatus(HttpStatus.OK)
     public void updateGroup(Long groupId, String groupName, @RequestParam("friends[]") Long[] friends, HttpSession session)
             throws HibernateException {
-        friendsGroupUtil.updateGroup((Long) session.getAttribute("userId"), groupId, groupName, friends);
+        friendsGroupService.update((Long) session.getAttribute("userId"), groupId, groupName, friends);
     }
 
     @RequestMapping("/get_group")
     public FriendsGroup getGroup(String groupName, HttpSession session) throws HibernateException {
         groupName = groupName.trim();
-        return userService.getFriendsGroup((Long) session.getAttribute("userId"), groupName);
+        return userService.getFriendsGroupByName((Long) session.getAttribute("userId"), groupName);
     }
 
     @RequestMapping("/get_friends")
@@ -89,5 +85,11 @@ public class FriendsController {
     @ResponseStatus(HttpStatus.OK)
     public void deleteGroup(Long groupId) throws HibernateException {
         friendsGroupService.delete(groupId);
+    }
+
+    @RequestMapping("/default_users")
+    public ModelAndView createDefaultUsers() {
+        userUtil.addDefaultUsers();
+        return new ModelAndView("redirect:/main/sign_in");
     }
 }
