@@ -5,7 +5,6 @@ import com.geekhub.entity.User;
 import com.geekhub.exception.UserValidateException;
 import com.geekhub.service.FriendsGroupService;
 import com.geekhub.service.UserService;
-import org.hibernate.HibernateException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -34,7 +33,7 @@ public class UserUtil {
         }
     }
 
-    public Long createUser(String firstName, String lastName, String login, String password) throws HibernateException {
+    public Long createUser(String firstName, String lastName, String login, String password) {
         User user = new User(firstName, lastName, password, login);
         return userService.save(user);
     }

@@ -4,7 +4,6 @@ import com.geekhub.entity.FriendsGroup;
 import com.geekhub.entity.User;
 import com.geekhub.service.UserService;
 import org.hibernate.Hibernate;
-import org.hibernate.HibernateException;
 import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
@@ -26,7 +25,7 @@ public class FriendsGroupDao implements EntityDao<FriendsGroup, Long> {
     private Class<FriendsGroup> clazz = FriendsGroup.class;
 
     @Override
-    public List<FriendsGroup> getAll(String orderParameter) throws HibernateException {
+    public List<FriendsGroup> getAll(String orderParameter) {
         return (List<FriendsGroup>) sessionFactory.getCurrentSession()
                 .createCriteria(clazz)
                 .addOrder(Order.asc(orderParameter))
@@ -34,7 +33,7 @@ public class FriendsGroupDao implements EntityDao<FriendsGroup, Long> {
     }
 
     @Override
-    public FriendsGroup getById(Long id) throws HibernateException {
+    public FriendsGroup getById(Long id) {
         FriendsGroup group = (FriendsGroup) sessionFactory.getCurrentSession()
                 .get(clazz, id);
         Hibernate.initialize(group);
@@ -42,7 +41,7 @@ public class FriendsGroupDao implements EntityDao<FriendsGroup, Long> {
     }
 
     @Override
-    public FriendsGroup get(String propertyName, Object value) throws HibernateException {
+    public FriendsGroup get(String propertyName, Object value) {
         List<FriendsGroup> list = (List<FriendsGroup>) sessionFactory.getCurrentSession()
                 .createCriteria(clazz)
                 .add(Restrictions.eq(propertyName, value))
@@ -54,27 +53,27 @@ public class FriendsGroupDao implements EntityDao<FriendsGroup, Long> {
     }
 
     @Override
-    public Long save(FriendsGroup entity) throws HibernateException {
+    public Long save(FriendsGroup entity) {
         return (Long) sessionFactory.getCurrentSession().save(entity);
     }
 
     @Override
-    public void update(FriendsGroup entity) throws HibernateException {
+    public void update(FriendsGroup entity) {
         sessionFactory.getCurrentSession().update(entity);
     }
 
     @Override
-    public void saveOrUpdate(FriendsGroup entity) throws HibernateException {
+    public void saveOrUpdate(FriendsGroup entity) {
         sessionFactory.getCurrentSession().saveOrUpdate(entity);
     }
 
     @Override
-    public void delete(FriendsGroup entity) throws HibernateException {
+    public void delete(FriendsGroup entity) {
         sessionFactory.getCurrentSession().delete(entity);
     }
 
     @Override
-    public void delete(Long entityId) throws HibernateException {
+    public void delete(Long entityId) {
         FriendsGroup friendsGroup = (FriendsGroup) sessionFactory.getCurrentSession()
                 .get(clazz, entityId);
 
@@ -82,7 +81,7 @@ public class FriendsGroupDao implements EntityDao<FriendsGroup, Long> {
                 .delete(friendsGroup);
     }
 
-    public List<FriendsGroup> getFriendsGroups(User owner, String name) throws HibernateException {
+    public List<FriendsGroup> getFriendsGroups(User owner, String name) {
         return (List<FriendsGroup>) sessionFactory.getCurrentSession()
                 .createQuery("from FriendsGroup fg where fg.name = :name and fg.owner = :owner")
                 .setParameter("name", name)

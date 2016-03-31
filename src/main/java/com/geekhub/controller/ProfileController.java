@@ -21,7 +21,7 @@ public class ProfileController {
     @RequestMapping(value = "/view", method = RequestMethod.GET)
     public ModelAndView profile(HttpSession session) {
         User user = userService.getById((Long) session.getAttribute("userId"));
-        ModelAndView model = new ModelAndView("pages/profile");
+        ModelAndView model = new ModelAndView("profile");
         model.addObject("login", user.getLogin())
                 .addObject("firstName", user.getFirstName())
                 .addObject("lastName", user.getLastName());
@@ -30,7 +30,7 @@ public class ProfileController {
 
     @RequestMapping(value = "/changeName", method = RequestMethod.POST)
     public ModelAndView changeName(String login, String firstName, String lastName, HttpSession session) {
-        ModelAndView model = new ModelAndView("pages/profile");
+        ModelAndView model = new ModelAndView("profile");
         User user = userService.getById((Long) session.getAttribute("userId"));
         if (user.getLogin().equals(login) || userService.getByLogin(login) == null) {
             user.setLogin(login);

@@ -4,7 +4,6 @@ import com.geekhub.dao.FriendsGroupDao;
 import com.geekhub.entity.FriendsGroup;
 import com.geekhub.entity.User;
 import org.hibernate.Hibernate;
-import org.hibernate.HibernateException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,42 +22,42 @@ public class FriendsGroupServiceImpl implements FriendsGroupService {
     private UserService userService;
 
     @Override
-    public List<FriendsGroup> getAll(String orderParameter) throws HibernateException {
+    public List<FriendsGroup> getAll(String orderParameter) {
         return friendsGroupDao.getAll(orderParameter);
     }
 
     @Override
-    public FriendsGroup getById(Long id) throws HibernateException {
+    public FriendsGroup getById(Long id) {
         return friendsGroupDao.getById(id);
     }
 
     @Override
-    public FriendsGroup get(String propertyName, Object value) throws HibernateException {
+    public FriendsGroup get(String propertyName, Object value) {
         return friendsGroupDao.get(propertyName, value);
     }
 
     @Override
-    public Long save(FriendsGroup entity) throws HibernateException {
+    public Long save(FriendsGroup entity) {
         return friendsGroupDao.save(entity);
     }
 
     @Override
-    public void update(FriendsGroup entity) throws HibernateException {
+    public void update(FriendsGroup entity) {
         friendsGroupDao.update(entity);
     }
 
     @Override
-    public void delete(FriendsGroup entity) throws HibernateException {
+    public void delete(FriendsGroup entity) {
         friendsGroupDao.delete(entity);
     }
 
     @Override
-    public void delete(Long entityId) throws HibernateException {
+    public void delete(Long entityId) {
         friendsGroupDao.delete(entityId);
     }
 
     @Override
-    public boolean addFriend(Long groupId, Long friendId) throws HibernateException {
+    public boolean addFriend(Long groupId, Long friendId) {
         FriendsGroup group = friendsGroupDao.getById(friendId);
         User user = userService.getById(friendId);
         Hibernate.initialize(group.getFriends());
@@ -70,18 +69,18 @@ public class FriendsGroupServiceImpl implements FriendsGroupService {
     }
 
     @Override
-    public FriendsGroup getByName(String groupName) throws HibernateException {
+    public FriendsGroup getByName(String groupName) {
         return friendsGroupDao.get("name", groupName);
     }
 
     @Override
-    public Set<User> getFriendsSet(FriendsGroup group) throws HibernateException {
+    public Set<User> getFriendsSet(FriendsGroup group) {
         Hibernate.initialize(group.getFriends());
         return group.getFriends();
     }
 
     @Override
-    public List<FriendsGroup> getFriendsGroups(User owner, String groupName) throws HibernateException {
+    public List<FriendsGroup> getFriendsGroups(User owner, String groupName) {
         return friendsGroupDao.getFriendsGroups(owner, groupName);
     }
 }

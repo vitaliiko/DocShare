@@ -9,6 +9,7 @@ import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Set;
@@ -16,10 +17,6 @@ import java.util.stream.Collectors;
 
 @Repository
 @SuppressWarnings("unchecked")
-//@NamedQueries({
-//        @NamedQuery(name = "getFriends", query = "from friendsgroup fg where fg.name = :name and fg.userId = :userId")
-//})
-
 public class UserDao implements EntityDao<User, Long> {
 
     @Autowired
@@ -27,7 +24,7 @@ public class UserDao implements EntityDao<User, Long> {
     private Class<User> clazz = User.class;
 
     @Override
-    public List<User> getAll(String orderParameter) throws HibernateException {
+    public List<User> getAll(String orderParameter) {
         return (List<User>) sessionFactory.getCurrentSession()
                 .createCriteria(clazz)
                 .addOrder(Order.asc(orderParameter))
@@ -35,13 +32,13 @@ public class UserDao implements EntityDao<User, Long> {
     }
 
     @Override
-    public User getById(Long id) throws HibernateException {
+    public User getById(Long id) {
         return (User) sessionFactory.getCurrentSession()
                 .get(clazz, id);
     }
 
     @Override
-    public User get(String propertyName, Object value) throws HibernateException {
+    public User get(String propertyName, Object value) {
         List<User> list = (List<User>) sessionFactory.getCurrentSession()
                 .createCriteria(clazz)
                 .add(Restrictions.eq(propertyName, value))
@@ -53,57 +50,53 @@ public class UserDao implements EntityDao<User, Long> {
     }
 
     @Override
-    public Long save(User entity) throws HibernateException {
+    public Long save(User entity) {
         return (Long) sessionFactory.getCurrentSession().save(entity);
     }
 
     @Override
-    public void update(User entity) throws HibernateException {
+    public void update(User entity) {
         sessionFactory.getCurrentSession().update(entity);
     }
 
     @Override
-    public void saveOrUpdate(User entity) throws HibernateException {
+    public void saveOrUpdate(User entity) {
         sessionFactory.getCurrentSession().saveOrUpdate(entity);
     }
 
     @Override
-    public void delete(User entity) throws HibernateException {
+    public void delete(User entity) {
         sessionFactory.getCurrentSession().delete(entity);
     }
 
     @Override
-    public void delete(Long entityId) throws HibernateException {
+    public void delete(Long entityId) {
         User user = getById(entityId);
         sessionFactory.getCurrentSession().delete(user);
     }
 
-    public FriendsGroup getFriendsGroup(Long userId, String groupName) throws HibernateException {
+    public FriendsGroup getFriendsGroup(Long userId, String groupName) {
         User owner = getById(userId);
-        FriendsGroup group = (FriendsGroup) sessionFactory.getCurrentSession()
+        return (FriendsGroup) sessionFactory.getCurrentSession()
                 .createQuery("from FriendsGroup fg where fg.name = :name and fg.owner = :owner")
                 .setParameter("name", groupName)
                 .setParameter("owner", owner)
                 .uniqueResult();
-        Hibernate.initialize(group.getFriends());
-        return group;
     }
 
-    public List<FriendsGroup> getFriendsGroups(Long userId) throws HibernateException {
+    public List<FriendsGroup> getFriendsGroups(Long userId) {
         User owner = getById(userId);
-        Hibernate.initialize(owner.getFriendsGroups());
         return owner.getFriendsGroups().stream().collect(Collectors.toList());
     }
 
-    public Set<User> getFriends(Long userId) throws HibernateException {
+    public Set<User> getFriends(Long userId) {
         User user = getById(userId);
         Hibernate.initialize(user.getFriends());
         return user.getFriends();
     }
 
-    public void addFriendsGroup(Long userId, FriendsGroup group) throws HibernateException {
+    public void addFriendsGroup(Long userId, FriendsGroup group) {
         User user = getById(userId);
-        Hibernate.initialize(user.getFriendsGroups());
         if (user.getFriendsGroups().stream().noneMatch(fg -> fg.getName().equals(group.getName()))) {
             user.getFriendsGroups().add(group);
         } else {
@@ -112,7 +105,7 @@ public class UserDao implements EntityDao<User, Long> {
         sessionFactory.getCurrentSession().update(user);
     }
 
-    public List<FriendsGroup> getGroupsByOwnerAndFriend(Long ownerId, User friend) throws HibernateException {
+    public List<FriendsGroup> getGroupsByOwnerAndFriend(Long ownerId, User friend) {
         User owner = getById(ownerId);
         return sessionFactory.getCurrentSession()
                 .createQuery("from FriendsGroup fg " +
@@ -127,18 +120,16 @@ public class UserDao implements EntityDao<User, Long> {
 
     }
 
-    public void addFriend(Long userId, Long friendId) throws HibernateException {
+    public void addFriend(Long userId, Long friendId) {
         User user = getById(userId);
         User friend = getById(friendId);
-        Hibernate.initialize(user.getFriends());
         user.getFriends().add(friend);
         sessionFactory.getCurrentSession().update(user);
     }
 
-    public void deleteFriend(Long userId, Long friendId) throws HibernateException {
+    public void deleteFriend(Long userId, Long friendId) {
         User user = getById(userId);
         User friend = getById(friendId);
-        Hibernate.initialize(user.getFriends());
         user.getFriends().remove(friend);
         sessionFactory.getCurrentSession().update(user);
     }

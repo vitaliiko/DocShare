@@ -1,7 +1,6 @@
 package com.geekhub.dao;
 
 import com.geekhub.entity.Message;
-import org.hibernate.HibernateException;
 import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
@@ -19,7 +18,7 @@ public class MessageDao implements EntityDao<Message, Long> {
     private Class<Message> clazz = Message.class;
 
     @Override
-    public List<Message> getAll(String orderParameter) throws HibernateException {
+    public List<Message> getAll(String orderParameter) {
         return (List<Message>) sessionFactory.getCurrentSession()
                 .createCriteria(clazz)
                 .addOrder(Order.asc(orderParameter))
@@ -27,13 +26,13 @@ public class MessageDao implements EntityDao<Message, Long> {
     }
 
     @Override
-    public Message getById(Long id) throws HibernateException {
+    public Message getById(Long id) {
         return (Message) sessionFactory.getCurrentSession()
                 .get(clazz, id);
     }
 
     @Override
-    public Message get(String propertyName, Object value) throws HibernateException {
+    public Message get(String propertyName, Object value) {
         List<Message> list = (List<Message>) sessionFactory.getCurrentSession()
                 .createCriteria(clazz)
                 .add(Restrictions.eq(propertyName, value))
@@ -45,27 +44,27 @@ public class MessageDao implements EntityDao<Message, Long> {
     }
 
     @Override
-    public Long save(Message entity) throws HibernateException {
+    public Long save(Message entity) {
         return (Long) sessionFactory.getCurrentSession().save(entity);
     }
 
     @Override
-    public void update(Message entity) throws HibernateException {
+    public void update(Message entity) {
         sessionFactory.getCurrentSession().update(entity);
     }
 
     @Override
-    public void saveOrUpdate(Message entity) throws HibernateException {
+    public void saveOrUpdate(Message entity) {
         sessionFactory.getCurrentSession().saveOrUpdate(entity);
     }
 
     @Override
-    public void delete(Message entity) throws HibernateException {
+    public void delete(Message entity) {
         sessionFactory.getCurrentSession().delete(entity);
     }
 
     @Override
-    public void delete(Long entityId) throws HibernateException {
+    public void delete(Long entityId) {
         Message message = (Message) sessionFactory.getCurrentSession()
                 .get(clazz, entityId);
 
