@@ -3,6 +3,7 @@ package com.geekhub.config;
 import com.geekhub.entity.FriendsGroup;
 import com.geekhub.entity.Message;
 import com.geekhub.entity.User;
+import com.geekhub.entity.UserDocument;
 import org.apache.tomcat.dbcp.dbcp.BasicDataSource;
 import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,7 +33,7 @@ public class HibernateConfig {
         LocalSessionFactoryBean sessionFactory = new LocalSessionFactoryBean();
         sessionFactory.setDataSource(restDataSource());
         sessionFactory.setHibernateProperties(hibernateProperties());
-        sessionFactory.setAnnotatedClasses(User.class, Message.class, FriendsGroup.class);
+        sessionFactory.setAnnotatedClasses(User.class, Message.class, FriendsGroup.class, UserDocument.class);
         sessionFactory.setAnnotatedPackages("com.geekhub.entity");
         return sessionFactory;
     }

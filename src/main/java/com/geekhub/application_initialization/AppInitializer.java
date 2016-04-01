@@ -3,12 +3,19 @@ package com.geekhub.application_initialization;
 import com.geekhub.config.HibernateConfig;
 import com.geekhub.config.SecurityConfig;
 import com.geekhub.config.WebAppConfig;
+import org.springframework.orm.jpa.support.OpenEntityManagerInViewFilter;
+import org.springframework.web.filter.HiddenHttpMethodFilter;
+import org.springframework.web.multipart.support.MultipartFilter;
 import org.springframework.web.servlet.support.AbstractAnnotationConfigDispatcherServletInitializer;
 
+import javax.servlet.Filter;
 import javax.servlet.MultipartConfigElement;
 import javax.servlet.ServletRegistration;
+import java.io.File;
 
 public class AppInitializer extends AbstractAnnotationConfigDispatcherServletInitializer {
+
+    private int maxUploadSizeInMb = 5 * 1024 * 1024;
 
     private static final String LOCATION = "D:/EFS/";
     private static final long MAX_FILE_SIZE = 1024 * 1024 * 250;
@@ -34,13 +41,31 @@ public class AppInitializer extends AbstractAnnotationConfigDispatcherServletIni
         return new String[] {"/"};
     }
 
+//    @Override
+//    protected void customizeRegistration(ServletRegistration.Dynamic registration) {
+//        registration.setMultipartConfig(getMultipartConfigElement());
+//    }
+
     @Override
-    protected void customizeRegistration(ServletRegistration.Dynamic registration) {
-        registration.setMultipartConfig(getMultipartConfigElement());
+    protected Filter[] getServletFilters() {
+        return new Filter[]{new HiddenHttpMethodFilter(), new MultipartFilter(), new OpenEntityManagerInViewFilter()};
     }
 
     private MultipartConfigElement getMultipartConfigElement(){
         return new MultipartConfigElement(LOCATION, MAX_FILE_SIZE, MAX_REQUEST_SIZE, FILE_SIZE_THRESHOLD);
+    }
+
+    @Override
+    protected void customizeRegistration(ServletRegistration.Dynamic registration) {
+
+        File uploadDirectory = new File("D:\\temp");
+
+        MultipartConfigElement multipartConfigElement =
+                new MultipartConfigElement(uploadDirectory.getAbsolutePath(),
+                        maxUploadSizeInMb, maxUploadSizeInMb * 2, maxUploadSizeInMb / 2);
+
+        registration.setMultipartConfig(multipartConfigElement);
+
     }
 
 //    @Override
