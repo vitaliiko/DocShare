@@ -43,7 +43,7 @@ public class User {
 
     @JsonIgnore
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "owner_id")
     private Set<FriendsGroup> friendsGroups = new HashSet<>();
 
     @JsonIgnore
@@ -57,6 +57,11 @@ public class User {
             }
     )
     private Set<User> friends = new HashSet<>();
+
+    @JsonIgnore
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "owner_id")
+    private Set<UserDocument> userDocuments = new HashSet<>();
 
     public User() {}
 
@@ -129,6 +134,14 @@ public class User {
 
     public void setFriends(Set<User> friends) {
         this.friends = friends;
+    }
+
+    public Set<UserDocument> getUserDocuments() {
+        return userDocuments;
+    }
+
+    public void setUserDocuments(Set<UserDocument> userDocuments) {
+        this.userDocuments = userDocuments;
     }
 
     @Override
