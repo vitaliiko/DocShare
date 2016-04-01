@@ -60,7 +60,7 @@ public class MessageDao implements EntityDao<Message, Long> {
     }
 
     @Override
-    public void delete(Long entityId) {
+    public void deleteById(Long entityId) {
         Message message = getById(entityId);
         sessionFactory.getCurrentSession().delete(message);
     }

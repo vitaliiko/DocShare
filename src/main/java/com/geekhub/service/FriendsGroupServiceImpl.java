@@ -55,7 +55,7 @@ public class FriendsGroupServiceImpl implements FriendsGroupService {
 
     @Override
     public void delete(Long entityId) {
-        friendsGroupDao.delete(entityId);
+        friendsGroupDao.deleteById(entityId);
     }
 
     @Override

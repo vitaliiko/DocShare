@@ -59,7 +59,7 @@ public class UserDao implements EntityDao<User, Long> {
     }
 
     @Override
-    public void delete(Long entityId) {
+    public void deleteById(Long entityId) {
         User user = getById(entityId);
         sessionFactory.getCurrentSession().delete(user);
     }

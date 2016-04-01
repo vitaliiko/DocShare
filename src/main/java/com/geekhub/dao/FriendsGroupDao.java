@@ -63,7 +63,7 @@ public class FriendsGroupDao implements EntityDao<FriendsGroup, Long> {
     }
 
     @Override
-    public void delete(Long entityId) {
+    public void deleteById(Long entityId) {
         FriendsGroup friendsGroup = getById(entityId);
         sessionFactory.getCurrentSession().delete(friendsGroup);
     }
