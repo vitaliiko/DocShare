@@ -45,13 +45,6 @@ public class DocumentController {
         binder.setValidator(fileValidator);
     }
 
-//    @RequestMapping("/manage")
-//    public ModelAndView documentsList(HttpSession session) {
-//        ModelAndView model = new ModelAndView("documents");
-//        model.addObject("documents", userDocumentService.getByOwnerId((Long) session.getAttribute("userId")));
-//        return model;
-//    }
-
     @RequestMapping(value = "/upload", method = RequestMethod.GET)
     public String addDocuments(ModelMap model, HttpSession session) {
         Long userId = (Long) session.getAttribute("userId");

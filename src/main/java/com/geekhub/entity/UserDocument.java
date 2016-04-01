@@ -25,7 +25,7 @@ public class UserDocument {
     @Column
     private String description;
 
-    @Lob
+    @Lob @JsonIgnore
     @Basic(fetch = FetchType.LAZY)
     @Column
     private byte[] content;
@@ -38,6 +38,7 @@ public class UserDocument {
     @Enumerated(EnumType.STRING)
     private DocumentAttribute documentAttribute;
 
+    @JsonIgnore
     @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
     @JoinTable(name = "userToDocumentRelation",
             joinColumns = {

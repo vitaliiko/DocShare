@@ -27,7 +27,9 @@ public class IndexController {
 
     @RequestMapping("/")
     public ModelAndView index() {
-        userUtil.addDefaultUsers();
+        if (userService.getAll("id").size() == 0) {
+            userUtil.addDefaultUsers();
+        }
         return new ModelAndView("redirect:/main/home");
     }
 

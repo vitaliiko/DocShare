@@ -45,13 +45,19 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Long save(User entity) {
-        return userDao.save(entity);
+        if (userDao.getById(entity.getId()) == null) {
+            return userDao.save(entity);
+        }
+        return null;
     }
 
     @Override
     public Long createUser(String firstName, String lastName, String login, String password) {
-        User user = new User(firstName, lastName, password, login);
-        return userDao.save(user);
+        if (userDao.get("login", login) == null) {
+            User user = new User(firstName, lastName, password, login);
+            return userDao.save(user);
+        }
+        return null;
     }
 
     @Override

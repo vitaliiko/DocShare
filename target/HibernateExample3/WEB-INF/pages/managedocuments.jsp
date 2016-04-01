@@ -14,28 +14,21 @@
 <jsp:include page="../include/header.jsp"/>
 <jsp:include page="../include/sidebar.jsp"/>
 
-<div class="container" style="width: 700px;">
+<div class="container" style="width: 900px;">
 
-  <div>
-
-      <div> class="panel-heading"><span class="lead">Upload New Document</span>
-          <form action="/document/upload" method="POST" enctype="multipart/form-data">
-              <label class="col-md-3 control-lable" for="file">Upload a document</label>
-              <input type="file" name="file" id="file" class="form-control input-sm"/>
-              <div class="row">
-                  <div class="form-group col-md-12">
-                      <label class="col-md-3 control-lable" for="description">Description</label>
-                      <div class="col-md-7">
-                          <input type="text" name="description" id="description" class="form-control input-sm"/>
-                      </div>
-                    </div>
-              </div>
-
-              <div class="row">
-                  <div class="form-actions floatRight">
-                     <input type="submit" value="Upload" class="btn btn-primary btn-sm">
-                  </div>
-              </div>
+    <div>
+        <div class="panel-heading"><span class="lead">Upload New Document</span>
+            <form action="/document/upload" method="POST" enctype="multipart/form-data">
+                <label class="col-md-3 control-lable" for="file">Upload a document</label>
+                <input type="file" name="file" id="file" class="form-control input-sm"/>
+                <label class="col-md-3 control-lable" for="description">Description</label>
+                <input type="text" name="description" id="description" class="form-control input-sm"/>
+                <div class="form-actions floatRight">
+                    <input type="submit" value="Upload" class="btn btn-primary btn-sm">
+                </div>
+            </form>
+        </div>
+    </div>
 
           </form>
       </div>
