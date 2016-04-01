@@ -45,7 +45,7 @@ public class MessageServiceImpl implements MessageService {
     }
 
     @Override
-    public void delete(Long entityId) {
+    public void deleteById(Long entityId) {
         messageDao.deleteById(entityId);
     }
 }

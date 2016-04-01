@@ -30,7 +30,7 @@ public class UserDocument {
     @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "owner_id")
-    private User user;
+    private User owner;
 
     public Long getId() {
         return id;
@@ -72,12 +72,12 @@ public class UserDocument {
         this.content = content;
     }
 
-    public User getUser() {
-        return user;
+    public User getOwner() {
+        return owner;
     }
 
-    public void setUser(User user) {
-        this.user = user;
+    public void setOwner(User owner) {
+        this.owner = owner;
     }
 
     @Override
@@ -92,7 +92,7 @@ public class UserDocument {
         if (type != null ? !type.equals(that.type) : that.type != null) return false;
         if (description != null ? !description.equals(that.description) : that.description != null) return false;
         if (!Arrays.equals(content, that.content)) return false;
-        return !(user != null ? !user.equals(that.user) : that.user != null);
+        return !(owner != null ? !owner.equals(that.owner) : that.owner != null);
 
     }
 
@@ -103,7 +103,7 @@ public class UserDocument {
         result = 31 * result + (type != null ? type.hashCode() : 0);
         result = 31 * result + (description != null ? description.hashCode() : 0);
         result = 31 * result + (content != null ? Arrays.hashCode(content) : 0);
-        result = 31 * result + (user != null ? user.hashCode() : 0);
+        result = 31 * result + (owner != null ? owner.hashCode() : 0);
         return result;
     }
 }

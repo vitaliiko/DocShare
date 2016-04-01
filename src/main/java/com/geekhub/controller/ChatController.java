@@ -111,7 +111,7 @@ public class ChatController {
     public ModelAndView removeAccount(String yes, HttpSession session) {
         ModelAndView model = new ModelAndView();
         if (yes != null) {
-            userService.delete((Long) session.getAttribute("userId"));
+            userService.deleteById((Long) session.getAttribute("userId"));
             session.invalidate();
             model.addObject("message", "Your account removed successfully")
                     .setViewName("pages/signIn");

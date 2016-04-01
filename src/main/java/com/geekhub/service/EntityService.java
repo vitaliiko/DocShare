@@ -20,5 +20,5 @@ public interface EntityService<T, PK extends Serializable> {
 
     void delete(T entity);
 
-    void delete(PK entityId);
+    void deleteById(PK entityId);
 }

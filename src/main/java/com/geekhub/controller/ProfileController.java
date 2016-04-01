@@ -67,7 +67,7 @@ public class ProfileController {
     @RequestMapping(value = "/removeAccount", method = RequestMethod.GET)
     public ModelAndView removeAccount(HttpSession session) {
         ModelAndView model = new ModelAndView();
-        userService.delete((Long) session.getAttribute("userId"));
+        userService.deleteById((Long) session.getAttribute("userId"));
         session.invalidate();
         model.addObject("message", "Your account removed successfully")
                 .setViewName("signIn");

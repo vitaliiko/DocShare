@@ -84,7 +84,7 @@ public class FriendsController {
     @RequestMapping("/delete_group")
     @ResponseStatus(HttpStatus.OK)
     public void deleteGroup(Long groupId) throws HibernateException {
-        friendsGroupService.delete(groupId);
+        friendsGroupService.deleteById(groupId);
     }
 
     @RequestMapping("/default_users")
