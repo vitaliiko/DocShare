@@ -2,6 +2,7 @@ package com.geekhub.controller;
 
 import com.geekhub.entity.User;
 import com.geekhub.entity.UserDocument;
+import com.geekhub.enums.DocumentAttribute;
 import com.geekhub.service.UserDocumentService;
 import com.geekhub.service.UserService;
 import com.geekhub.validation.FileValidator;
@@ -102,6 +103,7 @@ public class DocumentController {
         document.setType(multipartFile.getContentType());
         document.setContent(multipartFile.getBytes());
         document.setOwner(user);
+        document.setDocumentAttribute(DocumentAttribute.PRIVATE);
         userDocumentService.save(document);
     }
 }

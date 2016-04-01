@@ -50,10 +50,10 @@ public class User {
     @ManyToMany(cascade = CascadeType.ALL)
     @JoinTable(name = "userToFriendRelation",
             joinColumns = {
-                    @JoinColumn(name = "userId")
+                    @JoinColumn(name = "user_id")
             },
             inverseJoinColumns = {
-                    @JoinColumn(name = "friendId")
+                    @JoinColumn(name = "friend_id")
             }
     )
     private Set<User> friends = new HashSet<>();

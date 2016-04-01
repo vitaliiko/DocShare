@@ -1,9 +1,12 @@
 package com.geekhub.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.geekhub.enums.DocumentAttribute;
 
 import javax.persistence.*;
 import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table
@@ -31,6 +34,20 @@ public class UserDocument {
     @ManyToOne
     @JoinColumn(name = "owner_id")
     private User owner;
+
+    @Enumerated(EnumType.STRING)
+    private DocumentAttribute documentAttribute;
+
+    @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
+    @JoinTable(name = "userToDocumentRelation",
+            joinColumns = {
+                    @JoinColumn(name = "userdocument_id")
+            },
+            inverseJoinColumns = {
+                    @JoinColumn(name = "reader_id")
+            }
+    )
+    private Set<User> readers = new HashSet<>();
 
     public Long getId() {
         return id;
@@ -78,6 +95,22 @@ public class UserDocument {
 
     public void setOwner(User owner) {
         this.owner = owner;
+    }
+
+    public DocumentAttribute getDocumentAttribute() {
+        return documentAttribute;
+    }
+
+    public void setDocumentAttribute(DocumentAttribute documentAttribute) {
+        this.documentAttribute = documentAttribute;
+    }
+
+    public Set<User> getReaders() {
+        return readers;
+    }
+
+    public void setReaders(Set<User> readers) {
+        this.readers = readers;
     }
 
     @Override
