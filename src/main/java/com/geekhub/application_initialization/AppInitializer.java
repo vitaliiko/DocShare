@@ -15,12 +15,7 @@ import java.io.File;
 
 public class AppInitializer extends AbstractAnnotationConfigDispatcherServletInitializer {
 
-    private int maxUploadSizeInMb = 5 * 1024 * 1024;
-
-    private static final String LOCATION = "D:/EFS/";
-    private static final long MAX_FILE_SIZE = 1024 * 1024 * 250;
-    private static final long MAX_REQUEST_SIZE = 1024 * 1024 * 300;
-    private static final int FILE_SIZE_THRESHOLD = 0;
+    private int maxUploadSizeInMb = 500 * 1024 * 1024;
 
     @Override
     protected Class<?>[] getRootConfigClasses() {
@@ -49,10 +44,6 @@ public class AppInitializer extends AbstractAnnotationConfigDispatcherServletIni
     @Override
     protected Filter[] getServletFilters() {
         return new Filter[]{new HiddenHttpMethodFilter(), new MultipartFilter(), new OpenEntityManagerInViewFilter()};
-    }
-
-    private MultipartConfigElement getMultipartConfigElement(){
-        return new MultipartConfigElement(LOCATION, MAX_FILE_SIZE, MAX_REQUEST_SIZE, FILE_SIZE_THRESHOLD);
     }
 
     @Override
