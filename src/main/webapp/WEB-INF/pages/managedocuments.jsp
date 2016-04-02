@@ -6,7 +6,7 @@
 
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
-    <title>Upload/Download/Delete Documents</title>
+    <title>Home</title>
     <jsp:include page="../include/include.jsp"/>
     <script src="${pageContext.request.contextPath}/resources/js/managedocument.js"></script>
 </head>
@@ -19,13 +19,13 @@
 <div class="container" style="width: 900px;">
     <form action="/document/upload" method="POST" enctype="multipart/form-data">
         <label class="col-md-3 control-lable" for="file">Upload a document</label>
-        <input type="file" name="file" id="file" class="form-control input-sm"/>
+        <input type="file" multiple name="file" id="file" class="form-control input-sm"/>
         <br>
         <label class="col-md-3 control-lable" for="description">Description</label>
         <input type="text" name="description" id="description" class="form-control input-sm"/>
         <br>
         <div class="form-actions floatRight">
-            <input type="submit" value="Upload" class="btn btn-primary btn-sm">
+            <input type="submit" name="upload" value="Upload" class="btn btn-primary btn-sm">
         </div>
     </form>
 </div>

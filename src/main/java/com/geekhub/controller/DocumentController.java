@@ -10,7 +10,6 @@ import com.geekhub.validation.FileValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.http.HttpStatus;
-import org.springframework.stereotype.Controller;
 import org.springframework.util.FileCopyUtils;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
@@ -20,10 +19,12 @@ import org.springframework.web.servlet.ModelAndView;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
 
-@Controller
+@RestController
 @RequestMapping("/document")
 public class DocumentController {
 
@@ -71,14 +72,25 @@ public class DocumentController {
     }
 
     @RequestMapping(value = "/upload", method = RequestMethod.POST)
-    public String uploadDocument(MultipartFile file, String description, HttpSession session) throws IOException {
+    public List<UserDocument> uploadDocument(MultipartFile[] files, String description, HttpSession session) throws IOException {
         Long userId = (Long) session.getAttribute("userId");
         User user = userService.getById(userId);
-        saveOrUpdateDocument(file, description, user);
-        return "redirect:/document/upload";
+
+        List<UserDocument> documents = new ArrayList<>();
+        Arrays.stream(files).forEach(f -> {
+            try {
+                UserDocument doc = saveOrUpdateDocument(f, description, user);
+                if (doc != null) {
+                    documents.add(doc);
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
+        return documents;
     }
 
-    private void saveOrUpdateDocument(MultipartFile multipartFile, String description, User user) throws IOException{
+    private UserDocument saveOrUpdateDocument(MultipartFile multipartFile, String description, User user) throws IOException {
         UserDocument document = userDocumentService.getByNameAndOwnerId(user.getId(), multipartFile.getOriginalFilename());
         if (document == null) {
             document = new UserDocument();
@@ -91,11 +103,12 @@ public class DocumentController {
             document.setDocumentAttribute(DocumentAttribute.PRIVATE);
             document.setDocumentStatus(DocumentStatus.ACTUAL);
             userDocumentService.save(document);
-        } else {
-            document.setDescription(description);
-            document.setLastModifyTime(Calendar.getInstance().getTime());
-            document.setContent(multipartFile.getBytes());
-            userDocumentService.update(document);
+            return document;
         }
+        document.setDescription(description);
+        document.setLastModifyTime(Calendar.getInstance().getTime());
+        document.setContent(multipartFile.getBytes());
+        userDocumentService.update(document);
+        return null;
     }
 }
