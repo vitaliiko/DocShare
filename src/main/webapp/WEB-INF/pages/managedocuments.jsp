@@ -25,7 +25,7 @@
         <input type="text" name="description" id="description" class="form-control input-sm"/>
         <br>
         <div class="form-actions floatRight">
-            <input type="submit" name="upload" value="Upload" class="btn btn-primary btn-sm">
+            <input type="submit" value="Upload" class="btn btn-primary btn-sm upload-btn">
         </div>
     </form>
 </div>

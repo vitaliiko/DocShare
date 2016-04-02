@@ -35,7 +35,6 @@ public class MainController {
     @RequestMapping(value = "/sign_in", method = RequestMethod.GET)
     public ModelAndView signIn() {
         int size = userService.getAll("id").size();
-        System.out.println("SIZE: "+ size);
         if (size == 0) {
             userUtil.addDefaultUsers();
         }

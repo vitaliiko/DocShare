@@ -7,7 +7,7 @@ $(document).ready(function() {
         files = event.target.files;
     });
 
-    $('#upload').click(function() {
+    $('.upload-btn').click(function() {
         var data = new FormData();
         $.each(files, function(key, value) {
             data.append(key, value);
@@ -19,11 +19,11 @@ $(document).ready(function() {
             cache: false,
             dataType: 'json',
             success: function(documents) {
-                $('#documentTable').append("<tr id='" + "'>" +
-                    "<td><button type='button' name='groupInfoButton' class='btn btn-link group-info-btn'" +
-                    "data-toggle='modal' data-target='#groupInfo'> " + groupName + " </button>" +
-                    "</td><td><input type='button' class='btn btn-default removeGroupButton' id='"  + "' value='Remove friends group'>" +
-                    "</td></tr>");
+                //$('#documentTable').append("<tr id='" + "'>" +
+                //    "<td><button type='button' name='groupInfoButton' class='btn btn-link group-info-btn'" +
+                //    "data-toggle='modal' data-target='#groupInfo'> " + groupName + " </button>" +
+                //    "</td><td><input type='button' class='btn btn-default removeGroupButton' id='"  + "' value='Remove friends group'>" +
+                //    "</td></tr>");
             }
         });
     });

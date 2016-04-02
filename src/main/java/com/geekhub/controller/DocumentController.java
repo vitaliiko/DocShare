@@ -11,18 +11,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.http.HttpStatus;
 import org.springframework.util.FileCopyUtils;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.List;
+import java.util.*;
 
 @RestController
 @RequestMapping("/document")
@@ -72,21 +71,19 @@ public class DocumentController {
     }
 
     @RequestMapping(value = "/upload", method = RequestMethod.POST)
-    public List<UserDocument> uploadDocument(MultipartFile[] files, String description, HttpSession session) throws IOException {
+    public List<UserDocument> uploadDocument(MultipartHttpServletRequest request, String description, HttpSession session) throws IOException {
         Long userId = (Long) session.getAttribute("userId");
         User user = userService.getById(userId);
 
         List<UserDocument> documents = new ArrayList<>();
-        Arrays.stream(files).forEach(f -> {
-            try {
-                UserDocument doc = saveOrUpdateDocument(f, description, user);
-                if (doc != null) {
-                    documents.add(doc);
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
+        Map<String, MultipartFile> fileMap = request.getFileMap();
+        for (String s : fileMap.keySet()) {
+            MultipartFile mpf = request.getFile(s);
+            UserDocument doc = saveOrUpdateDocument(mpf, description, user);
+            if (doc != null) {
+                documents.add(doc);
             }
-        });
+        }
         return documents;
     }
 
