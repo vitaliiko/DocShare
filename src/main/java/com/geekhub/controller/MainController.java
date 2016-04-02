@@ -6,12 +6,10 @@ import com.geekhub.service.UserService;
 import com.geekhub.util.UserUtil;
 import org.hibernate.HibernateException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpSession;
@@ -36,6 +34,11 @@ public class MainController {
 
     @RequestMapping(value = "/sign_in", method = RequestMethod.GET)
     public ModelAndView signIn() {
+        int size = userService.getAll("id").size();
+        System.out.println("SIZE: "+ size);
+        if (size == 0) {
+            userUtil.addDefaultUsers();
+        }
         return new ModelAndView("signIn");
     }
 

@@ -45,7 +45,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Long save(User entity) {
-        if (userDao.getById(entity.getId()) == null) {
+        if (userDao.get("login", entity.getLogin()) == null) {
             return userDao.save(entity);
         }
         return null;
