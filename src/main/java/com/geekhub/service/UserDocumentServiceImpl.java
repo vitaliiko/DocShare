@@ -89,4 +89,10 @@ public class UserDocumentServiceImpl implements UserDocumentService {
         document.setLastModifyTime(Calendar.getInstance().getTime());
         userDocumentDao.update(document);
     }
+
+    @Override
+    public UserDocument getByNameAndOwnerId(Long ownerId, String name) {
+        User owner = userService.getById(ownerId);
+        return userDocumentDao.get(owner, "name", name);
+    }
 }

@@ -80,4 +80,12 @@ public class UserDocumentDao implements EntityDao<UserDocument, Long> {
                 .add(Restrictions.eq(propertyName, value))
                 .list();
     }
+
+    public UserDocument get(User owner, String propertyName, Object value) {
+        return (UserDocument) sessionFactory.getCurrentSession()
+                .createCriteria(clazz)
+                .add(Restrictions.eq("owner", owner))
+                .add(Restrictions.eq(propertyName, value))
+                .uniqueResult();
+    }
 }

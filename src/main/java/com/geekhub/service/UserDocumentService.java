@@ -17,4 +17,6 @@ public interface UserDocumentService extends EntityService<UserDocument, Long> {
     void moveToTrash(Long docId);
 
     void recover(Long docId);
+
+    UserDocument getByNameAndOwnerId(Long ownerId, String name);
 }

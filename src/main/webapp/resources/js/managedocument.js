@@ -3,7 +3,10 @@ $(document).ready(function() {
     var documentId;
 
     $('.delete-btn').click(function() {
-        documentId = this.closest('tr').id;
+        var row = this.closest('tr');
+        var fileName = $(row['name=file-name']).text();
+        documentId = row.id;
+        $('#dialog-text').text('Are you sure you want to move ' + fileName + ' into trash?');
     });
 
     $('#deleteDocument').click(function() {

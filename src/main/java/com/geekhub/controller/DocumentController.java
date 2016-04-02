@@ -74,23 +74,28 @@ public class DocumentController {
     public String uploadDocument(MultipartFile file, String description, HttpSession session) throws IOException {
         Long userId = (Long) session.getAttribute("userId");
         User user = userService.getById(userId);
-        saveDocument(file, description, user);
+        saveOrUpdateDocument(file, description, user);
         return "redirect:/document/upload";
     }
 
-    private void saveDocument(MultipartFile multipartFile, String description, User user) throws IOException{
-
-        UserDocument document = new UserDocument();
-
-
-        document.setName(multipartFile.getOriginalFilename());
-        document.setDescription(description);
-        document.setLastModifyTime(Calendar.getInstance().getTime());
-        document.setType(multipartFile.getContentType());
-        document.setContent(multipartFile.getBytes());
-        document.setOwner(user);
-        document.setDocumentAttribute(DocumentAttribute.PRIVATE);
-        document.setDocumentStatus(DocumentStatus.ACTUAL);
-        userDocumentService.save(document);
+    private void saveOrUpdateDocument(MultipartFile multipartFile, String description, User user) throws IOException{
+        UserDocument document = userDocumentService.getByNameAndOwnerId(user.getId(), multipartFile.getOriginalFilename());
+        if (document == null) {
+            document = new UserDocument();
+            document.setName(multipartFile.getOriginalFilename());
+            document.setDescription(description);
+            document.setLastModifyTime(Calendar.getInstance().getTime());
+            document.setType(multipartFile.getContentType());
+            document.setContent(multipartFile.getBytes());
+            document.setOwner(user);
+            document.setDocumentAttribute(DocumentAttribute.PRIVATE);
+            document.setDocumentStatus(DocumentStatus.ACTUAL);
+            userDocumentService.save(document);
+        } else {
+            document.setDescription(description);
+            document.setLastModifyTime(Calendar.getInstance().getTime());
+            document.setContent(multipartFile.getBytes());
+            userDocumentService.update(document);
+        }
     }
 }
