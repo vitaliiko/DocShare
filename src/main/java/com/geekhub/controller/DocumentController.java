@@ -3,23 +3,24 @@ package com.geekhub.controller;
 import com.geekhub.entity.User;
 import com.geekhub.entity.UserDocument;
 import com.geekhub.enums.DocumentAttribute;
+import com.geekhub.enums.DocumentStatus;
 import com.geekhub.service.UserDocumentService;
 import com.geekhub.service.UserService;
 import com.geekhub.validation.FileValidator;
-import com.geekhub.wrapper.FileBucket;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.ModelMap;
 import org.springframework.util.FileCopyUtils;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
+import java.util.Calendar;
 import java.util.List;
 
 @Controller
@@ -44,18 +45,11 @@ public class DocumentController {
     }
 
     @RequestMapping(value = "/upload", method = RequestMethod.GET)
-    public String addDocuments(ModelMap model, HttpSession session) {
-        Long userId = (Long) session.getAttribute("userId");
-        User user = userService.getById(userId);
-        model.addAttribute("user", user);
-
-        FileBucket fileModel = new FileBucket();
-        model.addAttribute("fileBucket", fileModel);
-
-        List<UserDocument> documents = userDocumentService.getByOwnerId(userId);
-        model.addAttribute("documents", documents);
-
-        return "managedocuments";
+    public ModelAndView addDocuments(HttpSession session) {
+        ModelAndView model = new ModelAndView("managedocuments");
+        List<UserDocument> documents = userDocumentService.getActualByOwnerId((Long) session.getAttribute("userId"));
+        model.addObject("documents", documents);
+        return model;
     }
 
     @RequestMapping(value = "/download-{docId}", method = RequestMethod.GET)
@@ -70,10 +64,10 @@ public class DocumentController {
         return "redirect:/document/upload";
     }
 
-    @RequestMapping(value = "/delete", method = RequestMethod.POST)
+    @RequestMapping(value = "/move-to-trash", method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.OK)
     public void deleteDocument(Long docId, HttpSession session) {
-        userDocumentService.deleteById(docId);
+        userDocumentService.moveToTrash(docId);
     }
 
     @RequestMapping(value = "/upload", method = RequestMethod.POST)
@@ -91,10 +85,12 @@ public class DocumentController {
 
         document.setName(multipartFile.getOriginalFilename());
         document.setDescription(description);
+        document.setLastModifyTime(Calendar.getInstance().getTime());
         document.setType(multipartFile.getContentType());
         document.setContent(multipartFile.getBytes());
         document.setOwner(user);
         document.setDocumentAttribute(DocumentAttribute.PRIVATE);
+        document.setDocumentStatus(DocumentStatus.ACTUAL);
         userDocumentService.save(document);
     }
 }

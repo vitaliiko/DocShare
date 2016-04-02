@@ -3,10 +3,12 @@ package com.geekhub.service;
 import com.geekhub.dao.UserDocumentDao;
 import com.geekhub.entity.User;
 import com.geekhub.entity.UserDocument;
+import com.geekhub.enums.DocumentStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Calendar;
 import java.util.List;
 
 @Service
@@ -55,8 +57,36 @@ public class UserDocumentServiceImpl implements UserDocumentService {
     }
 
     @Override
-    public List<UserDocument> getByOwnerId(Long ownerId) {
+    public List<UserDocument> getAllByOwnerId(Long ownerId) {
         User owner = userService.getById(ownerId);
         return userDocumentDao.getList("owner", owner);
+    }
+
+    @Override
+    public List<UserDocument> getActualByOwnerId(Long ownerId) {
+        User owner = userService.getById(ownerId);
+        return userDocumentDao.getList(owner, "documentStatus", DocumentStatus.ACTUAL);
+    }
+
+    @Override
+    public List<UserDocument> getRemovedByOwnerId(Long ownerId) {
+        User owner = userService.getById(ownerId);
+        return userDocumentDao.getList(owner, "documentStatus", DocumentStatus.REMOVED);
+    }
+
+    @Override
+    public void moveToTrash(Long docId) {
+        UserDocument document = userDocumentDao.getById(docId);
+        document.setDocumentStatus(DocumentStatus.REMOVED);
+        document.setLastModifyTime(Calendar.getInstance().getTime());
+        userDocumentDao.update(document);
+    }
+
+    @Override
+    public void recover(Long docId) {
+        UserDocument document = userDocumentDao.getById(docId);
+        document.setDocumentStatus(DocumentStatus.ACTUAL);
+        document.setLastModifyTime(Calendar.getInstance().getTime());
+        userDocumentDao.update(document);
     }
 }

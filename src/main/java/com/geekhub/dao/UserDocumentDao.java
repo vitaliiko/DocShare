@@ -1,5 +1,6 @@
 package com.geekhub.dao;
 
+import com.geekhub.entity.User;
 import com.geekhub.entity.UserDocument;
 import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Order;
@@ -68,6 +69,14 @@ public class UserDocumentDao implements EntityDao<UserDocument, Long> {
     public List<UserDocument> getList(String propertyName, Object value) {
         return sessionFactory.getCurrentSession()
                 .createCriteria(clazz)
+                .add(Restrictions.eq(propertyName, value))
+                .list();
+    }
+
+    public List<UserDocument> getList(User owner, String propertyName, Object value) {
+        return sessionFactory.getCurrentSession()
+                .createCriteria(clazz)
+                .add(Restrictions.eq("owner", owner))
                 .add(Restrictions.eq(propertyName, value))
                 .list();
     }

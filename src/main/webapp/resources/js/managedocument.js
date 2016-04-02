@@ -8,7 +8,7 @@ $(document).ready(function() {
 
     $('#deleteDocument').click(function() {
         $.ajax({
-            url: '/document/delete',
+            url: '/document/move-to-trash',
             type: 'POST',
             data: {docId: documentId},
             success: function() {

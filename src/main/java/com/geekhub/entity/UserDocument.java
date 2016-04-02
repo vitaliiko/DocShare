@@ -2,9 +2,11 @@ package com.geekhub.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.geekhub.enums.DocumentAttribute;
+import com.geekhub.enums.DocumentStatus;
 
 import javax.persistence.*;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -16,7 +18,7 @@ public class UserDocument {
     @GeneratedValue
     private Long id;
 
-    @Column
+    @Column(unique = true)
     private String name;
 
     @Column
@@ -24,6 +26,9 @@ public class UserDocument {
 
     @Column
     private String description;
+
+    @Column
+    private Date lastModifyTime;
 
     @Lob @JsonIgnore
     @Basic(fetch = FetchType.LAZY)
@@ -35,8 +40,13 @@ public class UserDocument {
     @JoinColumn(name = "owner_id")
     private User owner;
 
+    @Column(name = "documentAttribute")
     @Enumerated(EnumType.STRING)
     private DocumentAttribute documentAttribute;
+
+    @Column(name = "documentStatus")
+    @Enumerated(EnumType.ORDINAL)
+    private DocumentStatus documentStatus;
 
     @JsonIgnore
     @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
@@ -106,12 +116,28 @@ public class UserDocument {
         this.documentAttribute = documentAttribute;
     }
 
+    public DocumentStatus getDocumentStatus() {
+        return documentStatus;
+    }
+
+    public void setDocumentStatus(DocumentStatus documentStatus) {
+        this.documentStatus = documentStatus;
+    }
+
     public Set<User> getReaders() {
         return readers;
     }
 
     public void setReaders(Set<User> readers) {
         this.readers = readers;
+    }
+
+    public Date getLastModifyTime() {
+        return lastModifyTime;
+    }
+
+    public void setLastModifyTime(Date lastModifyTime) {
+        this.lastModifyTime = lastModifyTime;
     }
 
     @Override
