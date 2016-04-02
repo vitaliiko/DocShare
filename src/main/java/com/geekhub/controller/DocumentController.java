@@ -9,14 +9,12 @@ import com.geekhub.validation.FileValidator;
 import com.geekhub.wrapper.FileBucket;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.util.FileCopyUtils;
 import org.springframework.web.bind.WebDataBinder;
-import org.springframework.web.bind.annotation.InitBinder;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
@@ -72,10 +70,10 @@ public class DocumentController {
         return "redirect:/document/upload";
     }
 
-    @RequestMapping(value = "/delete-{docId}", method = RequestMethod.GET)
-    public String deleteDocument(@PathVariable Long docId, HttpSession session) {
+    @RequestMapping(value = "/delete", method = RequestMethod.POST)
+    @ResponseStatus(HttpStatus.OK)
+    public void deleteDocument(Long docId, HttpSession session) {
         userDocumentService.deleteById(docId);
-        return "redirect:/document/upload";
     }
 
     @RequestMapping(value = "/upload", method = RequestMethod.POST)

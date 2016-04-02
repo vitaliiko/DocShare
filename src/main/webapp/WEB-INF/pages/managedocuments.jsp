@@ -4,9 +4,10 @@
 <html>
 
 <head>
-  <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
-  <title>Upload/Download/Delete Documents</title>
-  <jsp:include page="../include/include.jsp"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+    <title>Upload/Download/Delete Documents</title>
+    <jsp:include page="../include/include.jsp"/>
+    <script src="${pageContext.request.contextPath}/resources/js/managedocument.js"></script>
 </head>
 
 <body>
@@ -29,14 +30,12 @@
             </form>
         </div>
     </div>
-
-          </form>
-      </div>
 </div>
+
     <div class="panel panel-default">
         <div class="panel-heading"><span class="lead">List of Documents </span></div>
         <div class="tablecontainer">
-            <table class="table table-hover tbody tr:hover td">
+            <table class="table table-hover tbody tr:hover td" id="documentTable">
                 <thead>
                     <tr>
                         <th>No.</th>
@@ -49,21 +48,44 @@
                 </thead>
                 <tbody>
                 <c:forEach items="${documents}" var="doc" varStatus="counter">
-                    <tr>
+                    <tr id="${doc.id}">
                         <td>${counter.index + 1}</td>
                         <td>${doc.name}</td>
                         <td>${doc.type}</td>
                         <td>${doc.description}</td>
                         <td><a href="<c:url value='/document/download-${doc.id}' />"
                                class="btn btn-success custom-width">download</a></td>
-                        <td><a href="<c:url value='/document/delete-${doc.id}' />"
-                               class="btn btn-primary custom-width">delete</a></td>
+
+                        <td><button class="btn btn-primary custom-width delete-btn" id="${doc.id}" name="deleteButton"
+                                    data-toggle="modal" data-target="#deleteDialog">delete</button></td>
                     </tr>
                 </c:forEach>
                 </tbody>
             </table>
         </div>
     </div>
+
+
+<div id="deleteDialog" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Removing</h4>
+            </div>
+            <div class="modal-body">
+                <h5 id="group-action">Are you sure you want to move file into trash?</h5>
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" id="deleteDocument" class="btn btn-success">YES</button>
+                <button type="button" class="btn btn-danger" data-dismiss="modal">NO</button>
+            </div>
+        </div>
+
+    </div>
+</div>
 
 
     <div class="well">
