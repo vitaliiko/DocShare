@@ -46,7 +46,7 @@ public class MainController {
         ModelAndView model = new ModelAndView();
         User user = userService.getByLogin(j_username);
         if (user != null && user.getPassword().equals(j_password)) {
-            model.setViewName("redirect:/main/home");
+            model.setViewName("redirect:/document/upload");
             session.setAttribute("userId", user.getId());
         } else {
             model.addObject("errorMessage", "Wrong login or password")

@@ -46,7 +46,7 @@ public class DocumentController {
 
     @RequestMapping(value = "/upload", method = RequestMethod.GET)
     public ModelAndView addDocuments(HttpSession session) {
-        ModelAndView model = new ModelAndView("managedocuments");
+        ModelAndView model = new ModelAndView("home");
         List<UserDocument> documents = userDocumentService.getActualByOwnerId((Long) session.getAttribute("userId"));
         model.addObject("documents", documents);
         return model;
@@ -70,8 +70,23 @@ public class DocumentController {
         userDocumentService.moveToTrash(docId);
     }
 
+    @RequestMapping("/recover")
+    public ModelAndView recoverDocument(HttpSession session) {
+        ModelAndView model = new ModelAndView("recover");
+        List<UserDocument> documents = userDocumentService.getRemovedByOwnerId((Long) session.getAttribute("userId"));
+        model.addObject("documents", documents);
+        return model;
+    }
+
+    @RequestMapping("/recover-{docId}")
+    public ModelAndView recoverDocument(@PathVariable Long docId, HttpSession session) {
+        userDocumentService.recover(docId);
+        return new ModelAndView("redirect:/document/upload");
+    }
+
     @RequestMapping(value = "/upload", method = RequestMethod.POST)
-    public List<UserDocument> uploadDocument(MultipartHttpServletRequest request, String description, HttpSession session) throws IOException {
+    public List<UserDocument> uploadDocument(MultipartHttpServletRequest request, String description, HttpSession session)
+            throws IOException {
         Long userId = (Long) session.getAttribute("userId");
         User user = userService.getById(userId);
 
