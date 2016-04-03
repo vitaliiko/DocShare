@@ -7,9 +7,12 @@ import com.geekhub.enums.DocumentStatus;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.text.DecimalFormat;
 import java.util.*;
 
 public class UserDocumentUtil {
+
+    private static String[] bytes = {"byte", "KB", "MB", "GB"};
 
     public static Map<String, List<UserDocument>> prepareDocumentsListMap(List<UserDocument> allDocuments) {
         List<UserDocument> privateDocuments = new ArrayList<>();
@@ -41,6 +44,7 @@ public class UserDocumentUtil {
         document.setDescription(description);
         document.setLastModifyTime(Calendar.getInstance().getTime());
         document.setType(multipartFile.getContentType());
+        document.setSize(calculateSize(multipartFile.getSize()));
         document.setContent(multipartFile.getBytes());
         document.setOwner(user);
         document.setDocumentAttribute(DocumentAttribute.PRIVATE);
@@ -52,8 +56,18 @@ public class UserDocumentUtil {
             throws IOException {
         document.setDescription(description);
         document.setLastModifyTime(Calendar.getInstance().getTime());
+        document.setSize(calculateSize(multipartFile.getSize()));
         document.setContent(multipartFile.getBytes());
         document.setDocumentStatus(DocumentStatus.ACTUAL);
         return document;
+    }
+
+    private static String calculateSize(long size) {
+        if (size <= 0) {
+            return "0 B";
+        }
+        final String[] units = new String[] {"B", "kB", "MB", "GB", "TB"};
+        int digitGroups = (int) (Math.log10(size)/Math.log10(1024));
+        return new DecimalFormat("#,##0.#").format(size/Math.pow(1024, digitGroups)) + " " + units[digitGroups];
     }
 }

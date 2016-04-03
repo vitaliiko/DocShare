@@ -30,6 +30,9 @@ public class UserDocument {
     @Column
     private Date lastModifyTime;
 
+    @Column
+    private String size;
+
     @Lob @JsonIgnore
     @Basic(fetch = FetchType.LAZY)
     @Column
@@ -138,6 +141,14 @@ public class UserDocument {
 
     public void setLastModifyTime(Date lastModifyTime) {
         this.lastModifyTime = lastModifyTime;
+    }
+
+    public String getSize() {
+        return size;
+    }
+
+    public void setSize(String size) {
+        this.size = size;
     }
 
     @Override

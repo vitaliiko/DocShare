@@ -43,6 +43,7 @@
                     data-toggle="modal" data-target="#deleteDialog">Delete</button>
             <button class="btn btn-default replace-btn action-btn">Replace</button>
             <button class="btn btn-default copy-btn action-btn">Copy</button>
+            <button class="btn btn-default rename-btn action-btn single-selection">Rename</button>
         </caption>
         <tr>
             <th><input type="checkbox" class="check-box select-all"/> No.</th>
@@ -56,11 +57,11 @@
         <table class="table table-hover tbody tr:hover td" id="${documentsEntry.key}">
         <c:forEach items="${documentsEntry.value}" var="doc" varStatus="counter">
             <tr id="${doc.id}">
-                <td>
+                <td class="document-num">
                     <input type="checkbox" class="check-box" value="${doc.id}"/> ${counter.index + 1}
                 </td>
-                <td>${doc.name}</td>
-                <td><fmt:formatDate type="both" value="${doc.lastModifyTime}"/></td>
+                <td class="document-name">${doc.name}</td>
+                <td class="document-date"><fmt:formatDate type="both" value="${doc.lastModifyTime}"/></td>
                 <td><a href="<c:url value='/document/download-${doc.id}' />"
                        class="btn btn-success custom-width">Download</a></td>
             </tr>

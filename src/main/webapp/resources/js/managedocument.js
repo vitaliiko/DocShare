@@ -51,10 +51,16 @@ $(document).ready(function() {
     });
 
     $('.check-box').click(function() {
-        if ($("input:checkbox:checked").length == 0) {
+        var checkBoxCount = $("input:checkbox:checked").length;
+        if (checkBoxCount == 0) {
             $('.action-btn').hide();
         } else {
             $('.action-btn').show();
+            if (checkBoxCount == 1) {
+                $('.single-selection').show();
+            } else {
+                $('.single-selection').hide();
+            }
         }
     });
 
