@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
 
@@ -83,11 +84,21 @@ public class UserDocumentServiceImpl implements UserDocumentService {
     }
 
     @Override
+    public void moveToTrash(Long[] docIds) {
+        Arrays.stream(docIds).forEach(this::moveToTrash);
+    }
+
+    @Override
     public void recover(Long docId) {
         UserDocument document = userDocumentDao.getById(docId);
         document.setDocumentStatus(DocumentStatus.ACTUAL);
         document.setLastModifyTime(Calendar.getInstance().getTime());
         userDocumentDao.update(document);
+    }
+
+    @Override
+    public void recover(Long[] docIds) {
+        Arrays.stream(docIds).forEach(this::recover);
     }
 
     @Override

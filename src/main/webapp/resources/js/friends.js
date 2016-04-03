@@ -49,7 +49,7 @@ $(document).ready(function() {
                 $('#groupInfo').modal('hide');
                 clearModalWindow();
             }
-        })
+        });
     });
 
     $('.group-info-btn').click(function() {

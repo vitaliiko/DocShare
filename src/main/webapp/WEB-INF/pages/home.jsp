@@ -38,7 +38,9 @@
             <button class="btn btn-link public-href">Public</button>
             <button class="btn btn-link for-friends-href">For Friends</button>
             <button class="btn btn-link private-href">Private</button>
-            <button class="btn btn-default delete-btn action-btn">Delete</button>
+
+            <button class="btn btn-default delete-btn action-btn"
+                    data-toggle="modal" data-target="#deleteDialog">Delete</button>
             <button class="btn btn-default replace-btn action-btn">Replace</button>
             <button class="btn btn-default copy-btn action-btn">Copy</button>
         </caption>

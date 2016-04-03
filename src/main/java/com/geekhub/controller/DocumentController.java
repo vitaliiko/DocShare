@@ -62,8 +62,8 @@ public class DocumentController {
 
     @RequestMapping(value = "/move-to-trash", method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.OK)
-    public void deleteDocument(Long docId, HttpSession session) {
-        userDocumentService.moveToTrash(docId);
+    public void moveDocumentToTrash(@RequestParam("docIds[]") Long[] docIds, HttpSession session) {
+        userDocumentService.moveToTrash(docIds);
     }
 
     @RequestMapping("/recover")

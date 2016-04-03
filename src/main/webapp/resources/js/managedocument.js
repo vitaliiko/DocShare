@@ -2,6 +2,8 @@ $(document).ready(function() {
 
     var documentId;
     var files;
+    var docIds = [];
+    var tableRows = [];
 
     function changeTab() {
         $('#publicDocumentsTable').hide();
@@ -78,19 +80,26 @@ $(document).ready(function() {
     });
 
     $('.delete-btn').click(function() {
-        var row = this.closest('tr');
-        var fileName = $(row['name=file-name']).text();
-        documentId = row.id;
-        $('#dialog-text').text('Are you sure you want to move ' + fileName + ' into trash?');
+        $('.check-box:checked').each(function() {
+            docIds.push($(this).val());
+            tableRows.push(this.closest('tr'));
+        });
+        //var row = this.closest('tr');
+        //var fileName = $(row['name=file-name']).text();
+        //documentId = row.id;
+        //$('#dialog-text').text('Are you sure you want to move ' + fileName + ' into trash?');
     });
 
     $('#deleteDocument').click(function() {
+        alert(docIds);
         $.ajax({
             url: '/document/move-to-trash',
             type: 'POST',
-            data: {docId: documentId},
+            data: {'docIds[]': docIds},
             success: function() {
-                $('table#documentTable tr#' + documentId).remove();
+                tableRows.forEach(function() {
+                    $(this).remove();
+                });
                 $('#deleteDialog').modal('hide');
             }
         });
