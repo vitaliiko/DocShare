@@ -31,8 +31,14 @@
 </div>
 
 <div class="container" style="width: 900px;">
-    <table class="table table-hover tbody tr:hover td" id="documentTable">
-        <caption><h3>List of Documents</h3></caption>
+    <table class="table table-hover tbody tr:hover td">
+        <caption>
+            <h3>List of Documents</h3>
+            <button class="btn btn-link all-href">All</button>
+            <button class="btn btn-link public-href">Public</button>
+            <button class="btn btn-link for-friends-href">For Friends</button>
+            <button class="btn btn-link private-href">Private</button>
+        </caption>
         <tr>
             <th>No.</th>
             <th id="file-name">File Name</th>
@@ -40,7 +46,55 @@
             <th width="100"></th>
             <th width="100"></th>
         </tr>
-        <c:forEach items="${documents}" var="doc" varStatus="counter">
+    </table>
+
+    <table class="table table-hover tbody tr:hover td" id="allDocumentsTable">
+        <c:forEach items="${allDocuments}" var="doc" varStatus="counter">
+            <tr id="${doc.id}">
+                <td>${counter.index + 1}</td>
+                <td>${doc.name}</td>
+                <td><fmt:formatDate type="both" value="${doc.lastModifyTime}"/></td>
+                <td><a href="<c:url value='/document/download-${doc.id}' />"
+                       class="btn btn-success custom-width">download</a></td>
+
+                <td><button class="btn btn-primary custom-width delete-btn" id="${doc.id}" name="deleteButton"
+                            data-toggle="modal" data-target="#deleteDialog">delete</button></td>
+            </tr>
+        </c:forEach>
+    </table>
+
+    <table class="table table-hover tbody tr:hover td" id="publicDocumentsTable">
+        <c:forEach items="${publicDocuments}" var="doc" varStatus="counter">
+            <tr id="${doc.id}">
+                <td>${counter.index + 1}</td>
+                <td>${doc.name}</td>
+                <td><fmt:formatDate type="both" value="${doc.lastModifyTime}"/></td>
+                <td><a href="<c:url value='/document/download-${doc.id}' />"
+                       class="btn btn-success custom-width">download</a></td>
+
+                <td><button class="btn btn-primary custom-width delete-btn" id="${doc.id}" name="deleteButton"
+                            data-toggle="modal" data-target="#deleteDialog">delete</button></td>
+            </tr>
+        </c:forEach>
+    </table>
+
+    <table class="table table-hover tbody tr:hover td" id="forFriendsDocumentsTable">
+        <c:forEach items="${forFriendsDocuments}" var="doc" varStatus="counter">
+            <tr id="${doc.id}">
+                <td>${counter.index + 1}</td>
+                <td>${doc.name}</td>
+                <td><fmt:formatDate type="both" value="${doc.lastModifyTime}"/></td>
+                <td><a href="<c:url value='/document/download-${doc.id}' />"
+                       class="btn btn-success custom-width">download</a></td>
+
+                <td><button class="btn btn-primary custom-width delete-btn" id="${doc.id}" name="deleteButton"
+                            data-toggle="modal" data-target="#deleteDialog">delete</button></td>
+            </tr>
+        </c:forEach>
+    </table>
+
+    <table class="table table-hover tbody tr:hover td" id="privateDocumentsTable">
+        <c:forEach items="${privateDocuments}" var="doc" varStatus="counter">
             <tr id="${doc.id}">
                 <td>${counter.index + 1}</td>
                 <td>${doc.name}</td>

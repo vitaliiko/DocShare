@@ -27,7 +27,7 @@ public class IndexController {
 
     @RequestMapping("/")
     public ModelAndView index() {
-        return new ModelAndView("redirect:/documents/upload");
+        return new ModelAndView("redirect:/document/upload");
     }
 
 //    @RequestMapping(value = {"/", "/index"}, method = RequestMethod.POST)

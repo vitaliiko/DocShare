@@ -11,7 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.http.HttpStatus;
 import org.springframework.util.FileCopyUtils;
-import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -21,7 +20,10 @@ import org.springframework.web.servlet.ModelAndView;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/document")
@@ -47,8 +49,25 @@ public class DocumentController {
     @RequestMapping(value = "/upload", method = RequestMethod.GET)
     public ModelAndView addDocuments(HttpSession session) {
         ModelAndView model = new ModelAndView("home");
-        List<UserDocument> documents = userDocumentService.getActualByOwnerId((Long) session.getAttribute("userId"));
-        model.addObject("documents", documents);
+        List<UserDocument> allDocuments = userDocumentService.getActualByOwnerId((Long) session.getAttribute("userId"));
+        List<UserDocument> privateDocuments = new ArrayList<>();
+        List<UserDocument> publicDocuments = new ArrayList<>();
+        List<UserDocument> forFriendsDocuments = new ArrayList<>();
+        allDocuments.forEach(doc -> {
+            if (doc.getDocumentAttribute() == DocumentAttribute.PRIVATE) {
+                privateDocuments.add(doc);
+            }
+            if (doc.getDocumentAttribute() == DocumentAttribute.PUBLIC) {
+                publicDocuments.add(doc);
+            }
+            if (doc.getDocumentAttribute() == DocumentAttribute.FOR_FRIENDS) {
+                forFriendsDocuments.add(doc);
+            }
+        });
+        model.addObject("allDocuments", allDocuments);
+        model.addObject("privateDocuments", privateDocuments);
+        model.addObject("publicDocuments", publicDocuments);
+        model.addObject("forFriendsDocuments", forFriendsDocuments);
         return model;
     }
 
@@ -120,6 +139,7 @@ public class DocumentController {
         document.setDescription(description);
         document.setLastModifyTime(Calendar.getInstance().getTime());
         document.setContent(multipartFile.getBytes());
+        document.setDocumentStatus(DocumentStatus.ACTUAL);
         userDocumentService.update(document);
         return null;
     }

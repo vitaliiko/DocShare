@@ -3,8 +3,40 @@ $(document).ready(function() {
     var documentId;
     var files;
 
+    $('#publicDocumentsTable').hide();
+    $('#forFriendsDocumentsTable').hide();
+    $('#privateDocumentsTable').hide();
+
     $('input[type=file]').on('change', function(event) {
         files = event.target.files;
+    });
+
+    $('.all-href').click(function() {
+        $('#allDocumentsTable').show();
+        $('#publicDocumentsTable').hide();
+        $('#forFriendsDocumentsTable').hide();
+        $('#privateDocumentsTable').hide();
+    });
+
+    $('.public-href').click(function() {
+        $('#allDocumentsTable').hide();
+        $('#publicDocumentsTable').show();
+        $('#forFriendsDocumentsTable').hide();
+        $('#privateDocumentsTable').hide();
+    });
+
+    $('.for-friends-href').click(function() {
+        $('#allDocumentsTable').hide();
+        $('#publicDocumentsTable').hide();
+        $('#forFriendsDocumentsTable').show();
+        $('#privateDocumentsTable').hide();
+    });
+
+    $('.private-href').click(function() {
+        $('#allDocumentsTable').hide();
+        $('#publicDocumentsTable').hide();
+        $('#forFriendsDocumentsTable').hide();
+        $('#privateDocumentsTable').show();
     });
 
     $('.upload-btn').click(function() {
