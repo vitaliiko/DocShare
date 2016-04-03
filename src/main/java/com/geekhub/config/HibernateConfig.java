@@ -1,5 +1,6 @@
 package com.geekhub.config;
 
+import com.geekhub.entity.Comment;
 import com.geekhub.entity.FriendsGroup;
 import com.geekhub.entity.Message;
 import com.geekhub.entity.User;
@@ -25,6 +26,14 @@ import java.util.Properties;
 @PropertySource("classpath:database.properties")
 public class HibernateConfig {
 
+    private Class[] entityClasses = new Class[] {
+            User.class,
+            Message.class,
+            FriendsGroup.class,
+            UserDocument.class,
+            Comment.class
+    };
+
     @Autowired
     private Environment environment;
 
@@ -33,7 +42,7 @@ public class HibernateConfig {
         LocalSessionFactoryBean sessionFactory = new LocalSessionFactoryBean();
         sessionFactory.setDataSource(restDataSource());
         sessionFactory.setHibernateProperties(hibernateProperties());
-        sessionFactory.setAnnotatedClasses(User.class, Message.class, FriendsGroup.class, UserDocument.class);
+        sessionFactory.setAnnotatedClasses(entityClasses);
         sessionFactory.setAnnotatedPackages("com.geekhub.entity");
         return sessionFactory;
     }
