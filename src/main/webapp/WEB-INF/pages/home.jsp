@@ -48,6 +48,7 @@
         <tr>
             <th><input type="checkbox" class="check-box select-all"/> No.</th>
             <th id="file-name">File Name</th>
+            <th>Size</th>
             <th>Changed</th>
             <th width="80"></th>
         </tr>
@@ -60,7 +61,10 @@
                 <td class="document-num">
                     <input type="checkbox" class="check-box" value="${doc.id}"/> ${counter.index + 1}
                 </td>
-                <td class="document-name">${doc.name}</td>
+                <td class="document-name">
+                    <a href="/document/browse-${doc.id}">${doc.name}</a>
+                </td>
+                <td>${doc.size}</td>
                 <td class="document-date"><fmt:formatDate type="both" value="${doc.lastModifyTime}"/></td>
                 <td><a href="<c:url value='/document/download-${doc.id}' />"
                        class="btn btn-success custom-width">Download</a></td>

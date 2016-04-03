@@ -2,6 +2,7 @@ package com.geekhub.dao;
 
 import com.geekhub.entity.User;
 import com.geekhub.entity.UserDocument;
+import org.hibernate.Hibernate;
 import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
@@ -87,5 +88,11 @@ public class UserDocumentDao implements EntityDao<UserDocument, Long> {
                 .add(Restrictions.eq("owner", owner))
                 .add(Restrictions.eq(propertyName, value))
                 .uniqueResult();
+    }
+
+    public UserDocument getAndInitContent(Long docId) {
+        UserDocument document = getById(docId);
+        Hibernate.initialize(document.getContent());
+        return document;
     }
 }

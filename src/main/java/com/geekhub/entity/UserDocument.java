@@ -4,11 +4,26 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.geekhub.enums.DocumentAttribute;
 import com.geekhub.enums.DocumentStatus;
 
-import javax.persistence.*;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
+import javax.persistence.Basic;
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.Lob;
+import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
 
 @Entity
 @Table
@@ -62,6 +77,11 @@ public class UserDocument {
             }
     )
     private Set<User> readers = new HashSet<>();
+
+    @JsonIgnore
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "doc_id")
+    private Set<Comment> comments = new HashSet<>();
 
     public Long getId() {
         return id;
@@ -149,6 +169,14 @@ public class UserDocument {
 
     public void setSize(String size) {
         this.size = size;
+    }
+
+    public Set<Comment> getComments() {
+        return comments;
+    }
+
+    public void setComments(Set<Comment> comments) {
+        this.comments = comments;
     }
 
     @Override

@@ -6,7 +6,7 @@
                 <a class="navbar-brand" href="#">Exchange File System</a>
             </div>
             <ul class="nav navbar-nav">
-                <li class="active"><a href="/main/home">Home</a></li>
+                <li class="active"><a href="/document/upload">Home</a></li>
                 <li><a href="/main/search">Search Friends</a></li>
                 <li><a href="/profile/view">Profile</a></li>
                 <li><a href="/main/signOut">Sign Out</a></li>

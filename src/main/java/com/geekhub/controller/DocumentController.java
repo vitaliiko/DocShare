@@ -98,6 +98,14 @@ public class DocumentController {
         return documents;
     }
 
+    @RequestMapping("/browse-{docId}")
+    public ModelAndView browseDocument(@PathVariable Long docId, HttpSession session) {
+        UserDocument document = userDocumentService.getById(docId);
+        ModelAndView model = new ModelAndView("document");
+        model.addObject("doc", document);
+        return model;
+    }
+
     private UserDocument saveOrUpdateDocument(MultipartFile multipartFile, String description, User user) throws IOException {
         UserDocument document = userDocumentService.getByNameAndOwnerId(user.getId(), multipartFile.getOriginalFilename());
         if (document == null) {
