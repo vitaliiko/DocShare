@@ -38,13 +38,15 @@
             <button class="btn btn-link public-href">Public</button>
             <button class="btn btn-link for-friends-href">For Friends</button>
             <button class="btn btn-link private-href">Private</button>
+            <button class="btn btn-default delete-btn action-btn">Delete</button>
+            <button class="btn btn-default replace-btn action-btn">Replace</button>
+            <button class="btn btn-default copy-btn action-btn">Copy</button>
         </caption>
         <tr>
-            <th>No.</th>
+            <th><input type="checkbox" class="check-box select-all"/> No.</th>
             <th id="file-name">File Name</th>
             <th>Changed</th>
-            <th width="100"></th>
-            <th width="100"></th>
+            <th width="80"></th>
         </tr>
     </table>
 
@@ -52,14 +54,13 @@
         <table class="table table-hover tbody tr:hover td" id="${documentsEntry.key}">
         <c:forEach items="${documentsEntry.value}" var="doc" varStatus="counter">
             <tr id="${doc.id}">
-                <td>${counter.index + 1}</td>
+                <td>
+                    <input type="checkbox" class="check-box" value="${doc.id}"/> ${counter.index + 1}
+                </td>
                 <td>${doc.name}</td>
                 <td><fmt:formatDate type="both" value="${doc.lastModifyTime}"/></td>
                 <td><a href="<c:url value='/document/download-${doc.id}' />"
-                       class="btn btn-success custom-width">download</a></td>
-
-                <td><button class="btn btn-primary custom-width delete-btn" id="${doc.id}" name="deleteButton"
-                            data-toggle="modal" data-target="#deleteDialog">delete</button></td>
+                       class="btn btn-success custom-width">Download</a></td>
             </tr>
         </c:forEach>
         </table>

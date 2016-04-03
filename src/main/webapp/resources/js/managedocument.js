@@ -3,40 +3,57 @@ $(document).ready(function() {
     var documentId;
     var files;
 
-    $('#publicDocumentsTable').hide();
-    $('#forFriendsDocumentsTable').hide();
-    $('#privateDocumentsTable').hide();
+    function changeTab() {
+        $('#publicDocumentsTable').hide();
+        $('#forFriendsDocumentsTable').hide();
+        $('#privateDocumentsTable').hide();
+        $('#allDocumentsTable').hide();
+        $("input:checkbox:checked").each(function() {
+            $(this).prop('checked', false);
+        });
+        $('.action-btn').hide();
+    }
+
+    changeTab();
+    $('#allDocumentsTable').show();
 
     $('input[type=file]').on('change', function(event) {
         files = event.target.files;
     });
 
     $('.all-href').click(function() {
+        changeTab();
         $('#allDocumentsTable').show();
-        $('#publicDocumentsTable').hide();
-        $('#forFriendsDocumentsTable').hide();
-        $('#privateDocumentsTable').hide();
     });
 
     $('.public-href').click(function() {
-        $('#allDocumentsTable').hide();
+        changeTab();
         $('#publicDocumentsTable').show();
-        $('#forFriendsDocumentsTable').hide();
-        $('#privateDocumentsTable').hide();
     });
 
     $('.for-friends-href').click(function() {
-        $('#allDocumentsTable').hide();
-        $('#publicDocumentsTable').hide();
+        changeTab();
         $('#forFriendsDocumentsTable').show();
-        $('#privateDocumentsTable').hide();
     });
 
     $('.private-href').click(function() {
-        $('#allDocumentsTable').hide();
-        $('#publicDocumentsTable').hide();
-        $('#forFriendsDocumentsTable').hide();
+        changeTab();
         $('#privateDocumentsTable').show();
+    });
+
+    $('.select-all').click(function() {
+        var checked = this.checked;
+        $("input:checkbox").each(function() {
+            $(this).prop('checked', checked);
+        });
+    });
+
+    $('.check-box').click(function() {
+        if ($("input:checkbox:checked").length == 0) {
+            $('.action-btn').hide();
+        } else {
+            $('.action-btn').show();
+        }
     });
 
     $('.upload-btn').click(function() {
