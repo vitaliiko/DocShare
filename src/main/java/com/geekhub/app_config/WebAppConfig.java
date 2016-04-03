@@ -1,4 +1,4 @@
-package com.geekhub.config;
+package com.geekhub.app_config;
 
 import com.geekhub.controller.MainInterceptor;
 import com.geekhub.security.UserDetailsServiceImpl;
@@ -63,7 +63,7 @@ public class WebAppConfig extends WebMvcConfigurerAdapter {
         return new ShaPasswordEncoder();
     }
 
-    @Bean(name="multipartResolver")
+    @Bean(name = "multipartResolver")
     public CommonsMultipartResolver getResolver() throws IOException {
         return new CommonsMultipartResolver();
     }

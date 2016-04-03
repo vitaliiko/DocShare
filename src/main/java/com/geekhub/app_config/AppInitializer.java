@@ -1,8 +1,5 @@
-package com.geekhub.application_initialization;
+package com.geekhub.app_config;
 
-import com.geekhub.config.HibernateConfig;
-import com.geekhub.config.SecurityConfig;
-import com.geekhub.config.WebAppConfig;
 import org.springframework.orm.jpa.support.OpenEntityManagerInViewFilter;
 import org.springframework.web.filter.HiddenHttpMethodFilter;
 import org.springframework.web.multipart.support.MultipartFilter;

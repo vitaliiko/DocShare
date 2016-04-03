@@ -1,4 +1,4 @@
-package com.geekhub.config;
+package com.geekhub.app_config;
 
 import com.geekhub.entity.Comment;
 import com.geekhub.entity.FriendsGroup;
