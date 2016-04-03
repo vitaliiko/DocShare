@@ -1,4 +1,4 @@
-package com.geekhub.util;
+package com.geekhub.provider;
 
 import com.geekhub.entity.FriendsGroup;
 import com.geekhub.entity.User;
@@ -12,13 +12,10 @@ import java.util.List;
 import java.util.function.LongPredicate;
 
 @Service
-public class UserUtil {
+public class UserProvider {
 
     @Autowired
     private UserService userService;
-
-    @Autowired
-    private FriendsGroupUtil friendsGroupUtil;
 
     @Autowired
     private FriendsGroupService friendsGroupService;

@@ -2,8 +2,7 @@ package com.geekhub.controller;
 
 import com.geekhub.service.MessageService;
 import com.geekhub.service.UserService;
-import com.geekhub.util.MessageUtil;
-import com.geekhub.util.UserUtil;
+import com.geekhub.provider.UserProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -17,13 +16,10 @@ public class IndexController {
     private MessageService messageService;
 
     @Autowired
-    private MessageUtil messageUtil;
-
-    @Autowired
     private UserService userService;
 
     @Autowired
-    private UserUtil userUtil;
+    private UserProvider userProvider;
 
     @RequestMapping("/")
     public ModelAndView index() {

@@ -3,7 +3,7 @@ package com.geekhub.controller;
 import com.geekhub.entity.User;
 import com.geekhub.exception.UserValidateException;
 import com.geekhub.service.UserService;
-import com.geekhub.util.UserUtil;
+import com.geekhub.provider.UserProvider;
 import org.hibernate.HibernateException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -25,7 +25,7 @@ public class MainController {
     private UserService userService;
 
     @Autowired
-    private UserUtil userUtil;
+    private UserProvider userProvider;
 
     @RequestMapping(value = "/home", method = RequestMethod.GET)
     public ModelAndView home() {
@@ -36,7 +36,7 @@ public class MainController {
     public ModelAndView signIn() {
         int size = userService.getAll("id").size();
         if (size == 0) {
-            userUtil.addDefaultUsers();
+            userProvider.addDefaultUsers();
         }
         return new ModelAndView("signIn");
     }
@@ -70,7 +70,7 @@ public class MainController {
 
         ModelAndView model = new ModelAndView();
         try {
-            userUtil.validateUser(login, password, confirmPassword);
+            userProvider.validateUser(login, password, confirmPassword);
             userService.createUser(firstName, lastName, login, password);
             model.setViewName("signIn");
             model.addObject("message", "Your account created successfully");

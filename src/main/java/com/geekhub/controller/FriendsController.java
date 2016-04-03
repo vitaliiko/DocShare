@@ -4,7 +4,7 @@ import com.geekhub.entity.FriendsGroup;
 import com.geekhub.entity.User;
 import com.geekhub.service.FriendsGroupService;
 import com.geekhub.service.UserService;
-import com.geekhub.util.UserUtil;
+import com.geekhub.provider.UserProvider;
 import org.hibernate.HibernateException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -28,7 +28,7 @@ public class FriendsController {
     private UserService userService;
 
     @Autowired
-    private UserUtil userUtil;
+    private UserProvider userProvider;
 
     @Autowired
     private FriendsGroupService friendsGroupService;
@@ -89,7 +89,7 @@ public class FriendsController {
 
     @RequestMapping("/default_users")
     public ModelAndView createDefaultUsers() {
-        userUtil.addDefaultUsers();
+        userProvider.addDefaultUsers();
         return new ModelAndView("redirect:/main/sign_in");
     }
 }
