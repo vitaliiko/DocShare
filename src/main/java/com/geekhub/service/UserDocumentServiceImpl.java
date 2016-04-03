@@ -1,9 +1,12 @@
 package com.geekhub.service;
 
 import com.geekhub.dao.UserDocumentDao;
+import com.geekhub.entity.Comment;
 import com.geekhub.entity.User;
 import com.geekhub.entity.UserDocument;
 import com.geekhub.enums.DocumentStatus;
+import java.util.Set;
+import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -105,5 +108,12 @@ public class UserDocumentServiceImpl implements UserDocumentService {
     public UserDocument getByNameAndOwnerId(Long ownerId, String name) {
         User owner = userService.getById(ownerId);
         return userDocumentDao.get(owner, "name", name);
+    }
+
+    @Override
+    public UserDocument getDocumentWithComments(Long docId) {
+        UserDocument document = userDocumentDao.getById(docId);
+        Hibernate.initialize(document.getComments());
+        return document;
     }
 }

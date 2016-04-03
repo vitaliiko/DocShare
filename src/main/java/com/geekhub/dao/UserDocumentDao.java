@@ -1,7 +1,9 @@
 package com.geekhub.dao;
 
+import com.geekhub.entity.Comment;
 import com.geekhub.entity.User;
 import com.geekhub.entity.UserDocument;
+import java.util.Set;
 import org.hibernate.Hibernate;
 import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Order;

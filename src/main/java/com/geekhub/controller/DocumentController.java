@@ -2,15 +2,23 @@ package com.geekhub.controller;
 
 import com.geekhub.entity.User;
 import com.geekhub.entity.UserDocument;
+import com.geekhub.service.CommentService;
 import com.geekhub.service.UserDocumentService;
 import com.geekhub.service.UserService;
+import com.geekhub.util.CommentUtil;
 import com.geekhub.util.UserDocumentUtil;
 import com.geekhub.validation.FileValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.util.FileCopyUtils;
 import org.springframework.web.bind.WebDataBinder;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.InitBinder;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 import org.springframework.web.servlet.ModelAndView;
@@ -35,6 +43,9 @@ public class DocumentController {
     @Autowired
     private FileValidator fileValidator;
 
+    @Autowired
+    private CommentService commentService;
+
     @InitBinder("multipartFile")
     protected void initBinder(WebDataBinder binder) {
         binder.setValidator(fileValidator);
@@ -49,7 +60,8 @@ public class DocumentController {
     }
 
     @RequestMapping(value = "/download-{docId}", method = RequestMethod.GET)
-    public String downloadDocument(@PathVariable Long docId, HttpSession session, HttpServletResponse response) throws IOException {
+    public String downloadDocument(@PathVariable Long docId, HttpSession session, HttpServletResponse response)
+            throws IOException {
         UserDocument document = userDocumentService.getById(docId);
         response.setContentType(document.getType());
         response.setContentLength(document.getContent().length);
@@ -100,13 +112,29 @@ public class DocumentController {
 
     @RequestMapping("/browse-{docId}")
     public ModelAndView browseDocument(@PathVariable Long docId, HttpSession session) {
-        UserDocument document = userDocumentService.getById(docId);
+        UserDocument document = userDocumentService.getDocumentWithComments(docId);
         ModelAndView model = new ModelAndView("document");
         model.addObject("doc", document);
         return model;
     }
 
-    private UserDocument saveOrUpdateDocument(MultipartFile multipartFile, String description, User user) throws IOException {
+    @RequestMapping("/add-comment")
+    @ResponseStatus(HttpStatus.OK)
+    public void addComment(String text, Long docId, HttpSession session) {
+        User owner = userService.getById((Long) session.getAttribute("userId"));
+        UserDocument document = userDocumentService.getDocumentWithComments(docId);
+        document.getComments().add(CommentUtil.createComment(text, owner));
+        userDocumentService.update(document);
+    }
+
+    @RequestMapping("/delete-comment")
+    @ResponseStatus(HttpStatus.OK)
+    public void deleteComment(Long commentId, HttpSession session) {
+        commentService.deleteById(commentId);
+    }
+
+    private UserDocument saveOrUpdateDocument(MultipartFile multipartFile, String description, User user)
+            throws IOException {
         UserDocument document = userDocumentService.getByNameAndOwnerId(user.getId(), multipartFile.getOriginalFilename());
         if (document == null) {
             document = UserDocumentUtil.createUserDocument(multipartFile, description, user);

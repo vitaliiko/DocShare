@@ -26,7 +26,7 @@ import java.util.Properties;
 @PropertySource("classpath:database.properties")
 public class HibernateConfig {
 
-    private Class[] entityClasses = new Class[] {
+    private Class[] annotatedClasses = new Class[] {
             User.class,
             Message.class,
             FriendsGroup.class,
@@ -42,7 +42,7 @@ public class HibernateConfig {
         LocalSessionFactoryBean sessionFactory = new LocalSessionFactoryBean();
         sessionFactory.setDataSource(restDataSource());
         sessionFactory.setHibernateProperties(hibernateProperties());
-        sessionFactory.setAnnotatedClasses(entityClasses);
+        sessionFactory.setAnnotatedClasses(annotatedClasses);
         sessionFactory.setAnnotatedPackages("com.geekhub.entity");
         return sessionFactory;
     }

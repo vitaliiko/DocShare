@@ -12,8 +12,6 @@ import java.util.*;
 
 public class UserDocumentUtil {
 
-    private static String[] bytes = {"byte", "KB", "MB", "GB"};
-
     public static Map<String, List<UserDocument>> prepareDocumentsListMap(List<UserDocument> allDocuments) {
         List<UserDocument> privateDocuments = new ArrayList<>();
         List<UserDocument> publicDocuments = new ArrayList<>();
