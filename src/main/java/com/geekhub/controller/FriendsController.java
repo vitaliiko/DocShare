@@ -5,6 +5,7 @@ import com.geekhub.entity.User;
 import com.geekhub.service.FriendsGroupService;
 import com.geekhub.service.UserService;
 import com.geekhub.provider.UserProvider;
+import java.util.Arrays;
 import org.hibernate.HibernateException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -54,7 +55,7 @@ public class FriendsController {
     @ResponseStatus(HttpStatus.OK)
     public void updateGroup(Long groupId, String groupName, @RequestParam("friends[]") Long[] friends, HttpSession session)
             throws HibernateException {
-        friendsGroupService.update((Long) session.getAttribute("userId"), groupId, groupName, friends);
+        friendsGroupService.update(groupId, (Long) session.getAttribute("userId"), groupName, friends);
     }
 
     @RequestMapping("/get_group")

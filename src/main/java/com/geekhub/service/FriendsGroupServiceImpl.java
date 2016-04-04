@@ -116,7 +116,7 @@ public class FriendsGroupServiceImpl implements FriendsGroupService {
 
     @Override
     public FriendsGroup getWithFriends(Long groupId) {
-        FriendsGroup group =getById(groupId);
+        FriendsGroup group = getById(groupId);
         Hibernate.initialize(group.getFriends());
         return group;
     }

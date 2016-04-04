@@ -2,7 +2,7 @@
 $(document).ready(function() {
 
     var friendsGroupId;
-    var oldGroupName;
+    var oldFriends = [];
 
     function clearModalWindow() {
         $('.check-box').each(function() {
@@ -41,14 +41,14 @@ $(document).ready(function() {
         var groupName = $('#groupName').val();
         var friends = [];
         $('.check-box:checked').each(function(k, v) {
-            friends.push(v.val());
+            friends.push(v.value);
         });
         $.ajax({
             url: '/friends/update_group',
             contentType: 'json',
             data: {groupId: friendsGroupId, groupName: groupName, friends: friends},
             success: function() {
-                $('.group-info' + friendsGroupId).text(groupName);
+                $('.group' + friendsGroupId).html(groupName);
                 clearModalWindow();
             }
         });
@@ -61,7 +61,6 @@ $(document).ready(function() {
         var groupId = this.id;
         $.getJSON('/friends/get_group', {groupId: groupId}, function(group) {
             friendsGroupId = group.id;
-            oldGroupName = group.name;
             var memberIds = [];
             $.each(group.friends, function (k, v) {
                 memberIds.push(v.id);
