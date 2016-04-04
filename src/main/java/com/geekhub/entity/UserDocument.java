@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.geekhub.enums.DocumentAttribute;
 import com.geekhub.enums.DocumentStatus;
 
+import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
@@ -27,7 +28,7 @@ import javax.persistence.Table;
 
 @Entity
 @Table
-public class UserDocument {
+public class UserDocument implements Serializable {
 
     @Id
     @GeneratedValue

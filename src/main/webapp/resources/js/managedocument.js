@@ -4,12 +4,16 @@ $(document).ready(function() {
     var files;
     var docIds = [];
     var tableRows = [];
+    var allTable = $('#allDocumentsTable');
+    var privateTable = $('#privateDocumentsTable');
+    var publicTable = $('#publicDocumentsTable');
+    var forFriendsTable = $('#forFriendsDocumentsTable');
 
     function changeTab() {
-        $('#publicDocumentsTable').hide(true);
-        $('#forFriendsDocumentsTable').hide(true);
-        $('#privateDocumentsTable').hide(true);
-        $('#allDocumentsTable').hide(true);
+        publicTable.hide(true);
+        forFriendsTable.hide(true);
+        privateTable.hide(true);
+        allTable.hide(true);
         $("input:checkbox:checked").each(function() {
             $(this).prop('checked', false);
         });
@@ -17,7 +21,7 @@ $(document).ready(function() {
     }
 
     changeTab();
-    $('#allDocumentsTable').show(true);
+    allTable.show(true);
 
     $('input[type=file]').on('change', function(event) {
         files = event.target.files;
@@ -25,22 +29,22 @@ $(document).ready(function() {
 
     $('.all-href').click(function() {
         changeTab();
-        $('#allDocumentsTable').show(true);
+        allTable.show(true);
     });
 
     $('.public-href').click(function() {
         changeTab();
-        $('#publicDocumentsTable').show(true);
+        publicTable.show(true);
     });
 
     $('.for-friends-href').click(function() {
         changeTab();
-        $('#forFriendsDocumentsTable').show(true);
+        forFriendsTable.show(true);
     });
 
     $('.private-href').click(function() {
         changeTab();
-        $('#privateDocumentsTable').show(true);
+        privateTable.show(true);
     });
 
     $('.select-all').click(function() {
@@ -66,23 +70,40 @@ $(document).ready(function() {
 
     $('.upload-btn').click(function() {
         var data = new FormData();
-        $.each(files, function(key, value) {
+        var filesCount = 0;
+        $.each(files, function (key, value) {
             data.append(key, value);
+            filesCount++;
         });
-        $.ajax({
-            url: 'document/upload',
-            type: 'POST',
-            data: data,
-            cache: false,
-            dataType: 'json',
-            success: function(documents) {
-                //$('#documentTable').append("<tr id='" + "'>" +
-                //    "<td><button type='button' name='groupInfoButton' class='btn btn-link group-info-btn'" +
-                //    "data-toggle='modal' data-target='#groupInfo'> " + groupName + " </button>" +
-                //    "</td><td><input type='button' class='btn btn-default removeGroupButton' id='"  + "' value='Remove friends group'>" +
-                //    "</td></tr>");
-            }
-        });
+        if (filesCount > 0) {
+            $.ajax({
+                url: 'upload',
+                type: 'POST',
+                data: data,
+                cache: false,
+                dataType: 'json',
+                contentType: false,
+                processData: false,
+                success: function() {
+                    location.reload();
+                }
+                //success: function (documents) {
+                //    var counter = allTable.find('tr').count + 1;
+                //    $.each(documents, function(k, v) {
+                //        allTable.append(
+                //            "<td class='document-num'>" +
+                //            "<input type='checkbox' class='check-box' value='" + v.id + "'/> " + counter++ + "</td>" +
+                //            "<td class='document-name'>" +
+                //            "<a href='/document/browse-" + v.id + "'>" + v.name + "</a></td>" +
+                //            "<td>" + v.size + "</td>" +
+                //            "<td class='document-date'>Now</td>" +
+                //            "<td><a href='/document/download-" + v.id + "' class='btn btn-success custom-width'>Download</a></td>"
+                //        );
+                //        counter++;
+                //    });
+                //}
+            });
+        }
     });
 
     $('.delete-btn').click(function() {
@@ -106,7 +127,6 @@ $(document).ready(function() {
                 tableRows.forEach(function() {
                     $(this).remove();
                 });
-                $('#deleteDialog').modal('hide');
             }
         });
     });

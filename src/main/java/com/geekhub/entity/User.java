@@ -18,9 +18,9 @@ import java.util.Set;
 @Entity
 @Table
 public class User {
+
     @Id
     @GeneratedValue
-    @Column
     private Long id;
 
     @Column

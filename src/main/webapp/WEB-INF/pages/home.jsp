@@ -17,7 +17,7 @@
 <jsp:include page="../include/sidebar.jsp"/>
 
 <div class="container" style="width: 900px;">
-    <form action="/document/upload" method="POST" enctype="multipart/form-data">
+    <div>
         <label class="col-md-3 control-lable" for="file">Upload a document</label>
         <input type="file" multiple name="file" id="file" class="form-control input-sm"/>
         <br>
@@ -25,9 +25,9 @@
         <input type="text" name="description" id="description" class="form-control input-sm"/>
         <br>
         <div class="form-actions floatRight">
-            <input type="submit" value="Upload" class="btn btn-primary btn-sm upload-btn">
+            <input type="button" value="Upload" class="btn btn-primary btn-sm upload-btn">
         </div>
-    </form>
+    </div>
 </div>
 
 <div class="container" style="width: 900px;">
@@ -88,7 +88,7 @@
                 <h4 id="dialog-text"></h4>
             </div>
             <div class="modal-footer">
-                <button type="button" id="deleteDocument" class="btn btn-success">YES</button>
+                <button type="button" id="deleteDocument" class="btn btn-success" data-dismiss="modal">YES</button>
                 <button type="button" class="btn btn-danger" data-dismiss="modal">NO</button>
             </div>
         </div>

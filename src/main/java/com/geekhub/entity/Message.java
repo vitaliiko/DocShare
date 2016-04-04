@@ -13,9 +13,9 @@ import java.util.Date;
 @Entity
 @Table
 public class Message {
+
     @Id
     @GeneratedValue
-    @Column
     private Long id;
 
     @ManyToOne

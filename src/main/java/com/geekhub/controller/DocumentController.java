@@ -94,21 +94,19 @@ public class DocumentController {
     }
 
     @RequestMapping(value = "/upload", method = RequestMethod.POST)
-    public List<UserDocument> uploadDocument(MultipartHttpServletRequest request, String description, HttpSession session)
+    @ResponseStatus(HttpStatus.OK)
+    public void uploadDocument(MultipartHttpServletRequest request, String description, HttpSession session)
             throws IOException {
         Long userId = (Long) session.getAttribute("userId");
         User user = userService.getById(userId);
 
-        List<UserDocument> documents = new ArrayList<>();
         Map<String, MultipartFile> fileMap = request.getFileMap();
-        for (String s : fileMap.keySet()) {
-            MultipartFile mpf = request.getFile(s);
-            UserDocument doc = saveOrUpdateDocument(mpf, description, user);
-            if (doc != null) {
-                documents.add(doc);
+        if (fileMap.size() > 0) {
+            for (String s : fileMap.keySet()) {
+                MultipartFile mpf = request.getFile(s);
+                saveOrUpdateDocument(mpf, description, user);
             }
         }
-        return documents;
     }
 
     @RequestMapping("/browse-{docId}")

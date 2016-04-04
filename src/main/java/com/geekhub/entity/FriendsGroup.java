@@ -18,9 +18,9 @@ import javax.persistence.Table;
 @Entity
 @Table
 public class FriendsGroup {
+
     @Id
     @GeneratedValue
-    @Column
     private Long id;
 
     @JsonIgnore
