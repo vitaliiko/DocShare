@@ -1,13 +1,15 @@
 package com.geekhub.controller;
 
 import com.geekhub.entity.Comment;
+import com.geekhub.entity.RemovedDocument;
 import com.geekhub.entity.User;
 import com.geekhub.entity.UserDocument;
 import com.geekhub.service.CommentService;
+import com.geekhub.service.RemovedDocumentService;
 import com.geekhub.service.UserDocumentService;
 import com.geekhub.service.UserService;
 import com.geekhub.util.CommentUtil;
-import com.geekhub.util.UserDocumentUtil;
+import com.geekhub.util.DocumentUtil;
 import com.geekhub.validation.FileValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -27,7 +29,6 @@ import org.springframework.web.servlet.ModelAndView;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -47,6 +48,9 @@ public class DocumentController {
     @Autowired
     private CommentService commentService;
 
+    @Autowired
+    private RemovedDocumentService removedDocumentService;
+
     @InitBinder("multipartFile")
     protected void initBinder(WebDataBinder binder) {
         binder.setValidator(fileValidator);
@@ -55,8 +59,8 @@ public class DocumentController {
     @RequestMapping(value = "/upload", method = RequestMethod.GET)
     public ModelAndView addDocuments(HttpSession session) {
         ModelAndView model = new ModelAndView("home");
-        List<UserDocument> allDocuments = userDocumentService.getActualByOwnerId((Long) session.getAttribute("userId"));
-        model.addObject("documentsMap", UserDocumentUtil.prepareDocumentsListMap(allDocuments));
+        List<UserDocument> allDocuments = userDocumentService.getAllByOwnerId((Long) session.getAttribute("userId"));
+        model.addObject("documentsMap", DocumentUtil.prepareDocumentsListMap(allDocuments));
         return model;
     }
 
@@ -76,13 +80,13 @@ public class DocumentController {
     @RequestMapping(value = "/move-to-trash", method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.OK)
     public void moveDocumentToTrash(@RequestParam("docIds[]") Long[] docIds, HttpSession session) {
-        userDocumentService.moveToTrash(docIds);
+        userDocumentService.moveToTrash(docIds, (Long) session.getAttribute("userId"));
     }
 
     @RequestMapping("/recover")
     public ModelAndView recoverDocument(HttpSession session) {
         ModelAndView model = new ModelAndView("recover");
-        List<UserDocument> documents = userDocumentService.getRemovedByOwnerId((Long) session.getAttribute("userId"));
+        List<RemovedDocument> documents = removedDocumentService.getAllByOwnerId((Long) session.getAttribute("userId"));
         model.addObject("documents", documents);
         return model;
     }
@@ -140,11 +144,11 @@ public class DocumentController {
             throws IOException {
         UserDocument document = userDocumentService.getByNameAndOwnerId(user.getId(), multipartFile.getOriginalFilename());
         if (document == null) {
-            document = UserDocumentUtil.createUserDocument(multipartFile, description, user);
+            document = DocumentUtil.createUserDocument(multipartFile, description, user);
             userDocumentService.save(document);
             return document;
         }
-        userDocumentService.update(UserDocumentUtil.updateUserDocument(document, multipartFile, description));
+        userDocumentService.update(DocumentUtil.updateUserDocument(document, multipartFile, description));
         return null;
     }
 }

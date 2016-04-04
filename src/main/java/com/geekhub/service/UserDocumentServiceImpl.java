@@ -1,10 +1,10 @@
 package com.geekhub.service;
 
 import com.geekhub.dao.UserDocumentDao;
-import com.geekhub.entity.Comment;
+import com.geekhub.entity.RemovedDocument;
 import com.geekhub.entity.User;
 import com.geekhub.entity.UserDocument;
-import java.util.Set;
+import com.geekhub.util.DocumentUtil;
 import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -23,6 +23,9 @@ public class UserDocumentServiceImpl implements UserDocumentService {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private RemovedDocumentService removedDocumentService;
 
     @Override
     public List<UserDocument> getAll(String orderParameter) {
@@ -66,22 +69,27 @@ public class UserDocumentServiceImpl implements UserDocumentService {
     }
 
     @Override
-    public void moveToTrash(Long docId) {
+    public void moveToTrash(Long docId, Long removerId) {
         UserDocument document = userDocumentDao.getById(docId);
-        document.setLastModifyTime(Calendar.getInstance().getTime());
-        userDocumentDao.update(document);
+        RemovedDocument removedDocument = DocumentUtil.wrapUserDocument(document, removerId);
+        removedDocumentService.save(removedDocument);
+        User owner = document.getOwner();
+        owner.getUserDocuments().remove(document);
+        userService.save(owner);
     }
 
     @Override
-    public void moveToTrash(Long[] docIds) {
-        Arrays.stream(docIds).forEach(this::moveToTrash);
+    public void moveToTrash(Long[] docIds, Long removerId) {
+        Arrays.stream(docIds).forEach(id -> moveToTrash(id, removerId));
     }
 
     @Override
     public void recover(Long docId) {
-        UserDocument document = userDocumentDao.getById(docId);
-        document.setLastModifyTime(Calendar.getInstance().getTime());
-        userDocumentDao.update(document);
+        RemovedDocument removedDocument = removedDocumentService.getById(docId);
+        UserDocument document = removedDocument.getUserDocument();
+        User owner = removedDocument.getOwner();
+        owner.getUserDocuments().add(document);
+        removedDocumentService.delete(removedDocument);
     }
 
     @Override

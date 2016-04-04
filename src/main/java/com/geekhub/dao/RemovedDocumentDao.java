@@ -38,6 +38,13 @@ public class RemovedDocumentDao implements EntityDao<RemovedDocument, Long> {
                 .uniqueResult();
     }
 
+    public List<RemovedDocument> getList(String propertyName, Object value) {
+        return sessionFactory.getCurrentSession()
+                .createCriteria(clazz)
+                .add(Restrictions.eq(propertyName, value))
+                .list();
+    }
+
     @Override
     public Long save(RemovedDocument entity) {
         return (Long) sessionFactory.getCurrentSession().save(entity);

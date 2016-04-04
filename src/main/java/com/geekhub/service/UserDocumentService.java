@@ -12,9 +12,9 @@ public interface UserDocumentService extends EntityService<UserDocument, Long> {
 
     List<UserDocument> getAllByOwnerId(Long ownerId);
 
-    void moveToTrash(Long docId);
+    void moveToTrash(Long docId, Long removerId);
 
-    void moveToTrash(Long[] docIds);
+    void moveToTrash(Long[] docIds, Long removerId);
 
     void recover(Long docId);
 

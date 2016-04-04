@@ -3,6 +3,7 @@ package com.geekhub.app_config;
 import com.geekhub.entity.Comment;
 import com.geekhub.entity.FriendsGroup;
 import com.geekhub.entity.Message;
+import com.geekhub.entity.RemovedDocument;
 import com.geekhub.entity.User;
 import com.geekhub.entity.UserDocument;
 import org.apache.tomcat.dbcp.dbcp.BasicDataSource;
@@ -31,7 +32,8 @@ public class HibernateConfig {
             Message.class,
             FriendsGroup.class,
             UserDocument.class,
-            Comment.class
+            Comment.class,
+            RemovedDocument.class
     };
 
     @Autowired

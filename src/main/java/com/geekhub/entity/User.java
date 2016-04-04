@@ -149,6 +149,14 @@ public class User {
         this.userDocuments = userDocuments;
     }
 
+    public Set<RemovedDocument> getRemovedDocuments() {
+        return removedDocuments;
+    }
+
+    public void setRemovedDocuments(Set<RemovedDocument> removedDocuments) {
+        this.removedDocuments = removedDocuments;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

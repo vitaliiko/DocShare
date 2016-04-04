@@ -28,10 +28,8 @@ public class RemovedDocument {
     @JoinColumn(name = "document_id")
     private UserDocument userDocument;
 
-    @JsonIgnore
-    @OneToOne
-    @JoinColumn(name = "owner_id")
-    private User remover;
+    @Column
+    private Long removerId;
 
     @Column
     private Date removalDate;
@@ -60,12 +58,12 @@ public class RemovedDocument {
         this.userDocument = userDocument;
     }
 
-    public User getRemover() {
-        return remover;
+    public Long getRemoverId() {
+        return removerId;
     }
 
-    public void setRemover(User remover) {
-        this.remover = remover;
+    public void setRemoverId(Long removerId) {
+        this.removerId = removerId;
     }
 
     public Date getRemovalDate() {

@@ -1,16 +1,16 @@
 package com.geekhub.util;
 
+import com.geekhub.entity.RemovedDocument;
 import com.geekhub.entity.User;
 import com.geekhub.entity.UserDocument;
 import com.geekhub.enums.DocumentAttribute;
-import com.geekhub.enums.DocumentStatus;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.*;
 
-public class UserDocumentUtil {
+public class DocumentUtil {
 
     public static Map<String, List<UserDocument>> prepareDocumentsListMap(List<UserDocument> allDocuments) {
         List<UserDocument> privateDocuments = new ArrayList<>();
@@ -46,7 +46,6 @@ public class UserDocumentUtil {
         document.setContent(multipartFile.getBytes());
         document.setOwner(user);
         document.setDocumentAttribute(DocumentAttribute.PRIVATE);
-        document.setDocumentStatus(DocumentStatus.ACTUAL);
         return document;
     }
 
@@ -56,7 +55,6 @@ public class UserDocumentUtil {
         document.setLastModifyTime(Calendar.getInstance().getTime());
         document.setSize(calculateSize(multipartFile.getSize()));
         document.setContent(multipartFile.getBytes());
-        document.setDocumentStatus(DocumentStatus.ACTUAL);
         return document;
     }
 
@@ -67,5 +65,14 @@ public class UserDocumentUtil {
         final String[] units = new String[] {"B", "kB", "MB", "GB", "TB"};
         int digitGroups = (int) (Math.log10(size)/Math.log10(1024));
         return new DecimalFormat("#,##0.#").format(size/Math.pow(1024, digitGroups)) + " " + units[digitGroups];
+    }
+
+    public static RemovedDocument wrapUserDocument(UserDocument document, Long removerId) {
+        RemovedDocument removedDocument = new RemovedDocument();
+        removedDocument.setOwner(document.getOwner());
+        removedDocument.setRemoverId(removerId);
+        removedDocument.setRemovalDate(Calendar.getInstance().getTime());
+        removedDocument.setUserDocument(document);
+        return removedDocument;
     }
 }

@@ -2,6 +2,7 @@ package com.geekhub.service;
 
 import com.geekhub.dao.RemovedDocumentDao;
 import com.geekhub.entity.RemovedDocument;
+import com.geekhub.entity.User;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -50,5 +51,11 @@ public class RemovedDocumentServiceImpl implements RemovedDocumentService {
     @Override
     public void deleteById(Long entityId) {
         removedDocumentDao.deleteById(entityId);
+    }
+
+    @Override
+    public List<RemovedDocument> getAllByOwnerId(Long ownerId) {
+        User owner = userService.getById(ownerId);
+        return removedDocumentDao.getList("owner", owner);
     }
 }
