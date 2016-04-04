@@ -65,7 +65,9 @@
                     <a href="/document/browse-${doc.id}">${doc.name}</a>
                 </td>
                 <td>${doc.size}</td>
-                <td class="document-date"><fmt:formatDate type="both" value="${doc.lastModifyTime}"/></td>
+                <td class="document-date">
+                    <fmt:formatDate type="date" timeStyle="short" dateStyle="short" value="${doc.lastModifyTime}"/>
+                </td>
                 <td><a href="<c:url value='/document/download-${doc.id}' />"
                        class="btn btn-success custom-width">Download</a></td>
             </tr>

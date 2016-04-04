@@ -6,18 +6,18 @@ $(document).ready(function() {
     var tableRows = [];
 
     function changeTab() {
-        $('#publicDocumentsTable').hide();
-        $('#forFriendsDocumentsTable').hide();
-        $('#privateDocumentsTable').hide();
-        $('#allDocumentsTable').hide();
+        $('#publicDocumentsTable').hide(true);
+        $('#forFriendsDocumentsTable').hide(true);
+        $('#privateDocumentsTable').hide(true);
+        $('#allDocumentsTable').hide(true);
         $("input:checkbox:checked").each(function() {
             $(this).prop('checked', false);
         });
-        $('.action-btn').hide();
+        $('.action-btn').hide(true);
     }
 
     changeTab();
-    $('#allDocumentsTable').show();
+    $('#allDocumentsTable').show(true);
 
     $('input[type=file]').on('change', function(event) {
         files = event.target.files;
@@ -25,22 +25,22 @@ $(document).ready(function() {
 
     $('.all-href').click(function() {
         changeTab();
-        $('#allDocumentsTable').show();
+        $('#allDocumentsTable').show(true);
     });
 
     $('.public-href').click(function() {
         changeTab();
-        $('#publicDocumentsTable').show();
+        $('#publicDocumentsTable').show(true);
     });
 
     $('.for-friends-href').click(function() {
         changeTab();
-        $('#forFriendsDocumentsTable').show();
+        $('#forFriendsDocumentsTable').show(true);
     });
 
     $('.private-href').click(function() {
         changeTab();
-        $('#privateDocumentsTable').show();
+        $('#privateDocumentsTable').show(true);
     });
 
     $('.select-all').click(function() {
@@ -53,13 +53,13 @@ $(document).ready(function() {
     $('.check-box').click(function() {
         var checkBoxCount = $("input:checkbox:checked").length;
         if (checkBoxCount == 0) {
-            $('.action-btn').hide();
+            $('.action-btn').hide(true);
         } else {
-            $('.action-btn').show();
+            $('.action-btn').show(true);
             if (checkBoxCount == 1) {
-                $('.single-selection').show();
+                $('.single-selection').show(true);
             } else {
-                $('.single-selection').hide();
+                $('.single-selection').hide(true);
             }
         }
     });

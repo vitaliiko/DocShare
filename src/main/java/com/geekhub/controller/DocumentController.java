@@ -1,5 +1,6 @@
 package com.geekhub.controller;
 
+import com.geekhub.entity.Comment;
 import com.geekhub.entity.User;
 import com.geekhub.entity.UserDocument;
 import com.geekhub.service.CommentService;
@@ -119,12 +120,16 @@ public class DocumentController {
     }
 
     @RequestMapping("/add-comment")
-    @ResponseStatus(HttpStatus.OK)
-    public void addComment(String text, Long docId, HttpSession session) {
+    public Comment addComment(String text, Long docId, HttpSession session) {
         User owner = userService.getById((Long) session.getAttribute("userId"));
         UserDocument document = userDocumentService.getDocumentWithComments(docId);
-        document.getComments().add(CommentUtil.createComment(text, owner));
-        userDocumentService.update(document);
+        if (text != null && !text.isEmpty() && docId != null) {
+            Comment comment = CommentUtil.createComment(text, owner);
+            document.getComments().add(comment);
+            userDocumentService.update(document);
+            return comment;
+        }
+        return null;
     }
 
     @RequestMapping("/delete-comment")

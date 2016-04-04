@@ -25,7 +25,6 @@ public class Comment {
     @Column
     private String text;
 
-    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "owner_id")
     private User owner;
@@ -101,5 +100,10 @@ public class Comment {
         result = 31 * result + (date != null ? date.hashCode() : 0);
         result = 31 * result + (userDocument != null ? userDocument.hashCode() : 0);
         return result;
+    }
+
+    @Override
+    public String toString() {
+        return text;
     }
 }
