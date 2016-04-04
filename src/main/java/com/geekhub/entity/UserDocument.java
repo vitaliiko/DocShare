@@ -2,7 +2,6 @@ package com.geekhub.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.geekhub.enums.DocumentAttribute;
-import com.geekhub.enums.DocumentStatus;
 
 import java.io.Serializable;
 import java.util.Arrays;
@@ -62,10 +61,6 @@ public class UserDocument implements Serializable {
     @Column(name = "documentAttribute")
     @Enumerated(EnumType.STRING)
     private DocumentAttribute documentAttribute;
-
-    @Column(name = "documentStatus")
-    @Enumerated(EnumType.ORDINAL)
-    private DocumentStatus documentStatus;
 
     @JsonIgnore
     @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
@@ -138,14 +133,6 @@ public class UserDocument implements Serializable {
 
     public void setDocumentAttribute(DocumentAttribute documentAttribute) {
         this.documentAttribute = documentAttribute;
-    }
-
-    public DocumentStatus getDocumentStatus() {
-        return documentStatus;
-    }
-
-    public void setDocumentStatus(DocumentStatus documentStatus) {
-        this.documentStatus = documentStatus;
     }
 
     public Set<User> getReaders() {

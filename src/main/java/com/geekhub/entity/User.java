@@ -63,6 +63,11 @@ public class User {
     @JoinColumn(name = "owner_id")
     private Set<UserDocument> userDocuments = new HashSet<>();
 
+    @JsonIgnore
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "owner_id")
+    private Set<RemovedDocument> removedDocuments = new HashSet<>();
+
     public User() {}
 
     public User(String firstName, String lastName, String password, String login) {

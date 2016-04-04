@@ -2,7 +2,6 @@
 $(document).ready(function() {
 
     var friendsGroupId;
-    var oldFriends = [];
 
     function clearModalWindow() {
         $('.check-box').each(function() {

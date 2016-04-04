@@ -12,10 +12,6 @@ public interface UserDocumentService extends EntityService<UserDocument, Long> {
 
     List<UserDocument> getAllByOwnerId(Long ownerId);
 
-    List<UserDocument> getActualByOwnerId(Long ownerId);
-
-    List<UserDocument> getRemovedByOwnerId(Long ownerId);
-
     void moveToTrash(Long docId);
 
     void moveToTrash(Long[] docIds);

@@ -4,7 +4,6 @@ import com.geekhub.dao.UserDocumentDao;
 import com.geekhub.entity.Comment;
 import com.geekhub.entity.User;
 import com.geekhub.entity.UserDocument;
-import com.geekhub.enums.DocumentStatus;
 import java.util.Set;
 import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -67,21 +66,8 @@ public class UserDocumentServiceImpl implements UserDocumentService {
     }
 
     @Override
-    public List<UserDocument> getActualByOwnerId(Long ownerId) {
-        User owner = userService.getById(ownerId);
-        return userDocumentDao.getList(owner, "documentStatus", DocumentStatus.ACTUAL);
-    }
-
-    @Override
-    public List<UserDocument> getRemovedByOwnerId(Long ownerId) {
-        User owner = userService.getById(ownerId);
-        return userDocumentDao.getList(owner, "documentStatus", DocumentStatus.REMOVED);
-    }
-
-    @Override
     public void moveToTrash(Long docId) {
         UserDocument document = userDocumentDao.getById(docId);
-        document.setDocumentStatus(DocumentStatus.REMOVED);
         document.setLastModifyTime(Calendar.getInstance().getTime());
         userDocumentDao.update(document);
     }
@@ -94,7 +80,6 @@ public class UserDocumentServiceImpl implements UserDocumentService {
     @Override
     public void recover(Long docId) {
         UserDocument document = userDocumentDao.getById(docId);
-        document.setDocumentStatus(DocumentStatus.ACTUAL);
         document.setLastModifyTime(Calendar.getInstance().getTime());
         userDocumentDao.update(document);
     }
