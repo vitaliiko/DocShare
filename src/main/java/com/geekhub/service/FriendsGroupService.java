@@ -23,4 +23,6 @@ public interface FriendsGroupService extends EntityService<FriendsGroup, Long> {
     Long addFriendsGroup(Long ownerId, String name, Long[] friendsIds);
 
     void update(Long groupId, Long ownerId, String groupName, Long[] friendsIds);
+
+    FriendsGroup getWithFriends(Long groupId);
 }

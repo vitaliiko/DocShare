@@ -108,8 +108,9 @@ $(document).ready(function() {
 
     $('.delete-btn').click(function() {
         $('.check-box:checked').each(function() {
-            docIds.push($(this).val());
-            tableRows.push(this.closest('tr'));
+            var id = $(this).val();
+            docIds.push(id);
+            tableRows.push($('.tr-doc' + id));
         });
         //var row = this.closest('tr');
         //var fileName = $(row['name=file-name']).text();
@@ -118,14 +119,13 @@ $(document).ready(function() {
     });
 
     $('#deleteDocument').click(function() {
-        alert(docIds);
         $.ajax({
             url: '/document/move-to-trash',
             type: 'POST',
             data: {'docIds[]': docIds},
             success: function() {
-                tableRows.forEach(function() {
-                    $(this).remove();
+                $.each(tableRows, function(k, v) {
+                    v.remove();
                 });
             }
         });

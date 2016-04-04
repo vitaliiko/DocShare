@@ -46,7 +46,7 @@
             <button class="btn btn-default rename-btn action-btn single-selection">Rename</button>
         </caption>
         <tr>
-            <th><input type="checkbox" class="check-box select-all"/> No.</th>
+            <th><input type="checkbox" class="check-box select-all"/></th>
             <th id="file-name">File Name</th>
             <th>Size</th>
             <th>Changed</th>
@@ -57,9 +57,9 @@
     <c:forEach items="${documentsMap}" var="documentsEntry">
         <table class="table table-hover tbody tr:hover td" id="${documentsEntry.key}">
         <c:forEach items="${documentsEntry.value}" var="doc" varStatus="counter">
-            <tr id="${doc.id}">
+            <tr class="tr-doc${doc.id}">
                 <td class="document-num">
-                    <input type="checkbox" class="check-box" value="${doc.id}"/> ${counter.index + 1}
+                    <input type="checkbox" class="check-box" value="${doc.id}"/>
                 </td>
                 <td class="document-name">
                     <a href="/document/browse-${doc.id}">${doc.name}</a>

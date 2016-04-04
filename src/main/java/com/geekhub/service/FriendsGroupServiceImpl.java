@@ -113,4 +113,11 @@ public class FriendsGroupServiceImpl implements FriendsGroupService {
         group.setFriends(friendsSet);
         friendsGroupDao.update(group);
     }
+
+    @Override
+    public FriendsGroup getWithFriends(Long groupId) {
+        FriendsGroup group =getById(groupId);
+        Hibernate.initialize(group.getFriends());
+        return group;
+    }
 }
