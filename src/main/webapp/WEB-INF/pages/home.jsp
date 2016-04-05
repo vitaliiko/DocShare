@@ -35,10 +35,10 @@
         <table class="table table-hover tbody tr:hover td" id="${documentsEntry.key}">
             <caption>
                 <h3>List of Documents</h3>
-                <button class="btn btn-link all-href">All</button>
-                <button class="btn btn-link public-href">Public</button>
-                <button class="btn btn-link for-friends-href">For Friends</button>
-                <button class="btn btn-link private-href">Private</button>
+                <a href="#" class="all-href">All &nbsp</a>
+                <a href="#" class="public-href">Public &nbsp</a>
+                <a href="#" class="for-friends-href">For Friends &nbsp</a>
+                <a href="#" class="private-href">Private</a>
 
                 <button class="btn btn-default delete-btn action-btn"
                         data-toggle="modal" data-target="#deleteDialog">Delete</button>
@@ -56,7 +56,7 @@
         <c:forEach items="${documentsEntry.value}" var="doc" varStatus="counter">
             <tr class="tr-doc${doc.id}">
                 <td class="document-num">
-                    <input type="checkbox" class="check-box big-check-box" value="${doc.id}"/>
+                    <input type="checkbox" class="check-box select-doc big-check-box" value="${doc.id}"/>
                 </td>
                 <td class="document-name">
                     <a href="/document/browse-${doc.id}">${doc.name}</a>

@@ -28,34 +28,39 @@ $(document).ready(function() {
     });
 
     $('.all-href').click(function() {
+        event.preventDefault();
         changeTab();
         allTable.show(true);
     });
 
     $('.public-href').click(function() {
+        event.preventDefault();
         changeTab();
         publicTable.show(true);
     });
 
     $('.for-friends-href').click(function() {
+        event.preventDefault();
         changeTab();
         forFriendsTable.show(true);
     });
 
     $('.private-href').click(function() {
+        event.preventDefault();
         changeTab();
         privateTable.show(true);
     });
 
     $('.select-all').click(function() {
         var checked = this.checked;
-        $("input:checkbox").each(function() {
+        $(".select-doc:visible").each(function() {
             $(this).prop('checked', checked);
         });
+        showHideButtons();
     });
 
-    $('.check-box').click(function() {
-        var checkBoxCount = $("input:checkbox:checked").length;
+    function showHideButtons() {
+        var checkBoxCount = $(".select-doc:checked").length;
         if (checkBoxCount == 0) {
             $('.action-btn').hide(true);
         } else {
@@ -66,6 +71,10 @@ $(document).ready(function() {
                 $('.single-selection').hide(true);
             }
         }
+    }
+
+    $('.select-doc').change(function() {
+        showHideButtons();
     });
 
     $('.upload-btn').click(function() {
@@ -107,7 +116,7 @@ $(document).ready(function() {
     });
 
     $('.delete-btn').click(function() {
-        $('.check-box:checked').each(function() {
+        $('.select-doc:visible:checked').each(function() {
             var id = $(this).val();
             docIds.push(id);
             tableRows.push($('.tr-doc' + id));

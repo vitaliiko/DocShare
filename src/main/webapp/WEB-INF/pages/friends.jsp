@@ -27,8 +27,8 @@
                     <c:url var="groupPage" value="/main/userpage/${group.id}"/>
                     <tr class="group${group.id}">
                         <td>
-                            <button type="button" name="groupInfoButton" class="btn btn-link group-info-btn group${group.id}"
-                                    id="${group.id}" data-toggle="modal" data-target="#groupInfo"> ${group.name} </button>
+                            <a href="#" name="groupInfoButton" class="group-info-btn group${group.id}"
+                                    id="${group.id}" data-toggle="modal" data-target="#groupInfo"> ${group.name} </a>
                         </td>
                         <td>
                             <input type="button" class="btn btn-default removeGroupButton"
@@ -51,10 +51,10 @@
                         </td>
                         <td class="td${friendEntry.key.id}">
                             <c:forEach var="group" items="${friendEntry.value}">
-                                <button type="button" name="groupInfoButton" data-toggle="modal" data-target="#groupInfo"
-                                        id="${group.id}" class="btn btn-link group-info-btn group${group.id}">
+                                <a href="#" name="groupInfoButton" data-toggle="modal" data-target="#groupInfo"
+                                        id="${group.id}" class="group-info-btn group${group.id}">
                                         ${group.name}
-                                </button>
+                                </a>
                             </c:forEach>
                         </td>
                         <td>

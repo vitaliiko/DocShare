@@ -54,6 +54,7 @@ $(document).ready(function() {
     });
 
     $('.group-info-btn').click(function() {
+        event.preventDefault();
         clearModalWindow();
         $('#saveGroupButton').hide();
         $('#updateGroupButton').show();
