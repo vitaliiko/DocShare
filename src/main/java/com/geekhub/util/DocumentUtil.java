@@ -89,7 +89,11 @@ public class DocumentUtil {
         return DocumentNameDigest.hashName("" + ownerId + docId);
     }
 
-    public static File createEmptyFile(String fileName) {
-        return new File(ROOT_LOCATION + "\\" + fileName + SYSTEM_EXTENSION);
+    public static File createFile(String fileName) {
+        return new File(getFullFileName(fileName));
+    }
+
+    public static String getFullFileName(String fileName) {
+        return ROOT_LOCATION + "\\" + fileName + SYSTEM_EXTENSION;
     }
 }

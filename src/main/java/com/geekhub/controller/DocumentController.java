@@ -12,7 +12,8 @@ import com.geekhub.util.CommentUtil;
 import com.geekhub.util.DocumentUtil;
 import com.geekhub.validation.FileValidator;
 import java.io.File;
-import java.util.Arrays;
+import java.nio.file.Files;
+import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.util.FileCopyUtils;
@@ -31,7 +32,6 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/document")
@@ -73,11 +73,12 @@ public class DocumentController {
     public String downloadDocument(@PathVariable Long docId, HttpSession session, HttpServletResponse response)
             throws IOException {
         UserDocument document = userDocumentService.getById(docId);
+        File file = DocumentUtil.createFile(document.getNashName());
         response.setContentType(document.getType());
-//        response.setContentLength(document.getContent().length);
+        response.setContentLength((int) file.length());
         response.setHeader("Content-Disposition","attachment; filename=\"" + document.getName() +"\"");
 
-//        FileCopyUtils.copy(document.getContent(), response.getOutputStream());
+        FileCopyUtils.copy(Files.newInputStream(file.toPath()), response.getOutputStream());
 
         return "redirect:/document/upload";
     }
@@ -148,7 +149,7 @@ public class DocumentController {
             document = DocumentUtil.createUserDocument(multipartFile, location, description, user);
             Long docId = userDocumentService.save(document);
             String docHashName = userDocumentService.getById(docId).getNashName();
-            multipartFile.transferTo(DocumentUtil.createEmptyFile(docHashName));
+            multipartFile.transferTo(DocumentUtil.createFile(docHashName));
         }
         userDocumentService.update(DocumentUtil.updateUserDocument(document, multipartFile, location, description));
     }
