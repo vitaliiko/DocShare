@@ -13,7 +13,6 @@ import com.geekhub.util.DocumentUtil;
 import com.geekhub.validation.FileValidator;
 import java.io.File;
 import java.nio.file.Files;
-import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.util.FileCopyUtils;
@@ -76,7 +75,7 @@ public class DocumentController {
         File file = DocumentUtil.createFile(document.getNashName());
         response.setContentType(document.getType());
         response.setContentLength((int) file.length());
-        response.setHeader("Content-Disposition","attachment; filename=\"" + document.getName() +"\"");
+        response.setHeader("Content-Disposition", "attachment; filename=\"" + document.getName() +"\"");
 
         FileCopyUtils.copy(Files.newInputStream(file.toPath()), response.getOutputStream());
 

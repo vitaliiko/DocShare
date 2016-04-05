@@ -66,7 +66,17 @@ public class User {
     @JsonIgnore
     @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "owner_id")
+    private Set<UserDirectory> userDirectories = new HashSet<>();
+
+    @JsonIgnore
+    @OneToMany(cascade = CascadeType.ALL)
+    @JoinColumn(name = "owner_id")
     private Set<RemovedDocument> removedDocuments = new HashSet<>();
+
+    @JsonIgnore
+    @OneToMany(cascade = CascadeType.ALL)
+    @JoinColumn(name = "owner_id")
+    private Set<RemovedDirectory> removedDirectories = new HashSet<>();
 
     @Column
     private String rootDirectory;
@@ -156,8 +166,24 @@ public class User {
         return removedDocuments;
     }
 
+    public Set<UserDirectory> getUserDirectories() {
+        return userDirectories;
+    }
+
+    public void setUserDirectories(Set<UserDirectory> userDirectories) {
+        this.userDirectories = userDirectories;
+    }
+
     public void setRemovedDocuments(Set<RemovedDocument> removedDocuments) {
         this.removedDocuments = removedDocuments;
+    }
+
+    public Set<RemovedDirectory> getRemovedDirectories() {
+        return removedDirectories;
+    }
+
+    public void setRemovedDirectories(Set<RemovedDirectory> removedDirectories) {
+        this.removedDirectories = removedDirectories;
     }
 
     public String getRootDirectory() {
