@@ -1,6 +1,7 @@
 package com.geekhub.service;
 
 import com.geekhub.entity.Comment;
+import com.geekhub.entity.User;
 import com.geekhub.entity.UserDocument;
 import java.util.Set;
 import org.springframework.stereotype.Service;
@@ -22,7 +23,7 @@ public interface UserDocumentService extends EntityService<UserDocument, Long> {
 
     UserDocument getByNameAndOwnerId(Long ownerId, String name);
 
-    UserDocument getByFullNameAndOwnerId(Long ownerId, String parentDirectoryHash, String name);
+    UserDocument getByFullNameAndOwnerId(User owner, String parentDirectoryHash, String name);
 
     UserDocument getDocumentWithComments(Long docId);
 }

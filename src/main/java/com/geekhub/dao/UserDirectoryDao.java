@@ -3,6 +3,8 @@ package com.geekhub.dao;
 import com.geekhub.entity.User;
 import com.geekhub.entity.UserDirectory;
 import java.util.List;
+import java.util.Map;
+import org.hibernate.Criteria;
 import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
@@ -86,5 +88,11 @@ public class UserDirectoryDao implements EntityDao<UserDirectory, Long> {
                 .add(Restrictions.eq("owner", owner))
                 .add(Restrictions.eq(propertyName, value))
                 .uniqueResult();
+    }
+
+    public UserDirectory get(Map<String, Object> propertiesMap) {
+        Criteria criteria = sessionFactory.getCurrentSession().createCriteria(clazz);
+        propertiesMap.forEach((prop, val) -> criteria.add(Restrictions.eq(prop, val)));
+        return (UserDirectory) criteria.uniqueResult();
     }
 }

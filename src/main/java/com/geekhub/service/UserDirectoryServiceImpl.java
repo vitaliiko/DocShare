@@ -3,9 +3,11 @@ package com.geekhub.service;
 import com.geekhub.dao.UserDirectoryDao;
 import com.geekhub.entity.User;
 import com.geekhub.entity.UserDirectory;
-import com.geekhub.util.DocumentUtil;
+import com.geekhub.util.UserFileUtil;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -43,7 +45,7 @@ public class UserDirectoryServiceImpl implements UserDirectoryService {
         Long dirId = userDirectoryDao.save(entity);
         Long ownerId = entity.getOwner().getId();
         entity.setId(dirId);
-        String hashName = DocumentUtil.createHashName(ownerId, dirId);
+        String hashName = UserFileUtil.createHashName(ownerId, dirId);
         entity.setHashName(hashName);
         userDirectoryDao.update(entity);
         return dirId;
@@ -94,5 +96,14 @@ public class UserDirectoryServiceImpl implements UserDirectoryService {
     public UserDirectory getByNameAndOwnerId(Long ownerId, String name) {
         User owner = userService.getById(ownerId);
         return userDirectoryDao.get(owner, "name", name);
+    }
+
+    @Override
+    public UserDirectory getByFullNameAndOwnerId(User owner, String parentDirectoryHash, String name) {
+        Map<String, Object> propertiesMap = new HashMap<>();
+        propertiesMap.put("owner", owner);
+        propertiesMap.put("parentDirectoryHash", parentDirectoryHash);
+        propertiesMap.put("name", name);
+        return userDirectoryDao.get(propertiesMap);
     }
 }

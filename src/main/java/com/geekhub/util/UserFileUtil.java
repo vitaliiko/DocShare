@@ -4,6 +4,7 @@ import com.geekhub.entity.RemovedDocument;
 import com.geekhub.entity.User;
 import com.geekhub.entity.UserDirectory;
 import com.geekhub.entity.UserDocument;
+import com.geekhub.entity.UserFile;
 import com.geekhub.enums.DocumentAttribute;
 import java.io.File;
 import java.util.ArrayList;
@@ -11,21 +12,22 @@ import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.text.DecimalFormat;
 
-public class DocumentUtil {
+public class UserFileUtil {
 
     public static final String ROOT_LOCATION = "C:\\spring_docs\\";
     public static final String SYSTEM_EXTENSION = ".curva";
     public static final String ROOT_DIRECTORY_HASH = createHashName(0L, 0L);
 
-    public static Map<String, List<UserDocument>> prepareDocumentsListMap(List<UserDocument> allDocuments) {
-        List<UserDocument> privateDocuments = new ArrayList<>();
-        List<UserDocument> publicDocuments = new ArrayList<>();
-        List<UserDocument> forFriendsDocuments = new ArrayList<>();
+    public static <T extends UserFile> Map<String, List<T>> prepareUserFileListMap(List<T> allDocuments) {
+        List<T> privateDocuments = new ArrayList<>();
+        List<T> publicDocuments = new ArrayList<>();
+        List<T> forFriendsDocuments = new ArrayList<>();
         allDocuments.forEach(doc -> {
             if (doc.getDocumentAttribute() == DocumentAttribute.PRIVATE) {
                 privateDocuments.add(doc);
@@ -37,7 +39,7 @@ public class DocumentUtil {
                 forFriendsDocuments.add(doc);
             }
         });
-        Map<String, List<UserDocument>> userDocumentsListMap = new HashMap<>();
+        Map<String, List<T>> userDocumentsListMap = new HashMap<>();
         userDocumentsListMap.put("allDocumentsTable", allDocuments);
         userDocumentsListMap.put("privateDocumentsTable", privateDocuments);
         userDocumentsListMap.put("publicDocumentsTable", publicDocuments);
@@ -104,10 +106,10 @@ public class DocumentUtil {
         return ROOT_LOCATION + rootUserDirectory + "\\" + fileName + SYSTEM_EXTENSION;
     }
 
-    public static UserDirectory createUserDir(String name, String parentDirectoryHash, User owner) {
+    public static UserDirectory createUserDirectory(User owner, String parentDirectoryHash, String dirName) {
         UserDirectory directory = new UserDirectory();
         directory.setOwner(owner);
-        directory.setName(name);
+        directory.setName(dirName);
         directory.setParentDirectoryHash(parentDirectoryHash);
         directory.setDocumentAttribute(DocumentAttribute.PRIVATE);
         return directory;

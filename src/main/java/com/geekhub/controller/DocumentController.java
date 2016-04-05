@@ -3,13 +3,15 @@ package com.geekhub.controller;
 import com.geekhub.entity.Comment;
 import com.geekhub.entity.RemovedDocument;
 import com.geekhub.entity.User;
+import com.geekhub.entity.UserDirectory;
 import com.geekhub.entity.UserDocument;
 import com.geekhub.service.CommentService;
 import com.geekhub.service.RemovedDocumentService;
+import com.geekhub.service.UserDirectoryService;
 import com.geekhub.service.UserDocumentService;
 import com.geekhub.service.UserService;
 import com.geekhub.util.CommentUtil;
-import com.geekhub.util.DocumentUtil;
+import com.geekhub.util.UserFileUtil;
 import com.geekhub.validation.FileValidator;
 import java.io.File;
 import java.nio.file.Files;
@@ -43,6 +45,9 @@ public class DocumentController {
     private UserDocumentService userDocumentService;
 
     @Autowired
+    private UserDirectoryService userDirectoryService;
+
+    @Autowired
     private FileValidator fileValidator;
 
     @Autowired
@@ -59,12 +64,15 @@ public class DocumentController {
     @RequestMapping(value = "/upload", method = RequestMethod.GET)
     public ModelAndView addDocuments(HttpSession session) {
         ModelAndView model = new ModelAndView("home");
-        List<UserDocument> allDocuments = userDocumentService.getAllByOwnerId((Long) session.getAttribute("userId"));
+        Long userId = (Long) session.getAttribute("userId");
+        List<UserDocument> allDocuments = userDocumentService.getAllByOwnerId(userId);
+        List<UserDirectory> allDirectories = userDirectoryService.getAllByOwnerId(userId);
 //        if (parentDirectoryHash == null && parentDirectoryHash.isEmpty()) {
 //            parentDirectoryHash = "\\";
 //        }
-        session.setAttribute("location", DocumentUtil.ROOT_LOCATION);
-        model.addObject("documentsMap", DocumentUtil.prepareDocumentsListMap(allDocuments));
+        session.setAttribute("location", UserFileUtil.ROOT_LOCATION);
+        model.addObject("documentsMap", UserFileUtil.prepareUserFileListMap(allDocuments));
+        model.addObject("directoriesMap", UserFileUtil.prepareUserFileListMap(allDirectories));
         return model;
     }
 
@@ -74,7 +82,7 @@ public class DocumentController {
 
         User user = userService.getById((Long) session.getAttribute("userId"));
         UserDocument document = userDocumentService.getById(docId);
-        File file = DocumentUtil.createFile(document.getHashName(), user.getRootDirectory());
+        File file = UserFileUtil.createFile(document.getHashName(), user.getRootDirectory());
         response.setContentType(document.getType());
         response.setContentLength((int) file.length());
         response.setHeader("Content-Disposition", "attachment; filename=\"" + document.getName() +"\"");
@@ -145,24 +153,36 @@ public class DocumentController {
 
     @RequestMapping("/make-directory")
     public ModelAndView makeDir(String dirName, HttpSession session) {
-        return null;
+        User owner = userService.getById((Long) session.getAttribute("userId"));
+        String parentDirectoryHash = (String) session.getAttribute("parentDirectoryHash");
+        makeDirectory(owner, parentDirectoryHash, dirName);
+        return new ModelAndView("redirect:/document/upload");
     }
 
     private void saveOrUpdateDocument(MultipartFile multipartFile, String parentDirectoryHash, String description, User user)
             throws IOException {
 
         UserDocument document = userDocumentService.getByFullNameAndOwnerId(
-                user.getId(), parentDirectoryHash, multipartFile.getOriginalFilename()
+                user, parentDirectoryHash, multipartFile.getOriginalFilename()
         );
 
         if (document == null) {
-            document = DocumentUtil.createUserDocument(multipartFile, parentDirectoryHash, description, user);
+            document = UserFileUtil.createUserDocument(multipartFile, parentDirectoryHash, description, user);
             Long docId = userDocumentService.save(document);
             String docHashName = userDocumentService.getById(docId).getHashName();
-            multipartFile.transferTo(DocumentUtil.createFile(docHashName, user.getRootDirectory()));
+            multipartFile.transferTo(UserFileUtil.createFile(docHashName, user.getRootDirectory()));
         } else {
-            userDocumentService.update(DocumentUtil.updateUserDocument(document, multipartFile, description));
-            multipartFile.transferTo(DocumentUtil.createFile(document.getHashName(), user.getRootDirectory()));
+            userDocumentService.update(UserFileUtil.updateUserDocument(document, multipartFile, description));
+            multipartFile.transferTo(UserFileUtil.createFile(document.getHashName(), user.getRootDirectory()));
+        }
+    }
+
+    private void makeDirectory(User owner, String parentDirectoryHash, String dirName) {
+        UserDirectory directory = userDirectoryService.getByFullNameAndOwnerId(owner, parentDirectoryHash, dirName);
+
+        if (directory == null) {
+            directory = UserFileUtil.createUserDirectory(owner, parentDirectoryHash, dirName);
+            userDirectoryService.save(directory);
         }
     }
 }

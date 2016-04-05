@@ -7,7 +7,7 @@ import com.geekhub.exception.UserValidateException;
 import com.geekhub.service.FriendsGroupService;
 import com.geekhub.service.UserDirectoryService;
 import com.geekhub.service.UserService;
-import com.geekhub.util.DocumentUtil;
+import com.geekhub.util.UserFileUtil;
 import java.io.File;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -79,7 +79,7 @@ public class UserProvider {
 
     private void createRootDir() {
         UserDirectory directory = new UserDirectory();
-        directory.setParentDirectoryHash(DocumentUtil.ROOT_DIRECTORY_HASH);
+        directory.setParentDirectoryHash(UserFileUtil.ROOT_DIRECTORY_HASH);
         File file = new File("spring_docs");
         if (!file.exists()) {
             file.mkdir();
@@ -87,10 +87,10 @@ public class UserProvider {
     }
 
     private String createUserDir(User user) {
-        UserDirectory directory = DocumentUtil.createUserDir(user.getLogin(), DocumentUtil.ROOT_DIRECTORY_HASH, user);
+        UserDirectory directory = UserFileUtil.createUserDirectory(user.getLogin(), UserFileUtil.ROOT_DIRECTORY_HASH, user);
         Long dirId = userDirectoryService.save(directory);
         directory = userDirectoryService.getById(dirId);
-        DocumentUtil.createDirInFileSystem(directory);
+        UserFileUtil.createDirInFileSystem(directory);
         return directory.getHashName();
     }
 }

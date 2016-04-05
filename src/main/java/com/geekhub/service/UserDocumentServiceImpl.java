@@ -4,11 +4,10 @@ import com.geekhub.dao.UserDocumentDao;
 import com.geekhub.entity.RemovedDocument;
 import com.geekhub.entity.User;
 import com.geekhub.entity.UserDocument;
-import com.geekhub.util.DocumentUtil;
+import com.geekhub.util.UserFileUtil;
 import java.util.HashMap;
 import java.util.Map;
 import org.hibernate.Hibernate;
-import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -49,7 +48,7 @@ public class UserDocumentServiceImpl implements UserDocumentService {
         Long docId = userDocumentDao.save(entity);
         Long ownerId = entity.getOwner().getId();
         entity.setId(docId);
-        String hashName = DocumentUtil.createHashName(ownerId, docId);
+        String hashName = UserFileUtil.createHashName(ownerId, docId);
         entity.setHashName(hashName);
         userDocumentDao.update(entity);
         return docId;
@@ -79,7 +78,7 @@ public class UserDocumentServiceImpl implements UserDocumentService {
     @Override
     public void moveToTrash(Long docId, Long removerId) {
         UserDocument document = userDocumentDao.getById(docId);
-        RemovedDocument removedDocument = DocumentUtil.wrapUserDocument(document, removerId);
+        RemovedDocument removedDocument = UserFileUtil.wrapUserDocument(document, removerId);
         removedDocumentService.save(removedDocument);
         User owner = document.getOwner();
         owner.getUserDocuments().remove(document);
@@ -112,9 +111,8 @@ public class UserDocumentServiceImpl implements UserDocumentService {
     }
 
     @Override
-    public UserDocument getByFullNameAndOwnerId(Long ownerId, String parentDirectoryHash, String name) {
+    public UserDocument getByFullNameAndOwnerId(User owner, String parentDirectoryHash, String name) {
         Map<String, Object> propertiesMap = new HashMap<>();
-        User owner = userService.getById(ownerId);
         propertiesMap.put("owner", owner);
         propertiesMap.put("parentDirectoryHash", parentDirectoryHash);
         propertiesMap.put("name", name);

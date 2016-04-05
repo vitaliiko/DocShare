@@ -5,7 +5,7 @@ import com.geekhub.entity.FriendsGroup;
 import com.geekhub.entity.Message;
 import com.geekhub.entity.User;
 import com.geekhub.entity.UserDirectory;
-import com.geekhub.util.DocumentUtil;
+import com.geekhub.util.UserFileUtil;
 import org.hibernate.HibernateException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -62,10 +62,10 @@ public class UserServiceImpl implements UserService {
             User user = new User(firstName, lastName, password, login);
             user.setId(userDao.save(user));
             UserDirectory directory =
-                    DocumentUtil.createUserDir(user.getLogin(), DocumentUtil.ROOT_DIRECTORY_HASH, user);
+                    UserFileUtil.createUserDirectory(user.getLogin(), UserFileUtil.ROOT_DIRECTORY_HASH, user);
             Long dirId = userDirectoryService.save(directory);
             directory = userDirectoryService.getById(dirId);
-            DocumentUtil.createDirInFileSystem(directory);
+            UserFileUtil.createDirInFileSystem(directory);
             user.setRootDirectory(directory.getHashName());
             userDao.update(user);
             return user.getId();

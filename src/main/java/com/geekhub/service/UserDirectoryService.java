@@ -1,5 +1,6 @@
 package com.geekhub.service;
 
+import com.geekhub.entity.User;
 import com.geekhub.entity.UserDirectory;
 import java.util.List;
 import org.springframework.stereotype.Service;
@@ -18,4 +19,6 @@ public interface UserDirectoryService extends EntityService<UserDirectory, Long>
     void recover(Long[] dirIds);
 
     UserDirectory getByNameAndOwnerId(Long ownerId, String name);
+
+    UserDirectory getByFullNameAndOwnerId(User owner, String parentDirectoryHash, String name);
 }

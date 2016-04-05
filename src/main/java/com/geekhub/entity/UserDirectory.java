@@ -19,20 +19,11 @@ import javax.persistence.Table;
 
 @Entity
 @Table
-public class UserDirectory {
+public class UserDirectory extends UserFile {
 
     @Id
     @GeneratedValue
     private Long id;
-
-    @Column
-    private String name;
-
-    @Column
-    private String parentDirectoryHash;
-
-    @Column
-    private String hashName;
 
     @Column
     private String description;
@@ -41,10 +32,6 @@ public class UserDirectory {
     @ManyToOne
     @JoinColumn(name = "owner_id")
     private User owner;
-
-    @Column(name = "documentAttribute")
-    @Enumerated(EnumType.STRING)
-    private DocumentAttribute documentAttribute;
 
     @JsonIgnore
     @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
@@ -66,30 +53,6 @@ public class UserDirectory {
         this.id = id;
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getParentDirectoryHash() {
-        return parentDirectoryHash;
-    }
-
-    public void setParentDirectoryHash(String parentDirectoryHash) {
-        this.parentDirectoryHash = parentDirectoryHash;
-    }
-
-    public String getHashName() {
-        return hashName;
-    }
-
-    public void setHashName(String hashName) {
-        this.hashName = hashName;
-    }
-
     public String getDescription() {
         return description;
     }
@@ -106,14 +69,6 @@ public class UserDirectory {
         this.owner = owner;
     }
 
-    public DocumentAttribute getDocumentAttribute() {
-        return documentAttribute;
-    }
-
-    public void setDocumentAttribute(DocumentAttribute documentAttribute) {
-        this.documentAttribute = documentAttribute;
-    }
-
     public Set<User> getReaders() {
         return readers;
     }
@@ -127,28 +82,21 @@ public class UserDirectory {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        UserDirectory that = (UserDirectory) o;
+        UserDirectory directory = (UserDirectory) o;
 
-        if (id != null ? !id.equals(that.id) : that.id != null) return false;
-        if (name != null ? !name.equals(that.name) : that.name != null) return false;
-        if (parentDirectoryHash != null ? !parentDirectoryHash.equals(that.parentDirectoryHash) : that.parentDirectoryHash != null) return false;
-        if (hashName != null ? !hashName.equals(that.hashName) : that.hashName != null) return false;
-        if (description != null ? !description.equals(that.description) : that.description != null) return false;
-        if (owner != null ? !owner.equals(that.owner) : that.owner != null) return false;
-        if (documentAttribute != that.documentAttribute) return false;
-        return readers != null ? readers.equals(that.readers) : that.readers == null;
+        if (id != null ? !id.equals(directory.id) : directory.id != null) return false;
+        if (description != null ? !description.equals(directory.description) : directory.description != null)
+            return false;
+        if (owner != null ? !owner.equals(directory.owner) : directory.owner != null) return false;
+        return readers != null ? readers.equals(directory.readers) : directory.readers == null;
 
     }
 
     @Override
     public int hashCode() {
         int result = id != null ? id.hashCode() : 0;
-        result = 31 * result + (name != null ? name.hashCode() : 0);
-        result = 31 * result + (parentDirectoryHash != null ? parentDirectoryHash.hashCode() : 0);
-        result = 31 * result + (hashName != null ? hashName.hashCode() : 0);
         result = 31 * result + (description != null ? description.hashCode() : 0);
         result = 31 * result + (owner != null ? owner.hashCode() : 0);
-        result = 31 * result + (documentAttribute != null ? documentAttribute.hashCode() : 0);
         result = 31 * result + (readers != null ? readers.hashCode() : 0);
         return result;
     }

@@ -23,20 +23,11 @@ import javax.persistence.Table;
 
 @Entity
 @Table
-public class UserDocument implements Serializable {
+public class UserDocument extends UserFile {
 
     @Id
     @GeneratedValue
     private Long id;
-
-    @Column
-    private String name;
-
-    @Column
-    private String parentDirectoryHash;
-
-    @Column
-    private String hashName;
 
     @Column
     private String type;
@@ -54,10 +45,6 @@ public class UserDocument implements Serializable {
     @ManyToOne
     @JoinColumn(name = "owner_id")
     private User owner;
-
-    @Column(name = "documentAttribute")
-    @Enumerated(EnumType.STRING)
-    private DocumentAttribute documentAttribute;
 
     @JsonIgnore
     @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
@@ -84,14 +71,6 @@ public class UserDocument implements Serializable {
         this.id = id;
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
     public String getType() {
         return type;
     }
@@ -114,14 +93,6 @@ public class UserDocument implements Serializable {
 
     public void setOwner(User owner) {
         this.owner = owner;
-    }
-
-    public DocumentAttribute getDocumentAttribute() {
-        return documentAttribute;
-    }
-
-    public void setDocumentAttribute(DocumentAttribute documentAttribute) {
-        this.documentAttribute = documentAttribute;
     }
 
     public Set<User> getReaders() {
@@ -156,22 +127,6 @@ public class UserDocument implements Serializable {
         this.comments = comments;
     }
 
-    public String getParentDirectoryHash() {
-        return parentDirectoryHash;
-    }
-
-    public void setParentDirectoryHash(String parentDirectoryHash) {
-        this.parentDirectoryHash = parentDirectoryHash;
-    }
-
-    public String getHashName() {
-        return hashName;
-    }
-
-    public void setHashName(String nashName) {
-        this.hashName = nashName;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -180,9 +135,6 @@ public class UserDocument implements Serializable {
         UserDocument document = (UserDocument) o;
 
         if (id != null ? !id.equals(document.id) : document.id != null) return false;
-        if (name != null ? !name.equals(document.name) : document.name != null) return false;
-        if (parentDirectoryHash != null ? !parentDirectoryHash.equals(document.parentDirectoryHash) : document.parentDirectoryHash != null) return false;
-        if (hashName != null ? !hashName.equals(document.hashName) : document.hashName != null) return false;
         if (type != null ? !type.equals(document.type) : document.type != null) return false;
         if (description != null ? !description.equals(document.description) : document.description != null)
             return false;
@@ -190,7 +142,6 @@ public class UserDocument implements Serializable {
             return false;
         if (size != null ? !size.equals(document.size) : document.size != null) return false;
         if (owner != null ? !owner.equals(document.owner) : document.owner != null) return false;
-        if (documentAttribute != document.documentAttribute) return false;
         if (readers != null ? !readers.equals(document.readers) : document.readers != null) return false;
         return comments != null ? comments.equals(document.comments) : document.comments == null;
 
@@ -199,15 +150,11 @@ public class UserDocument implements Serializable {
     @Override
     public int hashCode() {
         int result = id != null ? id.hashCode() : 0;
-        result = 31 * result + (name != null ? name.hashCode() : 0);
-        result = 31 * result + (parentDirectoryHash != null ? parentDirectoryHash.hashCode() : 0);
-        result = 31 * result + (hashName != null ? hashName.hashCode() : 0);
         result = 31 * result + (type != null ? type.hashCode() : 0);
         result = 31 * result + (description != null ? description.hashCode() : 0);
         result = 31 * result + (lastModifyTime != null ? lastModifyTime.hashCode() : 0);
         result = 31 * result + (size != null ? size.hashCode() : 0);
         result = 31 * result + (owner != null ? owner.hashCode() : 0);
-        result = 31 * result + (documentAttribute != null ? documentAttribute.hashCode() : 0);
         result = 31 * result + (readers != null ? readers.hashCode() : 0);
         result = 31 * result + (comments != null ? comments.hashCode() : 0);
         return result;
