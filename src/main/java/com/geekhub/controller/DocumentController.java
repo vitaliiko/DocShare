@@ -72,7 +72,7 @@ public class DocumentController {
     public String downloadDocument(@PathVariable Long docId, HttpSession session, HttpServletResponse response)
             throws IOException {
         UserDocument document = userDocumentService.getById(docId);
-        File file = DocumentUtil.createFile(document.getNashName());
+        File file = DocumentUtil.createFile(document.getHashName());
         response.setContentType(document.getType());
         response.setContentLength((int) file.length());
         response.setHeader("Content-Disposition", "attachment; filename=\"" + document.getName() +"\"");
@@ -143,14 +143,16 @@ public class DocumentController {
 
     private void saveOrUpdateDocument(MultipartFile multipartFile, String location, String description, User user)
             throws IOException {
-        UserDocument document = userDocumentService.getByNameAndOwnerId(user.getId(), multipartFile.getOriginalFilename());
+        UserDocument document =
+                userDocumentService.getByFullNameAndOwnerId(user.getId(), location, multipartFile.getOriginalFilename());
         if (document == null) {
             document = DocumentUtil.createUserDocument(multipartFile, location, description, user);
             Long docId = userDocumentService.save(document);
-            String docHashName = userDocumentService.getById(docId).getNashName();
+            String docHashName = userDocumentService.getById(docId).getHashName();
             multipartFile.transferTo(DocumentUtil.createFile(docHashName));
         } else {
-            userDocumentService.update(DocumentUtil.updateUserDocument(document, multipartFile, location, description));
+            userDocumentService.update(DocumentUtil.updateUserDocument(document, multipartFile, description));
+            multipartFile.transferTo(DocumentUtil.createFile(document.getHashName()));
         }
     }
 }

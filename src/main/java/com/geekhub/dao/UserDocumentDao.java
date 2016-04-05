@@ -3,7 +3,9 @@ package com.geekhub.dao;
 import com.geekhub.entity.Comment;
 import com.geekhub.entity.User;
 import com.geekhub.entity.UserDocument;
+import java.util.Map;
 import java.util.Set;
+import org.hibernate.Criteria;
 import org.hibernate.Hibernate;
 import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Order;
@@ -84,11 +86,23 @@ public class UserDocumentDao implements EntityDao<UserDocument, Long> {
                 .list();
     }
 
+    public List<UserDocument> getList(Map<String, Object> propertiesMap) {
+        Criteria criteria = sessionFactory.getCurrentSession().createCriteria(clazz);
+        propertiesMap.forEach((prop, val) -> criteria.add(Restrictions.eq(prop, val)));
+        return (List<UserDocument>) criteria.list();
+    }
+
     public UserDocument get(User owner, String propertyName, Object value) {
         return (UserDocument) sessionFactory.getCurrentSession()
                 .createCriteria(clazz)
                 .add(Restrictions.eq("owner", owner))
                 .add(Restrictions.eq(propertyName, value))
                 .uniqueResult();
+    }
+
+    public UserDocument get(Map<String, Object> propertiesMap) {
+        Criteria criteria = sessionFactory.getCurrentSession().createCriteria(clazz);
+        propertiesMap.forEach((prop, val) -> criteria.add(Restrictions.eq(prop, val)));
+        return (UserDocument) criteria.uniqueResult();
     }
 }

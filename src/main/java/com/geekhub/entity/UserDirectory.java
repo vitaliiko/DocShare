@@ -32,7 +32,7 @@ public class UserDirectory {
     private String location;
 
     @Column
-    private String nashName;
+    private String hashName;
 
     @Column
     private String description;
@@ -82,12 +82,12 @@ public class UserDirectory {
         this.location = location;
     }
 
-    public String getNashName() {
-        return nashName;
+    public String getHashName() {
+        return hashName;
     }
 
-    public void setNashName(String nashName) {
-        this.nashName = nashName;
+    public void setHashName(String hashName) {
+        this.hashName = hashName;
     }
 
     public String getDescription() {
@@ -132,7 +132,7 @@ public class UserDirectory {
         if (id != null ? !id.equals(that.id) : that.id != null) return false;
         if (name != null ? !name.equals(that.name) : that.name != null) return false;
         if (location != null ? !location.equals(that.location) : that.location != null) return false;
-        if (nashName != null ? !nashName.equals(that.nashName) : that.nashName != null) return false;
+        if (hashName != null ? !hashName.equals(that.hashName) : that.hashName != null) return false;
         if (description != null ? !description.equals(that.description) : that.description != null) return false;
         if (owner != null ? !owner.equals(that.owner) : that.owner != null) return false;
         if (documentAttribute != that.documentAttribute) return false;
@@ -145,7 +145,7 @@ public class UserDirectory {
         int result = id != null ? id.hashCode() : 0;
         result = 31 * result + (name != null ? name.hashCode() : 0);
         result = 31 * result + (location != null ? location.hashCode() : 0);
-        result = 31 * result + (nashName != null ? nashName.hashCode() : 0);
+        result = 31 * result + (hashName != null ? hashName.hashCode() : 0);
         result = 31 * result + (description != null ? description.hashCode() : 0);
         result = 31 * result + (owner != null ? owner.hashCode() : 0);
         result = 31 * result + (documentAttribute != null ? documentAttribute.hashCode() : 0);

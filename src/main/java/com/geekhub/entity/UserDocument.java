@@ -12,7 +12,6 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
@@ -37,7 +36,7 @@ public class UserDocument implements Serializable {
     private String location;
 
     @Column
-    private String nashName;
+    private String hashName;
 
     @Column
     private String type;
@@ -165,12 +164,12 @@ public class UserDocument implements Serializable {
         this.location = location;
     }
 
-    public String getNashName() {
-        return nashName;
+    public String getHashName() {
+        return hashName;
     }
 
     public void setHashName(String nashName) {
-        this.nashName = nashName;
+        this.hashName = nashName;
     }
 
     @Override
@@ -183,7 +182,7 @@ public class UserDocument implements Serializable {
         if (id != null ? !id.equals(document.id) : document.id != null) return false;
         if (name != null ? !name.equals(document.name) : document.name != null) return false;
         if (location != null ? !location.equals(document.location) : document.location != null) return false;
-        if (nashName != null ? !nashName.equals(document.nashName) : document.nashName != null) return false;
+        if (hashName != null ? !hashName.equals(document.hashName) : document.hashName != null) return false;
         if (type != null ? !type.equals(document.type) : document.type != null) return false;
         if (description != null ? !description.equals(document.description) : document.description != null)
             return false;
@@ -202,7 +201,7 @@ public class UserDocument implements Serializable {
         int result = id != null ? id.hashCode() : 0;
         result = 31 * result + (name != null ? name.hashCode() : 0);
         result = 31 * result + (location != null ? location.hashCode() : 0);
-        result = 31 * result + (nashName != null ? nashName.hashCode() : 0);
+        result = 31 * result + (hashName != null ? hashName.hashCode() : 0);
         result = 31 * result + (type != null ? type.hashCode() : 0);
         result = 31 * result + (description != null ? description.hashCode() : 0);
         result = 31 * result + (lastModifyTime != null ? lastModifyTime.hashCode() : 0);

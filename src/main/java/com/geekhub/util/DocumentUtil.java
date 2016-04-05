@@ -62,11 +62,11 @@ public class DocumentUtil {
 
     public static UserDocument updateUserDocument(UserDocument document,
                                                   MultipartFile multipartFile,
-                                                  String location,
                                                   String description) throws IOException {
 
-        document.setDescription(description);
-        document.setLocation(location);
+        if (description != null && !description.isEmpty()) {
+            document.setDescription(description);
+        }
         document.setLastModifyTime(Calendar.getInstance().getTime());
         document.setSize(calculateSize(multipartFile.getSize()));
         return document;

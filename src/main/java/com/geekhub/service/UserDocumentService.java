@@ -22,5 +22,7 @@ public interface UserDocumentService extends EntityService<UserDocument, Long> {
 
     UserDocument getByNameAndOwnerId(Long ownerId, String name);
 
+    UserDocument getByFullNameAndOwnerId(Long ownerId, String location, String name);
+
     UserDocument getDocumentWithComments(Long docId);
 }

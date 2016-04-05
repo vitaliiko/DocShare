@@ -5,7 +5,10 @@ import com.geekhub.entity.RemovedDocument;
 import com.geekhub.entity.User;
 import com.geekhub.entity.UserDocument;
 import com.geekhub.util.DocumentUtil;
+import java.util.HashMap;
+import java.util.Map;
 import org.hibernate.Hibernate;
+import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -106,6 +109,16 @@ public class UserDocumentServiceImpl implements UserDocumentService {
     public UserDocument getByNameAndOwnerId(Long ownerId, String name) {
         User owner = userService.getById(ownerId);
         return userDocumentDao.get(owner, "name", name);
+    }
+
+    @Override
+    public UserDocument getByFullNameAndOwnerId(Long ownerId, String location, String name) {
+        Map<String, Object> propertiesMap = new HashMap<>();
+        User owner = userService.getById(ownerId);
+        propertiesMap.put("owner", owner);
+        propertiesMap.put("location", location);
+        propertiesMap.put("name", name);
+        return userDocumentDao.get(propertiesMap);
     }
 
     @Override
