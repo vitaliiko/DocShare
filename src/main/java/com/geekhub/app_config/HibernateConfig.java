@@ -5,6 +5,7 @@ import com.geekhub.entity.FriendsGroup;
 import com.geekhub.entity.Message;
 import com.geekhub.entity.RemovedDocument;
 import com.geekhub.entity.User;
+import com.geekhub.entity.UserDirectory;
 import com.geekhub.entity.UserDocument;
 import org.apache.tomcat.dbcp.dbcp.BasicDataSource;
 import org.hibernate.SessionFactory;
@@ -32,6 +33,7 @@ public class HibernateConfig {
             Message.class,
             FriendsGroup.class,
             UserDocument.class,
+            UserDirectory.class,
             Comment.class,
             RemovedDocument.class
     };

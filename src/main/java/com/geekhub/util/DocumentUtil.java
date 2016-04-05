@@ -62,6 +62,7 @@ public class DocumentUtil {
                                                   String description) throws IOException {
 
         document.setDescription(description);
+        document.setLocation(location);
         document.setLastModifyTime(Calendar.getInstance().getTime());
         document.setSize(calculateSize(multipartFile.getSize()));
         return document;

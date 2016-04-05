@@ -150,7 +150,8 @@ public class DocumentController {
             Long docId = userDocumentService.save(document);
             String docHashName = userDocumentService.getById(docId).getNashName();
             multipartFile.transferTo(DocumentUtil.createFile(docHashName));
+        } else {
+            userDocumentService.update(DocumentUtil.updateUserDocument(document, multipartFile, location, description));
         }
-        userDocumentService.update(DocumentUtil.updateUserDocument(document, multipartFile, location, description));
     }
 }
