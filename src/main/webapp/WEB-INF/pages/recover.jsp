@@ -22,7 +22,7 @@
         <c:forEach items="${documents}" var="doc">
             <tr>
                 <td>${doc.userDocument.name}</td>
-                <td><fmt:formatDate type="both" value="${doc.removalDate}"/></td>
+                <td><fmt:formatDate type="date" timeStyle="short" dateStyle="short" value="${doc.removalDate}"/></td>
                 <td><a href="<c:url value='/document/recover-${doc.id}' />"
                        class="btn btn-primary custom-width">Recover</a></td>
             </tr>

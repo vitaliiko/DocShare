@@ -31,35 +31,32 @@
 </div>
 
 <div class="container" style="width: 900px;">
-    <table class="table table-hover tbody tr:hover td">
-        <caption>
-            <h3>List of Documents</h3>
-            <button class="btn btn-link all-href">All</button>
-            <button class="btn btn-link public-href">Public</button>
-            <button class="btn btn-link for-friends-href">For Friends</button>
-            <button class="btn btn-link private-href">Private</button>
-
-            <button class="btn btn-default delete-btn action-btn"
-                    data-toggle="modal" data-target="#deleteDialog">Delete</button>
-            <button class="btn btn-default replace-btn action-btn">Replace</button>
-            <button class="btn btn-default copy-btn action-btn">Copy</button>
-            <button class="btn btn-default rename-btn action-btn single-selection">Rename</button>
-        </caption>
-        <tr>
-            <th><input type="checkbox" class="check-box select-all"/></th>
-            <th id="file-name">File Name</th>
-            <th>Size</th>
-            <th>Changed</th>
-            <th width="80"></th>
-        </tr>
-    </table>
-
     <c:forEach items="${documentsMap}" var="documentsEntry">
         <table class="table table-hover tbody tr:hover td" id="${documentsEntry.key}">
+            <caption>
+                <h3>List of Documents</h3>
+                <button class="btn btn-link all-href">All</button>
+                <button class="btn btn-link public-href">Public</button>
+                <button class="btn btn-link for-friends-href">For Friends</button>
+                <button class="btn btn-link private-href">Private</button>
+
+                <button class="btn btn-default delete-btn action-btn"
+                        data-toggle="modal" data-target="#deleteDialog">Delete</button>
+                <button class="btn btn-default replace-btn action-btn">Replace</button>
+                <button class="btn btn-default copy-btn action-btn">Copy</button>
+                <button class="btn btn-default rename-btn action-btn single-selection">Rename</button>
+            </caption>
+            <tr>
+                <th><input type="checkbox" class="check-box big-check-box select-all"/></th>
+                <th id="file-name">File Name</th>
+                <th>Size</th>
+                <th>Changed</th>
+                <th width="80"></th>
+            </tr>
         <c:forEach items="${documentsEntry.value}" var="doc" varStatus="counter">
             <tr class="tr-doc${doc.id}">
                 <td class="document-num">
-                    <input type="checkbox" class="check-box" value="${doc.id}"/>
+                    <input type="checkbox" class="check-box big-check-box" value="${doc.id}"/>
                 </td>
                 <td class="document-name">
                     <a href="/document/browse-${doc.id}">${doc.name}</a>

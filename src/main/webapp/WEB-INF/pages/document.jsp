@@ -17,10 +17,9 @@
     Changed: <fmt:formatDate type="both" timeStyle="long" dateStyle="short" value="${doc.lastModifyTime}"/>
     <a href="<c:url value='/document/download-${doc.id}' />" class="btn btn-success custom-width">Download</a>
     <br>
-    <c:if test="${!doc.description.isEmpty()}">
+    <c:if test="${doc.description != null}">
         Description: ${doc.description}
     </c:if>
-    ${doc.content}
     <br>
     <br>
     <br>
