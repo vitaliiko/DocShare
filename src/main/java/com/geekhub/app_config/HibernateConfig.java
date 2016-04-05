@@ -1,6 +1,7 @@
 package com.geekhub.app_config;
 
 import com.geekhub.entity.Comment;
+import com.geekhub.entity.DocumentOldVersion;
 import com.geekhub.entity.FriendsGroup;
 import com.geekhub.entity.Message;
 import com.geekhub.entity.RemovedDirectory;
@@ -37,7 +38,8 @@ public class HibernateConfig {
             UserDirectory.class,
             Comment.class,
             RemovedDocument.class,
-            RemovedDirectory.class
+            RemovedDirectory.class,
+            DocumentOldVersion.class
     };
 
     @Autowired
