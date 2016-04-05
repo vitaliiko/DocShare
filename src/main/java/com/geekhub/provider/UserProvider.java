@@ -47,7 +47,8 @@ public class UserProvider {
             User user = new User(value, value, value, value);
             Long userId = userService.save(user);
             user.setId(userId);
-            createUserDir(user);
+            user.setRootDirectory(createUserDir(user));
+            userService.update(user);
         }
         addFriends(userService.getById(1L), id -> id > 0 && id < 10);
         addGroup(1L, "Parents", id -> id > 2 && id < 5);
@@ -85,9 +86,11 @@ public class UserProvider {
         }
     }
 
-    private void createUserDir(User user) {
+    private String createUserDir(User user) {
         UserDirectory directory = DocumentUtil.createUserDir(user.getLogin(), DocumentUtil.ROOT_DIRECTORY_HASH, user);
         Long dirId = userDirectoryService.save(directory);
-        DocumentUtil.createDirInFileSystem(userDirectoryService.getById(dirId));
+        directory = userDirectoryService.getById(dirId);
+        DocumentUtil.createDirInFileSystem(directory);
+        return directory.getHashName();
     }
 }

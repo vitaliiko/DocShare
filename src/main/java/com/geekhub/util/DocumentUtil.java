@@ -18,7 +18,7 @@ import java.text.DecimalFormat;
 
 public class DocumentUtil {
 
-    public static final String ROOT_LOCATION = "C:\\spring_docs";
+    public static final String ROOT_LOCATION = "C:\\spring_docs\\";
     public static final String SYSTEM_EXTENSION = ".curva";
     public static final String ROOT_DIRECTORY_HASH = createHashName(0L, 0L);
 
@@ -96,12 +96,12 @@ public class DocumentUtil {
         return DocumentNameDigest.hashName("" + ownerId + docId);
     }
 
-    public static File createFile(String fileName) {
-        return new File(getFullFileName(fileName));
+    public static File createFile(String fileName, String rootUserDirectory) {
+        return new File(getFullFileName(fileName, rootUserDirectory));
     }
 
-    public static String getFullFileName(String fileName) {
-        return ROOT_LOCATION + "\\" + fileName + SYSTEM_EXTENSION;
+    public static String getFullFileName(String fileName, String rootUserDirectory) {
+        return ROOT_LOCATION + rootUserDirectory + "\\" + fileName + SYSTEM_EXTENSION;
     }
 
     public static UserDirectory createUserDir(String name, String parentDirectoryHash, User owner) {

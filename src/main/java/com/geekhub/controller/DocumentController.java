@@ -71,8 +71,10 @@ public class DocumentController {
     @RequestMapping(value = "/download-{docId}", method = RequestMethod.GET)
     public String downloadDocument(@PathVariable Long docId, HttpSession session, HttpServletResponse response)
             throws IOException {
+
+        User user = userService.getById((Long) session.getAttribute("userId"));
         UserDocument document = userDocumentService.getById(docId);
-        File file = DocumentUtil.createFile(document.getHashName());
+        File file = DocumentUtil.createFile(document.getHashName(), user.getRootDirectory());
         response.setContentType(document.getType());
         response.setContentLength((int) file.length());
         response.setHeader("Content-Disposition", "attachment; filename=\"" + document.getName() +"\"");
@@ -148,16 +150,19 @@ public class DocumentController {
 
     private void saveOrUpdateDocument(MultipartFile multipartFile, String parentDirectoryHash, String description, User user)
             throws IOException {
-        UserDocument document =
-                userDocumentService.getByFullNameAndOwnerId(user.getId(), parentDirectoryHash, multipartFile.getOriginalFilename());
+
+        UserDocument document = userDocumentService.getByFullNameAndOwnerId(
+                user.getId(), parentDirectoryHash, multipartFile.getOriginalFilename()
+        );
+
         if (document == null) {
             document = DocumentUtil.createUserDocument(multipartFile, parentDirectoryHash, description, user);
             Long docId = userDocumentService.save(document);
             String docHashName = userDocumentService.getById(docId).getHashName();
-            multipartFile.transferTo(DocumentUtil.createFile(docHashName));
+            multipartFile.transferTo(DocumentUtil.createFile(docHashName, user.getRootDirectory()));
         } else {
             userDocumentService.update(DocumentUtil.updateUserDocument(document, multipartFile, description));
-            multipartFile.transferTo(DocumentUtil.createFile(document.getHashName()));
+            multipartFile.transferTo(DocumentUtil.createFile(document.getHashName(), user.getRootDirectory()));
         }
     }
 }
