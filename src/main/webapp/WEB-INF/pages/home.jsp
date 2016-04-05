@@ -17,17 +17,17 @@
 <jsp:include page="../include/sidebar.jsp"/>
 
 <div class="container" style="width: 900px;">
-    <div>
-        <label class="col-md-3 control-lable" for="file">Upload a document</label>
-        <input type="file" multiple name="file" id="file" class="form-control input-sm"/>
+    <form action="/document/upload" method="post" enctype="multipart/form-data">
+        <label class="col-md-3 control-lable" for="files">Upload a document</label>
+        <input type="file" multiple name="files[]" id="files" class="form-control input-sm"/>
         <br>
         <label class="col-md-3 control-lable" for="description">Description</label>
         <input type="text" name="description" id="description" class="form-control input-sm"/>
         <br>
         <div class="form-actions floatRight">
-            <input type="button" value="Upload" class="btn btn-primary btn-sm upload-btn">
+            <input type="submit" value="Upload" class="btn btn-primary btn-sm">
         </div>
-    </div>
+    </form>
 </div>
 
 <div class="container" style="width: 900px;">

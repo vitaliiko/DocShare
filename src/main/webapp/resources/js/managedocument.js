@@ -78,19 +78,20 @@ $(document).ready(function() {
     });
 
     $('.upload-btn').click(function() {
-        var data = new FormData();
+        var files = new FormData();
+        var description = $('#description').val();
         var filesCount = 0;
         $.each(files, function (key, value) {
-            data.append(key, value);
+            files.append(key, value);
             filesCount++;
         });
         if (filesCount > 0) {
             $.ajax({
                 url: 'upload',
                 type: 'POST',
-                data: data,
+                data: {files: files, description: description},
                 cache: false,
-                dataType: 'json',
+                dataType: 'multipart/form-data',
                 contentType: false,
                 processData: false,
                 success: function() {

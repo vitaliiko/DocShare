@@ -11,6 +11,7 @@ import com.geekhub.service.UserService;
 import com.geekhub.util.CommentUtil;
 import com.geekhub.util.DocumentUtil;
 import com.geekhub.validation.FileValidator;
+import java.util.Arrays;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.util.FileCopyUtils;
@@ -23,7 +24,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.multipart.MultipartHttpServletRequest;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletResponse;
@@ -98,19 +98,15 @@ public class DocumentController {
     }
 
     @RequestMapping(value = "/upload", method = RequestMethod.POST)
-    @ResponseStatus(HttpStatus.OK)
-    public void uploadDocument(MultipartHttpServletRequest request, String description, HttpSession session)
+    public ModelAndView uploadDocument(@RequestParam("files[]") MultipartFile[] files, String description, HttpSession session)
             throws IOException {
         Long userId = (Long) session.getAttribute("userId");
         User user = userService.getById(userId);
-
-        Map<String, MultipartFile> fileMap = request.getFileMap();
-        if (fileMap.size() > 0) {
-            for (String s : fileMap.keySet()) {
-                MultipartFile mpf = request.getFile(s);
-                saveOrUpdateDocument(mpf, description, user);
-            }
+        for (MultipartFile file : files) {
+            UserDocument document = DocumentUtil.createUserDocument(file, description, user);
+            userDocumentService.save(document);
         }
+        return new ModelAndView("redirect:/document/upload");
     }
 
     @RequestMapping("/browse-{docId}")
