@@ -3,6 +3,7 @@ package com.geekhub.service;
 import com.geekhub.dao.UserDirectoryDao;
 import com.geekhub.entity.User;
 import com.geekhub.entity.UserDirectory;
+import com.geekhub.util.DocumentUtil;
 import java.util.Arrays;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,7 +40,13 @@ public class UserDirectoryServiceImpl implements UserDirectoryService {
 
     @Override
     public Long save(UserDirectory entity) {
-        return null;
+        Long dirId = userDirectoryDao.save(entity);
+        Long ownerId = entity.getOwner().getId();
+        entity.setId(dirId);
+        String hashName = DocumentUtil.createHashName(ownerId, dirId);
+        entity.setHashName(hashName);
+        userDirectoryDao.update(entity);
+        return dirId;
     }
 
     @Override

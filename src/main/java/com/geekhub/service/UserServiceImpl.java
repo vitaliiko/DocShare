@@ -4,6 +4,8 @@ import com.geekhub.dao.UserDao;
 import com.geekhub.entity.FriendsGroup;
 import com.geekhub.entity.Message;
 import com.geekhub.entity.User;
+import com.geekhub.entity.UserDirectory;
+import com.geekhub.util.DocumentUtil;
 import org.hibernate.HibernateException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -27,6 +29,9 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private FriendsGroupService friendsGroupService;
+
+    @Autowired
+    private UserDirectoryService userDirectoryService;
 
     @Override
     public List<User> getAll(String orderParameter) {
@@ -55,7 +60,12 @@ public class UserServiceImpl implements UserService {
     public Long createUser(String firstName, String lastName, String login, String password) {
         if (userDao.get("login", login) == null) {
             User user = new User(firstName, lastName, password, login);
-            return userDao.save(user);
+            user.setId(userDao.save(user));
+            UserDirectory directory =
+                    DocumentUtil.createUserDir(user.getLogin(), DocumentUtil.ROOT_DIRECTORY_HASH, user);
+            Long dirId = userDirectoryService.save(directory);
+            DocumentUtil.createDirInFileSystem(userDirectoryService.getById(dirId));
+            return user.getId();
         }
         return null;
     }

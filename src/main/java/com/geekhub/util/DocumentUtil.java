@@ -2,6 +2,7 @@ package com.geekhub.util;
 
 import com.geekhub.entity.RemovedDocument;
 import com.geekhub.entity.User;
+import com.geekhub.entity.UserDirectory;
 import com.geekhub.entity.UserDocument;
 import com.geekhub.enums.DocumentAttribute;
 import java.io.File;
@@ -19,6 +20,7 @@ public class DocumentUtil {
 
     public static final String ROOT_LOCATION = "C:\\spring_docs";
     public static final String SYSTEM_EXTENSION = ".curva";
+    public static final String ROOT_DIRECTORY_HASH = createHashName(0L, 0L);
 
     public static Map<String, List<UserDocument>> prepareDocumentsListMap(List<UserDocument> allDocuments) {
         List<UserDocument> privateDocuments = new ArrayList<>();
@@ -44,13 +46,13 @@ public class DocumentUtil {
     }
 
     public static UserDocument createUserDocument(MultipartFile multipartFile,
-                                                  String location,
+                                                  String parentDirectoryHash,
                                                   String description,
                                                   User user) throws IOException {
 
         UserDocument document = new UserDocument();
         document.setName(multipartFile.getOriginalFilename());
-        document.setLocation(location);
+        document.setParentDirectoryHash(parentDirectoryHash);
         document.setDescription(description);
         document.setLastModifyTime(Calendar.getInstance().getTime());
         document.setType(multipartFile.getContentType());
@@ -100,5 +102,21 @@ public class DocumentUtil {
 
     public static String getFullFileName(String fileName) {
         return ROOT_LOCATION + "\\" + fileName + SYSTEM_EXTENSION;
+    }
+
+    public static UserDirectory createUserDir(String name, String parentDirectoryHash, User owner) {
+        UserDirectory directory = new UserDirectory();
+        directory.setOwner(owner);
+        directory.setName(name);
+        directory.setParentDirectoryHash(parentDirectoryHash);
+        directory.setDocumentAttribute(DocumentAttribute.PRIVATE);
+        return directory;
+    }
+
+    public static void createDirInFileSystem(UserDirectory directory) {
+        File file = new File(ROOT_LOCATION + "\\" + directory.getHashName());
+        if (!file.exists()) {
+            file.mkdir();
+        }
     }
 }

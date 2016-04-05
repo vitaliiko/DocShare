@@ -33,7 +33,7 @@ public class UserDocument implements Serializable {
     private String name;
 
     @Column
-    private String location;
+    private String parentDirectoryHash;
 
     @Column
     private String hashName;
@@ -156,12 +156,12 @@ public class UserDocument implements Serializable {
         this.comments = comments;
     }
 
-    public String getLocation() {
-        return location;
+    public String getParentDirectoryHash() {
+        return parentDirectoryHash;
     }
 
-    public void setLocation(String location) {
-        this.location = location;
+    public void setParentDirectoryHash(String parentDirectoryHash) {
+        this.parentDirectoryHash = parentDirectoryHash;
     }
 
     public String getHashName() {
@@ -181,7 +181,7 @@ public class UserDocument implements Serializable {
 
         if (id != null ? !id.equals(document.id) : document.id != null) return false;
         if (name != null ? !name.equals(document.name) : document.name != null) return false;
-        if (location != null ? !location.equals(document.location) : document.location != null) return false;
+        if (parentDirectoryHash != null ? !parentDirectoryHash.equals(document.parentDirectoryHash) : document.parentDirectoryHash != null) return false;
         if (hashName != null ? !hashName.equals(document.hashName) : document.hashName != null) return false;
         if (type != null ? !type.equals(document.type) : document.type != null) return false;
         if (description != null ? !description.equals(document.description) : document.description != null)
@@ -200,7 +200,7 @@ public class UserDocument implements Serializable {
     public int hashCode() {
         int result = id != null ? id.hashCode() : 0;
         result = 31 * result + (name != null ? name.hashCode() : 0);
-        result = 31 * result + (location != null ? location.hashCode() : 0);
+        result = 31 * result + (parentDirectoryHash != null ? parentDirectoryHash.hashCode() : 0);
         result = 31 * result + (hashName != null ? hashName.hashCode() : 0);
         result = 31 * result + (type != null ? type.hashCode() : 0);
         result = 31 * result + (description != null ? description.hashCode() : 0);

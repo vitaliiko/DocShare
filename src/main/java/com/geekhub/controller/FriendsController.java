@@ -88,7 +88,7 @@ public class FriendsController {
 
     @RequestMapping("/default_users")
     public ModelAndView createDefaultUsers() {
-        userProvider.addDefaultUsers();
+        userProvider.fillDB();
         return new ModelAndView("redirect:/main/sign_in");
     }
 }

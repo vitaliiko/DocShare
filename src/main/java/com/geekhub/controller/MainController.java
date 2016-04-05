@@ -36,7 +36,7 @@ public class MainController {
     public ModelAndView signIn() {
         int size = userService.getAll("id").size();
         if (size == 0) {
-            userProvider.addDefaultUsers();
+            userProvider.fillDB();
         }
         return new ModelAndView("signIn");
     }

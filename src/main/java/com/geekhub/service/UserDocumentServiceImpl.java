@@ -112,11 +112,11 @@ public class UserDocumentServiceImpl implements UserDocumentService {
     }
 
     @Override
-    public UserDocument getByFullNameAndOwnerId(Long ownerId, String location, String name) {
+    public UserDocument getByFullNameAndOwnerId(Long ownerId, String parentDirectoryHash, String name) {
         Map<String, Object> propertiesMap = new HashMap<>();
         User owner = userService.getById(ownerId);
         propertiesMap.put("owner", owner);
-        propertiesMap.put("location", location);
+        propertiesMap.put("parentDirectoryHash", parentDirectoryHash);
         propertiesMap.put("name", name);
         return userDocumentDao.get(propertiesMap);
     }

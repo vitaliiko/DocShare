@@ -60,8 +60,8 @@ public class DocumentController {
     public ModelAndView addDocuments(HttpSession session) {
         ModelAndView model = new ModelAndView("home");
         List<UserDocument> allDocuments = userDocumentService.getAllByOwnerId((Long) session.getAttribute("userId"));
-//        if (location == null && location.isEmpty()) {
-//            location = "\\";
+//        if (parentDirectoryHash == null && parentDirectoryHash.isEmpty()) {
+//            parentDirectoryHash = "\\";
 //        }
         session.setAttribute("location", DocumentUtil.ROOT_LOCATION);
         model.addObject("documentsMap", DocumentUtil.prepareDocumentsListMap(allDocuments));
@@ -106,10 +106,10 @@ public class DocumentController {
     public ModelAndView uploadDocument(@RequestParam("files[]") MultipartFile[] files, String description, HttpSession session)
             throws IOException {
         Long userId = (Long) session.getAttribute("userId");
-        String location = (String) session.getAttribute("location");
+        String parentDirectoryHash = (String) session.getAttribute("parentDirectoryHash");
         User user = userService.getById(userId);
         for (MultipartFile file : files) {
-            saveOrUpdateDocument(file, location, description, user);
+            saveOrUpdateDocument(file, parentDirectoryHash, description, user);
         }
         return new ModelAndView("redirect:/document/upload");
     }
@@ -141,12 +141,17 @@ public class DocumentController {
         commentService.deleteById(commentId);
     }
 
-    private void saveOrUpdateDocument(MultipartFile multipartFile, String location, String description, User user)
+    @RequestMapping("/make-directory")
+    public ModelAndView makeDir(String dirName, HttpSession session) {
+        return null;
+    }
+
+    private void saveOrUpdateDocument(MultipartFile multipartFile, String parentDirectoryHash, String description, User user)
             throws IOException {
         UserDocument document =
-                userDocumentService.getByFullNameAndOwnerId(user.getId(), location, multipartFile.getOriginalFilename());
+                userDocumentService.getByFullNameAndOwnerId(user.getId(), parentDirectoryHash, multipartFile.getOriginalFilename());
         if (document == null) {
-            document = DocumentUtil.createUserDocument(multipartFile, location, description, user);
+            document = DocumentUtil.createUserDocument(multipartFile, parentDirectoryHash, description, user);
             Long docId = userDocumentService.save(document);
             String docHashName = userDocumentService.getById(docId).getHashName();
             multipartFile.transferTo(DocumentUtil.createFile(docHashName));

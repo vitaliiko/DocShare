@@ -2,9 +2,13 @@ package com.geekhub.provider;
 
 import com.geekhub.entity.FriendsGroup;
 import com.geekhub.entity.User;
+import com.geekhub.entity.UserDirectory;
 import com.geekhub.exception.UserValidateException;
 import com.geekhub.service.FriendsGroupService;
+import com.geekhub.service.UserDirectoryService;
 import com.geekhub.service.UserService;
+import com.geekhub.util.DocumentUtil;
+import java.io.File;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -20,6 +24,9 @@ public class UserProvider {
     @Autowired
     private FriendsGroupService friendsGroupService;
 
+    @Autowired
+    private UserDirectoryService userDirectoryService;
+
     public void validateUser(String login, String password, String confirmPassword) throws UserValidateException {
         if (userService.getByLogin(login) != null) {
             throw new UserValidateException("User with such login already exist");
@@ -29,11 +36,18 @@ public class UserProvider {
         }
     }
 
-    public void addDefaultUsers() {
+    public void fillDB() {
+        createRootDir();
+        addDefaultUsers();
+    }
+
+    private void addDefaultUsers() {
         for (int i = 0; i < 20; i++) {
             String value = String.valueOf(i) + i + i;
             User user = new User(value, value, value, value);
-            userService.save(user);
+            Long userId = userService.save(user);
+            user.setId(userId);
+            createUserDir(user);
         }
         addFriends(userService.getById(1L), id -> id > 0 && id < 10);
         addGroup(1L, "Parents", id -> id > 2 && id < 5);
@@ -42,7 +56,7 @@ public class UserProvider {
         addGroup(2L, "Fuckers", id -> id > 13 && id < 18);
     }
 
-    public void addFriends(User user, LongPredicate predicate) {
+    private void addFriends(User user, LongPredicate predicate) {
         List<User> userList = userService.getAll("id");
         userList.stream()
                 .filter(u -> predicate.test(u.getId()))
@@ -60,5 +74,20 @@ public class UserProvider {
                 .filter(u -> predicate.test(u.getId()))
                 .forEach(group.getFriends()::add);
         userService.addFriendsGroup(userId, group);
+    }
+
+    private void createRootDir() {
+        UserDirectory directory = new UserDirectory();
+        directory.setParentDirectoryHash(DocumentUtil.ROOT_DIRECTORY_HASH);
+        File file = new File("spring_docs");
+        if (!file.exists()) {
+            file.mkdir();
+        }
+    }
+
+    private void createUserDir(User user) {
+        UserDirectory directory = DocumentUtil.createUserDir(user.getLogin(), DocumentUtil.ROOT_DIRECTORY_HASH, user);
+        Long dirId = userDirectoryService.save(directory);
+        DocumentUtil.createDirInFileSystem(userDirectoryService.getById(dirId));
     }
 }
