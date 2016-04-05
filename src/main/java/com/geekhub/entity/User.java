@@ -59,12 +59,12 @@ public class User {
     private Set<User> friends = new HashSet<>();
 
     @JsonIgnore
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "owner_id")
     private Set<UserDocument> userDocuments = new HashSet<>();
 
     @JsonIgnore
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "owner_id")
     private Set<RemovedDocument> removedDocuments = new HashSet<>();
 
