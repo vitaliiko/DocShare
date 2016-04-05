@@ -91,10 +91,4 @@ public class UserDocumentDao implements EntityDao<UserDocument, Long> {
                 .add(Restrictions.eq(propertyName, value))
                 .uniqueResult();
     }
-
-    public UserDocument getAndInitContent(Long docId) {
-        UserDocument document = getById(docId);
-        Hibernate.initialize(document.getContent());
-        return document;
-    }
 }

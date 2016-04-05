@@ -46,7 +46,7 @@ public class AppInitializer extends AbstractAnnotationConfigDispatcherServletIni
     @Override
     protected void customizeRegistration(ServletRegistration.Dynamic registration) {
 
-        File uploadDirectory = new File("D:\\temp");
+        File uploadDirectory = new File("C:\\spring_temp");
 
         MultipartConfigElement multipartConfigElement =
                 new MultipartConfigElement(uploadDirectory.getAbsolutePath(),

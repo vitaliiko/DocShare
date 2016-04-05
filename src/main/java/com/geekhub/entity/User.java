@@ -68,6 +68,9 @@ public class User {
     @JoinColumn(name = "owner_id")
     private Set<RemovedDocument> removedDocuments = new HashSet<>();
 
+    @Column
+    private String rootDirectory;
+
     public User() {}
 
     public User(String firstName, String lastName, String password, String login) {
@@ -155,6 +158,14 @@ public class User {
 
     public void setRemovedDocuments(Set<RemovedDocument> removedDocuments) {
         this.removedDocuments = removedDocuments;
+    }
+
+    public String getRootDirectory() {
+        return rootDirectory;
+    }
+
+    public void setRootDirectory(String rootDirectory) {
+        this.rootDirectory = rootDirectory;
     }
 
     @Override

@@ -11,6 +11,7 @@ import com.geekhub.service.UserService;
 import com.geekhub.util.CommentUtil;
 import com.geekhub.util.DocumentUtil;
 import com.geekhub.validation.FileValidator;
+import java.io.File;
 import java.util.Arrays;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -60,6 +61,10 @@ public class DocumentController {
     public ModelAndView addDocuments(HttpSession session) {
         ModelAndView model = new ModelAndView("home");
         List<UserDocument> allDocuments = userDocumentService.getAllByOwnerId((Long) session.getAttribute("userId"));
+//        if (location == null && location.isEmpty()) {
+//            location = "\\";
+//        }
+        session.setAttribute("location", DocumentUtil.ROOT_LOCATION);
         model.addObject("documentsMap", DocumentUtil.prepareDocumentsListMap(allDocuments));
         return model;
     }
@@ -69,10 +74,10 @@ public class DocumentController {
             throws IOException {
         UserDocument document = userDocumentService.getById(docId);
         response.setContentType(document.getType());
-        response.setContentLength(document.getContent().length);
+//        response.setContentLength(document.getContent().length);
         response.setHeader("Content-Disposition","attachment; filename=\"" + document.getName() +"\"");
 
-        FileCopyUtils.copy(document.getContent(), response.getOutputStream());
+//        FileCopyUtils.copy(document.getContent(), response.getOutputStream());
 
         return "redirect:/document/upload";
     }
@@ -101,10 +106,10 @@ public class DocumentController {
     public ModelAndView uploadDocument(@RequestParam("files[]") MultipartFile[] files, String description, HttpSession session)
             throws IOException {
         Long userId = (Long) session.getAttribute("userId");
+        String location = (String) session.getAttribute("location");
         User user = userService.getById(userId);
         for (MultipartFile file : files) {
-            UserDocument document = DocumentUtil.createUserDocument(file, description, user);
-            userDocumentService.save(document);
+            saveOrUpdateDocument(file, location, description, user);
         }
         return new ModelAndView("redirect:/document/upload");
     }
@@ -136,15 +141,15 @@ public class DocumentController {
         commentService.deleteById(commentId);
     }
 
-    private UserDocument saveOrUpdateDocument(MultipartFile multipartFile, String description, User user)
+    private void saveOrUpdateDocument(MultipartFile multipartFile, String location, String description, User user)
             throws IOException {
         UserDocument document = userDocumentService.getByNameAndOwnerId(user.getId(), multipartFile.getOriginalFilename());
         if (document == null) {
-            document = DocumentUtil.createUserDocument(multipartFile, description, user);
-            userDocumentService.save(document);
-            return document;
+            document = DocumentUtil.createUserDocument(multipartFile, location, description, user);
+            Long docId = userDocumentService.save(document);
+            String docHashName = userDocumentService.getById(docId).getNashName();
+            multipartFile.transferTo(DocumentUtil.createEmptyFile(docHashName));
         }
-        userDocumentService.update(DocumentUtil.updateUserDocument(document, multipartFile, description));
-        return null;
+        userDocumentService.update(DocumentUtil.updateUserDocument(document, multipartFile, location, description));
     }
 }

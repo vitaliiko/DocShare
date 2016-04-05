@@ -27,7 +27,7 @@
         <div class="form-actions floatRight">
             <input type="submit" value="Upload" class="btn btn-primary btn-sm">
         </div>
-    </form>
+    </div>
 </div>
 
 <div class="container" style="width: 900px;">

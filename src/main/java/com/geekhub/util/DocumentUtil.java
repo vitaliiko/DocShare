@@ -4,6 +4,7 @@ import com.geekhub.entity.RemovedDocument;
 import com.geekhub.entity.User;
 import com.geekhub.entity.UserDocument;
 import com.geekhub.enums.DocumentAttribute;
+import java.io.File;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -11,6 +12,9 @@ import java.text.DecimalFormat;
 import java.util.*;
 
 public class DocumentUtil {
+
+    public static final String ROOT_LOCATION = "C:\\spring_docs";
+    public static final String SYSTEM_EXTENSION = ".curva";
 
     public static Map<String, List<UserDocument>> prepareDocumentsListMap(List<UserDocument> allDocuments) {
         List<UserDocument> privateDocuments = new ArrayList<>();
@@ -35,26 +39,31 @@ public class DocumentUtil {
         return userDocumentsListMap;
     }
 
-    public static UserDocument createUserDocument(MultipartFile multipartFile, String description, User user)
-            throws IOException {
+    public static UserDocument createUserDocument(MultipartFile multipartFile,
+                                                  String location,
+                                                  String description,
+                                                  User user) throws IOException {
+
         UserDocument document = new UserDocument();
         document.setName(multipartFile.getOriginalFilename());
+        document.setLocation(location);
         document.setDescription(description);
         document.setLastModifyTime(Calendar.getInstance().getTime());
         document.setType(multipartFile.getContentType());
         document.setSize(calculateSize(multipartFile.getSize()));
-        document.setContent(multipartFile.getBytes());
         document.setOwner(user);
         document.setDocumentAttribute(DocumentAttribute.PRIVATE);
         return document;
     }
 
-    public static UserDocument updateUserDocument(UserDocument document, MultipartFile multipartFile, String description)
-            throws IOException {
+    public static UserDocument updateUserDocument(UserDocument document,
+                                                  MultipartFile multipartFile,
+                                                  String location,
+                                                  String description) throws IOException {
+
         document.setDescription(description);
         document.setLastModifyTime(Calendar.getInstance().getTime());
         document.setSize(calculateSize(multipartFile.getSize()));
-        document.setContent(multipartFile.getBytes());
         return document;
     }
 
@@ -74,5 +83,13 @@ public class DocumentUtil {
         removedDocument.setRemovalDate(Calendar.getInstance().getTime());
         removedDocument.setUserDocument(document);
         return removedDocument;
+    }
+
+    public static String createHashName(long ownerId, long docId) {
+        return DocumentNameDigest.hashName("" + ownerId + docId);
+    }
+
+    public static File createEmptyFile(String fileName) {
+        return new File(ROOT_LOCATION + "\\" + fileName + SYSTEM_EXTENSION);
     }
 }
