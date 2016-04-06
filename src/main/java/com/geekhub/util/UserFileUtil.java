@@ -124,4 +124,12 @@ public class UserFileUtil {
             file.mkdir();
         }
     }
+
+    public static Map<String, Object> createPropertiesMap(User owner, String parentDirectoryHash, String name) {
+        Map<String, Object> propertiesMap = new HashMap<>();
+        propertiesMap.put("owner", owner);
+        propertiesMap.put("parentDirectoryHash", parentDirectoryHash);
+        propertiesMap.put("name", name);
+        return propertiesMap;
+    }
 }

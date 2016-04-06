@@ -127,6 +127,12 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public List<User> getAllFriends(Long userId) {
+        User owner = userDao.getById(userId);
+        return owner.getFriends().stream().collect(Collectors.toList());
+    }
+
+    @Override
     public List<FriendsGroup> getGroupsByOwnerAndFriend(Long ownerId, User friend) {
         User owner = userDao.getById(ownerId);
         return friendsGroupService.getByOwnerAndFriend(owner, friend);

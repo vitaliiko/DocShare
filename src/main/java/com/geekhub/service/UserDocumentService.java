@@ -1,6 +1,7 @@
 package com.geekhub.service;
 
 import com.geekhub.entity.Comment;
+import com.geekhub.entity.FriendsGroup;
 import com.geekhub.entity.User;
 import com.geekhub.entity.UserDocument;
 import java.util.Set;
@@ -26,4 +27,8 @@ public interface UserDocumentService extends EntityService<UserDocument, Long> {
     UserDocument getByFullNameAndOwnerId(User owner, String parentDirectoryHash, String name);
 
     UserDocument getDocumentWithComments(Long docId);
+
+    Set<User> getReaders(Long docId);
+
+    Set<FriendsGroup> getReadersGroup(Long docId);
 }

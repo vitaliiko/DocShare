@@ -26,6 +26,8 @@ public interface UserService extends EntityService<User, Long> {
 
     List<FriendsGroup> getAllFriendsGroups(Long ownerId);
 
+    List<User> getAllFriends(Long userId);
+
     List<FriendsGroup> getGroupsByOwnerAndFriend(Long ownerId, User friend);
 
     void addFriend(Long userId, Long friendId);

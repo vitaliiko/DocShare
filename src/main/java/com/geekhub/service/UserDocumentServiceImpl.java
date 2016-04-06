@@ -1,12 +1,14 @@
 package com.geekhub.service;
 
 import com.geekhub.dao.UserDocumentDao;
+import com.geekhub.entity.FriendsGroup;
 import com.geekhub.entity.RemovedDocument;
 import com.geekhub.entity.User;
 import com.geekhub.entity.UserDocument;
 import com.geekhub.util.UserFileUtil;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -112,10 +114,7 @@ public class UserDocumentServiceImpl implements UserDocumentService {
 
     @Override
     public UserDocument getByFullNameAndOwnerId(User owner, String parentDirectoryHash, String name) {
-        Map<String, Object> propertiesMap = new HashMap<>();
-        propertiesMap.put("owner", owner);
-        propertiesMap.put("parentDirectoryHash", parentDirectoryHash);
-        propertiesMap.put("name", name);
+        Map<String, Object> propertiesMap = UserFileUtil.createPropertiesMap(owner, parentDirectoryHash, name);
         return userDocumentDao.get(propertiesMap);
     }
 
@@ -124,5 +123,19 @@ public class UserDocumentServiceImpl implements UserDocumentService {
         UserDocument document = userDocumentDao.getById(docId);
         Hibernate.initialize(document.getComments());
         return document;
+    }
+
+    @Override
+    public Set<User> getReaders(Long docId) {
+        UserDocument document = getById(docId);
+        Hibernate.initialize(document.getReaders());
+        return document.getReaders();
+    }
+
+    @Override
+    public Set<FriendsGroup> getReadersGroup(Long docId) {
+        UserDocument document = getById(docId);
+        Hibernate.initialize(document.getReadersGroups());
+        return document.getReadersGroups();
     }
 }

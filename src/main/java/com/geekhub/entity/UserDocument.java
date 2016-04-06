@@ -1,17 +1,13 @@
 package com.geekhub.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.geekhub.enums.DocumentAttribute;
 
-import java.io.Serializable;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
@@ -57,6 +53,18 @@ public class UserDocument extends UserFile implements Comparable<UserDocument> {
             }
     )
     private Set<User> readers = new HashSet<>();
+
+    @JsonIgnore
+    @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
+    @JoinTable(name = "friendsGroupToDocumentRelation",
+            joinColumns = {
+                    @JoinColumn(name = "userdocument_id")
+            },
+            inverseJoinColumns = {
+                    @JoinColumn(name = "readergroup_id")
+            }
+    )
+    private Set<FriendsGroup> readersGroups = new HashSet<>();
 
     @JsonIgnore
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
@@ -125,6 +133,14 @@ public class UserDocument extends UserFile implements Comparable<UserDocument> {
 
     public void setComments(Set<Comment> comments) {
         this.comments = comments;
+    }
+
+    public Set<FriendsGroup> getReadersGroups() {
+        return readersGroups;
+    }
+
+    public void setReadersGroups(Set<FriendsGroup> readersGroups) {
+        this.readersGroups = readersGroups;
     }
 
     @Override

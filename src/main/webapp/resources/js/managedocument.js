@@ -133,4 +133,37 @@ $(document).ready(function() {
             }
         });
     });
+
+    $('.share-doc-btn').click(function() {
+        clearModalWindow();
+        var docId = $(this).val();
+        $.getJSON('/document/get_document', {docId: docId}, function(document) {
+            documentId = document.id;
+            var readers = [];
+            var readersGroup = [];
+            $.each(document.readers, function (k, v) {
+                readers.push(v.id);
+            });
+            $.each(document.readersGroup, function (k, v) {
+                readersGroup.push(v.id);
+            });
+            $('.group-check-dox').each(function (k, v) {
+                var isChecked = $.inArray(parseInt(v.value), readersGroup) != -1;
+                $(this).prop('checked', isChecked);
+            });
+            $('.friend-check-dox').each(function (k, v) {
+                var isChecked = $.inArray(parseInt(v.value), readers) != -1;
+                $(this).prop('checked', isChecked);
+            });
+            $('#doc-name').text(document.name);
+        });
+    });
+
+    $('#shareDocument').click();
+
+    function clearModalWindow() {
+        $('.check-box').each(function() {
+            $(this).prop('checked', false);
+        });
+    }
 });

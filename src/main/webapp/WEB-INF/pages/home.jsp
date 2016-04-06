@@ -51,11 +51,12 @@
                 <th id="file-name">File Name</th>
                 <th>Size</th>
                 <th>Changed</th>
-                <th width="80"></th>
+                <th width="15"></th>
+                <th width="15"></th>
             </tr>
         <c:forEach items="${documentsEntry.value}" var="doc" varStatus="counter">
             <tr class="tr-doc${doc.id}">
-                <td class="document-num">
+                <td class="document-num" width="20">
                     <input type="checkbox" class="check-box select-doc big-check-box" value="${doc.id}"/>
                 </td>
                 <td class="document-name">
@@ -65,8 +66,10 @@
                 <td class="document-date">
                     <fmt:formatDate type="date" timeStyle="short" dateStyle="short" value="${doc.lastModifyTime}"/>
                 </td>
-                <td><a href="<c:url value='/document/download-${doc.id}' />"
-                       class="btn btn-success custom-width">Download</a></td>
+                <td width="15"><a href="<c:url value='/document/download-${doc.id}' />"
+                       class="btn btn-default btn-sm custom-width">Download</a></td>
+                <td width="15"><button type="button" class="btn btn-default btn-sm share-doc-btn"
+                            data-toggle="modal" data-target="#shareDialog" value="${doc.id}">Share</button></td>
             </tr>
         </c:forEach>
         </table>
@@ -87,6 +90,47 @@
             <div class="modal-footer">
                 <button type="button" id="deleteDocument" class="btn btn-success" data-dismiss="modal">YES</button>
                 <button type="button" class="btn btn-danger" data-dismiss="modal">NO</button>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<div id="shareDialog" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Share documents</h4>
+                <p id="doc-name"></p>
+            </div>
+
+            <div class="modal-body">
+                <div class="checkbox" id="friends-list">
+                    <c:forEach var="group" items="${friendsGroups}">
+                        <div class="group-${group.id}">
+                            <label>
+                                <input type="checkbox" class="check-box group-check-dox" value="${group.id}">
+                                    ${group.name}
+                            </label>
+                            <br>
+                        </div>
+                    </c:forEach>
+                    <c:forEach var="friend" items="${friends}">
+                        <div class="group-${friend.id}">
+                            <label>
+                                <input type="checkbox" class="check-box friend-check-dox" value="${friend.id}">
+                                    ${friend.firstName} ${friend.lastName}
+                            </label>
+                            <br>
+                        </div>
+                    </c:forEach>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" id="shareDocument" class="btn btn-default" data-dismiss="modal">SHARE</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
             </div>
         </div>
 

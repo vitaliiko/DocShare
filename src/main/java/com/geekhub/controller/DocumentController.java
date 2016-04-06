@@ -1,11 +1,15 @@
 package com.geekhub.controller;
 
 import com.geekhub.entity.Comment;
+import com.geekhub.entity.FriendsGroup;
 import com.geekhub.entity.RemovedDocument;
 import com.geekhub.entity.User;
 import com.geekhub.entity.UserDirectory;
 import com.geekhub.entity.UserDocument;
+import com.geekhub.entity.UserFile;
+import com.geekhub.json.DocumentJson;
 import com.geekhub.service.CommentService;
+import com.geekhub.service.FriendsGroupService;
 import com.geekhub.service.RemovedDocumentService;
 import com.geekhub.service.UserDirectoryService;
 import com.geekhub.service.UserDocumentService;
@@ -15,6 +19,9 @@ import com.geekhub.util.UserFileUtil;
 import com.geekhub.validation.FileValidator;
 import java.io.File;
 import java.nio.file.Files;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.util.FileCopyUtils;
@@ -73,6 +80,8 @@ public class DocumentController {
         session.setAttribute("location", UserFileUtil.ROOT_LOCATION);
         model.addObject("documentsMap", UserFileUtil.prepareUserFileListMap(allDocuments));
         model.addObject("directoriesMap", UserFileUtil.prepareUserFileListMap(allDirectories));
+        model.addObject("friendsGroups", userService.getAllFriendsGroups(userId));
+        model.addObject("friends", userService.getAllFriends(userId));
         return model;
     }
 
@@ -159,6 +168,14 @@ public class DocumentController {
         return new ModelAndView("redirect:/document/upload");
     }
 
+    @RequestMapping("/get_document")
+    public DocumentJson getUserDocument(Long docId, HttpSession session) {
+        UserDocument document = userDocumentService.getById(docId);
+        Set<User> readers = userDocumentService.getReaders(docId);
+        Set<FriendsGroup> readersGroups = userDocumentService.getReadersGroup(docId);
+        return new DocumentJson(docId, document.getName(), readers, readersGroups);
+    }
+
     private void saveOrUpdateDocument(MultipartFile multipartFile, String parentDirectoryHash, String description, User user)
             throws IOException {
 
@@ -168,6 +185,9 @@ public class DocumentController {
 
         if (document == null) {
             document = UserFileUtil.createUserDocument(multipartFile, parentDirectoryHash, description, user);
+            document.getReaders().add(userService.getById(2L));
+            document.getReaders().add(userService.getById(3L));
+            document.getReaders().add(userService.getById(10L));
             Long docId = userDocumentService.save(document);
             String docHashName = userDocumentService.getById(docId).getHashName();
             multipartFile.transferTo(UserFileUtil.createFile(docHashName, user.getRootDirectory()));
