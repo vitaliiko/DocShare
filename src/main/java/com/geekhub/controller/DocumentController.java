@@ -1,6 +1,7 @@
 package com.geekhub.controller;
 
 import com.geekhub.entity.Comment;
+import com.geekhub.entity.DocumentOldVersion;
 import com.geekhub.entity.FriendsGroup;
 import com.geekhub.entity.RemovedDocument;
 import com.geekhub.entity.User;
@@ -9,12 +10,14 @@ import com.geekhub.entity.UserDocument;
 import com.geekhub.json.DocumentJson;
 import com.geekhub.json.SharedJson;
 import com.geekhub.service.CommentService;
+import com.geekhub.service.DocumentOldVersionService;
 import com.geekhub.service.FriendsGroupService;
 import com.geekhub.service.RemovedDocumentService;
 import com.geekhub.service.UserDirectoryService;
 import com.geekhub.service.UserDocumentService;
 import com.geekhub.service.UserService;
 import com.geekhub.util.CommentUtil;
+import com.geekhub.util.DocumentVersionUtil;
 import com.geekhub.util.UserFileUtil;
 import com.geekhub.validation.FileValidator;
 import java.io.File;
@@ -66,6 +69,9 @@ public class DocumentController {
 
     @Autowired
     private FriendsGroupService friendsGroupService;
+
+    @Autowired
+    private DocumentOldVersionService documentOldVersionService;
 
     @InitBinder("multipartFile")
     protected void initBinder(WebDataBinder binder) {
@@ -208,7 +214,10 @@ public class DocumentController {
             String docHashName = userDocumentService.getById(docId).getHashName();
             multipartFile.transferTo(UserFileUtil.createFile(docHashName, user.getRootDirectory()));
         } else {
+            document = userDocumentService.getDocumentWithOldVersions(document.getId());
+            DocumentOldVersion oldVersion = DocumentVersionUtil.saveOldVersion(document, "Changed by " + user.toString());
             userDocumentService.update(UserFileUtil.updateUserDocument(document, multipartFile, description));
+            documentOldVersionService.save(oldVersion);
             multipartFile.transferTo(UserFileUtil.createFile(document.getHashName(), user.getRootDirectory()));
         }
     }

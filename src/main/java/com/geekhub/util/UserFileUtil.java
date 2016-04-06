@@ -8,6 +8,7 @@ import com.geekhub.entity.UserFile;
 import com.geekhub.enums.DocumentAttribute;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
@@ -99,6 +100,12 @@ public class UserFileUtil {
 
     public static String createHashName(long ownerId, long docId) {
         return DocumentNameDigest.hashName("" + ownerId + docId);
+    }
+
+    public static String createHashName(long... parameters) {
+        StringBuilder preparedHashName = new StringBuilder("");
+        Arrays.stream(parameters).forEach(preparedHashName::append);
+        return DocumentNameDigest.hashName(preparedHashName.toString());
     }
 
     public static File createFile(String fileName, String rootUserDirectory) {

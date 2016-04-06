@@ -1,6 +1,7 @@
 package com.geekhub.service;
 
 import com.geekhub.dao.UserDocumentDao;
+import com.geekhub.entity.DocumentOldVersion;
 import com.geekhub.entity.FriendsGroup;
 import com.geekhub.entity.RemovedDocument;
 import com.geekhub.entity.User;
@@ -126,6 +127,13 @@ public class UserDocumentServiceImpl implements UserDocumentService {
     }
 
     @Override
+    public UserDocument getDocumentWithOldVersions(Long docId) {
+        UserDocument document = userDocumentDao.getById(docId);
+        Hibernate.initialize(document.getDocumentOldVersions());
+        return document;
+    }
+
+    @Override
     public Set<User> getReaders(Long docId) {
         UserDocument document = getById(docId);
         Hibernate.initialize(document.getReaders());
@@ -145,5 +153,12 @@ public class UserDocumentServiceImpl implements UserDocumentService {
         Hibernate.initialize(document.getReadersGroups());
         Hibernate.initialize(document.getReaders());
         return document;
+    }
+
+    @Override
+    public Set<DocumentOldVersion> getOldVersions(Long docId) {
+        UserDocument document = getById(docId);
+        Hibernate.initialize(document.getDocumentOldVersions());
+        return document.getDocumentOldVersions();
     }
 }

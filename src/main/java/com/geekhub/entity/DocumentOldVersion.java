@@ -17,11 +17,17 @@ public class DocumentOldVersion {
     private Long id;
 
     @OneToOne
-    @JoinColumn(name = "document_id")
+    @JoinColumn(name = "userdocument_id")
     private UserDocument userDocument;
 
     @Column
-    private Integer version;
+    private String hashName;
+
+    @Column
+    private long version;
+
+    @Column
+    private String description;
 
     public Long getId() {
         return id;
@@ -39,12 +45,28 @@ public class DocumentOldVersion {
         this.userDocument = userDocument;
     }
 
-    public Integer getVersion() {
+    public long getVersion() {
         return version;
     }
 
-    public void setVersion(Integer version) {
+    public void setVersion(long version) {
         this.version = version;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public String getHashName() {
+        return hashName;
+    }
+
+    public void setHashName(String hashName) {
+        this.hashName = hashName;
     }
 
     @Override
@@ -54,9 +76,10 @@ public class DocumentOldVersion {
 
         DocumentOldVersion that = (DocumentOldVersion) o;
 
+        if (version != that.version) return false;
         if (id != null ? !id.equals(that.id) : that.id != null) return false;
         if (userDocument != null ? !userDocument.equals(that.userDocument) : that.userDocument != null) return false;
-        return version != null ? version.equals(that.version) : that.version == null;
+        return description != null ? description.equals(that.description) : that.description == null;
 
     }
 
@@ -64,7 +87,8 @@ public class DocumentOldVersion {
     public int hashCode() {
         int result = id != null ? id.hashCode() : 0;
         result = 31 * result + (userDocument != null ? userDocument.hashCode() : 0);
-        result = 31 * result + (version != null ? version.hashCode() : 0);
+        result = 31 * result + (int) (version ^ (version >>> 32));
+        result = 31 * result + (description != null ? description.hashCode() : 0);
         return result;
     }
 }

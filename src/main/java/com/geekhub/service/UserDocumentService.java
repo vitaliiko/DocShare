@@ -1,6 +1,7 @@
 package com.geekhub.service;
 
 import com.geekhub.entity.Comment;
+import com.geekhub.entity.DocumentOldVersion;
 import com.geekhub.entity.FriendsGroup;
 import com.geekhub.entity.User;
 import com.geekhub.entity.UserDocument;
@@ -30,7 +31,11 @@ public interface UserDocumentService extends EntityService<UserDocument, Long> {
 
     UserDocument getDocumentWithReaders(Long docId);
 
+    UserDocument getDocumentWithOldVersions(Long docId);
+
     Set<User> getReaders(Long docId);
 
     Set<FriendsGroup> getReadersGroup(Long docId);
+
+    Set<DocumentOldVersion> getOldVersions(Long docId);
 }

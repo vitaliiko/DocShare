@@ -78,11 +78,6 @@ public class User {
     @JoinColumn(name = "owner_id")
     private Set<RemovedDirectory> removedDirectories = new HashSet<>();
 
-    @JsonIgnore
-    @OneToMany(cascade = CascadeType.ALL)
-    @JoinColumn(name = "owner_id")
-    private Set<DocumentOldVersion> documentOldVersions = new HashSet<>();
-
     @Column
     private String rootDirectory;
 
@@ -197,14 +192,6 @@ public class User {
 
     public void setRootDirectory(String rootDirectory) {
         this.rootDirectory = rootDirectory;
-    }
-
-    public Set<DocumentOldVersion> getDocumentOldVersions() {
-        return documentOldVersions;
-    }
-
-    public void setDocumentOldVersions(Set<DocumentOldVersion> documentOldVersions) {
-        this.documentOldVersions = documentOldVersions;
     }
 
     @Override

@@ -71,6 +71,11 @@ public class UserDocument extends UserFile implements Comparable<UserDocument> {
     @JoinColumn(name = "doc_id")
     private Set<Comment> comments = new HashSet<>();
 
+    @JsonIgnore
+    @OneToMany(cascade = CascadeType.ALL)
+    @JoinColumn(name = "userdocument_id")
+    private Set<DocumentOldVersion> documentOldVersions = new HashSet<>();
+
     public Long getId() {
         return id;
     }
@@ -141,6 +146,14 @@ public class UserDocument extends UserFile implements Comparable<UserDocument> {
 
     public void setReadersGroups(Set<FriendsGroup> readersGroups) {
         this.readersGroups = readersGroups;
+    }
+
+    public Set<DocumentOldVersion> getDocumentOldVersions() {
+        return documentOldVersions;
+    }
+
+    public void setDocumentOldVersions(Set<DocumentOldVersion> documentOldVersions) {
+        this.documentOldVersions = documentOldVersions;
     }
 
     @Override
