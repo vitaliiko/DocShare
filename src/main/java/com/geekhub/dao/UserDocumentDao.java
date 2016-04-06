@@ -87,9 +87,10 @@ public class UserDocumentDao implements EntityDao<UserDocument, Long> {
     }
 
     public List<UserDocument> getList(Map<String, Object> propertiesMap) {
-        Criteria criteria = sessionFactory.getCurrentSession().createCriteria(clazz);
-        propertiesMap.forEach((prop, val) -> criteria.add(Restrictions.eq(prop, val)));
-        return (List<UserDocument>) criteria.list();
+        return (List<UserDocument>) sessionFactory.getCurrentSession()
+                .createCriteria(clazz)
+                .add(Restrictions.allEq(propertiesMap))
+                .uniqueResult();
     }
 
     public UserDocument get(User owner, String propertyName, Object value) {
@@ -101,8 +102,9 @@ public class UserDocumentDao implements EntityDao<UserDocument, Long> {
     }
 
     public UserDocument get(Map<String, Object> propertiesMap) {
-        Criteria criteria = sessionFactory.getCurrentSession().createCriteria(clazz);
-        propertiesMap.forEach((prop, val) -> criteria.add(Restrictions.eq(prop, val)));
-        return (UserDocument) criteria.uniqueResult();
+        return (UserDocument) sessionFactory.getCurrentSession()
+                .createCriteria(clazz)
+                .add(Restrictions.allEq(propertiesMap))
+                .uniqueResult();
     }
 }

@@ -3,6 +3,7 @@ package com.geekhub.provider;
 import com.geekhub.entity.FriendsGroup;
 import com.geekhub.entity.User;
 import com.geekhub.entity.UserDirectory;
+import com.geekhub.enums.DocumentAttribute;
 import com.geekhub.exception.UserValidateException;
 import com.geekhub.service.FriendsGroupService;
 import com.geekhub.service.UserDirectoryService;
@@ -88,6 +89,7 @@ public class UserProvider {
 
     private String createUserDir(User user) {
         UserDirectory directory = UserFileUtil.createUserDirectory(user, UserFileUtil.ROOT_DIRECTORY_HASH, user.getLogin());
+        directory.setDocumentAttribute(DocumentAttribute.ROOT);
         Long dirId = userDirectoryService.save(directory);
         directory = userDirectoryService.getById(dirId);
         UserFileUtil.createDirInFileSystem(directory);

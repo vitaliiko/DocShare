@@ -4,10 +4,10 @@ $(document).ready(function() {
     var files;
     var docIds = [];
     var tableRows = [];
-    var allTable = $('#allDocumentsTable');
-    var privateTable = $('#privateDocumentsTable');
-    var publicTable = $('#publicDocumentsTable');
-    var forFriendsTable = $('#forFriendsDocumentsTable');
+    var allTable = $('.allDocumentsTable');
+    var privateTable = $('.privateDocumentsTable');
+    var publicTable = $('.publicDocumentsTable');
+    var forFriendsTable = $('.forFriendsDocumentsTable');
 
     function changeTab() {
         publicTable.hide(true);

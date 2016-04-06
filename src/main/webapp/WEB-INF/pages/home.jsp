@@ -31,8 +31,8 @@
 </div>
 
 <div class="container" style="width: 900px;">
-    <c:forEach items="${documentsMap}" var="documentsEntry">
-        <table class="table table-hover tbody tr:hover td" id="${documentsEntry.key}">
+    <c:forEach items="${directoriesMap}" var="directoryEntry">
+        <table class="table table-hover tbody tr:hover td ${directoryEntry.key}">
             <caption>
                 <h3>List of Documents</h3>
                 <a href="#" class="all-href">All &nbsp</a>
@@ -48,15 +48,37 @@
             </caption>
             <tr>
                 <th><input type="checkbox" class="check-box big-check-box select-all"/></th>
+                <th id="dir-name">Directory Name</th>
+                <th width="15"></th>
+            </tr>
+            <c:forEach items="${directoryEntry.value}" var="doc" varStatus="counter">
+                <tr class="tr-doc${doc.id}">
+                    <td width="20">
+                        <input type="checkbox" class="check-box select-doc big-check-box" value="${doc.id}"/>
+                    </td>
+                    <td class="directory-name">
+                        <a href="#">${doc.name}</a>
+                    </td>
+                    <td width="15"><button type="button" class="btn btn-default btn-sm share-dir-btn"
+                                           data-toggle="modal" data-target="#shareDialog" value="${doc.id}">Share</button></td>
+                </tr>
+            </c:forEach>
+        </table>
+    </c:forEach>
+    <br><br>
+    <c:forEach items="${documentsMap}" var="documentEntry">
+        <table class="table table-hover tbody tr:hover td ${documentEntry.key}">
+            <tr>
+                <th><input type="checkbox" class="check-box big-check-box select-all"/></th>
                 <th id="file-name">File Name</th>
                 <th>Size</th>
                 <th>Changed</th>
                 <th width="15"></th>
                 <th width="15"></th>
             </tr>
-        <c:forEach items="${documentsEntry.value}" var="doc" varStatus="counter">
+        <c:forEach items="${documentEntry.value}" var="doc" varStatus="counter">
             <tr class="tr-doc${doc.id}">
-                <td class="document-num" width="20">
+                <td width="20">
                     <input type="checkbox" class="check-box select-doc big-check-box" value="${doc.id}"/>
                 </td>
                 <td class="document-name">

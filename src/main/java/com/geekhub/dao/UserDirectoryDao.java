@@ -2,12 +2,14 @@ package com.geekhub.dao;
 
 import com.geekhub.entity.User;
 import com.geekhub.entity.UserDirectory;
+import com.geekhub.enums.DocumentAttribute;
 import java.util.List;
 import java.util.Map;
 import org.hibernate.Criteria;
 import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
+import org.hibernate.criterion.SimpleExpression;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -19,11 +21,13 @@ public class UserDirectoryDao implements EntityDao<UserDirectory, Long> {
     private SessionFactory sessionFactory;
 
     private Class<UserDirectory> clazz = UserDirectory.class;
+    private SimpleExpression notRoot = Restrictions.ne("documentAttribute", DocumentAttribute.ROOT);
 
     @Override
     public List<UserDirectory> getAll(String orderParameter) {
         return sessionFactory.getCurrentSession()
                 .createCriteria(clazz)
+                .add(notRoot)
                 .addOrder(Order.asc(orderParameter))
                 .list();
     }
@@ -71,6 +75,7 @@ public class UserDirectoryDao implements EntityDao<UserDirectory, Long> {
         return sessionFactory.getCurrentSession()
                 .createCriteria(clazz)
                 .add(Restrictions.eq(propertyName, value))
+                .add(notRoot)
                 .list();
     }
 
@@ -79,6 +84,7 @@ public class UserDirectoryDao implements EntityDao<UserDirectory, Long> {
                 .createCriteria(clazz)
                 .add(Restrictions.eq("owner", owner))
                 .add(Restrictions.eq(propertyName, value))
+                .add(notRoot)
                 .list();
     }
 
@@ -87,12 +93,15 @@ public class UserDirectoryDao implements EntityDao<UserDirectory, Long> {
                 .createCriteria(clazz)
                 .add(Restrictions.eq("owner", owner))
                 .add(Restrictions.eq(propertyName, value))
+                .add(notRoot)
                 .uniqueResult();
     }
 
     public UserDirectory get(Map<String, Object> propertiesMap) {
-        Criteria criteria = sessionFactory.getCurrentSession().createCriteria(clazz);
-        propertiesMap.forEach((prop, val) -> criteria.add(Restrictions.eq(prop, val)));
-        return (UserDirectory) criteria.uniqueResult();
+        return (UserDirectory) sessionFactory.getCurrentSession()
+                .createCriteria(clazz)
+                .add(Restrictions.allEq(propertiesMap))
+                .add(notRoot)
+                .uniqueResult();
     }
 }
