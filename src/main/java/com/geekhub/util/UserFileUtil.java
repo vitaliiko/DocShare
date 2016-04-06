@@ -12,7 +12,9 @@ import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
+import java.util.TreeSet;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -24,10 +26,11 @@ public class UserFileUtil {
     public static final String SYSTEM_EXTENSION = ".curva";
     public static final String ROOT_DIRECTORY_HASH = createHashName(0L, 0L);
 
-    public static <T extends UserFile> Map<String, List<T>> prepareUserFileListMap(List<T> allDocuments) {
-        List<T> privateDocuments = new ArrayList<>();
-        List<T> publicDocuments = new ArrayList<>();
-        List<T> forFriendsDocuments = new ArrayList<>();
+    public static <T extends UserFile> Map<String, Set<T>> prepareUserFileListMap(List<T> allDocumentsList) {
+        Set<T> allDocuments = new TreeSet<>(allDocumentsList);
+        Set<T> privateDocuments = new TreeSet<>();
+        Set<T> publicDocuments = new TreeSet<>();
+        Set<T> forFriendsDocuments = new TreeSet<>();
         allDocuments.forEach(doc -> {
             if (doc.getDocumentAttribute() == DocumentAttribute.PRIVATE) {
                 privateDocuments.add(doc);
@@ -39,7 +42,7 @@ public class UserFileUtil {
                 forFriendsDocuments.add(doc);
             }
         });
-        Map<String, List<T>> userDocumentsListMap = new HashMap<>();
+        Map<String, Set<T>> userDocumentsListMap = new HashMap<>();
         userDocumentsListMap.put("allDocumentsTable", allDocuments);
         userDocumentsListMap.put("privateDocumentsTable", privateDocuments);
         userDocumentsListMap.put("publicDocumentsTable", publicDocuments);

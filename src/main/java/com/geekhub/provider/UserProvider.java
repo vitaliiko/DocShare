@@ -87,7 +87,7 @@ public class UserProvider {
     }
 
     private String createUserDir(User user) {
-        UserDirectory directory = UserFileUtil.createUserDirectory(user.getLogin(), UserFileUtil.ROOT_DIRECTORY_HASH, user);
+        UserDirectory directory = UserFileUtil.createUserDirectory(user, UserFileUtil.ROOT_DIRECTORY_HASH, user.getLogin());
         Long dirId = userDirectoryService.save(directory);
         directory = userDirectoryService.getById(dirId);
         UserFileUtil.createDirInFileSystem(directory);

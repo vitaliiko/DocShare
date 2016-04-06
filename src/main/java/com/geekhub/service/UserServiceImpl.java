@@ -62,7 +62,7 @@ public class UserServiceImpl implements UserService {
             User user = new User(firstName, lastName, password, login);
             user.setId(userDao.save(user));
             UserDirectory directory =
-                    UserFileUtil.createUserDirectory(user.getLogin(), UserFileUtil.ROOT_DIRECTORY_HASH, user);
+                    UserFileUtil.createUserDirectory(user, UserFileUtil.ROOT_DIRECTORY_HASH, user.getLogin());
             Long dirId = userDirectoryService.save(directory);
             directory = userDirectoryService.getById(dirId);
             UserFileUtil.createDirInFileSystem(directory);

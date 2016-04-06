@@ -23,7 +23,7 @@ import javax.persistence.Table;
 
 @Entity
 @Table
-public class UserDocument extends UserFile {
+public class UserDocument extends UserFile implements Comparable<UserDocument> {
 
     @Id
     @GeneratedValue
@@ -158,5 +158,10 @@ public class UserDocument extends UserFile {
         result = 31 * result + (readers != null ? readers.hashCode() : 0);
         result = 31 * result + (comments != null ? comments.hashCode() : 0);
         return result;
+    }
+
+    @Override
+    public int compareTo(UserDocument o) {
+        return this.getName().compareTo(o.getName());
     }
 }

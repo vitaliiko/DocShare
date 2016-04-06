@@ -19,7 +19,7 @@ import javax.persistence.Table;
 
 @Entity
 @Table
-public class UserDirectory extends UserFile {
+public class UserDirectory extends UserFile implements Comparable<UserDirectory> {
 
     @Id
     @GeneratedValue
@@ -99,5 +99,10 @@ public class UserDirectory extends UserFile {
         result = 31 * result + (owner != null ? owner.hashCode() : 0);
         result = 31 * result + (readers != null ? readers.hashCode() : 0);
         return result;
+    }
+
+    @Override
+    public int compareTo(UserDirectory o) {
+        return this.getName().compareTo(o.getName());
     }
 }
