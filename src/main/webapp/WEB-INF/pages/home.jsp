@@ -34,7 +34,9 @@
     <c:forEach items="${directoriesMap}" var="directoryEntry">
         <table class="table table-hover tbody tr:hover td ${directoryEntry.key}">
             <caption>
-                <h3>List of Documents</h3>
+                <button type="button" class="btn btn-default" data-toggle="modal" data-target="#makeDirDialog"
+                        name="makeDirButton">Make dir</button>
+                <h3></h3>
                 <a href="#" class="all-href">All &nbsp</a>
                 <a href="#" class="public-href">Public &nbsp</a>
                 <a href="#" class="for-friends-href">For Friends &nbsp</a>
@@ -112,6 +114,28 @@
             <div class="modal-footer">
                 <button type="button" id="deleteDocument" class="btn btn-success" data-dismiss="modal">YES</button>
                 <button type="button" class="btn btn-danger" data-dismiss="modal">NO</button>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<div id="makeDirDialog" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Removing</h4>
+            </div>
+            <div class="modal-body">
+                <p id="group-action">Input directory name</p>
+                <input type="text" id="directoryName" class="form-control group-name-input"
+                       placeholder="Directory Name" autofocus="">
+            </div>
+            <div class="modal-footer">
+                <button type="button" id="makeDir" class="btn btn-default" data-dismiss="modal">Make dir</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
             </div>
         </div>
 

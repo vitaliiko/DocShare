@@ -184,4 +184,15 @@ $(document).ready(function() {
             $(this).prop('checked', false);
         });
     }
+
+    $('#makeDir').click(function() {
+        var dirName = $('#directoryName').val();
+        $.ajax({
+            url: '/document/make-directory',
+            data: {dirName: dirName},
+            success: function () {
+                location.reload();
+            }
+        });
+    });
 });
