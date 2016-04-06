@@ -61,7 +61,7 @@ public class UserDocument extends UserFile implements Comparable<UserDocument> {
                     @JoinColumn(name = "userdocument_id")
             },
             inverseJoinColumns = {
-                    @JoinColumn(name = "readergroup_id")
+                    @JoinColumn(name = "readersgroup_id")
             }
     )
     private Set<FriendsGroup> readersGroups = new HashSet<>();

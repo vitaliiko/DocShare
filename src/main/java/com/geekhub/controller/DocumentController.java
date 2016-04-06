@@ -6,8 +6,8 @@ import com.geekhub.entity.RemovedDocument;
 import com.geekhub.entity.User;
 import com.geekhub.entity.UserDirectory;
 import com.geekhub.entity.UserDocument;
-import com.geekhub.entity.UserFile;
 import com.geekhub.json.DocumentJson;
+import com.geekhub.json.SharedJson;
 import com.geekhub.service.CommentService;
 import com.geekhub.service.FriendsGroupService;
 import com.geekhub.service.RemovedDocumentService;
@@ -19,8 +19,8 @@ import com.geekhub.util.UserFileUtil;
 import com.geekhub.validation.FileValidator;
 import java.io.File;
 import java.nio.file.Files;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Set;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -28,6 +28,7 @@ import org.springframework.util.FileCopyUtils;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -62,6 +63,9 @@ public class DocumentController {
 
     @Autowired
     private RemovedDocumentService removedDocumentService;
+
+    @Autowired
+    private FriendsGroupService friendsGroupService;
 
     @InitBinder("multipartFile")
     protected void initBinder(WebDataBinder binder) {
@@ -122,8 +126,10 @@ public class DocumentController {
     }
 
     @RequestMapping(value = "/upload", method = RequestMethod.POST)
-    public ModelAndView uploadDocument(@RequestParam("files[]") MultipartFile[] files, String description, HttpSession session)
-            throws IOException {
+    public ModelAndView uploadDocument(@RequestParam("files[]") MultipartFile[] files,
+                                       String description,
+                                       HttpSession session) throws IOException {
+
         Long userId = (Long) session.getAttribute("userId");
         String parentDirectoryHash = (String) session.getAttribute("parentDirectoryHash");
         User user = userService.getById(userId);
@@ -176,6 +182,19 @@ public class DocumentController {
         return new DocumentJson(docId, document.getName(), readers, readersGroups);
     }
 
+    @RequestMapping(value = "/share_document", method = RequestMethod.POST)
+    @ResponseStatus(HttpStatus.OK)
+    public void shareUserDocument(@RequestBody SharedJson shared, HttpSession session) {
+        UserDocument document = userDocumentService.getDocumentWithReaders(shared.getDocId());
+        Set<User> readersSet = new HashSet<>();
+        Arrays.stream(shared.getReaders()).forEach(id -> readersSet.add(userService.getById(id)));
+        document.setReaders(readersSet);
+        Set<FriendsGroup> readersGroupsSet = new HashSet<>();
+        Arrays.stream(shared.getReadersGroups()).forEach(id -> readersGroupsSet.add(friendsGroupService.getById(id)));
+        document.setReadersGroups(readersGroupsSet);
+        userDocumentService.update(document);
+    }
+
     private void saveOrUpdateDocument(MultipartFile multipartFile, String parentDirectoryHash, String description, User user)
             throws IOException {
 
@@ -185,9 +204,6 @@ public class DocumentController {
 
         if (document == null) {
             document = UserFileUtil.createUserDocument(multipartFile, parentDirectoryHash, description, user);
-            document.getReaders().add(userService.getById(2L));
-            document.getReaders().add(userService.getById(3L));
-            document.getReaders().add(userService.getById(10L));
             Long docId = userDocumentService.save(document);
             String docHashName = userDocumentService.getById(docId).getHashName();
             multipartFile.transferTo(UserFileUtil.createFile(docHashName, user.getRootDirectory()));

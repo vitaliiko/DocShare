@@ -111,7 +111,7 @@
                     <c:forEach var="group" items="${friendsGroups}">
                         <div class="group-${group.id}">
                             <label>
-                                <input type="checkbox" class="check-box group-check-dox" value="${group.id}">
+                                <input type="checkbox" class="check-box group-check-box" value="${group.id}">
                                     ${group.name}
                             </label>
                             <br>
@@ -120,7 +120,7 @@
                     <c:forEach var="friend" items="${friends}">
                         <div class="group-${friend.id}">
                             <label>
-                                <input type="checkbox" class="check-box friend-check-dox" value="${friend.id}">
+                                <input type="checkbox" class="check-box friend-check-box" value="${friend.id}">
                                     ${friend.firstName} ${friend.lastName}
                             </label>
                             <br>

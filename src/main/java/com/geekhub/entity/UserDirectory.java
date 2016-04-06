@@ -35,15 +35,27 @@ public class UserDirectory extends UserFile implements Comparable<UserDirectory>
 
     @JsonIgnore
     @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
-    @JoinTable(name = "userToDocumentRelation",
+    @JoinTable(name = "userToDirectoryRelation",
             joinColumns = {
-                    @JoinColumn(name = "userdocument_id")
+                    @JoinColumn(name = "userdirectory_id")
             },
             inverseJoinColumns = {
                     @JoinColumn(name = "reader_id")
             }
     )
     private Set<User> readers = new HashSet<>();
+
+    @JsonIgnore
+    @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
+    @JoinTable(name = "friendGroupToDirectoryRelation",
+            joinColumns = {
+                    @JoinColumn(name = "userdirectory_id")
+            },
+            inverseJoinColumns = {
+                    @JoinColumn(name = "readersgroup_id")
+            }
+    )
+    private Set<FriendsGroup> readersGroups = new HashSet<>();
 
     public Long getId() {
         return id;
@@ -75,6 +87,14 @@ public class UserDirectory extends UserFile implements Comparable<UserDirectory>
 
     public void setReaders(Set<User> readers) {
         this.readers = readers;
+    }
+
+    public Set<FriendsGroup> getReadersGroups() {
+        return readersGroups;
+    }
+
+    public void setReadersGroups(Set<FriendsGroup> readersGroups) {
+        this.readersGroups = readersGroups;
     }
 
     @Override

@@ -140,18 +140,18 @@ $(document).ready(function() {
         $.getJSON('/document/get_document', {docId: docId}, function(document) {
             documentId = document.id;
             var readers = [];
-            var readersGroup = [];
+            var readersGroups = [];
             $.each(document.readers, function (k, v) {
                 readers.push(v.id);
             });
             $.each(document.readersGroup, function (k, v) {
-                readersGroup.push(v.id);
+                readersGroups.push(v.id);
             });
-            $('.group-check-dox').each(function (k, v) {
-                var isChecked = $.inArray(parseInt(v.value), readersGroup) != -1;
+            $('.group-check-box').each(function (k, v) {
+                var isChecked = $.inArray(parseInt(v.value), readersGroups) != -1;
                 $(this).prop('checked', isChecked);
             });
-            $('.friend-check-dox').each(function (k, v) {
+            $('.friend-check-box').each(function (k, v) {
                 var isChecked = $.inArray(parseInt(v.value), readers) != -1;
                 $(this).prop('checked', isChecked);
             });
@@ -159,7 +159,25 @@ $(document).ready(function() {
         });
     });
 
-    $('#shareDocument').click();
+    $('#shareDocument').click(function() {
+        var readers = [];
+        var readersGroups = [];
+        $('.group-check-box:checked').each(function (k, v) {
+            readersGroups.push(v.value);
+        });
+        $('.friend-check-box:checked').each(function (k, v) {
+            readers.push(v.value);
+        });
+        $.ajax({
+            url: '/document/share_document',
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({docId: documentId, readers: readers, readersGroups: readersGroups}),
+            success: function () {
+                clearModalWindow();
+            }
+        });
+    });
 
     function clearModalWindow() {
         $('.check-box').each(function() {

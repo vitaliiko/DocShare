@@ -28,6 +28,8 @@ public interface UserDocumentService extends EntityService<UserDocument, Long> {
 
     UserDocument getDocumentWithComments(Long docId);
 
+    UserDocument getDocumentWithReaders(Long docId);
+
     Set<User> getReaders(Long docId);
 
     Set<FriendsGroup> getReadersGroup(Long docId);
