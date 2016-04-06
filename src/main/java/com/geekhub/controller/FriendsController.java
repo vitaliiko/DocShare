@@ -2,6 +2,7 @@ package com.geekhub.controller;
 
 import com.geekhub.entity.FriendsGroup;
 import com.geekhub.entity.User;
+import com.geekhub.json.FriendsGroupJson;
 import com.geekhub.service.FriendsGroupService;
 import com.geekhub.service.UserService;
 import com.geekhub.provider.UserProvider;
@@ -59,8 +60,10 @@ public class FriendsController {
     }
 
     @RequestMapping("/get_group")
-    public FriendsGroup getGroup(Long groupId, HttpSession session) throws HibernateException {
-        return friendsGroupService.getWithFriends(groupId);
+    public FriendsGroupJson getGroup(Long groupId, HttpSession session) throws HibernateException {
+        FriendsGroup group = friendsGroupService.getWithFriends(groupId);
+        User[] friends = group.getFriends().stream().toArray(User[]::new);
+        return new FriendsGroupJson(groupId, group.getName(), friends);
     }
 
     @RequestMapping("/get_friends")

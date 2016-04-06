@@ -31,6 +31,7 @@ public class FriendsGroup {
     @Column
     private String name;
 
+    @JsonIgnore
     @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
     @JoinTable(name = "userToGroupRelation",
             joinColumns = {
