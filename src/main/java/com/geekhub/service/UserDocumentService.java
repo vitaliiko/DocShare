@@ -38,4 +38,6 @@ public interface UserDocumentService extends EntityService<UserDocument, Long> {
     Set<FriendsGroup> getReadersGroup(Long docId);
 
     Set<DocumentOldVersion> getOldVersions(Long docId);
+
+    UserDocument getWithOldVersions(Long docId);
 }

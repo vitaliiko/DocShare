@@ -161,4 +161,9 @@ public class UserDocumentServiceImpl implements UserDocumentService {
         Hibernate.initialize(document.getDocumentOldVersions());
         return document.getDocumentOldVersions();
     }
+
+    @Override
+    public UserDocument getWithOldVersions(Long docId) {
+        return userDocumentDao.getWithOldVersions(docId);
+    }
 }

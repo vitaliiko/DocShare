@@ -9,6 +9,7 @@ import com.geekhub.entity.UserDirectory;
 import com.geekhub.entity.UserDocument;
 import com.geekhub.entity.enums.DocumentAttribute;
 import com.geekhub.json.DocumentJson;
+import com.geekhub.json.DocumentOldVersionDto;
 import com.geekhub.json.SharedJson;
 import com.geekhub.service.CommentService;
 import com.geekhub.service.DocumentOldVersionService;
@@ -19,10 +20,12 @@ import com.geekhub.service.UserDocumentService;
 import com.geekhub.service.UserService;
 import com.geekhub.util.CommentUtil;
 import com.geekhub.util.DocumentVersionUtil;
+import com.geekhub.util.EntityToDtoConverter;
 import com.geekhub.util.UserFileUtil;
 import com.geekhub.validation.FileValidator;
 import java.io.File;
 import java.nio.file.Files;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
@@ -208,6 +211,16 @@ public class DocumentController {
         document.setReadersGroups(readersGroupsSet);
 
         userDocumentService.update(document);
+    }
+
+    @RequestMapping("/history-{docId}")
+    public ModelAndView showHistory(@PathVariable Long docId, HttpSession session) {
+        UserDocument document = userDocumentService.getWithOldVersions(docId);
+        ModelAndView model = new ModelAndView("history");
+        List<DocumentOldVersionDto> versions = new ArrayList<>();
+        document.getDocumentOldVersions().forEach(v -> versions.add(EntityToDtoConverter.convert(v)));
+        model.addObject("versions", versions);
+        return model;
     }
 
     private void saveOrUpdateDocument(MultipartFile multipartFile, String parentDirectoryHash, String description, User user)

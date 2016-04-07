@@ -107,4 +107,10 @@ public class UserDocumentDao implements EntityDao<UserDocument, Long> {
                 .add(Restrictions.allEq(propertiesMap))
                 .uniqueResult();
     }
+
+    public UserDocument getWithOldVersions(Long docId) {
+        UserDocument document = getById(docId);
+        Hibernate.initialize(document.getDocumentOldVersions());
+        return document;
+    }
 }

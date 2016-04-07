@@ -16,7 +16,8 @@
     ${doc.name} <br>
     ${doc.size} <br>
     Changed: <fmt:formatDate type="both" timeStyle="short" dateStyle="long" value="${doc.lastModifyTime}"/>
-    <a href="<c:url value='/document/download-${doc.id}' />" class="btn btn-success custom-width">Download</a>
+    <a href="<c:url value='/document/download-${doc.id}' />" class="btn btn-default custom-width">Download</a>
+    <a href="<c:url value='/document/history-${doc.id}' />" class="btn btn-default custom-width">Previous versions</a>
     <br>
     <c:if test="${doc.description != null}">
         Description: ${doc.description}
