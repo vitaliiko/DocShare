@@ -94,6 +94,8 @@ public class DocumentController {
         session.setAttribute("location", UserFileUtil.ROOT_LOCATION);
         model.addObject("documentsMap", UserFileUtil.prepareUserFileListMap(allDocuments));
         model.addObject("directoriesMap", UserFileUtil.prepareUserFileListMap(allDirectories));
+        model.addObject("tableNames", new String[] {"allDocumentsTable",
+                "privateDocumentsTable", "publicDocumentsTable", "forFriendsDocumentsTable"});
         model.addObject("friendsGroups", userService.getAllFriendsGroups(userId));
         model.addObject("friends", userService.getAllFriends(userId));
         return model;

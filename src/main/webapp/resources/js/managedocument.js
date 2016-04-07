@@ -47,25 +47,16 @@ $(document).ready(function() {
         privateTable.show(true);
     });
 
-    $('.select-all-dirs').click(function() {
+    $('.select-all').click(function() {
         var checked = this.checked;
-        $(".select-dir:visible").each(function() {
-            $(this).prop('checked', checked);
-        });
-        showHideButtons();
-    });
-
-    $('.select-all-docs').click(function() {
-        var checked = this.checked;
-        $(".select-doc:visible").each(function() {
+        $(".select:visible").each(function() {
             $(this).prop('checked', checked);
         });
         showHideButtons();
     });
 
     function showHideButtons() {
-        var checkBoxCount = $(".select-doc:checked").length;
-        checkBoxCount += $(".select-dir:checked").length;
+        var checkBoxCount = $(".select:checked").length;
         if (checkBoxCount == 0) {
             $('.action-btn').hide(true);
         } else {
@@ -78,11 +69,7 @@ $(document).ready(function() {
         }
     }
 
-    $('.select-doc').change(function() {
-        showHideButtons();
-    });
-
-    $('.select-dir').change(function() {
+    $('.select').change(function() {
         showHideButtons();
     });
 
