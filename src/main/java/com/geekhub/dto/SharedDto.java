@@ -1,6 +1,6 @@
-package com.geekhub.json;
+package com.geekhub.dto;
 
-public class SharedJson {
+public class SharedDto {
 
     private long docId;
     private String access;

@@ -2,11 +2,10 @@ package com.geekhub.controller;
 
 import com.geekhub.entity.FriendsGroup;
 import com.geekhub.entity.User;
-import com.geekhub.json.FriendsGroupJson;
+import com.geekhub.dto.FriendsGroupDto;
 import com.geekhub.service.FriendsGroupService;
 import com.geekhub.service.UserService;
 import com.geekhub.provider.UserProvider;
-import java.util.Arrays;
 import org.hibernate.HibernateException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -60,10 +59,10 @@ public class FriendsController {
     }
 
     @RequestMapping("/get_group")
-    public FriendsGroupJson getGroup(Long groupId, HttpSession session) throws HibernateException {
+    public FriendsGroupDto getGroup(Long groupId, HttpSession session) throws HibernateException {
         FriendsGroup group = friendsGroupService.getWithFriends(groupId);
         User[] friends = group.getFriends().stream().toArray(User[]::new);
-        return new FriendsGroupJson(groupId, group.getName(), friends);
+        return new FriendsGroupDto(groupId, group.getName(), friends);
     }
 
     @RequestMapping("/get_friends")

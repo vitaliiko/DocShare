@@ -1,4 +1,4 @@
-package com.geekhub.json;
+package com.geekhub.dto;
 
 import java.util.Date;
 

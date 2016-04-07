@@ -1,7 +1,7 @@
 package com.geekhub.util;
 
 import com.geekhub.entity.DocumentOldVersion;
-import com.geekhub.json.DocumentOldVersionDto;
+import com.geekhub.dto.DocumentOldVersionDto;
 
 public class EntityToDtoConverter {
 

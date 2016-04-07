@@ -1,6 +1,6 @@
-package com.geekhub.json;
+package com.geekhub.dto;
 
-public class UserJson {
+public class UserDto {
 
     private String firstName;
     private String lastName;

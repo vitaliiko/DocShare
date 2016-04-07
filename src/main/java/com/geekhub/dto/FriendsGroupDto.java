@@ -1,14 +1,14 @@
-package com.geekhub.json;
+package com.geekhub.dto;
 
 import com.geekhub.entity.User;
 
-public class FriendsGroupJson {
+public class FriendsGroupDto {
 
     private long id;
     private String name;
     private User[] friends;
 
-    public FriendsGroupJson(long id, String name, User[] friends) {
+    public FriendsGroupDto(long id, String name, User[] friends) {
         this.id = id;
         this.name = name;
         this.friends = friends;

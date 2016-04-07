@@ -8,9 +8,9 @@ import com.geekhub.entity.User;
 import com.geekhub.entity.UserDirectory;
 import com.geekhub.entity.UserDocument;
 import com.geekhub.entity.enums.DocumentAttribute;
-import com.geekhub.json.DocumentJson;
-import com.geekhub.json.DocumentOldVersionDto;
-import com.geekhub.json.SharedJson;
+import com.geekhub.dto.DocumentDto;
+import com.geekhub.dto.DocumentOldVersionDto;
+import com.geekhub.dto.SharedDto;
 import com.geekhub.service.CommentService;
 import com.geekhub.service.DocumentOldVersionService;
 import com.geekhub.service.FriendsGroupService;
@@ -189,16 +189,16 @@ public class DocumentController {
     }
 
     @RequestMapping("/get_document")
-    public DocumentJson getUserDocument(Long docId, HttpSession session) {
+    public DocumentDto getUserDocument(Long docId, HttpSession session) {
         UserDocument document = userDocumentService.getById(docId);
         Set<User> readers = userDocumentService.getReaders(docId);
         Set<FriendsGroup> readersGroups = userDocumentService.getReadersGroup(docId);
-        return new DocumentJson(docId, document.getName(), document.getDocumentAttribute().toString(), readers, readersGroups);
+        return new DocumentDto(docId, document.getName(), document.getDocumentAttribute().toString(), readers, readersGroups);
     }
 
     @RequestMapping(value = "/share_document", method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.OK)
-    public void shareUserDocument(@RequestBody SharedJson shared, HttpSession session) {
+    public void shareUserDocument(@RequestBody SharedDto shared, HttpSession session) {
         UserDocument document = userDocumentService.getDocumentWithReaders(shared.getDocId());
         document.setDocumentAttribute(DocumentAttribute.valueOf(shared.getAccess()));
 
