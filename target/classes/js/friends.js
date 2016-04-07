@@ -2,7 +2,6 @@
 $(document).ready(function() {
 
     var friendsGroupId;
-    var oldGroupName;
 
     function clearModalWindow() {
         $('.check-box').each(function() {
@@ -20,13 +19,18 @@ $(document).ready(function() {
         $.ajax({
             url: '/friends/create_group',
             data: {groupName: groupName, friends: friends},
-            success: function() {
-                $('#groupTable').append("<tr id='" + "'>" +
-                "<td><button type='button' name='groupInfoButton' class='btn btn-link group-info-btn'" +
-                "data-toggle='modal' data-target='#groupInfo'> " + groupName + " </button>" +
-                "</td><td><input type='button' class='btn btn-default removeGroupButton' id='"  + "' value='Remove friends group'>" +
-                "</td></tr>");
-                $('#groupInfo').modal('hide');
+            success: function(groupId) {
+                $('#groupTable').append("<tr class='group" + groupId + "'>" +
+                    "<td><button type='button' name='groupInfoButton' class='btn btn-link group-info-btn'" +
+                    "data-toggle='modal' data-target='#groupInfo'> " + groupName + " </button></td>" +
+                    "<td><input type='button' class='btn btn-default removeGroupButton' id='" + groupId +
+                    "' value='Remove friends group'>" +
+                    "</td></tr>");
+                $.each(friends, function(k, v) {
+                    $('.td' + v).append("<button type='button' name='groupInfoButton' " +
+                        "data-toggle='modal' data-target='#groupInfo'" +
+                        "class='btn btn-link group-info-btn group" + groupId + "'>" + groupName + "</button>");
+                });
                 clearModalWindow();
             }
         });
@@ -35,44 +39,37 @@ $(document).ready(function() {
     $('#updateGroupButton').click(function() {
         var groupName = $('#groupName').val();
         var friends = [];
-        $('.check-box:checked').each(function() {
-            friends.push($(this).val());
+        $('.check-box:checked').each(function(k, v) {
+            friends.push(v.value);
         });
         $.ajax({
             url: '/friends/update_group',
             contentType: 'json',
             data: {groupId: friendsGroupId, groupName: groupName, friends: friends},
             success: function() {
-                $('.group-info[text="'+oldGroupName+'"]').each(function() {
-                    $(this).text(groupName);
-                });
-                $('#groupInfo').modal('hide');
+                $('.group' + friendsGroupId).html(groupName);
                 clearModalWindow();
             }
-        })
+        });
     });
 
     $('.group-info-btn').click(function() {
+        event.preventDefault();
         clearModalWindow();
         $('#saveGroupButton').hide();
         $('#updateGroupButton').show();
-        $.ajax({
-            url: '/friends/get_group',
-            dataType: 'json',
-            data: {groupName: $(this).text()},
-            success: function(group) {
-                friendsGroupId = group.id;
-                oldGroupName = group.name;
-                var memberIds = [];
-                $.each(group.friends, function(k, v) {
-                    memberIds.push(v.id);
-                });
-                $('.check-box').each(function() {
-                    var isChecked = $.inArray(parseInt($(this).val()), memberIds) != -1;
-                    $(this).prop('checked', isChecked);
-                });
-                $('#groupName').val(group.name);
-            }
+        var groupId = this.id;
+        $.getJSON('/friends/get_group', {groupId: groupId}, function(group) {
+            friendsGroupId = group.id;
+            var memberIds = [];
+            $.each(group.friends, function (k, v) {
+                memberIds.push(v.id);
+            });
+            $('.check-box').each(function (k, v) {
+                var isChecked = $.inArray(parseInt(v.value), memberIds) != -1;
+                $(this).prop('checked', isChecked);
+            });
+            $('.group-name-input').val(group.name);
         });
     });
 
@@ -80,20 +77,6 @@ $(document).ready(function() {
         clearModalWindow();
         $('#saveGroupButton').show();
         $('#updateGroupButton').hide();
-
-        //$.ajax({
-        //    url: '/friends/get_friends',
-        //    dataType: 'json',
-        //    success: function(friends) {
-        //        var input = '';
-        //        $.each(friends, function (k, v) {
-        //            input += "<input type='checkbox' class='check-box' value='" + v.id + "'>" +
-        //                v.firstName + ' ' + v.lastName + '<br>';
-        //        });
-        //        $('#friends-list').html(input);
-        //        $('#groupName').val('');
-        //    }
-        //});
     });
 
     $('.removeFriendButton').click(function() {
@@ -102,13 +85,7 @@ $(document).ready(function() {
             url: '/friends/delete_friend',
             data: {friendId: friendId},
             success: function() {
-                $('table#friendsTable tr#' + friendId).remove();
-                var divId = 'checkBoxDiv' + friendId;
-                $('div[id="'+divId+'"]').remove();
-                //var checkBox = $('.check-box[value="'+friendId+'"]');
-                //var checkBoxId = checkBox.attr('id');
-                //checkBox.remove();
-                //$('label[for="'+checkBoxId+'"]').remove();
+                $('.friend' + friendId).remove();
             }
         })
     });
@@ -119,9 +96,8 @@ $(document).ready(function() {
             url: '/friends/delete_group',
             data: {groupId: groupId},
             success: function() {
-                $('table#groupTable tr#' + groupId).remove();
+                $('.group' + groupId).remove();
             }
         })
     });
-
 });

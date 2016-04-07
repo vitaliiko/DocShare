@@ -18,7 +18,7 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 @Entity
-@Table
+@Table(name = "user_document")
 public class UserDocument extends UserFile implements Comparable<UserDocument> {
 
     @Id
@@ -44,7 +44,7 @@ public class UserDocument extends UserFile implements Comparable<UserDocument> {
 
     @JsonIgnore
     @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
-    @JoinTable(name = "userToDocumentRelation",
+    @JoinTable(name = "user_to_document_relation",
             joinColumns = {
                     @JoinColumn(name = "userdocument_id")
             },
@@ -56,7 +56,7 @@ public class UserDocument extends UserFile implements Comparable<UserDocument> {
 
     @JsonIgnore
     @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
-    @JoinTable(name = "friendsGroupToDocumentRelation",
+    @JoinTable(name = "friends_group_to_document_relation",
             joinColumns = {
                     @JoinColumn(name = "userdocument_id")
             },

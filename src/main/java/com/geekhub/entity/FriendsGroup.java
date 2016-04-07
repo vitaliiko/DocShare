@@ -16,7 +16,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 @Entity
-@Table
+@Table(name = "friends_group")
 public class FriendsGroup {
 
     @Id
@@ -33,7 +33,7 @@ public class FriendsGroup {
 
     @JsonIgnore
     @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
-    @JoinTable(name = "userToGroupRelation",
+    @JoinTable(name = "user_to_group_relation",
             joinColumns = {
                     @JoinColumn(name = "groupId")
             },

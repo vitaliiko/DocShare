@@ -25,10 +25,10 @@
 
                 <c:forEach var="group" items="${groups}">
                     <c:url var="groupPage" value="/main/userpage/${group.id}"/>
-                    <tr id="${group.id}">
+                    <tr class="group${group.id}">
                         <td>
-                            <button type="button" name="groupInfoButton" class="btn btn-link group-info-btn"
-                                    data-toggle="modal" data-target="#groupInfo"> ${group.name} </button>
+                            <a href="#" name="groupInfoButton" class="group-info-btn group${group.id}"
+                                    id="${group.id}" data-toggle="modal" data-target="#groupInfo"> ${group.name} </a>
                         </td>
                         <td>
                             <input type="button" class="btn btn-default removeGroupButton"
@@ -45,14 +45,16 @@
 
                 <c:forEach var="friendEntry" items="${friends}">
                     <c:url var="friendPage" value="/main/userpage/${friendEntry.key.id}"/>
-                    <tr id="${friendEntry.key.id}">
+                    <tr class="friend${friendEntry.key.id}">
                         <td>
                             <a href="${friendPage}" class="btn btn-link"> ${friendEntry.key} </a>
                         </td>
-                        <td>
+                        <td class="td${friendEntry.key.id}">
                             <c:forEach var="group" items="${friendEntry.value}">
-                                <button type="button" name="groupInfoButton" class="btn btn-link group-info-btn"
-                                        data-toggle="modal" data-target="#groupInfo"> ${group.name} </button>
+                                <a href="#" name="groupInfoButton" data-toggle="modal" data-target="#groupInfo"
+                                        id="${group.id}" class="group-info-btn group${group.id}">
+                                        ${group.name}
+                                </a>
                             </c:forEach>
                         </td>
                         <td>
@@ -74,12 +76,12 @@
                     </div>
                     <div class="modal-body">
                         <p id="group-action">Input group name</p>
-                        <input type="text" id="groupName" class="form-control"
+                        <input type="text" id="groupName" class="form-control group-name-input"
                                placeholder="Group Name" autofocus="">
 
                         <div class="checkbox" id="friends-list">
                             <c:forEach var="friendEntry" items="${friends}">
-                                <div id="checkBoxDiv${friendEntry.key.id}">
+                                <div class="friend${friendEntry.key.id}">
                                     <label>
                                         <input type="checkbox" class="check-box" value="${friendEntry.key.id}">
                                         ${friendEntry.key}
@@ -91,8 +93,8 @@
 
                     </div>
                     <div class="modal-footer">
-                        <button type="button" id="saveGroupButton" class="btn btn-primary">Save</button>
-                        <button type="button" id="updateGroupButton" class="btn btn-primary">Save</button>
+                        <button type="button" id="saveGroupButton" class="btn btn-primary" data-dismiss="modal">Save</button>
+                        <button type="button" id="updateGroupButton" class="btn btn-primary" data-dismiss="modal">Save</button>
                         <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
                     </div>
                 </div>
@@ -102,7 +104,9 @@
     </div>
 
 
-
-    <jsp:include page="../include/footer.jsp"/>
 </body>
+
+<footer>
+    <jsp:include page="../include/footer.jsp"/>
+</footer>
 </html>

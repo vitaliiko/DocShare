@@ -18,7 +18,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 @Entity
-@Table
+@Table(name = "user_directory")
 public class UserDirectory extends UserFile implements Comparable<UserDirectory> {
 
     @Id
@@ -35,7 +35,7 @@ public class UserDirectory extends UserFile implements Comparable<UserDirectory>
 
     @JsonIgnore
     @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
-    @JoinTable(name = "userToDirectoryRelation",
+    @JoinTable(name = "user_to_directory_relation",
             joinColumns = {
                     @JoinColumn(name = "userdirectory_id")
             },
@@ -47,7 +47,7 @@ public class UserDirectory extends UserFile implements Comparable<UserDirectory>
 
     @JsonIgnore
     @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
-    @JoinTable(name = "friendGroupToDirectoryRelation",
+    @JoinTable(name = "friends_group_to_directory_relation",
             joinColumns = {
                     @JoinColumn(name = "userdirectory_id")
             },

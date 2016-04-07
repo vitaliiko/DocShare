@@ -48,7 +48,7 @@ public class User {
 
     @JsonIgnore
     @ManyToMany(cascade = CascadeType.ALL)
-    @JoinTable(name = "userToFriendRelation",
+    @JoinTable(name = "user_to_friend_relation",
             joinColumns = {
                     @JoinColumn(name = "user_id")
             },
