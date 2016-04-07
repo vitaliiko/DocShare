@@ -5,7 +5,7 @@ import com.geekhub.entity.FriendsGroup;
 import com.geekhub.entity.Message;
 import com.geekhub.entity.User;
 import com.geekhub.entity.UserDirectory;
-import com.geekhub.enums.DocumentAttribute;
+import com.geekhub.entity.enums.DocumentAttribute;
 import com.geekhub.util.UserFileUtil;
 import org.hibernate.HibernateException;
 import org.springframework.beans.factory.annotation.Autowired;

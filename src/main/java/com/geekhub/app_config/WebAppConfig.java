@@ -58,11 +58,6 @@ public class WebAppConfig extends WebMvcConfigurerAdapter {
         return new UserDetailsServiceImpl();
     }
 
-    @Bean
-    public ShaPasswordEncoder getShaPasswordEncoder(){
-        return new ShaPasswordEncoder();
-    }
-
     @Bean(name = "multipartResolver")
     public CommonsMultipartResolver getResolver() throws IOException {
         return new CommonsMultipartResolver();
@@ -79,5 +74,4 @@ public class WebAppConfig extends WebMvcConfigurerAdapter {
     public void configurePathMatch(PathMatchConfigurer matcher) {
         matcher.setUseRegisteredSuffixPatternMatch(true);
     }
-
 }

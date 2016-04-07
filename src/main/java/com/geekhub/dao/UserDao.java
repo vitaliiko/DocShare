@@ -15,6 +15,7 @@ public class UserDao implements EntityDao<User, Long> {
 
     @Autowired
     private SessionFactory sessionFactory;
+
     private Class<User> clazz = User.class;
 
     @Override

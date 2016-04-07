@@ -3,7 +3,7 @@ package com.geekhub.provider;
 import com.geekhub.entity.FriendsGroup;
 import com.geekhub.entity.User;
 import com.geekhub.entity.UserDirectory;
-import com.geekhub.enums.DocumentAttribute;
+import com.geekhub.entity.enums.DocumentAttribute;
 import com.geekhub.exception.UserValidateException;
 import com.geekhub.service.FriendsGroupService;
 import com.geekhub.service.UserDirectoryService;

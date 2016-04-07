@@ -1,14 +1,11 @@
 package com.geekhub.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.geekhub.enums.DocumentAttribute;
 import java.util.HashSet;
 import java.util.Set;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;

@@ -1,6 +1,6 @@
 package com.geekhub.entity;
 
-import com.geekhub.enums.DocumentAttribute;
+import com.geekhub.entity.enums.DocumentAttribute;
 import javax.persistence.Column;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;

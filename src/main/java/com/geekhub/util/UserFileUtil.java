@@ -5,16 +5,14 @@ import com.geekhub.entity.User;
 import com.geekhub.entity.UserDirectory;
 import com.geekhub.entity.UserDocument;
 import com.geekhub.entity.UserFile;
-import com.geekhub.enums.DocumentAttribute;
+import com.geekhub.entity.enums.DocumentAttribute;
 import java.io.File;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeMap;
 import java.util.TreeSet;
 import org.springframework.web.multipart.MultipartFile;
 

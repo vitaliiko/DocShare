@@ -2,14 +2,13 @@ package com.geekhub.dao;
 
 import com.geekhub.entity.User;
 import com.geekhub.entity.UserDirectory;
-import com.geekhub.enums.DocumentAttribute;
+import com.geekhub.entity.enums.DocumentAttribute;
 import java.util.List;
 import java.util.Map;
-import org.hibernate.Criteria;
 import org.hibernate.SessionFactory;
+import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
-import org.hibernate.criterion.SimpleExpression;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -21,7 +20,7 @@ public class UserDirectoryDao implements EntityDao<UserDirectory, Long> {
     private SessionFactory sessionFactory;
 
     private Class<UserDirectory> clazz = UserDirectory.class;
-    private SimpleExpression notRoot = Restrictions.ne("documentAttribute", DocumentAttribute.ROOT);
+    private Criterion notRoot = Restrictions.ne("documentAttribute", DocumentAttribute.ROOT);
 
     @Override
     public List<UserDirectory> getAll(String orderParameter) {
