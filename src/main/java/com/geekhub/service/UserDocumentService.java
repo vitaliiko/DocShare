@@ -19,13 +19,13 @@ public interface UserDocumentService extends EntityService<UserDocument, Long> {
 
     void moveToTrash(Long[] docIds, Long removerId);
 
-    void recover(Long docId);
+    Long recover(Long removedDocId);
 
-    void recover(Long[] docIds);
+    void recover(Long[] removedDocIds);
 
     UserDocument getByNameAndOwnerId(Long ownerId, String name);
 
-    UserDocument getByFullNameAndOwnerId(User owner, String parentDirectoryHash, String name);
+    UserDocument getByFullNameAndOwner(User owner, String parentDirectoryHash, String name);
 
     UserDocument getDocumentWithComments(Long docId);
 

@@ -125,9 +125,9 @@ public class DocumentController {
         return model;
     }
 
-    @RequestMapping("/recover-{docId}")
-    public ModelAndView recoverDocument(@PathVariable Long docId, HttpSession session) {
-        userDocumentService.recover(docId);
+    @RequestMapping("/recover-{remDocId}")
+    public ModelAndView recoverDocument(@PathVariable Long remDocId, HttpSession session) {
+        userDocumentService.recover(remDocId);
         return new ModelAndView("redirect:/document/upload");
     }
 
@@ -192,34 +192,49 @@ public class DocumentController {
     @ResponseStatus(HttpStatus.OK)
     public void shareUserDocument(@RequestBody SharedJson shared, HttpSession session) {
         UserDocument document = userDocumentService.getDocumentWithReaders(shared.getDocId());
+
         Set<User> readersSet = new HashSet<>();
         Arrays.stream(shared.getReaders()).forEach(id -> readersSet.add(userService.getById(id)));
         document.setReaders(readersSet);
+
         Set<FriendsGroup> readersGroupsSet = new HashSet<>();
         Arrays.stream(shared.getReadersGroups()).forEach(id -> readersGroupsSet.add(friendsGroupService.getById(id)));
         document.setReadersGroups(readersGroupsSet);
+
         userDocumentService.update(document);
     }
 
     private void saveOrUpdateDocument(MultipartFile multipartFile, String parentDirectoryHash, String description, User user)
             throws IOException {
 
-        UserDocument document = userDocumentService.getByFullNameAndOwnerId(
-                user, parentDirectoryHash, multipartFile.getOriginalFilename()
-        );
+        String docName = multipartFile.getOriginalFilename();
+        UserDocument document = userDocumentService.getByFullNameAndOwner(user, parentDirectoryHash, docName);
 
         if (document == null) {
-            document = UserFileUtil.createUserDocument(multipartFile, parentDirectoryHash, description, user);
-            Long docId = userDocumentService.save(document);
-            String docHashName = userDocumentService.getById(docId).getHashName();
-            multipartFile.transferTo(UserFileUtil.createFile(docHashName, user.getRootDirectory()));
+            RemovedDocument removedDocument =
+                    removedDocumentService.getByFullNameAndOwner(user, parentDirectoryHash, docName);
+            if (removedDocument == null) {
+                document = UserFileUtil.createUserDocument(multipartFile, parentDirectoryHash, description, user);
+                Long docId = userDocumentService.save(document);
+                String docHashName = userDocumentService.getById(docId).getHashName();
+                multipartFile.transferTo(UserFileUtil.createFile(docHashName, user.getRootDirectory()));
+            } else {
+                Long docId = userDocumentService.recover(removedDocument.getId());
+                document = userDocumentService.getDocumentWithOldVersions(docId);
+                updateDocument(document, user, description, multipartFile);
+            }
         } else {
             document = userDocumentService.getDocumentWithOldVersions(document.getId());
-            DocumentOldVersion oldVersion = DocumentVersionUtil.saveOldVersion(document, "Changed by " + user.toString());
-            userDocumentService.update(UserFileUtil.updateUserDocument(document, multipartFile, description));
-            documentOldVersionService.save(oldVersion);
-            multipartFile.transferTo(UserFileUtil.createFile(document.getHashName(), user.getRootDirectory()));
+            updateDocument(document, user, description, multipartFile);
         }
+    }
+
+    private void updateDocument(UserDocument document, User owner, String description, MultipartFile multipartFile)
+            throws IOException {
+        DocumentOldVersion oldVersion = DocumentVersionUtil.saveOldVersion(document, "Changed by " + owner.toString());
+        userDocumentService.update(UserFileUtil.updateUserDocument(document, multipartFile, description));
+        documentOldVersionService.save(oldVersion);
+        multipartFile.transferTo(UserFileUtil.createFile(document.getHashName(), owner.getRootDirectory()));
     }
 
     private void makeDirectory(User owner, String parentDirectoryHash, String dirName) {

@@ -1,6 +1,7 @@
 package com.geekhub.dao;
 
 import com.geekhub.entity.RemovedDocument;
+import com.geekhub.entity.User;
 import java.util.List;
 import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Order;
@@ -38,6 +39,22 @@ public class RemovedDocumentDao implements EntityDao<RemovedDocument, Long> {
                 .uniqueResult();
     }
 
+    public RemovedDocument get(User owner, String propertyName, Object value) {
+        return (RemovedDocument) sessionFactory.getCurrentSession()
+                .createCriteria(clazz)
+                .add(Restrictions.eq("owner", owner))
+                .add(Restrictions.eq(propertyName, value))
+                .uniqueResult();
+    }
+
+    public RemovedDocument getByUserDocumentHashName(String userDocumentHashName) {
+        return (RemovedDocument) sessionFactory.getCurrentSession()
+                .createCriteria(clazz, "rem")
+                .createAlias("rem.userDocument", "doc")
+                .add(Restrictions.eq("doc.hashName", userDocumentHashName))
+                .uniqueResult();
+    }
+
     public List<RemovedDocument> getList(String propertyName, Object value) {
         return sessionFactory.getCurrentSession()
                 .createCriteria(clazz)
@@ -69,5 +86,15 @@ public class RemovedDocumentDao implements EntityDao<RemovedDocument, Long> {
     public void deleteById(Long entityId) {
         RemovedDocument RemovedDocument = getById(entityId);
         sessionFactory.getCurrentSession().delete(RemovedDocument);
+    }
+
+    public RemovedDocument getByFullNameAndOwner(User owner, String parentDirectoryHash, String name) {
+        return (RemovedDocument) sessionFactory.getCurrentSession()
+                .createCriteria(clazz, "rem")
+                .createAlias("rem.userDocument", "doc")
+                .add(Restrictions.eq("owner", owner))
+                .add(Restrictions.eq("doc.name", name))
+                .add(Restrictions.eq("doc.parentDirectoryHash", parentDirectoryHash))
+                .uniqueResult();
     }
 }

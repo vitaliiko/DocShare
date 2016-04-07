@@ -7,7 +7,6 @@ import com.geekhub.entity.RemovedDocument;
 import com.geekhub.entity.User;
 import com.geekhub.entity.UserDocument;
 import com.geekhub.util.UserFileUtil;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import org.hibernate.Hibernate;
@@ -94,17 +93,18 @@ public class UserDocumentServiceImpl implements UserDocumentService {
     }
 
     @Override
-    public void recover(Long docId) {
-        RemovedDocument removedDocument = removedDocumentService.getById(docId);
+    public Long recover(Long removedDocId) {
+        RemovedDocument removedDocument = removedDocumentService.getById(removedDocId);
         UserDocument document = removedDocument.getUserDocument();
         User owner = removedDocument.getOwner();
         owner.getUserDocuments().add(document);
         removedDocumentService.delete(removedDocument);
+        return document.getId();
     }
 
     @Override
-    public void recover(Long[] docIds) {
-        Arrays.stream(docIds).forEach(this::recover);
+    public void recover(Long[] removedDocIds) {
+        Arrays.stream(removedDocIds).forEach(this::recover);
     }
 
     @Override
@@ -114,7 +114,7 @@ public class UserDocumentServiceImpl implements UserDocumentService {
     }
 
     @Override
-    public UserDocument getByFullNameAndOwnerId(User owner, String parentDirectoryHash, String name) {
+    public UserDocument getByFullNameAndOwner(User owner, String parentDirectoryHash, String name) {
         Map<String, Object> propertiesMap = UserFileUtil.createPropertiesMap(owner, parentDirectoryHash, name);
         return userDocumentDao.get(propertiesMap);
     }
