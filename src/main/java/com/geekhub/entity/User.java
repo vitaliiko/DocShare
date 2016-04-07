@@ -63,7 +63,7 @@ public class User {
     private Set<FriendsGroup> friendsGroups = new HashSet<>();
 
     @JsonIgnore
-    @ManyToMany(cascade = CascadeType.ALL)
+    @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
     @JoinTable(name = "user_to_friend_relation",
             joinColumns = {
                     @JoinColumn(name = "user_id")

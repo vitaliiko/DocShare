@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
+import org.apache.commons.io.FileUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -136,5 +137,13 @@ public class UserFileUtil {
         propertiesMap.put("parentDirectoryHash", parentDirectoryHash);
         propertiesMap.put("name", name);
         return propertiesMap;
+    }
+
+    public static void removeUserFiles(String userDirectory) {
+        try {
+            FileUtils.deleteDirectory(new File(ROOT_LOCATION + userDirectory));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

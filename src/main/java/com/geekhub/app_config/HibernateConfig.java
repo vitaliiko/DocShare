@@ -33,10 +33,10 @@ public class HibernateConfig {
     private Class[] annotatedClasses = new Class[] {
             User.class,
             Message.class,
+            Comment.class,
             FriendsGroup.class,
             UserDocument.class,
             UserDirectory.class,
-            Comment.class,
             RemovedDocument.class,
             RemovedDirectory.class,
             DocumentOldVersion.class

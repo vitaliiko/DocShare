@@ -49,6 +49,10 @@ public class UserDao implements EntityDao<User, Long> {
         sessionFactory.getCurrentSession().update(entity);
     }
 
+    public void update(List<User> users) {
+        users.forEach(this::update);
+    }
+
     @Override
     public void saveOrUpdate(User entity) {
         sessionFactory.getCurrentSession().saveOrUpdate(entity);
@@ -63,5 +67,12 @@ public class UserDao implements EntityDao<User, Long> {
     public void deleteById(Long entityId) {
         User user = getById(entityId);
         sessionFactory.getCurrentSession().delete(user);
+    }
+
+    public List<User> getByFriend(User friend) {
+        return sessionFactory.getCurrentSession()
+                .createQuery("from User u where :friend in elements(u.friends)")
+                .setParameter("friend", friend)
+                .list();
     }
  }

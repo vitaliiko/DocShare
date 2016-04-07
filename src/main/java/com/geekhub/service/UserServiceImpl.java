@@ -189,4 +189,17 @@ public class UserServiceImpl implements UserService {
         friends.forEach(friend -> friendsGroupsMap.put(friend, getGroupsByOwnerAndFriend(ownerId, friend)));
         return friendsGroupsMap;
     }
+
+    @Override
+    public void removeFromFriends(User friend) {
+        List<User> users = userDao.getByFriend(friend);
+        users.forEach(u -> u.getFriends().remove(friend));
+        update(users);
+
+    }
+
+    @Override
+    public void update(List<User> users) {
+        userDao.update(users);
+    }
 }

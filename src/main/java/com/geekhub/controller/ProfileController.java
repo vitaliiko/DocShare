@@ -2,6 +2,8 @@ package com.geekhub.controller;
 
 import com.geekhub.entity.User;
 import com.geekhub.service.UserService;
+import com.geekhub.util.UserFileUtil;
+import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -64,10 +66,13 @@ public class ProfileController {
         return model;
     }
 
-    @RequestMapping(value = "/removeAccount", method = RequestMethod.GET)
+    @RequestMapping("/removeAccount")
     public ModelAndView removeAccount(HttpSession session) {
         ModelAndView model = new ModelAndView();
-        userService.deleteById((Long) session.getAttribute("userId"));
+        User user = userService.getById((Long) session.getAttribute("userId"));
+        userService.removeFromFriends(user);
+        UserFileUtil.removeUserFiles(user.getRootDirectory());
+        userService.delete(user);
         session.invalidate();
         model.addObject("message", "Your account removed successfully")
                 .setViewName("signIn");

@@ -51,7 +51,7 @@ public class UserProvider {
             user.setRootDirectory(createUserDir(user));
             userService.update(user);
         }
-        addFriends(userService.getById(1L), id -> id > 0 && id < 10);
+        addFriends(userService.getById(1L), id -> id > 1 && id < 10);
         addGroup(1L, "Parents", id -> id > 2 && id < 5);
         addGroup(1L, "Fuckers", id -> id > 3 && id < 8);
         addFriends(userService.getById(2L), id -> id > 10 && id < 18);
