@@ -3,6 +3,7 @@ package com.geekhub.json;
 public class SharedJson {
 
     private long docId;
+    private String access;
     private long[] readers;
     private long[] readersGroups;
 
@@ -12,6 +13,14 @@ public class SharedJson {
 
     public void setDocId(long docId) {
         this.docId = docId;
+    }
+
+    public String getAccess() {
+        return access;
+    }
+
+    public void setAccess(String access) {
+        this.access = access;
     }
 
     public long[] getReaders() {

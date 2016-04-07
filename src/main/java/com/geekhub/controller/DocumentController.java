@@ -7,6 +7,7 @@ import com.geekhub.entity.RemovedDocument;
 import com.geekhub.entity.User;
 import com.geekhub.entity.UserDirectory;
 import com.geekhub.entity.UserDocument;
+import com.geekhub.entity.enums.DocumentAttribute;
 import com.geekhub.json.DocumentJson;
 import com.geekhub.json.SharedJson;
 import com.geekhub.service.CommentService;
@@ -185,13 +186,14 @@ public class DocumentController {
         UserDocument document = userDocumentService.getById(docId);
         Set<User> readers = userDocumentService.getReaders(docId);
         Set<FriendsGroup> readersGroups = userDocumentService.getReadersGroup(docId);
-        return new DocumentJson(docId, document.getName(), readers, readersGroups);
+        return new DocumentJson(docId, document.getName(), document.getDocumentAttribute().toString(), readers, readersGroups);
     }
 
     @RequestMapping(value = "/share_document", method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.OK)
     public void shareUserDocument(@RequestBody SharedJson shared, HttpSession session) {
         UserDocument document = userDocumentService.getDocumentWithReaders(shared.getDocId());
+        document.setDocumentAttribute(DocumentAttribute.valueOf(shared.getAccess()));
 
         Set<User> readersSet = new HashSet<>();
         Arrays.stream(shared.getReaders()).forEach(id -> readersSet.add(userService.getById(id)));

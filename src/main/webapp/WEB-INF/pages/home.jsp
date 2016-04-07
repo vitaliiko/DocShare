@@ -49,14 +49,14 @@
                 <button class="btn btn-default rename-btn action-btn single-selection">Rename</button>
             </caption>
             <tr>
-                <th><input type="checkbox" class="check-box big-check-box select-all"/></th>
+                <th><input type="checkbox" class="check-box big-check-box select-all-dirs"/></th>
                 <th id="dir-name">Directory Name</th>
                 <th width="15"></th>
             </tr>
             <c:forEach items="${directoryEntry.value}" var="doc" varStatus="counter">
                 <tr class="tr-doc${doc.id}">
                     <td width="20">
-                        <input type="checkbox" class="check-box select-doc big-check-box" value="${doc.id}"/>
+                        <input type="checkbox" class="check-box select-dir big-check-box" value="${doc.id}"/>
                     </td>
                     <td class="directory-name">
                         <a href="#">${doc.name}</a>
@@ -71,7 +71,7 @@
     <c:forEach items="${documentsMap}" var="documentEntry">
         <table class="table table-hover tbody tr:hover td ${documentEntry.key}">
             <tr>
-                <th><input type="checkbox" class="check-box big-check-box select-all"/></th>
+                <th><input type="checkbox" class="check-box big-check-box select-all-docs"/></th>
                 <th id="file-name">File Name</th>
                 <th>Size</th>
                 <th>Changed</th>
@@ -109,7 +109,7 @@
                 <h4 class="modal-title">Removing</h4>
             </div>
             <div class="modal-body">
-                <h4 id="dialog-text"></h4>
+                <h4 id="delete-dialog-text"></h4>
             </div>
             <div class="modal-footer">
                 <button type="button" id="deleteDocument" class="btn btn-success" data-dismiss="modal">YES</button>
@@ -148,11 +148,15 @@
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal">&times;</button>
-                <h4 class="modal-title">Share documents</h4>
-                <p id="doc-name"></p>
+                <h4 class="modal-title"></h4>
             </div>
 
             <div class="modal-body">
+                <div class="btn-group" data-toggle="buttons">
+                    <input type="radio" name="access" id="PRIVATE" value="PRIVATE" checked>Private
+                    <input type="radio" name="access" id="FOR_FRIENDS" value="FOR_FRIENDS">For friends
+                    <input type="radio" name="access" id="PUBLIC" value="PUBLIC">Public
+                </div>
                 <div class="checkbox" id="friends-list">
                     <c:forEach var="group" items="${friendsGroups}">
                         <div class="group-${group.id}">

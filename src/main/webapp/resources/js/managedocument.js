@@ -51,7 +51,15 @@ $(document).ready(function() {
         privateTable.show(true);
     });
 
-    $('.select-all').click(function() {
+    $('.select-all-dirs').click(function() {
+        var checked = this.checked;
+        $(".select-dir:visible").each(function() {
+            $(this).prop('checked', checked);
+        });
+        showHideButtons();
+    });
+
+    $('.select-all-docs').click(function() {
         var checked = this.checked;
         $(".select-doc:visible").each(function() {
             $(this).prop('checked', checked);
@@ -61,6 +69,7 @@ $(document).ready(function() {
 
     function showHideButtons() {
         var checkBoxCount = $(".select-doc:checked").length;
+        checkBoxCount += $(".select-dir:checked").length;
         if (checkBoxCount == 0) {
             $('.action-btn').hide(true);
         } else {
@@ -74,6 +83,10 @@ $(document).ready(function() {
     }
 
     $('.select-doc').change(function() {
+        showHideButtons();
+    });
+
+    $('.select-dir').change(function() {
         showHideButtons();
     });
 
@@ -110,15 +123,18 @@ $(document).ready(function() {
     });
 
     $('.delete-btn').click(function() {
+        var checkBoxesCount = 0;
         $('.select-doc:visible:checked').each(function() {
+            checkBoxesCount++;
             var id = $(this).val();
             docIds.push(id);
             tableRows.push($('.tr-doc' + id));
         });
+        $('#delete-dialog-text').text('Are you sure you want to move ' + checkBoxesCount + ' documents into trash?');
         //var row = this.closest('tr');
         //var fileName = $(row['name=file-name']).text();
         //documentId = row.id;
-        //$('#dialog-text').text('Are you sure you want to move ' + fileName + ' into trash?');
+
     });
 
     $('#deleteDocument').click(function() {
@@ -155,13 +171,15 @@ $(document).ready(function() {
                 var isChecked = $.inArray(parseInt(v.value), readers) != -1;
                 $(this).prop('checked', isChecked);
             });
-            $('#doc-name').text(document.name);
+            $('.modal-title').text('Share ' + document.name);
+            $('#' + document.access).prop('checked', true);
         });
     });
 
     $('#shareDocument').click(function() {
         var readers = [];
         var readersGroups = [];
+        var access = $('input[name=access]:checked').val();
         $('.group-check-box:checked').each(function (k, v) {
             readersGroups.push(v.value);
         });
@@ -172,7 +190,7 @@ $(document).ready(function() {
             url: '/document/share_document',
             type: 'POST',
             contentType: 'application/json',
-            data: JSON.stringify({docId: documentId, readers: readers, readersGroups: readersGroups}),
+            data: JSON.stringify({docId: documentId, access: access, readers: readers, readersGroups: readersGroups}),
             success: function () {
                 clearModalWindow();
             }

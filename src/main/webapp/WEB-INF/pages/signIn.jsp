@@ -30,7 +30,7 @@
     <c:url value="/j_spring_security_check" var="loginUrl" />
     <c:url value="/main/sign_in" var="signInURL"/>
     <div class="container" style="width: 300px;" align="center">
-        <form class="form-signin" action="${loginUrl}" method="post">
+        <form class="form-signin" action="${signInURL}" method="post">
             <input type="text" name="j_username" class="form-control" placeholder="Email address" required="" autofocus="">
             <br>
             <input type="password" name="j_password" class="form-control" placeholder="Password" required="">

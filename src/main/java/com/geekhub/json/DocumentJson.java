@@ -9,12 +9,14 @@ public class DocumentJson {
     private long id;
     private String name;
     private Set<User> readers;
+    private String access;
     private Set<FriendsGroup> readersGroup;
 
-    public DocumentJson(long id, String name, Set<User> readers, Set<FriendsGroup> readersGroup) {
+    public DocumentJson(long id, String name, String access, Set<User> readers, Set<FriendsGroup> readersGroup) {
         this.id = id;
         this.name = name;
         this.readers = readers;
+        this.access = access;
         this.readersGroup = readersGroup;
     }
 
@@ -48,5 +50,13 @@ public class DocumentJson {
 
     public void setReadersGroup(Set<FriendsGroup> readersGroup) {
         this.readersGroup = readersGroup;
+    }
+
+    public String getAccess() {
+        return access;
+    }
+
+    public void setAccess(String access) {
+        this.access = access;
     }
 }
