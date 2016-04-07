@@ -9,6 +9,12 @@
     <title>Home</title>
     <jsp:include page="../include/include.jsp"/>
     <script src="${pageContext.request.contextPath}/resources/js/managedocument.js"></script>
+    <style>
+        .big-check-box {
+            width: 18px;
+            height: 18px;
+        }
+    </style>
 </head>
 
 <body>

@@ -7,6 +7,7 @@ import com.geekhub.entity.User;
 import com.geekhub.entity.UserDirectory;
 import com.geekhub.entity.enums.DocumentAttribute;
 import com.geekhub.util.UserFileUtil;
+import java.util.Calendar;
 import org.hibernate.HibernateException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -61,6 +62,7 @@ public class UserServiceImpl implements UserService {
     public Long createUser(String firstName, String lastName, String login, String password) {
         if (userDao.get("login", login) == null) {
             User user = new User(firstName, lastName, password, login);
+            user.setRegistrationDate(Calendar.getInstance().getTime());
             user.setId(userDao.save(user));
             UserDirectory directory =
                     UserFileUtil.createUserDirectory(user, UserFileUtil.ROOT_DIRECTORY_HASH, user.getLogin());

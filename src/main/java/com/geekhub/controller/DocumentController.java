@@ -140,8 +140,12 @@ public class DocumentController {
         Long userId = (Long) session.getAttribute("userId");
         String parentDirectoryHash = (String) session.getAttribute("parentDirectoryHash");
         User user = userService.getById(userId);
-        for (MultipartFile file : files) {
-            saveOrUpdateDocument(file, parentDirectoryHash, description, user);
+        if (files.length > 0) {
+            for (MultipartFile file : files) {
+                if (!file.isEmpty()) {
+                    saveOrUpdateDocument(file, parentDirectoryHash, description, user);
+                }
+            }
         }
         return new ModelAndView("redirect:/document/upload");
     }

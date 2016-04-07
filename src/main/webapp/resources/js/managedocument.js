@@ -23,10 +23,6 @@ $(document).ready(function() {
     changeTab();
     allTable.show(true);
 
-    $('input[type=file]').on('change', function(event) {
-        files = event.target.files;
-    });
-
     $('.all-href').click(function() {
         event.preventDefault();
         changeTab();
@@ -93,33 +89,35 @@ $(document).ready(function() {
     $('.upload-btn').click(function() {
         var files = new FormData();
         var description = $('#description').val();
-        files.append( 'file', $('#file').files[0] );
-        $.ajax({
-            url: 'upload',
-            type: 'POST',
-            data: {files: files, description: description},
-            cache: false,
-            contentType: false,
-            processData: false,
-            success: function() {
-                location.reload();
-            }
-            //success: function (documents) {
-            //    var counter = allTable.find('tr').count + 1;
-            //    $.each(documents, function(k, v) {
-            //        allTable.append(
-            //            "<td class='document-num'>" +
-            //            "<input type='checkbox' class='check-box' value='" + v.id + "'/> " + counter++ + "</td>" +
-            //            "<td class='document-name'>" +
-            //            "<a href='/document/browse-" + v.id + "'>" + v.name + "</a></td>" +
-            //            "<td>" + v.size + "</td>" +
-            //            "<td class='document-date'>Now</td>" +
-            //            "<td><a href='/document/download-" + v.id + "' class='btn btn-success custom-width'>Download</a></td>"
-            //        );
-            //        counter++;
-            //    });
-            //}
-        });
+        files.append('file', $('#file').files[0]);
+        if (files.length) {
+            $.ajax({
+                url: 'upload',
+                type: 'POST',
+                data: {files: files, description: description},
+                cache: false,
+                contentType: false,
+                processData: false,
+                success: function () {
+                    location.reload();
+                }
+                //success: function (documents) {
+                //    var counter = allTable.find('tr').count + 1;
+                //    $.each(documents, function(k, v) {
+                //        allTable.append(
+                //            "<td class='document-num'>" +
+                //            "<input type='checkbox' class='check-box' value='" + v.id + "'/> " + counter++ + "</td>" +
+                //            "<td class='document-name'>" +
+                //            "<a href='/document/browse-" + v.id + "'>" + v.name + "</a></td>" +
+                //            "<td>" + v.size + "</td>" +
+                //            "<td class='document-date'>Now</td>" +
+                //            "<td><a href='/document/download-" + v.id + "' class='btn btn-success custom-width'>Download</a></td>"
+                //        );
+                //        counter++;
+                //    });
+                //}
+            });
+        }
     });
 
     $('.delete-btn').click(function() {
