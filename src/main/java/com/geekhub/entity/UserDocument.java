@@ -44,7 +44,7 @@ public class UserDocument extends UserFile implements Comparable<UserDocument> {
 
     @JsonIgnore
     @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
-    @JoinTable(name = "user_to_document_relation",
+    @JoinTable(name = "reader_to_document_relation",
             joinColumns = {
                     @JoinColumn(name = "userdocument_id")
             },
@@ -56,7 +56,19 @@ public class UserDocument extends UserFile implements Comparable<UserDocument> {
 
     @JsonIgnore
     @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
-    @JoinTable(name = "friends_group_to_document_relation",
+    @JoinTable(name = "editor_to_document_relation",
+            joinColumns = {
+                    @JoinColumn(name = "userdocument_id")
+            },
+            inverseJoinColumns = {
+                    @JoinColumn(name = "editor_id")
+            }
+    )
+    private Set<User> editors = new HashSet<>();
+
+    @JsonIgnore
+    @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
+    @JoinTable(name = "readers_group_to_document_relation",
             joinColumns = {
                     @JoinColumn(name = "userdocument_id")
             },
@@ -65,6 +77,18 @@ public class UserDocument extends UserFile implements Comparable<UserDocument> {
             }
     )
     private Set<FriendsGroup> readersGroups = new HashSet<>();
+
+    @JsonIgnore
+    @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
+    @JoinTable(name = "editors_group_to_document_relation",
+            joinColumns = {
+                    @JoinColumn(name = "userdocument_id")
+            },
+            inverseJoinColumns = {
+                    @JoinColumn(name = "editorsgroup_id")
+            }
+    )
+    private Set<FriendsGroup> editorsGroups = new HashSet<>();
 
     @JsonIgnore
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
@@ -154,6 +178,22 @@ public class UserDocument extends UserFile implements Comparable<UserDocument> {
 
     public void setDocumentOldVersions(Set<DocumentOldVersion> documentOldVersions) {
         this.documentOldVersions = documentOldVersions;
+    }
+
+    public Set<User> getEditors() {
+        return editors;
+    }
+
+    public void setEditors(Set<User> editors) {
+        this.editors = editors;
+    }
+
+    public Set<FriendsGroup> getEditorsGroups() {
+        return editorsGroups;
+    }
+
+    public void setEditorsGroups(Set<FriendsGroup> editorsGroups) {
+        this.editorsGroups = editorsGroups;
     }
 
     @Override

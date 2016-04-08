@@ -29,7 +29,7 @@ public class UserDirectory extends UserFile implements Comparable<UserDirectory>
 
     @JsonIgnore
     @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
-    @JoinTable(name = "user_to_directory_relation",
+    @JoinTable(name = "reader_to_directory_relation",
             joinColumns = {
                     @JoinColumn(name = "userdirectory_id")
             },
@@ -41,7 +41,7 @@ public class UserDirectory extends UserFile implements Comparable<UserDirectory>
 
     @JsonIgnore
     @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
-    @JoinTable(name = "friends_group_to_directory_relation",
+    @JoinTable(name = "readers_group_to_directory_relation",
             joinColumns = {
                     @JoinColumn(name = "userdirectory_id")
             },

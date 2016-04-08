@@ -1,5 +1,6 @@
 package com.geekhub.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.Date;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -28,6 +29,7 @@ public class User {
     @Column
     private String lastName;
 
+    @JsonIgnore
     @Column
     private String password;
 
@@ -49,14 +51,17 @@ public class User {
     @Column
     private Date registrationDate;
 
+    @JsonIgnore
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "user_id")
     private Set<Message> messageSet = new HashSet<>();
 
+    @JsonIgnore
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "owner_id")
     private Set<FriendsGroup> friendsGroups = new HashSet<>();
 
+    @JsonIgnore
     @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
     @JoinTable(name = "user_to_friend_relation",
             joinColumns = {
@@ -68,18 +73,22 @@ public class User {
     )
     private Set<User> friends = new HashSet<>();
 
+    @JsonIgnore
     @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "owner_id")
     private Set<UserDocument> userDocuments = new HashSet<>();
 
+    @JsonIgnore
     @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "owner_id")
     private Set<UserDirectory> userDirectories = new HashSet<>();
 
+    @JsonIgnore
     @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "owner_id")
     private Set<RemovedDocument> removedDocuments = new HashSet<>();
 
+    @JsonIgnore
     @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "owner_id")
     private Set<RemovedDirectory> removedDirectories = new HashSet<>();
