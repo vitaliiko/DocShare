@@ -6,6 +6,7 @@ import com.geekhub.dto.FriendsGroupDto;
 import com.geekhub.service.FriendsGroupService;
 import com.geekhub.service.UserService;
 import com.geekhub.provider.UserProvider;
+import com.geekhub.util.EntityToDtoConverter;
 import org.hibernate.HibernateException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -61,8 +62,7 @@ public class FriendsController {
     @RequestMapping("/get_group")
     public FriendsGroupDto getGroup(Long groupId, HttpSession session) throws HibernateException {
         FriendsGroup group = friendsGroupService.getWithFriends(groupId);
-        User[] friends = group.getFriends().stream().toArray(User[]::new);
-        return new FriendsGroupDto(groupId, group.getName(), friends);
+        return EntityToDtoConverter.convert(group);
     }
 
     @RequestMapping("/get_friends")

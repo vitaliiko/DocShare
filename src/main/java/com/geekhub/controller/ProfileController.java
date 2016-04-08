@@ -1,18 +1,22 @@
 package com.geekhub.controller;
 
+import com.geekhub.dto.UserDto;
 import com.geekhub.entity.User;
 import com.geekhub.service.UserService;
+import com.geekhub.util.DtoToEntityConverter;
+import com.geekhub.util.EntityToDtoConverter;
 import com.geekhub.util.UserFileUtil;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpSession;
 
-@Controller
+@RestController
 @RequestMapping("/profile")
 @SuppressWarnings("unchecked")
 public class ProfileController {
@@ -24,25 +28,23 @@ public class ProfileController {
     public ModelAndView profile(HttpSession session) {
         User user = userService.getById((Long) session.getAttribute("userId"));
         ModelAndView model = new ModelAndView("profile");
-        model.addObject("login", user.getLogin())
-                .addObject("firstName", user.getFirstName())
-                .addObject("lastName", user.getLastName());
+        model.addObject("user", EntityToDtoConverter.convert(user));
         return model;
     }
 
-    @RequestMapping(value = "/changeName", method = RequestMethod.POST)
-    public ModelAndView changeName(String login, String firstName, String lastName, HttpSession session) {
+    @RequestMapping(value = "/changeProfile", method = RequestMethod.POST)
+    public ModelAndView changeName(UserDto userDto, HttpSession session) {
         ModelAndView model = new ModelAndView("profile");
         User user = userService.getById((Long) session.getAttribute("userId"));
-        if (user.getLogin().equals(login) || userService.getByLogin(login) == null) {
-            user.setLogin(login);
-            user.setFirstName(firstName);
-            user.setLastName(lastName);
+
+        if (user.getLogin().equals(userDto.getLogin()) || userService.getByLogin(userDto.getLogin()) == null) {
+            DtoToEntityConverter.merge(userDto, user);
             userService.update(user);
             model.addObject("message", "Your account updated successfully");
         } else {
             model.addObject("errorMessage", "User with such login already exist");
         }
+        model.addObject("user", userDto);
         return model;
     }
 

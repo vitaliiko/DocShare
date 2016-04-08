@@ -12,14 +12,6 @@ public class DocumentOldVersionDto {
 
     public DocumentOldVersionDto() {}
 
-    public DocumentOldVersionDto(long id, String name, String description, Date lastModifyDate, String size) {
-        this.id = id;
-        this.name = name;
-        this.description = description;
-        this.lastModifyTime = lastModifyDate;
-        this.size = size;
-    }
-
     public long getId() {
         return id;
     }

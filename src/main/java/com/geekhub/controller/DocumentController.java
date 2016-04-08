@@ -8,7 +8,7 @@ import com.geekhub.entity.User;
 import com.geekhub.entity.UserDirectory;
 import com.geekhub.entity.UserDocument;
 import com.geekhub.entity.enums.DocumentAttribute;
-import com.geekhub.dto.DocumentDto;
+import com.geekhub.dto.UserDocumentDto;
 import com.geekhub.dto.DocumentOldVersionDto;
 import com.geekhub.dto.SharedDto;
 import com.geekhub.service.CommentService;
@@ -102,7 +102,8 @@ public class DocumentController {
     }
 
     @RequestMapping(value = "/download-{docId}", method = RequestMethod.GET)
-    public String downloadDocument(@PathVariable Long docId, HttpSession session, HttpServletResponse response)
+    @ResponseStatus(HttpStatus.OK)
+    public void downloadDocument(@PathVariable Long docId, HttpSession session, HttpServletResponse response)
             throws IOException {
 
         User user = userService.getById((Long) session.getAttribute("userId"));
@@ -113,8 +114,6 @@ public class DocumentController {
         response.setHeader("Content-Disposition", "attachment; filename=\"" + document.getName() +"\"");
 
         FileCopyUtils.copy(Files.newInputStream(file.toPath()), response.getOutputStream());
-
-        return "redirect:/document/upload";
     }
 
     @RequestMapping(value = "/move-to-trash", method = RequestMethod.POST)
@@ -191,11 +190,9 @@ public class DocumentController {
     }
 
     @RequestMapping("/get_document")
-    public DocumentDto getUserDocument(Long docId, HttpSession session) {
-        UserDocument document = userDocumentService.getById(docId);
-        Set<User> readers = userDocumentService.getReaders(docId);
-        Set<FriendsGroup> readersGroups = userDocumentService.getReadersGroup(docId);
-        return new DocumentDto(docId, document.getName(), document.getDocumentAttribute().toString(), readers, readersGroups);
+    public UserDocumentDto getUserDocument(Long docId, HttpSession session) {
+        UserDocument document = userDocumentService.getDocumentWithReaders(docId);
+        return EntityToDtoConverter.convert(document);
     }
 
     @RequestMapping(value = "/share_document", method = RequestMethod.POST)

@@ -1,18 +1,13 @@
 package com.geekhub.dto;
 
 import com.geekhub.entity.User;
+import java.util.Set;
 
 public class FriendsGroupDto {
 
     private long id;
     private String name;
-    private User[] friends;
-
-    public FriendsGroupDto(long id, String name, User[] friends) {
-        this.id = id;
-        this.name = name;
-        this.friends = friends;
-    }
+    private Set<User> friends;
 
     public long getId() {
         return id;
@@ -30,11 +25,11 @@ public class FriendsGroupDto {
         this.name = name;
     }
 
-    public User[] getFriends() {
+    public Set<User> getFriends() {
         return friends;
     }
 
-    public void setFriends(User[] friends) {
+    public void setFriends(Set<User> friends) {
         this.friends = friends;
     }
 }

@@ -31,21 +31,37 @@
         </c:if>
     </div>
 
-    <div class="container" style="width: 300px;" align="left">
-        <form action="/profile/changeName" method="post">
+    <div class="container" style="width: 450px;" align="left">
+        <form action="/profile/changeProfile" method="post">
             <h4>Set your account</h4>
 
-            <input type="text" name="firstName" value="${firstName}" id="firstName"
-                   class="form-control" placeholder="First Name" required="" autofocus="">
+            <label for="firstName">First name: </label>
+            <input type="text" name="firstName" value="${user.firstName}" id="firstName"
+                   class="form-control" required="" autofocus="">
             <br>
-            <input type="text" name="lastName" id="lastName" value="${lastName}"
-                   class="form-control" placeholder="Last Name" required="" autofocus="">
+            <label for="lastName">Last name: </label>
+            <input type="text" name="lastName" id="lastName" value="${user.lastName}"
+                   class="form-control" required="" autofocus="">
             <br>
-            <input type="text" name="login" value="${login}" id="login"
-                   class="form-control" placeholder="Login" required="" autofocus="">
+            <label for="login">Login: </label>
+            <input type="text" name="login" value="${user.login}" id="login"
+                   class="form-control" required="" autofocus="">
             <br>
-            <input type="text" name="lastName" id="email" value="${email}"
-                   class="form-control" placeholder="Email Address" autofocus="">
+            <label for="email">E-mail address: </label>
+            <input type="text" name="email" id="email" value="${user.email}"
+                   class="form-control" autofocus="">
+            <br>
+            <label for="country">Country: </label>
+            <input type="text" name="country" value="${user.country}" id="country"
+                   class="form-control" required="" autofocus="">
+            <br>
+            <label for="state">State: </label>
+            <input type="text" name="state" id="state" value="${user.state}"
+                   class="form-control" required="" autofocus="">
+            <br>
+            <label for="city">City: </label>
+            <input type="text" name="city" value="${user.city}" id="city"
+                   class="form-control" required="" autofocus="">
             <br>
             <button class="btn btn-primary btn-sm" type="submit">Save</button>
         </form>
@@ -54,30 +70,17 @@
         <form class="form-signin" action="/profile/changePassword" method="post">
             <h4>To change password enter your current password</h4>
 
+            <label for="currentPassword">Your current password: </label>
             <input type="password" name="currentPassword" id="currentPassword"
-                   class="form-control" placeholder="Password" required="">
+                   class="form-control" required="">
             <br>
+            <label for="newPassword">New password: </label>
             <input type="password" name="newPassword" id="newPassword"
-                   class="form-control" placeholder="Password" required="">
+                   class="form-control" required="">
             <br>
+            <label for="confirmNewPassword">Confirm new password: </label>
             <input type="password" name="confirmNewPassword" id="confirmNewPassword"
-                   class="form-control" placeholder="Password" required="">
-            <br>
-            <button class="btn btn-primary btn-sm" type="submit">Save</button>
-        </form>
-        <hr/>
-
-        <form action="/profile/changeLocation" method="post">
-            <h4>Set your location</h4>
-
-            <input type="text" name="country" value="${country}" id="country"
-                   class="form-control" placeholder="Country" required="" autofocus="">
-            <br>
-            <input type="text" name="state" id="state" value="${state}"
-                   class="form-control" placeholder="State" required="" autofocus="">
-            <br>
-            <input type="text" name="city" value="${city}" id="city"
-                   class="form-control" placeholder="City" required="" autofocus="">
+                   class="form-control" required="">
             <br>
             <button class="btn btn-primary btn-sm" type="submit">Save</button>
         </form>
