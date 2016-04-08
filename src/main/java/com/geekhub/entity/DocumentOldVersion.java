@@ -1,11 +1,12 @@
 package com.geekhub.entity;
 
+import java.util.Date;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.OneToOne;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 @Entity
@@ -15,19 +16,25 @@ public class DocumentOldVersion {
     @Id
     @GeneratedValue
     private Long id;
-
-    @OneToOne
-    @JoinColumn(name = "userdocument_id")
-    private UserDocument userDocument;
+    
+    @Column
+    private String name;
 
     @Column
     private String hashName;
+    
+    @Column
+    private String size;
+    
+    @Column
+    private Date lastModifyDate;
 
     @Column
-    private long version;
+    private String changedBy;
 
-    @Column
-    private String description;
+    @ManyToOne
+    @JoinColumn(name = "userdocument_id")
+    private UserDocument userDocument;
 
     public Long getId() {
         return id;
@@ -45,20 +52,36 @@ public class DocumentOldVersion {
         this.userDocument = userDocument;
     }
 
-    public long getVersion() {
-        return version;
+    public String getChangedBy() {
+        return changedBy;
     }
 
-    public void setVersion(long version) {
-        this.version = version;
+    public void setChangedBy(String changedBy) {
+        this.changedBy = changedBy;
     }
 
-    public String getDescription() {
-        return description;
+    public String getSize() {
+        return size;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
+    public void setSize(String size) {
+        this.size = size;
+    }
+
+    public Date getLastModifyDate() {
+        return lastModifyDate;
+    }
+
+    public void setLastModifyDate(Date lastModifyDate) {
+        this.lastModifyDate = lastModifyDate;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public String getHashName() {
@@ -76,10 +99,9 @@ public class DocumentOldVersion {
 
         DocumentOldVersion that = (DocumentOldVersion) o;
 
-        if (version != that.version) return false;
         if (id != null ? !id.equals(that.id) : that.id != null) return false;
         if (userDocument != null ? !userDocument.equals(that.userDocument) : that.userDocument != null) return false;
-        return description != null ? description.equals(that.description) : that.description == null;
+        return changedBy != null ? changedBy.equals(that.changedBy) : that.changedBy == null;
 
     }
 
@@ -87,8 +109,7 @@ public class DocumentOldVersion {
     public int hashCode() {
         int result = id != null ? id.hashCode() : 0;
         result = 31 * result + (userDocument != null ? userDocument.hashCode() : 0);
-        result = 31 * result + (int) (version ^ (version >>> 32));
-        result = 31 * result + (description != null ? description.hashCode() : 0);
+        result = 31 * result + (changedBy != null ? changedBy.hashCode() : 0);
         return result;
     }
 }

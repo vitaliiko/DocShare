@@ -27,7 +27,7 @@
                 <td>${doc.name}</td>
                 <td>${doc.size}</td>
                 <td><fmt:formatDate type="date" timeStyle="short" dateStyle="short" value="${doc.lastModifyTime}"/></td>
-                <td>${doc.description}</td>
+                <td>${doc.changedBy}</td>
                 <td><a href="<c:url value='/document/version-recover-${doc.id}' />"
                        class="btn btn-primary custom-width">Recover</a></td>
                 <td><a href="<c:url value='/document/download-${doc.id}' />"

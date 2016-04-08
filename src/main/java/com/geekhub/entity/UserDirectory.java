@@ -22,9 +22,6 @@ public class UserDirectory extends UserFile implements Comparable<UserDirectory>
     @GeneratedValue
     private Long id;
 
-    @Column
-    private String description;
-
     @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "owner_id")
@@ -62,14 +59,6 @@ public class UserDirectory extends UserFile implements Comparable<UserDirectory>
         this.id = id;
     }
 
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
     public User getOwner() {
         return owner;
     }
@@ -102,8 +91,6 @@ public class UserDirectory extends UserFile implements Comparable<UserDirectory>
         UserDirectory directory = (UserDirectory) o;
 
         if (id != null ? !id.equals(directory.id) : directory.id != null) return false;
-        if (description != null ? !description.equals(directory.description) : directory.description != null)
-            return false;
         if (owner != null ? !owner.equals(directory.owner) : directory.owner != null) return false;
         return readers != null ? readers.equals(directory.readers) : directory.readers == null;
 
@@ -112,7 +99,6 @@ public class UserDirectory extends UserFile implements Comparable<UserDirectory>
     @Override
     public int hashCode() {
         int result = id != null ? id.hashCode() : 0;
-        result = 31 * result + (description != null ? description.hashCode() : 0);
         result = 31 * result + (owner != null ? owner.hashCode() : 0);
         result = 31 * result + (readers != null ? readers.hashCode() : 0);
         return result;

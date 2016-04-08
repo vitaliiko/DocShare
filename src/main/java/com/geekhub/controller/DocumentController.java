@@ -108,7 +108,7 @@ public class DocumentController {
 
         User user = userService.getById((Long) session.getAttribute("userId"));
         UserDocument document = userDocumentService.getById(docId);
-        File file = UserFileUtil.createFile(document.getHashName(), user.getRootDirectory());
+        File file = UserFileUtil.createFile(document.getHashName());
         response.setContentType(document.getType());
         response.setContentLength((int) file.length());
         response.setHeader("Content-Disposition", "attachment; filename=\"" + document.getName() +"\"");
@@ -222,8 +222,10 @@ public class DocumentController {
         return model;
     }
 
-    private void saveOrUpdateDocument(MultipartFile multipartFile, String parentDirectoryHash, String description, User user)
-            throws IOException {
+    private void saveOrUpdateDocument(MultipartFile multipartFile,
+                                      String parentDirectoryHash,
+                                      String description,
+                                      User user) throws IOException {
 
         String docName = multipartFile.getOriginalFilename();
         UserDocument document = userDocumentService.getByFullNameAndOwner(user, parentDirectoryHash, docName);
@@ -233,9 +235,8 @@ public class DocumentController {
                     removedDocumentService.getByFullNameAndOwner(user, parentDirectoryHash, docName);
             if (removedDocument == null) {
                 document = UserFileUtil.createUserDocument(multipartFile, parentDirectoryHash, description, user);
-                Long docId = userDocumentService.save(document);
-                String docHashName = userDocumentService.getById(docId).getHashName();
-                multipartFile.transferTo(UserFileUtil.createFile(docHashName, user.getRootDirectory()));
+                multipartFile.transferTo(UserFileUtil.createFile(document.getHashName()));
+                userDocumentService.save(document);
             } else {
                 Long docId = userDocumentService.recover(removedDocument.getId());
                 document = userDocumentService.getDocumentWithOldVersions(docId);
@@ -250,9 +251,8 @@ public class DocumentController {
     private void updateDocument(UserDocument document, User owner, String description, MultipartFile multipartFile)
             throws IOException {
         DocumentOldVersion oldVersion = DocumentVersionUtil.saveOldVersion(document, "Changed by " + owner.toString());
+        document.getDocumentOldVersions().add(oldVersion);
         userDocumentService.update(UserFileUtil.updateUserDocument(document, multipartFile, description));
-        documentOldVersionService.save(oldVersion);
-        multipartFile.transferTo(UserFileUtil.createFile(document.getHashName(), owner.getRootDirectory()));
     }
 
     private void makeDirectory(User owner, String parentDirectoryHash, String dirName) {

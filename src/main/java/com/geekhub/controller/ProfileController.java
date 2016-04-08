@@ -73,7 +73,7 @@ public class ProfileController {
         ModelAndView model = new ModelAndView();
         User user = userService.getById((Long) session.getAttribute("userId"));
         userService.removeFromFriends(user);
-        UserFileUtil.removeUserFiles(user.getRootDirectory());
+        UserFileUtil.removeUserFiles(user);
         userService.delete(user);
         session.invalidate();
         model.addObject("message", "Your account removed successfully")

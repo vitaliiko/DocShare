@@ -48,7 +48,7 @@ public class MainController {
         if (user != null && user.getPassword().equals(j_password)) {
             model.setViewName("redirect:/document/upload");
             session.setAttribute("userId", user.getId());
-            session.setAttribute("parentDirectoryHash", user.getRootDirectory());
+            session.setAttribute("parentDirectoryHash", "/");
         } else {
             model.addObject("errorMessage", "Wrong login or password")
                     .setViewName("signIn");

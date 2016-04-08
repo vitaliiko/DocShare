@@ -9,12 +9,12 @@ import com.geekhub.entity.enums.DocumentAttribute;
 import java.io.File;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
-import org.apache.commons.io.FileUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -61,8 +61,9 @@ public class UserFileUtil {
         document.setDescription(description);
         document.setLastModifyTime(Calendar.getInstance().getTime());
         document.setType(multipartFile.getContentType());
-        document.setSize(calculateSize(multipartFile.getSize()));
+        document.setSize(convertSize(multipartFile.getSize()));
         document.setOwner(user);
+        document.setHashName(createHashName(new Date().getTime()));
         document.setDocumentAttribute(DocumentAttribute.PRIVATE);
         return document;
     }
@@ -74,12 +75,15 @@ public class UserFileUtil {
         if (description != null && !description.isEmpty()) {
             document.setDescription(description);
         }
+        String hashName = UserFileUtil.createHashName();
         document.setLastModifyTime(Calendar.getInstance().getTime());
-        document.setSize(calculateSize(multipartFile.getSize()));
+        document.setSize(convertSize(multipartFile.getSize()));
+        document.setHashName(hashName);
+        multipartFile.transferTo(UserFileUtil.createFile(hashName));
         return document;
     }
 
-    private static String calculateSize(long size) {
+    private static String convertSize(long size) {
         if (size <= 0) {
             return "0 B";
         }
@@ -97,8 +101,8 @@ public class UserFileUtil {
         return removedDocument;
     }
 
-    public static String createHashName(long ownerId, long docId) {
-        return DocumentNameDigest.hashName("" + ownerId + docId);
+    public static String createHashName() {
+        return DocumentNameDigest.hashName("" + new Date().getTime());
     }
 
     public static String createHashName(long... parameters) {
@@ -107,12 +111,11 @@ public class UserFileUtil {
         return DocumentNameDigest.hashName(preparedHashName.toString());
     }
 
-    public static File createFile(String fileName, String rootUserDirectory) {
-        return new File(getFullFileName(fileName, rootUserDirectory));
-    }
-
-    public static String getFullFileName(String fileName, String rootUserDirectory) {
-        return ROOT_LOCATION + rootUserDirectory + "\\" + fileName + SYSTEM_EXTENSION;
+    public static File createFile(String fileName) {
+        if (fileName != null && !fileName.isEmpty()) {
+            return new File(ROOT_LOCATION + fileName + SYSTEM_EXTENSION);
+        }
+        return null;
     }
 
     public static UserDirectory createUserDirectory(User owner, String parentDirectoryHash, String dirName) {
@@ -120,15 +123,9 @@ public class UserFileUtil {
         directory.setOwner(owner);
         directory.setName(dirName);
         directory.setParentDirectoryHash(parentDirectoryHash);
+        directory.setHashName(createHashName());
         directory.setDocumentAttribute(DocumentAttribute.PRIVATE);
         return directory;
-    }
-
-    public static void createDirInFileSystem(UserDirectory directory) {
-        File file = new File(ROOT_LOCATION + "\\" + directory.getHashName());
-        if (!file.exists()) {
-            file.mkdir();
-        }
     }
 
     public static Map<String, Object> createPropertiesMap(User owner, String parentDirectoryHash, String name) {
@@ -139,11 +136,7 @@ public class UserFileUtil {
         return propertiesMap;
     }
 
-    public static void removeUserFiles(String userDirectory) {
-        try {
-            FileUtils.deleteDirectory(new File(ROOT_LOCATION + userDirectory));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    public static void removeUserFiles(User user) {
+
     }
 }

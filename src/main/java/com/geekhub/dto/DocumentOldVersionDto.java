@@ -6,7 +6,7 @@ public class DocumentOldVersionDto {
 
     private long id;
     private String name;
-    private String description;
+    private String changedBy;
     private Date lastModifyTime;
     private String size;
 
@@ -28,12 +28,12 @@ public class DocumentOldVersionDto {
         this.name = name;
     }
 
-    public String getDescription() {
-        return description;
+    public String getChangedBy() {
+        return changedBy;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
+    public void setChangedBy(String changedBy) {
+        this.changedBy = changedBy;
     }
 
     public Date getLastModifyTime() {

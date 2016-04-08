@@ -32,9 +32,6 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private FriendsGroupService friendsGroupService;
 
-    @Autowired
-    private UserDirectoryService userDirectoryService;
-
     @Override
     public List<User> getAll(String orderParameter) {
         return userDao.getAll(orderParameter);
@@ -63,16 +60,7 @@ public class UserServiceImpl implements UserService {
         if (userDao.get("login", login) == null) {
             User user = new User(firstName, lastName, password, login);
             user.setRegistrationDate(Calendar.getInstance().getTime());
-            user.setId(userDao.save(user));
-            UserDirectory directory =
-                    UserFileUtil.createUserDirectory(user, UserFileUtil.ROOT_DIRECTORY_HASH, user.getLogin());
-            directory.setDocumentAttribute(DocumentAttribute.ROOT);
-            Long dirId = userDirectoryService.save(directory);
-            directory = userDirectoryService.getById(dirId);
-            UserFileUtil.createDirInFileSystem(directory);
-            user.setRootDirectory(directory.getHashName());
-            userDao.update(user);
-            return user.getId();
+            return userDao.save(user);
         }
         return null;
     }
