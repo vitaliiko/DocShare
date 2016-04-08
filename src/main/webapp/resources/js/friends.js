@@ -2,6 +2,7 @@
 $(document).ready(function() {
 
     var friendsGroupId;
+    var handlebarsPath = '/resources/js/templates/';
 
     function clearModalWindow() {
         $('.check-box').each(function() {
@@ -20,16 +21,14 @@ $(document).ready(function() {
             url: '/friends/create_group',
             data: {groupName: groupName, friends: friends},
             success: function(groupId) {
-                $('#groupTable').append("<tr class='group" + groupId + "'>" +
-                    "<td><button type='button' name='groupInfoButton' class='btn btn-link group-info-btn'" +
-                    "data-toggle='modal' data-target='#groupInfo'> " + groupName + " </button></td>" +
-                    "<td><input type='button' class='btn btn-default removeGroupButton' id='" + groupId +
-                    "' value='Remove friends group'>" +
-                    "</td></tr>");
-                $.each(friends, function(k, v) {
-                    $('.td' + v).append("<button type='button' name='groupInfoButton' " +
-                        "data-toggle='modal' data-target='#groupInfo'" +
-                        "class='btn btn-link group-info-btn group" + groupId + "'>" + groupName + "</button>");
+                var group = {groupId: groupId, groupName: groupName};
+                loadTemplate(handlebarsPath + 'groupTableRow.html', function(template) {
+                    $('#groupTable').append(template(group));
+                });
+                $.each(friends, function (k, v) {
+                    loadTemplate(handlebarsPath + 'groupInfoButton.html', function (template) {
+                        $('.td' +  v).append(template(group));
+                    });
                 });
                 clearModalWindow();
             }
@@ -53,7 +52,7 @@ $(document).ready(function() {
         });
     });
 
-    $('.group-info-btn').click(function() {
+    $('.table').on('click', '.group-info-btn', function(event) {
         event.preventDefault();
         clearModalWindow();
         $('#saveGroupButton').hide();
@@ -100,4 +99,18 @@ $(document).ready(function() {
             }
         })
     });
+
+    function loadTemplate(path, callback) {
+        var source, template;
+        $.ajax({
+            url: path,
+            success: function(data) {
+                source = data;
+                template = Handlebars.compile(source);
+                if (callback && typeof callback === 'function') {
+                    callback(template);
+                }
+            }
+        });
+    }
 });
