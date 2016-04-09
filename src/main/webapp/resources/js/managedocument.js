@@ -1,5 +1,6 @@
 $(document).ready(function() {
 
+    var content = $('.content');
     var fileId;
     var fileAccess;
     var shareUrl;
@@ -11,6 +12,7 @@ $(document).ready(function() {
     var publicTable = $('.PUBLIC');
     var forFriendsTable = $('.FOR_FRIENDS');
     var handlebarsPath = '/resources/js/templates/';
+    var backLink = $('.back-link');
 
     function changeTab() {
         $('.doc-table').hide(true);
@@ -28,6 +30,7 @@ $(document).ready(function() {
     changeTab();
     allTable.show(true);
     setSelectionStyle($('.all-href'));
+    backLink.hide();
 
     $('.all-href').click(function() {
         event.preventDefault();
@@ -79,7 +82,7 @@ $(document).ready(function() {
         }
     }
 
-    $('.select').change(function() {
+    content.on('change', '.select', function() {
         showHideButtons();
     });
 
@@ -130,7 +133,7 @@ $(document).ready(function() {
         });
     });
 
-    $('.share-doc-btn').click(function() {
+    content.on('click', '.share-doc-btn', function() {
         clearModalWindow();
         $('.group-check-box').show();
         shareUrl = '/document/share_document';
@@ -148,7 +151,7 @@ $(document).ready(function() {
         });
     });
 
-    $('.share-dir-btn').click(function() {
+    content.on('click', '.share-dir-btn', function() {
         clearModalWindow();
         $('.group-check-box').hide();
         shareUrl = '/document/share_directory';
@@ -247,34 +250,65 @@ $(document).ready(function() {
         });
     });
 
-    $('.get-dir-content').click(function(event) {
+    content.on('click', '.get-dir-content', function(event) {
         event.preventDefault();
         var dirName = $(this).text();
-        var url = $(this).prop('href');
+        var url = '/document/get-directory-content-' + this.id;
 
         $.getJSON(url, function(files) {
-            var dirHashName = files[0].parentDirectoryHash;
-            $('#location').append('<label> / ' + dirName + '</label>');
-            $('.back-link').prop('href', 'get-parent-directory-content-' + dirHashName);
+            var locationElement = $('#location');
+            var location = locationElement.text();
+            locationElement.text(location + '/' + dirName);
+
+            url = '' + url;
+            url = url.substring(url.lastIndexOf('-'));
+            $('.back-link').prop('href', '/document/get-parent-directory-content' + url);
             $('.file-tr').remove();
-            $.each(files, function(k, file) {
-                if (file.type === 'doc') {
-                    loadTemplate(handlebarsPath + 'documentRow.html', function (template) {
-                        allTable.append(template(file));
-                        $('.' + file.access).append(template(file));
-                    });
-                } else {
-                    loadTemplate(handlebarsPath + 'directoryRow.html', function (template) {
-                        allTable.append(template(file));
-                        $('.' + file.access).append(template(file));
-                    });
-                }
-            });
+            loadContent(files);
+            hideShowBackLink();
         });
     });
 
-    $('.back-link').click(function(event) {
+    backLink.click(function(event) {
         event.preventDefault();
+        var url = $(this).prop('href');
 
+        $.getJSON(url, function(files) {
+            var locationElement = $('#location');
+            var location = locationElement.text();
+            locationElement.text(location.substring(0, location.lastIndexOf('/') - 1));
+
+            var dirHashName = files[0].parentDirectoryHash;
+            $('.back-link').prop('href', 'get-parent-directory-content-' + dirHashName);
+            $('.file-tr').remove();
+
+            loadContent(files);
+            hideShowBackLink();
+        });
     });
+
+    function hideShowBackLink() {
+        var url = '' + backLink.prop('href');
+        if (url.endsWith('DocShare')) {
+            backLink.hide();
+        } else {
+            backLink.show();
+        }
+    }
+
+    function loadContent(files) {
+        $.each(files, function(k, file) {
+            if (file.type === 'doc') {
+                loadTemplate(handlebarsPath + 'documentRow.html', function (template) {
+                    allTable.append(template(file));
+                    $('.' + file.access).append(template(file));
+                });
+            } else {
+                loadTemplate(handlebarsPath + 'directoryRow.html', function (template) {
+                    allTable.append(template(file));
+                    $('.' + file.access).append(template(file));
+                });
+            }
+        });
+    }
 });

@@ -42,8 +42,8 @@
         </div>
     </form>
 
-    <div id="location" class="back-links">
-        <label>DocShare</label>
+    <div  class="back-links">
+        <h3 id="location">DocShare</h3>
     </div>
     <div>
         <a href="" class="back-link"><-Back</a>
@@ -55,7 +55,7 @@
         <%--</form>--%>
     <%--</div>--%>
 
-    <div>
+    <div class="content">
         <c:forEach items="${tableNames}" var="tableName">
             <table class="table table-hover tbody tr:hover td doc-table ${tableName}">
                 <caption>
@@ -86,8 +86,7 @@
                             <input type="checkbox" class="check-box select select-dir big-check-box" value="${dir.id}"/>
                         </td>
                         <td class="directory-name">
-                            <a href="/document/get-directory-content-${dir.hashName}"
-                               class="get-dir-content">${dir.name}</a>
+                            <a href="#" id="${dir.hashName}" class="get-dir-content">${dir.name}</a>
                         </td>
                         <td>--</td>
                         <td>--</td>

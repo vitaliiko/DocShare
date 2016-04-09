@@ -244,24 +244,21 @@ public class DocumentController {
 
     @RequestMapping("/get-directory-content-{dirHashName}")
     public Set<UserFileDto> getDirectoryContent(@PathVariable String dirHashName, HttpSession session) {
-        UserDirectory currentDirectory = userDirectoryService.getByHashName(dirHashName);
-        return getDirectoryContent(currentDirectory);
+        return getDirectoryContent(dirHashName);
     }
 
     @RequestMapping("get-parent-directory-content-{dirHashName}")
     public Set<UserFileDto> getParentDirectoryContent(@PathVariable String dirHashName, HttpSession session) {
         UserDirectory currentDirectory = userDirectoryService.getByHashName(dirHashName);
-        UserDirectory parentDirectory = userDirectoryService.getByHashName(currentDirectory.getParentDirectoryHash());
-        return getDirectoryContent(parentDirectory);
+        return getDirectoryContent(currentDirectory.getParentDirectoryHash());
     }
 
-    private Set<UserFileDto> getDirectoryContent(UserDirectory directory) {
-        List<UserDocument> documents = null;
-        List<UserDirectory> directories = null;
-        if (directory != null) {
-            documents = userDocumentService.getAllByParentDirectoryHash(directory.getHashName());
-            directories = userDirectoryService.getAllByParentDirectoryHash(directory.getHashName());
-        }
+    private Set<UserFileDto> getDirectoryContent(String directoryHashName) {
+        List<UserDocument> documents;
+        List<UserDirectory> directories;
+        documents = userDocumentService.getAllByParentDirectoryHash(directoryHashName);
+        directories = userDirectoryService.getAllByParentDirectoryHash(directoryHashName);
+
         Set<UserFileDto> dtoList = new TreeSet<>();
         if (documents != null) {
             documents.forEach(d -> dtoList.add(EntityToDtoConverter.convert(d)));
