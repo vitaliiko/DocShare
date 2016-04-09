@@ -5,13 +5,15 @@ import com.geekhub.entity.User;
 import java.util.Date;
 import java.util.Set;
 
-public class UserFileDto {
+public class UserFileDto implements Comparable<UserFileDto> {
 
     private long id;
     private String type;
     private String name;
+    private String hashName;
     private String access;
     private String size;
+    private String parentDirectoryHash;
     private Date lastModifyTime;
     private Set<User> readers;
     private Set<FriendsGroup> readersGroups;
@@ -42,6 +44,14 @@ public class UserFileDto {
         this.name = name;
     }
 
+    public String getHashName() {
+        return hashName;
+    }
+
+    public void setHashName(String hashName) {
+        this.hashName = hashName;
+    }
+
     public String getAccess() {
         return access;
     }
@@ -56,6 +66,14 @@ public class UserFileDto {
 
     public void setSize(String size) {
         this.size = size;
+    }
+
+    public String getParentDirectoryHash() {
+        return parentDirectoryHash;
+    }
+
+    public void setParentDirectoryHash(String parentDirectoryHash) {
+        this.parentDirectoryHash = parentDirectoryHash;
     }
 
     public Date getLastModifyTime() {
@@ -96,5 +114,10 @@ public class UserFileDto {
 
     public void setEditorsGroups(Set<FriendsGroup> editorsGroups) {
         this.editorsGroups = editorsGroups;
+    }
+
+    @Override
+    public int compareTo(UserFileDto o) {
+        return this.getName().compareTo(o.getName());
     }
 }

@@ -24,6 +24,7 @@ public class UserFileUtil {
 
     public static final String ROOT_LOCATION = "C:\\spring_docs\\";
     public static final String SYSTEM_EXTENSION = ".curva";
+    public static final String ROOT_DIRECTORY_NAME = "DocShare";
 
     public static <T extends UserFile> Map<String, Set<T>> prepareUserFileListMap(List<T> allDocumentsList) {
         Set<T> allDocuments = new TreeSet<>(allDocumentsList);

@@ -5,7 +5,6 @@ import com.geekhub.entity.User;
 import com.geekhub.entity.UserDirectory;
 import com.geekhub.util.UserFileUtil;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.hibernate.Hibernate;
@@ -105,5 +104,15 @@ public class UserDirectoryServiceImpl implements UserDirectoryService {
         Hibernate.initialize(directory.getReadersGroups());
         Hibernate.initialize(directory.getReaders());
         return directory;
+    }
+
+    @Override
+    public List<UserDirectory> getAllByParentDirectoryHash(String parentDirectoryHash) {
+        return userDirectoryDao.getList("parentDirectoryHash", parentDirectoryHash);
+    }
+
+    @Override
+    public UserDirectory getByHashName(String hashName) {
+        return userDirectoryDao.get("hashName", hashName);
     }
 }

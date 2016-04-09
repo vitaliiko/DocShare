@@ -4,6 +4,7 @@ import com.geekhub.entity.User;
 import com.geekhub.exception.UserValidateException;
 import com.geekhub.service.UserService;
 import com.geekhub.provider.UserProvider;
+import com.geekhub.util.UserFileUtil;
 import org.hibernate.HibernateException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -48,7 +49,8 @@ public class MainController {
         if (user != null && user.getPassword().equals(j_password)) {
             model.setViewName("redirect:/document/upload");
             session.setAttribute("userId", user.getId());
-            session.setAttribute("parentDirectoryHash", "/");
+            session.setAttribute("parentDirectoryHash", UserFileUtil.ROOT_DIRECTORY_NAME);
+            session.setAttribute("currentLocation", UserFileUtil.ROOT_DIRECTORY_NAME);
         } else {
             model.addObject("errorMessage", "Wrong login or password")
                     .setViewName("signIn");

@@ -8,6 +8,7 @@ import java.util.Set;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
@@ -43,7 +44,8 @@ public class UserDocument extends UserFile implements Comparable<UserDocument> {
     private User owner;
 
     @JsonIgnore
-    @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
+    @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH},
+            fetch = FetchType.EAGER)
     @JoinTable(name = "reader_to_document_relation",
             joinColumns = {
                     @JoinColumn(name = "userdocument_id")
@@ -55,7 +57,8 @@ public class UserDocument extends UserFile implements Comparable<UserDocument> {
     private Set<User> readers = new HashSet<>();
 
     @JsonIgnore
-    @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
+    @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH},
+            fetch = FetchType.EAGER)
     @JoinTable(name = "editor_to_document_relation",
             joinColumns = {
                     @JoinColumn(name = "userdocument_id")
@@ -67,7 +70,8 @@ public class UserDocument extends UserFile implements Comparable<UserDocument> {
     private Set<User> editors = new HashSet<>();
 
     @JsonIgnore
-    @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
+    @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH},
+            fetch = FetchType.EAGER)
     @JoinTable(name = "readers_group_to_document_relation",
             joinColumns = {
                     @JoinColumn(name = "userdocument_id")
@@ -79,7 +83,8 @@ public class UserDocument extends UserFile implements Comparable<UserDocument> {
     private Set<FriendsGroup> readersGroups = new HashSet<>();
 
     @JsonIgnore
-    @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
+    @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH},
+            fetch = FetchType.EAGER)
     @JoinTable(name = "editors_group_to_document_relation",
             joinColumns = {
                     @JoinColumn(name = "userdocument_id")

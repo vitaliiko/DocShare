@@ -162,4 +162,9 @@ public class UserDocumentServiceImpl implements UserDocumentService {
     public UserDocument getWithOldVersions(Long docId) {
         return userDocumentDao.getWithOldVersions(docId);
     }
+
+    @Override
+    public List<UserDocument> getAllByParentDirectoryHash(String parentDirectoryHash) {
+        return userDocumentDao.getList("parentDirectoryHash", parentDirectoryHash);
+    }
 }

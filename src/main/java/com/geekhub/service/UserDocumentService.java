@@ -4,6 +4,7 @@ import com.geekhub.entity.Comment;
 import com.geekhub.entity.DocumentOldVersion;
 import com.geekhub.entity.FriendsGroup;
 import com.geekhub.entity.User;
+import com.geekhub.entity.UserDirectory;
 import com.geekhub.entity.UserDocument;
 import java.util.Set;
 import org.springframework.stereotype.Service;
@@ -40,4 +41,6 @@ public interface UserDocumentService extends EntityService<UserDocument, Long> {
     Set<DocumentOldVersion> getOldVersions(Long docId);
 
     UserDocument getWithOldVersions(Long docId);
+
+    List<UserDocument> getAllByParentDirectoryHash(String parentDirectoryHash);
 }

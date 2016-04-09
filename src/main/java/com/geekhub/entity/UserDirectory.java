@@ -6,6 +6,7 @@ import java.util.Set;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
@@ -28,7 +29,8 @@ public class UserDirectory extends UserFile implements Comparable<UserDirectory>
     private User owner;
 
     @JsonIgnore
-    @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
+    @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH},
+            fetch = FetchType.EAGER)
     @JoinTable(name = "reader_to_directory_relation",
             joinColumns = {
                     @JoinColumn(name = "userdirectory_id")
@@ -40,7 +42,8 @@ public class UserDirectory extends UserFile implements Comparable<UserDirectory>
     private Set<User> readers = new HashSet<>();
 
     @JsonIgnore
-    @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
+    @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH},
+            fetch = FetchType.EAGER)
     @JoinTable(name = "readers_group_to_directory_relation",
             joinColumns = {
                     @JoinColumn(name = "userdirectory_id")

@@ -30,6 +30,7 @@ public class EntityToDtoConverter {
         documentDto.setSize(document.getSize());
         documentDto.setLastModifyTime(document.getLastModifyTime());
         documentDto.setName(document.getName());
+        documentDto.setParentDirectoryHash(document.getParentDirectoryHash());
         documentDto.setAccess(document.getDocumentAttribute().toString());
         documentDto.setReaders(document.getReaders());
         documentDto.setReadersGroups(document.getReadersGroups());
@@ -43,6 +44,8 @@ public class EntityToDtoConverter {
         directoryDto.setId(directory.getId());
         directoryDto.setType("dir");
         directoryDto.setName(directory.getName());
+        directoryDto.setHashName(directory.getHashName());
+        directoryDto.setParentDirectoryHash(directory.getParentDirectoryHash());
         directoryDto.setAccess(directory.getDocumentAttribute().toString());
         directoryDto.setReaders(directory.getReaders());
         directoryDto.setReadersGroups(directory.getReadersGroups());

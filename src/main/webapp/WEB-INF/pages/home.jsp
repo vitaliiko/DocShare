@@ -43,6 +43,10 @@
     </form>
 </div>
 
+<div id="location" class="container" style="width: 900px;">
+    <h3>${currentLocation}</h3>
+</div>
+
 <%--<div class="container" style="width: 900px;">--%>
     <%--<form action="/document/search">--%>
         <%--<input type="text" name="search" class="form-control input-sm">--%>
@@ -81,7 +85,7 @@
                         <input type="checkbox" class="check-box select select-dir big-check-box" value="${dir.id}"/>
                     </td>
                     <td class="directory-name">
-                        <a href="#">${dir.name}</a>
+                        <a href="<c:url value='/document/get-directory-content-${dir.hashName}' />">${dir.name}</a>
                     </td>
                     <td>--</td>
                     <td>--</td>
@@ -106,7 +110,7 @@
                         <fmt:formatDate type="date" timeStyle="short" dateStyle="short" value="${doc.lastModifyTime}"/>
                     </td>
                     <td width="15">
-                        <a href="<c:url value='/document/download-${doc.id}' />"
+                        <a href="<c:url value='/document/download-${doc.id}'/>"
                            class="btn btn-default btn-sm custom-width">Download</a>
                     </td>
                     <td width="15">

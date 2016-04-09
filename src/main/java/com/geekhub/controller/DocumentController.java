@@ -2,7 +2,6 @@ package com.geekhub.controller;
 
 import com.geekhub.entity.Comment;
 import com.geekhub.entity.DocumentOldVersion;
-import com.geekhub.entity.FriendsGroup;
 import com.geekhub.entity.RemovedDocument;
 import com.geekhub.entity.User;
 import com.geekhub.entity.UserDirectory;
@@ -30,6 +29,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.TreeSet;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.util.FileCopyUtils;
@@ -92,7 +92,6 @@ public class DocumentController {
 //        if (parentDirectoryHash == null && parentDirectoryHash.isEmpty()) {
 //            parentDirectoryHash = "\\";
 //        }
-        session.setAttribute("location", UserFileUtil.ROOT_LOCATION);
         model.addObject("documentsMap", UserFileUtil.prepareUserFileListMap(allDocuments));
         model.addObject("directoriesMap", UserFileUtil.prepareUserFileListMap(allDirectories));
         model.addObject("tableNames", new String[] {"ALL", "PRIVATE", "PUBLIC", "FOR_FRIENDS"});
@@ -241,6 +240,25 @@ public class DocumentController {
         document.getDocumentOldVersions().forEach(v -> versions.add(EntityToDtoConverter.convert(v)));
         model.addObject("versions", versions);
         return model;
+    }
+
+    @RequestMapping("/get-directory-content-{dirHashName}")
+    public Set<UserFileDto> getDirectoryContent(@PathVariable String dirHashName, HttpSession session) {
+        UserDirectory currentDirectory = userDirectoryService.getByHashName(dirHashName);
+        List<UserDocument> documents = null;
+        List<UserDirectory> directories = null;
+        if (currentDirectory != null) {
+            documents = userDocumentService.getAllByParentDirectoryHash(currentDirectory.getHashName());
+            directories = userDirectoryService.getAllByParentDirectoryHash(currentDirectory.getHashName());
+        }
+        Set<UserFileDto> dtoList = new TreeSet<>();
+        if (documents != null) {
+            documents.forEach(d -> dtoList.add(EntityToDtoConverter.convert(d)));
+        }
+        if (directories != null) {
+            directories.forEach(d -> dtoList.add(EntityToDtoConverter.convert(d)));
+        }
+        return dtoList;
     }
 
     private void saveOrUpdateDocument(MultipartFile multipartFile,
