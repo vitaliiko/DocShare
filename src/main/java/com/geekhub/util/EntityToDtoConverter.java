@@ -27,12 +27,15 @@ public class EntityToDtoConverter {
         documentDto.setName(document.getName());
         documentDto.setAccess(document.getDocumentAttribute().toString());
         documentDto.setReaders(document.getReaders());
-        documentDto.setReadersGroup(document.getReadersGroups());
+        documentDto.setReadersGroups(document.getReadersGroups());
+        documentDto.setEditors(document.getEditors());
+        documentDto.setEditorsGroups(document.getEditorsGroups());
         return documentDto;
     }
 
     public static UserDto convert(User user) {
         UserDto userDto = new UserDto();
+        userDto.setId(userDto.getId());
         userDto.setFirstName(user.getFirstName());
         userDto.setLastName(user.getLastName());
         userDto.setLogin(user.getLogin());

@@ -209,6 +209,14 @@ public class DocumentController {
         Arrays.stream(shared.getReadersGroups()).forEach(id -> readersGroupsSet.add(friendsGroupService.getById(id)));
         document.setReadersGroups(readersGroupsSet);
 
+        Set<User> editorsSet = new HashSet<>();
+        Arrays.stream(shared.getEditors()).forEach(id -> editorsSet.add(userService.getById(id)));
+        document.setEditors(editorsSet);
+
+        Set<FriendsGroup> editorsGroups = new HashSet<>();
+        Arrays.stream(shared.getEditorsGroups()).forEach(id -> editorsGroups.add(friendsGroupService.getById(id)));
+        document.setEditorsGroups(editorsGroups);
+
         userDocumentService.update(document);
     }
 

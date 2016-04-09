@@ -14,6 +14,10 @@
             width: 18px;
             height: 18px;
         }
+        .checkbox-table {
+            border-spacing: 10px;
+            border-collapse: separate;
+        }
     </style>
 </head>
 
@@ -33,6 +37,13 @@
         <div class="form-actions floatRight">
             <input type="submit" value="Upload" class="btn btn-primary btn-sm">
         </div>
+    </form>
+</div>
+
+<div class="container" style="width: 900px;">
+    <form action="/document/search">
+        <input type="text" name="search" class="form-control input-sm">
+        <input type="submit" value="Search" class="btn btn-primary btn-sm">
     </form>
 </div>
 
@@ -164,26 +175,44 @@
                     <input type="radio" name="access" id="FOR_FRIENDS" value="FOR_FRIENDS">For friends
                     <input type="radio" name="access" id="PUBLIC" value="PUBLIC">Public
                 </div>
-                <div class="checkbox" id="friends-list">
+                <table class="checkbox checkbox-table" id="friends-list">
+                    <tr>
+                        <th>Friends, who can read</th>
+                        <th>Friends, who can change</th>
+                    </tr>
                     <c:forEach var="group" items="${friendsGroups}">
-                        <div class="group-${group.id}">
-                            <label>
-                                <input type="checkbox" class="check-box group-check-box" value="${group.id}">
-                                    ${group.name}
-                            </label>
-                            <br>
-                        </div>
+                        <tr class="group-${group.id}">
+                            <td>
+                                <label>
+                                    <input type="checkbox" class="check-box readers-group-check-box" value="${group.id}">
+                                        ${group.name}
+                                </label>
+                            </td>
+                            <td>
+                                <label>
+                                    <input type="checkbox" class="check-box editors-group-check-box" value="${group.id}">
+                                        ${group.name}
+                                </label>
+                            </td>
+                        </tr>
                     </c:forEach>
                     <c:forEach var="friend" items="${friends}">
-                        <div class="group-${friend.id}">
-                            <label>
-                                <input type="checkbox" class="check-box friend-check-box" value="${friend.id}">
-                                    ${friend.firstName} ${friend.lastName}
-                            </label>
-                            <br>
-                        </div>
+                        <tr class="group-${friend.id}">
+                            <td>
+                                <label>
+                                    <input type="checkbox" class="check-box reader-check-box" value="${friend.id}">
+                                        ${friend.firstName} ${friend.lastName}
+                                </label>
+                            </td>
+                            <td>
+                                <label>
+                                    <input type="checkbox" class="check-box editor-check-box" value="${friend.id}">
+                                        ${friend.firstName} ${friend.lastName}
+                                </label>
+                            </td>
+                        </tr>
                     </c:forEach>
-                </div>
+                </table>
             </div>
             <div class="modal-footer">
                 <button type="button" id="shareDocument" class="btn btn-default" data-dismiss="modal">SHARE</button>

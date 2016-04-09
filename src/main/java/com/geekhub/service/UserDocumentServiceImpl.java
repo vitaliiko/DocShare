@@ -152,6 +152,8 @@ public class UserDocumentServiceImpl implements UserDocumentService {
         UserDocument document = getById(docId);
         Hibernate.initialize(document.getReadersGroups());
         Hibernate.initialize(document.getReaders());
+        Hibernate.initialize(document.getEditorsGroups());
+        Hibernate.initialize(document.getEditors());
         return document;
     }
 

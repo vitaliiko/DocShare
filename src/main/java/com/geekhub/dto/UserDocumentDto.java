@@ -10,7 +10,9 @@ public class UserDocumentDto {
     private String name;
     private String access;
     private Set<User> readers;
-    private Set<FriendsGroup> readersGroup;
+    private Set<FriendsGroup> readersGroups;
+    private Set<User> editors;
+    private Set<FriendsGroup> editorsGroups;
 
     public long getId() {
         return id;
@@ -36,12 +38,12 @@ public class UserDocumentDto {
         this.readers = readers;
     }
 
-    public Set<FriendsGroup> getReadersGroup() {
-        return readersGroup;
+    public Set<FriendsGroup> getReadersGroups() {
+        return readersGroups;
     }
 
-    public void setReadersGroup(Set<FriendsGroup> readersGroup) {
-        this.readersGroup = readersGroup;
+    public void setReadersGroups(Set<FriendsGroup> readersGroups) {
+        this.readersGroups = readersGroups;
     }
 
     public String getAccess() {
@@ -50,5 +52,21 @@ public class UserDocumentDto {
 
     public void setAccess(String access) {
         this.access = access;
+    }
+
+    public Set<User> getEditors() {
+        return editors;
+    }
+
+    public void setEditors(Set<User> editors) {
+        this.editors = editors;
+    }
+
+    public Set<FriendsGroup> getEditorsGroups() {
+        return editorsGroups;
+    }
+
+    public void setEditorsGroups(Set<FriendsGroup> editorsGroups) {
+        this.editorsGroups = editorsGroups;
     }
 }

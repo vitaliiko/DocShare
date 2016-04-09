@@ -6,6 +6,8 @@ public class SharedDto {
     private String access;
     private long[] readers;
     private long[] readersGroups;
+    private long[] editors;
+    private long[] editorsGroups;
 
     public long getDocId() {
         return docId;
@@ -37,5 +39,21 @@ public class SharedDto {
 
     public void setReadersGroups(long[] readersGroups) {
         this.readersGroups = readersGroups;
+    }
+
+    public long[] getEditors() {
+        return editors;
+    }
+
+    public void setEditors(long[] editors) {
+        this.editors = editors;
+    }
+
+    public long[] getEditorsGroups() {
+        return editorsGroups;
+    }
+
+    public void setEditorsGroups(long[] editorsGroups) {
+        this.editorsGroups = editorsGroups;
     }
 }

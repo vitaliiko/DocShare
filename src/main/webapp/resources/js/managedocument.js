@@ -140,42 +140,55 @@ $(document).ready(function() {
         var docId = $(this).val();
         $.getJSON('/document/get_document', {docId: docId}, function(document) {
             documentId = document.id;
-            var readers = [];
-            var readersGroups = [];
-            $.each(document.readers, function (k, v) {
-                readers.push(v.id);
-            });
-            $.each(document.readersGroup, function (k, v) {
-                readersGroups.push(v.id);
-            });
-            $('.group-check-box').each(function (k, v) {
-                var isChecked = $.inArray(parseInt(v.value), readersGroups) != -1;
-                $(this).prop('checked', isChecked);
-            });
-            $('.friend-check-box').each(function (k, v) {
-                var isChecked = $.inArray(parseInt(v.value), readers) != -1;
-                $(this).prop('checked', isChecked);
-            });
+            checkedBoxes(document.readers, $('.reader-check-box'));
+            checkedBoxes(document.readersGroups, $('.readers-group-check-box'));
+            checkedBoxes(document.editors, $('.editor-check-box'));
+            checkedBoxes(document.editorsGroups, $('.editors-group-check-box'));
             $('.modal-title').text('Share ' + document.name);
             $('#' + document.access).prop('checked', true);
         });
     });
 
+    function checkedBoxes(readers, checkBoxes) {
+        $.each(readers, function (k, v) {
+            readers.push(v.id);
+        });
+        $(checkBoxes).each(function (k, v) {
+            var isChecked = $.inArray(parseInt(v.value), readers) != -1;
+            $(this).prop('checked', isChecked);
+        });
+    }
+
     $('#shareDocument').click(function() {
         var readers = [];
         var readersGroups = [];
+        var editors = [];
+        var editorsGroups = [];
         var access = $('input[name=access]:checked').val();
-        $('.group-check-box:checked').each(function (k, v) {
+        $('.readers-group-check-box:checked').each(function (k, v) {
             readersGroups.push(v.value);
         });
-        $('.friend-check-box:checked').each(function (k, v) {
+        $('.reader-check-box:checked').each(function (k, v) {
             readers.push(v.value);
+        });
+        $('.editors-group-check-box:checked').each(function (k, v) {
+            editorsGroups.push(v.value);
+        });
+        $('.editor-check-box:checked').each(function (k, v) {
+            editors.push(v.value);
         });
         $.ajax({
             url: '/document/share_document',
             type: 'POST',
             contentType: 'application/json',
-            data: JSON.stringify({docId: documentId, access: access, readers: readers, readersGroups: readersGroups}),
+            data: JSON.stringify({
+                docId: documentId,
+                access: access,
+                readers: readers,
+                readersGroups: readersGroups,
+                editors: editors,
+                editorsGroups: editorsGroups
+            }),
             success: function () {
                 clearModalWindow();
             }
