@@ -29,7 +29,7 @@ public interface UserDocumentService extends EntityService<UserDocument, Long> {
 
     UserDocument getDocumentWithComments(Long docId);
 
-    UserDocument getDocumentWithReaders(Long docId);
+    UserDocument getDocumentWithReadersAndEditors(Long docId);
 
     UserDocument getDocumentWithOldVersions(Long docId);
 

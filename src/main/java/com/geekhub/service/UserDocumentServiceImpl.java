@@ -148,7 +148,7 @@ public class UserDocumentServiceImpl implements UserDocumentService {
     }
 
     @Override
-    public UserDocument getDocumentWithReaders(Long docId) {
+    public UserDocument getDocumentWithReadersAndEditors(Long docId) {
         UserDocument document = getById(docId);
         Hibernate.initialize(document.getReadersGroups());
         Hibernate.initialize(document.getReaders());

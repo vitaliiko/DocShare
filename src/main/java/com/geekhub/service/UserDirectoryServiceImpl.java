@@ -8,6 +8,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -102,5 +103,13 @@ public class UserDirectoryServiceImpl implements UserDirectoryService {
     public UserDirectory getByFullNameAndOwnerId(User owner, String parentDirectoryHash, String name) {
         Map<String, Object> propertiesMap = UserFileUtil.createPropertiesMap(owner, parentDirectoryHash, name);
         return userDirectoryDao.get(propertiesMap);
+    }
+
+    @Override
+    public UserDirectory getDirectoryWithReaders(Long dirId) {
+        UserDirectory directory = getById(dirId);
+        Hibernate.initialize(directory.getReadersGroups());
+        Hibernate.initialize(directory.getReaders());
+        return directory;
     }
 }

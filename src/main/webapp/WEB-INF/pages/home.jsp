@@ -178,7 +178,7 @@
                 <table class="checkbox checkbox-table" id="friends-list">
                     <tr>
                         <th>Friends, who can read</th>
-                        <th>Friends, who can change</th>
+                        <th class="group-check-box">Friends, who can change</th>
                     </tr>
                     <c:forEach var="group" items="${friendsGroups}">
                         <tr class="group-${group.id}">
@@ -188,7 +188,7 @@
                                         ${group.name}
                                 </label>
                             </td>
-                            <td>
+                            <td class="group-check-box">
                                 <label>
                                     <input type="checkbox" class="check-box editors-group-check-box" value="${group.id}">
                                         ${group.name}
@@ -204,7 +204,7 @@
                                         ${friend.firstName} ${friend.lastName}
                                 </label>
                             </td>
-                            <td>
+                            <td class="group-check-box">
                                 <label>
                                     <input type="checkbox" class="check-box editor-check-box" value="${friend.id}">
                                         ${friend.firstName} ${friend.lastName}

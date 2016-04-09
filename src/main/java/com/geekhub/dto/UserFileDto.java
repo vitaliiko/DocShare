@@ -4,7 +4,7 @@ import com.geekhub.entity.FriendsGroup;
 import com.geekhub.entity.User;
 import java.util.Set;
 
-public class UserDocumentDto {
+public class UserFileDto {
 
     private long id;
     private String name;

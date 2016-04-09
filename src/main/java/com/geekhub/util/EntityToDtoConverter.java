@@ -1,12 +1,14 @@
 package com.geekhub.util;
 
 import com.geekhub.dto.FriendsGroupDto;
-import com.geekhub.dto.UserDocumentDto;
+
+import com.geekhub.dto.UserFileDto;
 import com.geekhub.dto.UserDto;
 import com.geekhub.entity.DocumentOldVersion;
 import com.geekhub.dto.DocumentOldVersionDto;
 import com.geekhub.entity.FriendsGroup;
 import com.geekhub.entity.User;
+import com.geekhub.entity.UserDirectory;
 import com.geekhub.entity.UserDocument;
 
 public class EntityToDtoConverter {
@@ -21,8 +23,8 @@ public class EntityToDtoConverter {
         return oldVersionDto;
     }
 
-    public static UserDocumentDto convert(UserDocument document) {
-        UserDocumentDto documentDto = new UserDocumentDto();
+    public static UserFileDto convert(UserDocument document) {
+        UserFileDto documentDto = new UserFileDto();
         documentDto.setId(document.getId());
         documentDto.setName(document.getName());
         documentDto.setAccess(document.getDocumentAttribute().toString());
@@ -31,6 +33,16 @@ public class EntityToDtoConverter {
         documentDto.setEditors(document.getEditors());
         documentDto.setEditorsGroups(document.getEditorsGroups());
         return documentDto;
+    }
+
+    public static UserFileDto convert(UserDirectory directory) {
+        UserFileDto directoryDto = new UserFileDto();
+        directoryDto.setId(directory.getId());
+        directoryDto.setName(directory.getName());
+        directoryDto.setAccess(directory.getDocumentAttribute().toString());
+        directoryDto.setReaders(directory.getReaders());
+        directoryDto.setReadersGroups(directory.getReadersGroups());
+        return directoryDto;
     }
 
     public static UserDto convert(User user) {

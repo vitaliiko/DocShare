@@ -1,6 +1,7 @@
 $(document).ready(function() {
 
-    var documentId;
+    var fileId;
+    var shareUrl;
     var files;
     var docIds = [];
     var tableRows = [];
@@ -137,15 +138,33 @@ $(document).ready(function() {
 
     $('.share-doc-btn').click(function() {
         clearModalWindow();
+        $('.group-check-box').show();
+        shareUrl = '/document/share_document';
+
         var docId = $(this).val();
         $.getJSON('/document/get_document', {docId: docId}, function(document) {
-            documentId = document.id;
+            fileId = document.id;
             checkedBoxes(document.readers, $('.reader-check-box'));
             checkedBoxes(document.readersGroups, $('.readers-group-check-box'));
             checkedBoxes(document.editors, $('.editor-check-box'));
             checkedBoxes(document.editorsGroups, $('.editors-group-check-box'));
             $('.modal-title').text('Share ' + document.name);
             $('#' + document.access).prop('checked', true);
+        });
+    });
+
+    $('.share-dir-btn').click(function() {
+        clearModalWindow();
+        $('.group-check-box').hide();
+        shareUrl = '/document/share_directory';
+
+        var dirId = $(this).val();
+        $.getJSON('/document/get_directory', {dirId: dirId}, function(directory) {
+            fileId = directory.id;
+            checkedBoxes(directory.readers, $('.reader-check-box'));
+            checkedBoxes(directory.readersGroups, $('.readers-group-check-box'));
+            $('.modal-title').text('Share ' + directory.name);
+            $('#' + directory.access).prop('checked', true);
         });
     });
 
@@ -178,11 +197,11 @@ $(document).ready(function() {
             editors.push(v.value);
         });
         $.ajax({
-            url: '/document/share_document',
+            url: shareUrl,
             type: 'POST',
             contentType: 'application/json',
             data: JSON.stringify({
-                docId: documentId,
+                docId: fileId,
                 access: access,
                 readers: readers,
                 readersGroups: readersGroups,

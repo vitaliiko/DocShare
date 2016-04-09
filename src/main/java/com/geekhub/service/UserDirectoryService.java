@@ -21,4 +21,6 @@ public interface UserDirectoryService extends EntityService<UserDirectory, Long>
     UserDirectory getByNameAndOwnerId(Long ownerId, String name);
 
     UserDirectory getByFullNameAndOwnerId(User owner, String parentDirectoryHash, String name);
+
+    UserDirectory getDirectoryWithReaders(Long dirId);
 }

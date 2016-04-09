@@ -8,11 +8,12 @@ import com.geekhub.entity.User;
 import com.geekhub.entity.UserDirectory;
 import com.geekhub.entity.UserDocument;
 import com.geekhub.entity.enums.DocumentAttribute;
-import com.geekhub.dto.UserDocumentDto;
+import com.geekhub.dto.UserFileDto;
 import com.geekhub.dto.DocumentOldVersionDto;
 import com.geekhub.dto.SharedDto;
 import com.geekhub.service.CommentService;
 import com.geekhub.service.DocumentOldVersionService;
+import com.geekhub.service.EntityService;
 import com.geekhub.service.FriendsGroupService;
 import com.geekhub.service.RemovedDocumentService;
 import com.geekhub.service.UserDirectoryService;
@@ -190,34 +191,47 @@ public class DocumentController {
     }
 
     @RequestMapping("/get_document")
-    public UserDocumentDto getUserDocument(Long docId, HttpSession session) {
-        UserDocument document = userDocumentService.getDocumentWithReaders(docId);
+    public UserFileDto getUserDocument(Long docId, HttpSession session) {
+        UserDocument document = userDocumentService.getDocumentWithReadersAndEditors(docId);
         return EntityToDtoConverter.convert(document);
+    }
+
+    @RequestMapping("/get_directory")
+    public UserFileDto getUserDirectory(Long dirId, HttpSession session) {
+        UserDirectory directory = userDirectoryService.getDirectoryWithReaders(dirId);
+        return EntityToDtoConverter.convert(directory);
     }
 
     @RequestMapping(value = "/share_document", method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.OK)
     public void shareUserDocument(@RequestBody SharedDto shared, HttpSession session) {
-        UserDocument document = userDocumentService.getDocumentWithReaders(shared.getDocId());
+        UserDocument document = userDocumentService.getDocumentWithReadersAndEditors(shared.getDocId());
         document.setDocumentAttribute(DocumentAttribute.valueOf(shared.getAccess()));
 
-        Set<User> readersSet = new HashSet<>();
-        Arrays.stream(shared.getReaders()).forEach(id -> readersSet.add(userService.getById(id)));
-        document.setReaders(readersSet);
-
-        Set<FriendsGroup> readersGroupsSet = new HashSet<>();
-        Arrays.stream(shared.getReadersGroups()).forEach(id -> readersGroupsSet.add(friendsGroupService.getById(id)));
-        document.setReadersGroups(readersGroupsSet);
-
-        Set<User> editorsSet = new HashSet<>();
-        Arrays.stream(shared.getEditors()).forEach(id -> editorsSet.add(userService.getById(id)));
-        document.setEditors(editorsSet);
-
-        Set<FriendsGroup> editorsGroups = new HashSet<>();
-        Arrays.stream(shared.getEditorsGroups()).forEach(id -> editorsGroups.add(friendsGroupService.getById(id)));
-        document.setEditorsGroups(editorsGroups);
+        document.setReaders(createEntitySet(shared.getReaders(), userService));
+        document.setReadersGroups(createEntitySet(shared.getReadersGroups(), friendsGroupService));
+        document.setEditors(createEntitySet(shared.getEditors(), userService));
+        document.setEditorsGroups(createEntitySet(shared.getEditorsGroups(), friendsGroupService));
 
         userDocumentService.update(document);
+    }
+
+    @RequestMapping(value = "/share_directory", method = RequestMethod.POST)
+    @ResponseStatus(HttpStatus.OK)
+    public void shareUserDirectory(@RequestBody SharedDto shared, HttpSession session) {
+        UserDirectory directory = userDirectoryService.getDirectoryWithReaders(shared.getDocId());
+        directory.setDocumentAttribute(DocumentAttribute.valueOf(shared.getAccess()));
+
+        directory.setReaders(createEntitySet(shared.getReaders(), userService));
+        directory.setReadersGroups(createEntitySet(shared.getReadersGroups(), friendsGroupService));
+
+        userDirectoryService.update(directory);
+    }
+
+    private <T, S extends EntityService<T, Long>> Set<T> createEntitySet(long[] ids, S service) {
+        Set<T> entitySet = new HashSet<>();
+        Arrays.stream(ids).forEach(id -> entitySet.add(service.getById(id)));
+        return entitySet;
     }
 
     @RequestMapping("/history-{docId}")
