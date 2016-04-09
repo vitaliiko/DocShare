@@ -6,6 +6,7 @@ $(document).ready(function() {
     var shareUrl;
     var files;
     var docIds = [];
+    var dirIds = [];
     var tableRows = [];
     var allTable = $('.ALL');
     var privateTable = $('.PRIVATE');
@@ -32,7 +33,8 @@ $(document).ready(function() {
     setSelectionStyle($('.all-href'));
     backLink.hide();
     $.getJSON('/document/get-directory-content-DocShare', function(files) {
-        loadContent(files);
+        renderDirectories(files);
+        renderDocuments(files);
     });
 
     $('.all-href').click(function() {
@@ -109,21 +111,45 @@ $(document).ready(function() {
     });
 
     $('.delete-btn').click(function() {
-        var checkBoxesCount = 0;
+        var docCount = 0;
+        var dirCount = 0;
+        var message = 'Are you sure you want to move ';
         $('.select-doc:visible:checked').each(function() {
-            checkBoxesCount++;
+            docCount++;
             var id = $(this).val();
             docIds.push(id);
             tableRows.push($('.tr-doc' + id));
         });
-        $('#delete-dialog-text').text('Are you sure you want to move ' + checkBoxesCount + ' documents into trash?');
+        $('.select-dir:visible:checked').each(function() {
+            dirCount++;
+            var id = $(this).val();
+            dirIds.push(id);
+            tableRows.push($('.tr-dir' + id));
+        });
+        if (docCount == 1) {
+            message += docCount + ' document ';
+        }
+        if (docCount > 1) {
+            message += docCount + ' documents ';
+        }
+        if (docCount > 0 && dirCount > 0) {
+            message += 'and ';
+        }
+        if (dirCount == 1) {
+            message += dirCount + ' directory ';
+        }
+        if (dirCount > 1) {
+            message += dirCount + ' directories ';
+        }
+        message += 'into trash';
+        $('#delete-dialog-text').text(message);
     });
 
     $('#deleteDocument').click(function() {
         $.ajax({
             url: '/document/move-to-trash',
             type: 'POST',
-            data: {'docIds[]': docIds},
+            data: {'docIds[]': docIds, 'dirIds[]': dirIds},
             success: function() {
                 $.each(tableRows, function(k, v) {
                     v.remove();
@@ -264,7 +290,8 @@ $(document).ready(function() {
             $('.back-link').prop('href', '/document/get-parent-directory-content' + url);
             $('.doc-table tr').not('.table-head').remove();
 
-            loadContent(files);
+            renderDirectories(files);
+            renderDocuments(files);
             hideShowBackLink();
         });
     });
@@ -276,13 +303,14 @@ $(document).ready(function() {
         $.getJSON(url, function(files) {
             var locationElement = $('#location');
             var location = locationElement.text();
-            locationElement.text(location.substring(0, location.lastIndexOf('/') - 1));
+            locationElement.text(location.substring(0, location.lastIndexOf('/')));
 
             var dirHashName = files[0].parentDirectoryHash;
             $('.back-link').prop('href', 'get-parent-directory-content-' + dirHashName);
             $('.doc-table tr').not('.table-head').remove();
 
-            loadContent(files);
+            renderDirectories(files);
+            renderDocuments(files);
             hideShowBackLink();
         });
     });
@@ -296,8 +324,8 @@ $(document).ready(function() {
         }
     }
 
-    function loadContent(files) {
-        $.each(files, function(k, file) {
+    function renderDirectories(files) {
+        $.each(files, function (k, file) {
             if (file.type === 'dir') {
                 loadTemplate(handlebarsPath + 'directoryRow.html', function (template) {
                     allTable.append(template(file));
@@ -305,6 +333,9 @@ $(document).ready(function() {
                 });
             }
         });
+    }
+
+    function renderDocuments(files) {
         $.each(files, function(k, file) {
             if (file.type === 'doc') {
                 loadTemplate(handlebarsPath + 'documentRow.html', function (template) {

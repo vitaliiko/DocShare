@@ -2,6 +2,7 @@ package com.geekhub.controller;
 
 import com.geekhub.entity.Comment;
 import com.geekhub.entity.DocumentOldVersion;
+import com.geekhub.entity.RemovedDirectory;
 import com.geekhub.entity.RemovedDocument;
 import com.geekhub.entity.User;
 import com.geekhub.entity.UserDirectory;
@@ -14,6 +15,7 @@ import com.geekhub.service.CommentService;
 import com.geekhub.service.DocumentOldVersionService;
 import com.geekhub.service.EntityService;
 import com.geekhub.service.FriendsGroupService;
+import com.geekhub.service.RemovedDirectoryService;
 import com.geekhub.service.RemovedDocumentService;
 import com.geekhub.service.UserDirectoryService;
 import com.geekhub.service.UserDocumentService;
@@ -73,6 +75,9 @@ public class DocumentController {
     private RemovedDocumentService removedDocumentService;
 
     @Autowired
+    private RemovedDirectoryService removedDirectoryService;
+
+    @Autowired
     private FriendsGroupService friendsGroupService;
 
     @Autowired
@@ -110,21 +115,40 @@ public class DocumentController {
 
     @RequestMapping(value = "/move-to-trash", method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.OK)
-    public void moveDocumentToTrash(@RequestParam("docIds[]") Long[] docIds, HttpSession session) {
-        userDocumentService.moveToTrash(docIds, (Long) session.getAttribute("userId"));
+    public void moveDocumentToTrash(@RequestParam(value = "docIds[]", required = false) Long[] docIds,
+                                    @RequestParam(value = "dirIds[]", required = false) Long[] dirIds,
+                                    HttpSession session) {
+
+        Long removerId = (Long) session.getAttribute("userId");
+        if (docIds != null) {
+            userDocumentService.moveToTrash(docIds, removerId);
+        }
+        if (dirIds != null) {
+            userDirectoryService.moveToTrash(dirIds, removerId);
+        }
     }
 
     @RequestMapping("/recover")
     public ModelAndView recoverDocument(HttpSession session) {
         ModelAndView model = new ModelAndView("recover");
-        List<RemovedDocument> documents = removedDocumentService.getAllByOwnerId((Long) session.getAttribute("userId"));
+        List<RemovedDocument> documents =
+                removedDocumentService.getAllByOwnerId((Long) session.getAttribute("userId"));
+        List<RemovedDirectory> directories =
+                removedDirectoryService.getAllByOwnerId((Long) session.getAttribute("userId"));
         model.addObject("documents", documents);
+        model.addObject("directories", directories);
         return model;
     }
 
-    @RequestMapping("/recover-{remDocId}")
+    @RequestMapping("/recover-doc-{remDocId}")
     public ModelAndView recoverDocument(@PathVariable Long remDocId, HttpSession session) {
         userDocumentService.recover(remDocId);
+        return new ModelAndView("redirect:/document/upload");
+    }
+
+    @RequestMapping("/recover-dir-{remDirId}")
+    public ModelAndView recoverDirectory(@PathVariable Long remDirId, HttpSession session) {
+        userDirectoryService.recover(remDirId);
         return new ModelAndView("redirect:/document/upload");
     }
 
@@ -254,10 +278,18 @@ public class DocumentController {
 
         Set<UserFileDto> dtoList = new TreeSet<>();
         if (documents != null) {
-            documents.forEach(d -> dtoList.add(EntityToDtoConverter.convert(d)));
+            documents.forEach(d -> {
+                if (d.getOwner() != null) {
+                    dtoList.add(EntityToDtoConverter.convert(d));
+                }
+            });
         }
         if (directories != null) {
-            directories.forEach(d -> dtoList.add(EntityToDtoConverter.convert(d)));
+            directories.forEach(d -> {
+                if (d.getOwner() != null) {
+                    dtoList.add(EntityToDtoConverter.convert(d));
+                }
+            });
         }
         return dtoList;
     }

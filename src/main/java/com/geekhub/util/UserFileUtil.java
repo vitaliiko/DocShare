@@ -1,5 +1,6 @@
 package com.geekhub.util;
 
+import com.geekhub.entity.RemovedDirectory;
 import com.geekhub.entity.RemovedDocument;
 import com.geekhub.entity.User;
 import com.geekhub.entity.UserDirectory;
@@ -99,6 +100,15 @@ public class UserFileUtil {
         removedDocument.setRemovalDate(Calendar.getInstance().getTime());
         removedDocument.setUserDocument(document);
         return removedDocument;
+    }
+
+    public static RemovedDirectory wrapUserDirectory(UserDirectory directory, Long removerId) {
+        RemovedDirectory removedDirectory = new RemovedDirectory();
+        removedDirectory.setOwner(directory.getOwner());
+        removedDirectory.setRemoverId(removerId);
+        removedDirectory.setRemovalDate(Calendar.getInstance().getTime());
+        removedDirectory.setUserDirectory(directory);
+        return removedDirectory;
     }
 
     public static String createHashName() {

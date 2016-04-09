@@ -15,15 +15,23 @@
     <table class="table table-hover tbody tr:hover td" id="documentTable">
         <caption><h3>List of Removed Documents</h3></caption>
         <tr>
-            <th id="file-name">File Name</th>
+            <th id="file-name">Name</th>
             <th>Removed</th>
             <th width="100"></th>
         </tr>
+        <c:forEach items="${directories}" var="dir">
+            <tr>
+                <td>${dir.userDirectory.name}</td>
+                <td><fmt:formatDate type="date" timeStyle="short" dateStyle="short" value="${dir.removalDate}"/></td>
+                <td><a href="<c:url value='/document/recover-dir-${dir.id}' />"
+                       class="btn btn-primary custom-width">Recover</a></td>
+            </tr>
+        </c:forEach>
         <c:forEach items="${documents}" var="doc">
             <tr>
                 <td>${doc.userDocument.name}</td>
                 <td><fmt:formatDate type="date" timeStyle="short" dateStyle="short" value="${doc.removalDate}"/></td>
-                <td><a href="<c:url value='/document/recover-${doc.id}' />"
+                <td><a href="<c:url value='/document/recover-doc-${doc.id}' />"
                        class="btn btn-primary custom-width">Recover</a></td>
             </tr>
         </c:forEach>

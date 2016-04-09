@@ -1,6 +1,7 @@
 package com.geekhub.service;
 
 import com.geekhub.dao.UserDirectoryDao;
+import com.geekhub.entity.RemovedDirectory;
 import com.geekhub.entity.User;
 import com.geekhub.entity.UserDirectory;
 import com.geekhub.util.UserFileUtil;
@@ -23,7 +24,7 @@ public class UserDirectoryServiceImpl implements UserDirectoryService {
     private UserService userService;
 
     @Autowired
-    private RemovedDocumentService removedDocumentService;
+    private RemovedDirectoryService removedDirectoryService;
 
     @Override
     public List<UserDirectory> getAll(String orderParameter) {
@@ -68,7 +69,11 @@ public class UserDirectoryServiceImpl implements UserDirectoryService {
 
     @Override
     public void moveToTrash(Long docId, Long removerId) {
-        
+        UserDirectory directory = userDirectoryDao.getById(docId);
+        RemovedDirectory removedDirectory = UserFileUtil.wrapUserDirectory(directory, removerId);
+        removedDirectoryService.save(removedDirectory);
+        directory.setOwner(null);
+        userDirectoryDao.save(directory);
     }
 
     @Override
@@ -77,8 +82,13 @@ public class UserDirectoryServiceImpl implements UserDirectoryService {
     }
 
     @Override
-    public void recover(Long docId) {
-        
+    public Long recover(Long removedDirIds) {
+        RemovedDirectory removedDocument = removedDirectoryService.getById(removedDirIds);
+        UserDirectory directory = removedDocument.getUserDirectory();
+        User owner = removedDocument.getOwner();
+        owner.getUserDirectories().add(directory);
+        removedDirectoryService.delete(removedDocument);
+        return directory.getId();
     }
 
     @Override

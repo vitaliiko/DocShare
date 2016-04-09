@@ -76,9 +76,8 @@ public class UserDocumentServiceImpl implements UserDocumentService {
         UserDocument document = userDocumentDao.getById(docId);
         RemovedDocument removedDocument = UserFileUtil.wrapUserDocument(document, removerId);
         removedDocumentService.save(removedDocument);
-        User owner = document.getOwner();
-        owner.getUserDocuments().remove(document);
-        userService.save(owner);
+        document.setOwner(null);
+        userDocumentDao.save(document);
     }
 
     @Override
