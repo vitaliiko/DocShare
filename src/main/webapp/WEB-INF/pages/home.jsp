@@ -9,6 +9,7 @@
     <title>Home</title>
     <jsp:include page="../include/include.jsp"/>
     <script src="${pageContext.request.contextPath}/resources/js/managedocument.js"></script>
+    <script src="${pageContext.request.contextPath}/resources/js/templateHandler.js"></script>
     <style>
         .big-check-box {
             width: 18px;
@@ -49,10 +50,10 @@
 
 <div class="container" style="width: 900px;">
     <c:forEach items="${tableNames}" var="tableName">
-        <table class="table table-hover tbody tr:hover td ${tableName}">
+        <table class="table table-hover tbody tr:hover td doc-table ${tableName}">
             <caption>
-                <button type="button" class="btn btn-default" data-toggle="modal" data-target="#makeDirDialog"
-                        name="makeDirButton">Make dir</button>
+                <button type="button" class="btn btn-default make-dir-btn"
+                        data-toggle="modal" data-target="#makeDirDialog">Make dir</button>
                 <h3></h3>
                 <a href="#" class="all-href">All &nbsp</a>
                 <a href="#" class="public-href">Public &nbsp</a>
@@ -144,7 +145,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal">&times;</button>
-                <h4 class="modal-title">Removing</h4>
+                <h4 class="modal-title">Make directory</h4>
             </div>
             <div class="modal-body">
                 <p id="group-action">Input directory name</p>

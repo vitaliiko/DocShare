@@ -1,0 +1,20 @@
+<tr class="tr-doc{{id}}" xmlns:fmt="http://java.sun.com/jsp/jstl/fmt">
+    <td width="20">
+        <input type="checkbox" class="check-box select select-doc big-check-box" value="{{id}}"/>
+    </td>
+    <td class="document-name">
+        <a href="/document/browse-{{id}}">${doc.name}</a>
+    </td>
+    <td>{{size}}</td>
+    <td class="document-date">
+        <fmt:formatDate type="date" timeStyle="short" dateStyle="short" value="{{lastModifyTime}}"/>
+    </td>
+    <td width="15">
+        <a href="/document/download-{{id}}"
+           class="btn btn-default btn-sm custom-width">Download</a>
+    </td>
+    <td width="15">
+        <button type="button" class="btn btn-default btn-sm share-doc-btn"
+                data-toggle="modal" data-target="#shareDialog" value="{{id}}">Share</button>
+    </td>
+</tr>

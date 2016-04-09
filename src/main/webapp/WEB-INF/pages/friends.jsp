@@ -8,6 +8,7 @@
 
     <jsp:include page="../include/include.jsp"/>
     <script src="${pageContext.request.contextPath}/resources/js/friends.js"></script>
+    <script src="${pageContext.request.contextPath}/resources/js/templateHandler.js"></script>
 </head>
 <body>
 

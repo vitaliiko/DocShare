@@ -95,8 +95,7 @@ public class DocumentController {
         session.setAttribute("location", UserFileUtil.ROOT_LOCATION);
         model.addObject("documentsMap", UserFileUtil.prepareUserFileListMap(allDocuments));
         model.addObject("directoriesMap", UserFileUtil.prepareUserFileListMap(allDirectories));
-        model.addObject("tableNames", new String[] {"allDocumentsTable",
-                "privateDocumentsTable", "publicDocumentsTable", "forFriendsDocumentsTable"});
+        model.addObject("tableNames", new String[] {"ALL", "PRIVATE", "PUBLIC", "FOR_FRIENDS"});
         model.addObject("friendsGroups", userService.getAllFriendsGroups(userId));
         model.addObject("friends", userService.getAllFriends(userId));
         return model;
@@ -183,11 +182,11 @@ public class DocumentController {
     }
 
     @RequestMapping("/make-directory")
-    public ModelAndView makeDir(String dirName, HttpSession session) {
+    public UserFileDto makeDir(String dirName, HttpSession session) {
         User owner = userService.getById((Long) session.getAttribute("userId"));
         String parentDirectoryHash = (String) session.getAttribute("parentDirectoryHash");
-        makeDirectory(owner, parentDirectoryHash, dirName);
-        return new ModelAndView("redirect:/document/upload");
+        UserDirectory directory = makeDirectory(owner, parentDirectoryHash, dirName);
+        return EntityToDtoConverter.convert(directory);
     }
 
     @RequestMapping("/get_document")
@@ -277,12 +276,14 @@ public class DocumentController {
         userDocumentService.update(UserFileUtil.updateUserDocument(document, multipartFile, description));
     }
 
-    private void makeDirectory(User owner, String parentDirectoryHash, String dirName) {
+    private UserDirectory makeDirectory(User owner, String parentDirectoryHash, String dirName) {
         UserDirectory directory = userDirectoryService.getByFullNameAndOwnerId(owner, parentDirectoryHash, dirName);
 
         if (directory == null) {
             directory = UserFileUtil.createUserDirectory(owner, parentDirectoryHash, dirName);
-            userDirectoryService.save(directory);
+            long dirId = userDirectoryService.save(directory);
+            directory.setId(dirId);
         }
+        return directory;
     }
 }

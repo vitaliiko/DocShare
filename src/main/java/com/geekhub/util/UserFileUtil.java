@@ -43,10 +43,10 @@ public class UserFileUtil {
             }
         });
         Map<String, Set<T>> userDocumentsListMap = new HashMap<>();
-        userDocumentsListMap.put("allDocumentsTable", allDocuments);
-        userDocumentsListMap.put("privateDocumentsTable", privateDocuments);
-        userDocumentsListMap.put("publicDocumentsTable", publicDocuments);
-        userDocumentsListMap.put("forFriendsDocumentsTable", forFriendsDocuments);
+        userDocumentsListMap.put("ALL", allDocuments);
+        userDocumentsListMap.put("PRIVATE", privateDocuments);
+        userDocumentsListMap.put("PUBLIC", publicDocuments);
+        userDocumentsListMap.put("FOR_FRIENDS", forFriendsDocuments);
         return userDocumentsListMap;
     }
 

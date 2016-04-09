@@ -5,10 +5,11 @@ $(document).ready(function() {
     var files;
     var docIds = [];
     var tableRows = [];
-    var allTable = $('.allDocumentsTable');
-    var privateTable = $('.privateDocumentsTable');
-    var publicTable = $('.publicDocumentsTable');
-    var forFriendsTable = $('.forFriendsDocumentsTable');
+    var allTable = $('.ALL');
+    var privateTable = $('.PRIVATE');
+    var publicTable = $('.PUBLIC');
+    var forFriendsTable = $('.FOR_FRIENDS');
+    var handlebarsPath = '/resources/js/templates/';
 
     function changeTab() {
         publicTable.hide(true);
@@ -220,13 +221,21 @@ $(document).ready(function() {
         });
     }
 
+    $('.make-dir-btn').click(function() {
+        $('#directoryName').val('');
+    });
+
     $('#makeDir').click(function() {
         var dirName = $('#directoryName').val();
         $.ajax({
             url: '/document/make-directory',
             data: {dirName: dirName},
-            success: function () {
-                location.reload();
+            success: function (directory) {
+                loadTemplate(handlebarsPath + 'directoryRow.html', function(template) {
+                    var html = template(directory);
+                    allTable.append(html);
+                    privateTable.append(html);
+                });
             }
         });
     });
