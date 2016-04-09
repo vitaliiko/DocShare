@@ -26,6 +26,9 @@ public class EntityToDtoConverter {
     public static UserFileDto convert(UserDocument document) {
         UserFileDto documentDto = new UserFileDto();
         documentDto.setId(document.getId());
+        documentDto.setType("doc");
+        documentDto.setSize(document.getSize());
+        documentDto.setLastModifyTime(document.getLastModifyTime());
         documentDto.setName(document.getName());
         documentDto.setAccess(document.getDocumentAttribute().toString());
         documentDto.setReaders(document.getReaders());
@@ -38,6 +41,7 @@ public class EntityToDtoConverter {
     public static UserFileDto convert(UserDirectory directory) {
         UserFileDto directoryDto = new UserFileDto();
         directoryDto.setId(directory.getId());
+        directoryDto.setType("dir");
         directoryDto.setName(directory.getName());
         directoryDto.setAccess(directory.getDocumentAttribute().toString());
         directoryDto.setReaders(directory.getReaders());

@@ -76,7 +76,7 @@
             </tr>
 
             <c:forEach items="${directoriesMap[tableName]}" var="dir">
-                <tr class="tr-doc${dir.id}">
+                <tr class="tr-dir${dir.id}">
                     <td width="20">
                         <input type="checkbox" class="check-box select select-dir big-check-box" value="${dir.id}"/>
                     </td>

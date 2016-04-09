@@ -202,8 +202,7 @@ public class DocumentController {
     }
 
     @RequestMapping(value = "/share_document", method = RequestMethod.POST)
-    @ResponseStatus(HttpStatus.OK)
-    public void shareUserDocument(@RequestBody SharedDto shared, HttpSession session) {
+    public UserFileDto shareUserDocument(@RequestBody SharedDto shared, HttpSession session) {
         UserDocument document = userDocumentService.getDocumentWithReadersAndEditors(shared.getDocId());
         document.setDocumentAttribute(DocumentAttribute.valueOf(shared.getAccess()));
 
@@ -213,11 +212,11 @@ public class DocumentController {
         document.setEditorsGroups(createEntitySet(shared.getEditorsGroups(), friendsGroupService));
 
         userDocumentService.update(document);
+        return EntityToDtoConverter.convert(document);
     }
 
     @RequestMapping(value = "/share_directory", method = RequestMethod.POST)
-    @ResponseStatus(HttpStatus.OK)
-    public void shareUserDirectory(@RequestBody SharedDto shared, HttpSession session) {
+    public UserFileDto shareUserDirectory(@RequestBody SharedDto shared, HttpSession session) {
         UserDirectory directory = userDirectoryService.getDirectoryWithReaders(shared.getDocId());
         directory.setDocumentAttribute(DocumentAttribute.valueOf(shared.getAccess()));
 
@@ -225,6 +224,7 @@ public class DocumentController {
         directory.setReadersGroups(createEntitySet(shared.getReadersGroups(), friendsGroupService));
 
         userDirectoryService.update(directory);
+        return EntityToDtoConverter.convert(directory);
     }
 
     private <T, S extends EntityService<T, Long>> Set<T> createEntitySet(long[] ids, S service) {

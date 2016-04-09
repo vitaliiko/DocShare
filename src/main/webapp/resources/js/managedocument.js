@@ -1,6 +1,7 @@
 $(document).ready(function() {
 
     var fileId;
+    var fileAccess;
     var shareUrl;
     var files;
     var docIds = [];
@@ -145,6 +146,7 @@ $(document).ready(function() {
         var docId = $(this).val();
         $.getJSON('/document/get_document', {docId: docId}, function(document) {
             fileId = document.id;
+            fileAccess = document.access;
             checkedBoxes(document.readers, $('.reader-check-box'));
             checkedBoxes(document.readersGroups, $('.readers-group-check-box'));
             checkedBoxes(document.editors, $('.editor-check-box'));
@@ -209,8 +211,22 @@ $(document).ready(function() {
                 editors: editors,
                 editorsGroups: editorsGroups
             }),
-            success: function () {
+            success: function (file) {
                 clearModalWindow();
+                if (fileAccess !== file.access) {
+                    if (file.type === 'doc') {
+                        $('.' + fileAccess).find($('.tr-doc' + file.id)).remove();
+                        loadTemplate(handlebarsPath + 'documentRow.html', function (template) {
+                            $('.' + file.access).append(template(file));
+                        });
+                    } else {
+                        var row = $('.' + fileAccess).find($('.tr-dir' + file.id));
+                        row.remove();
+                        loadTemplate(handlebarsPath + 'directoryRow.html', function (template) {
+                            $('.' + file.access).append(template(file));
+                        });
+                    }
+                }
             }
         });
     });

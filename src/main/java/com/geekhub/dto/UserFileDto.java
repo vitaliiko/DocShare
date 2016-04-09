@@ -2,13 +2,17 @@ package com.geekhub.dto;
 
 import com.geekhub.entity.FriendsGroup;
 import com.geekhub.entity.User;
+import java.util.Date;
 import java.util.Set;
 
 public class UserFileDto {
 
     private long id;
+    private String type;
     private String name;
     private String access;
+    private String size;
+    private Date lastModifyTime;
     private Set<User> readers;
     private Set<FriendsGroup> readersGroups;
     private Set<User> editors;
@@ -22,12 +26,44 @@ public class UserFileDto {
         this.id = id;
     }
 
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
     public String getName() {
         return name;
     }
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getAccess() {
+        return access;
+    }
+
+    public void setAccess(String access) {
+        this.access = access;
+    }
+
+    public String getSize() {
+        return size;
+    }
+
+    public void setSize(String size) {
+        this.size = size;
+    }
+
+    public Date getLastModifyTime() {
+        return lastModifyTime;
+    }
+
+    public void setLastModifyTime(Date lastModifyTime) {
+        this.lastModifyTime = lastModifyTime;
     }
 
     public Set<User> getReaders() {
@@ -44,14 +80,6 @@ public class UserFileDto {
 
     public void setReadersGroups(Set<FriendsGroup> readersGroups) {
         this.readersGroups = readersGroups;
-    }
-
-    public String getAccess() {
-        return access;
-    }
-
-    public void setAccess(String access) {
-        this.access = access;
     }
 
     public Set<User> getEditors() {
