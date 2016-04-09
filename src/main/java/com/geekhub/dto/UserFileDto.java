@@ -14,7 +14,7 @@ public class UserFileDto implements Comparable<UserFileDto> {
     private String access;
     private String size;
     private String parentDirectoryHash;
-    private Date lastModifyTime;
+    private String lastModifyTime;
     private Set<User> readers;
     private Set<FriendsGroup> readersGroups;
     private Set<User> editors;
@@ -76,11 +76,11 @@ public class UserFileDto implements Comparable<UserFileDto> {
         this.parentDirectoryHash = parentDirectoryHash;
     }
 
-    public Date getLastModifyTime() {
+    public String getLastModifyTime() {
         return lastModifyTime;
     }
 
-    public void setLastModifyTime(Date lastModifyTime) {
+    public void setLastModifyTime(String lastModifyTime) {
         this.lastModifyTime = lastModifyTime;
     }
 

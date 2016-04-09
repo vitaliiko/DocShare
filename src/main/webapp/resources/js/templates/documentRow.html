@@ -1,4 +1,4 @@
-<tr class="tr-doc{{id}}">
+<tr class="file-tr tr-doc{{id}}">
     <td width="20">
         <input type="checkbox" class="check-box select select-doc big-check-box" value="{{id}}"/>
     </td>
@@ -6,9 +6,7 @@
         <a href="/document/browse-{{id}}">{{name}}</a>
     </td>
     <td>{{size}}</td>
-    <td class="document-date">
-        <fmt:formatDate type="date" timeStyle="short" dateStyle="short" value="{{lastModifyTime}}"/>
-    </td>
+    <td class="document-date">{{lastModifyTime}}</td>
     <td width="15">
         <a href="/document/download-{{id}}"
            class="btn btn-default btn-sm custom-width">Download</a>

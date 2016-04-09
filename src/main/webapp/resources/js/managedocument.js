@@ -31,6 +31,9 @@ $(document).ready(function() {
     allTable.show(true);
     setSelectionStyle($('.all-href'));
     backLink.hide();
+    $.getJSON('/document/get-directory-content-DocShare', function(files) {
+        loadContent(files);
+    });
 
     $('.all-href').click(function() {
         event.preventDefault();
@@ -114,10 +117,6 @@ $(document).ready(function() {
             tableRows.push($('.tr-doc' + id));
         });
         $('#delete-dialog-text').text('Are you sure you want to move ' + checkBoxesCount + ' documents into trash?');
-        //var row = this.closest('tr');
-        //var fileName = $(row['name=file-name']).text();
-        //documentId = row.id;
-
     });
 
     $('#deleteDocument').click(function() {
@@ -263,7 +262,8 @@ $(document).ready(function() {
             url = '' + url;
             url = url.substring(url.lastIndexOf('-'));
             $('.back-link').prop('href', '/document/get-parent-directory-content' + url);
-            $('.file-tr').remove();
+            $('.doc-table tr').not('.table-head').remove();
+
             loadContent(files);
             hideShowBackLink();
         });
@@ -280,7 +280,7 @@ $(document).ready(function() {
 
             var dirHashName = files[0].parentDirectoryHash;
             $('.back-link').prop('href', 'get-parent-directory-content-' + dirHashName);
-            $('.file-tr').remove();
+            $('.doc-table tr').not('.table-head').remove();
 
             loadContent(files);
             hideShowBackLink();
@@ -298,13 +298,16 @@ $(document).ready(function() {
 
     function loadContent(files) {
         $.each(files, function(k, file) {
-            if (file.type === 'doc') {
-                loadTemplate(handlebarsPath + 'documentRow.html', function (template) {
+            if (file.type === 'dir') {
+                loadTemplate(handlebarsPath + 'directoryRow.html', function (template) {
                     allTable.append(template(file));
                     $('.' + file.access).append(template(file));
                 });
-            } else {
-                loadTemplate(handlebarsPath + 'directoryRow.html', function (template) {
+            }
+        });
+        $.each(files, function(k, file) {
+            if (file.type === 'doc') {
+                loadTemplate(handlebarsPath + 'documentRow.html', function (template) {
                     allTable.append(template(file));
                     $('.' + file.access).append(template(file));
                 });

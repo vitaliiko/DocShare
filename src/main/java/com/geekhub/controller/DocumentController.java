@@ -87,13 +87,6 @@ public class DocumentController {
     public ModelAndView addDocuments(HttpSession session) {
         ModelAndView model = new ModelAndView("home");
         Long userId = (Long) session.getAttribute("userId");
-        List<UserDocument> allDocuments = userDocumentService.getAllByOwnerId(userId);
-        List<UserDirectory> allDirectories = userDirectoryService.getAllByOwnerId(userId);
-//        if (parentDirectoryHash == null && parentDirectoryHash.isEmpty()) {
-//            parentDirectoryHash = "\\";
-//        }
-        model.addObject("documentsMap", UserFileUtil.prepareUserFileListMap(allDocuments));
-        model.addObject("directoriesMap", UserFileUtil.prepareUserFileListMap(allDirectories));
         model.addObject("tableNames", new String[] {"ALL", "PRIVATE", "PUBLIC", "FOR_FRIENDS"});
         model.addObject("friendsGroups", userService.getAllFriendsGroups(userId));
         model.addObject("friends", userService.getAllFriends(userId));

@@ -10,6 +10,8 @@ import com.geekhub.entity.FriendsGroup;
 import com.geekhub.entity.User;
 import com.geekhub.entity.UserDirectory;
 import com.geekhub.entity.UserDocument;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 
 public class EntityToDtoConverter {
 
@@ -24,11 +26,12 @@ public class EntityToDtoConverter {
     }
 
     public static UserFileDto convert(UserDocument document) {
+        DateFormat df = new SimpleDateFormat("MM.dd.yy");
         UserFileDto documentDto = new UserFileDto();
         documentDto.setId(document.getId());
         documentDto.setType("doc");
         documentDto.setSize(document.getSize());
-        documentDto.setLastModifyTime(document.getLastModifyTime());
+        documentDto.setLastModifyTime(df.format(document.getLastModifyTime()));
         documentDto.setName(document.getName());
         documentDto.setParentDirectoryHash(document.getParentDirectoryHash());
         documentDto.setAccess(document.getDocumentAttribute().toString());

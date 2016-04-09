@@ -37,6 +37,7 @@
         <br>
         <div class="form-actions floatRight">
             <input type="submit" value="Upload" class="btn btn-primary btn-sm">
+
             <button type="button" class="btn btn-default btn-sm make-dir-btn"
                     data-toggle="modal" data-target="#makeDirDialog">Make dir</button>
         </div>
@@ -71,7 +72,7 @@
                     <button class="btn btn-default copy-btn action-btn">Copy</button>
                     <button class="btn btn-default rename-btn action-btn single-selection">Rename</button>
                 </caption>
-                <tr>
+                <tr class="table-head">
                     <th><input type="checkbox" class="check-box big-check-box select-all"/></th>
                     <th id="file-name">Name</th>
                     <th>Size</th>
@@ -79,47 +80,6 @@
                     <th width="15"></th>
                     <th width="15"></th>
                 </tr>
-
-                <c:forEach items="${directoriesMap[tableName]}" var="dir">
-                    <tr class="file-tr tr-dir${dir.id}">
-                        <td width="20">
-                            <input type="checkbox" class="check-box select select-dir big-check-box" value="${dir.id}"/>
-                        </td>
-                        <td class="directory-name">
-                            <a href="#" id="${dir.hashName}" class="get-dir-content">${dir.name}</a>
-                        </td>
-                        <td>--</td>
-                        <td>--</td>
-                        <td width="15"></td>
-                        <td width="15">
-                            <button type="button" class="btn btn-default btn-sm share-dir-btn"
-                                    data-toggle="modal" data-target="#shareDialog" value="${dir.id}">Share</button>
-                        </td>
-                    </tr>
-                </c:forEach>
-
-                <c:forEach items="${documentsMap[tableName]}" var="doc" varStatus="counter">
-                    <tr class="file-tr tr-doc${doc.id}">
-                        <td width="20">
-                            <input type="checkbox" class="check-box select select-doc big-check-box" value="${doc.id}"/>
-                        </td>
-                        <td class="document-name">
-                            <a href="/document/browse-${doc.id}">${doc.name}</a>
-                        </td>
-                        <td>${doc.size}</td>
-                        <td class="document-date">
-                            <fmt:formatDate type="date" timeStyle="short" dateStyle="short" value="${doc.lastModifyTime}"/>
-                        </td>
-                        <td width="15">
-                            <a href="<c:url value='/document/download-${doc.id}'/>"
-                               class="btn btn-default btn-sm custom-width">Download</a>
-                        </td>
-                        <td width="15">
-                            <button type="button" class="btn btn-default btn-sm share-doc-btn"
-                                    data-toggle="modal" data-target="#shareDialog" value="${doc.id}">Share</button>
-                        </td>
-                    </tr>
-                </c:forEach>
             </table>
         </c:forEach>
     </div>
