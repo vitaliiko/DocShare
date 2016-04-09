@@ -98,21 +98,6 @@ $(document).ready(function() {
                 success: function () {
                     location.reload();
                 }
-                //success: function (documents) {
-                //    var counter = allTable.find('tr').count + 1;
-                //    $.each(documents, function(k, v) {
-                //        allTable.append(
-                //            "<td class='document-num'>" +
-                //            "<input type='checkbox' class='check-box' value='" + v.id + "'/> " + counter++ + "</td>" +
-                //            "<td class='document-name'>" +
-                //            "<a href='/document/browse-" + v.id + "'>" + v.name + "</a></td>" +
-                //            "<td>" + v.size + "</td>" +
-                //            "<td class='document-date'>Now</td>" +
-                //            "<td><a href='/document/download-" + v.id + "' class='btn btn-success custom-width'>Download</a></td>"
-                //        );
-                //        counter++;
-                //    });
-                //}
             });
         }
     });
@@ -227,8 +212,7 @@ $(document).ready(function() {
                             $('.' + file.access).append(template(file));
                         });
                     } else {
-                        var row = $('.' + fileAccess).find($('.tr-dir' + file.id));
-                        row.remove();
+                        $('.' + fileAccess).find($('.tr-dir' + file.id)).remove();
                         loadTemplate(handlebarsPath + 'directoryRow.html', function (template) {
                             $('.' + file.access).append(template(file));
                         });
@@ -261,5 +245,36 @@ $(document).ready(function() {
                 });
             }
         });
+    });
+
+    $('.get-dir-content').click(function(event) {
+        event.preventDefault();
+        var dirName = $(this).text();
+        var url = $(this).prop('href');
+
+        $.getJSON(url, function(files) {
+            var dirHashName = files[0].parentDirectoryHash;
+            $('#location').append('<label> / ' + dirName + '</label>');
+            $('.back-link').prop('href', 'get-parent-directory-content-' + dirHashName);
+            $('.file-tr').remove();
+            $.each(files, function(k, file) {
+                if (file.type === 'doc') {
+                    loadTemplate(handlebarsPath + 'documentRow.html', function (template) {
+                        allTable.append(template(file));
+                        $('.' + file.access).append(template(file));
+                    });
+                } else {
+                    loadTemplate(handlebarsPath + 'directoryRow.html', function (template) {
+                        allTable.append(template(file));
+                        $('.' + file.access).append(template(file));
+                    });
+                }
+            });
+        });
+    });
+
+    $('.back-link').click(function(event) {
+        event.preventDefault();
+
     });
 });

@@ -245,11 +245,22 @@ public class DocumentController {
     @RequestMapping("/get-directory-content-{dirHashName}")
     public Set<UserFileDto> getDirectoryContent(@PathVariable String dirHashName, HttpSession session) {
         UserDirectory currentDirectory = userDirectoryService.getByHashName(dirHashName);
+        return getDirectoryContent(currentDirectory);
+    }
+
+    @RequestMapping("get-parent-directory-content-{dirHashName}")
+    public Set<UserFileDto> getParentDirectoryContent(@PathVariable String dirHashName, HttpSession session) {
+        UserDirectory currentDirectory = userDirectoryService.getByHashName(dirHashName);
+        UserDirectory parentDirectory = userDirectoryService.getByHashName(currentDirectory.getParentDirectoryHash());
+        return getDirectoryContent(parentDirectory);
+    }
+
+    private Set<UserFileDto> getDirectoryContent(UserDirectory directory) {
         List<UserDocument> documents = null;
         List<UserDirectory> directories = null;
-        if (currentDirectory != null) {
-            documents = userDocumentService.getAllByParentDirectoryHash(currentDirectory.getHashName());
-            directories = userDirectoryService.getAllByParentDirectoryHash(currentDirectory.getHashName());
+        if (directory != null) {
+            documents = userDocumentService.getAllByParentDirectoryHash(directory.getHashName());
+            directories = userDirectoryService.getAllByParentDirectoryHash(directory.getHashName());
         }
         Set<UserFileDto> dtoList = new TreeSet<>();
         if (documents != null) {

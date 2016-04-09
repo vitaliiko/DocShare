@@ -41,86 +41,89 @@
                     data-toggle="modal" data-target="#makeDirDialog">Make dir</button>
         </div>
     </form>
-</div>
 
-<div id="location" class="container" style="width: 900px;">
-    <h3>${currentLocation}</h3>
-</div>
+    <div id="location" class="back-links">
+        <label>DocShare</label>
+    </div>
+    <div>
+        <a href="" class="back-link"><-Back</a>
+    </div>
+    <%--<div class="container" style="width: 900px;">--%>
+        <%--<form action="/document/search">--%>
+            <%--<input type="text" name="search" class="form-control input-sm">--%>
+            <%--<input type="submit" value="Search" class="btn btn-primary btn-sm">--%>
+        <%--</form>--%>
+    <%--</div>--%>
 
-<%--<div class="container" style="width: 900px;">--%>
-    <%--<form action="/document/search">--%>
-        <%--<input type="text" name="search" class="form-control input-sm">--%>
-        <%--<input type="submit" value="Search" class="btn btn-primary btn-sm">--%>
-    <%--</form>--%>
-<%--</div>--%>
+    <div>
+        <c:forEach items="${tableNames}" var="tableName">
+            <table class="table table-hover tbody tr:hover td doc-table ${tableName}">
+                <caption>
+                    <h3></h3>
+                    <a href="#" class="switch-btn all-href">All &nbsp</a>
+                    <a href="#" class="switch-btn public-href">Public &nbsp</a>
+                    <a href="#" class="switch-btn for-friends-href">For Friends &nbsp</a>
+                    <a href="#" class="switch-btn private-href">Private</a>
 
-<div class="container" style="width: 900px;">
-    <c:forEach items="${tableNames}" var="tableName">
-        <table class="table table-hover tbody tr:hover td doc-table ${tableName}">
-            <caption>
-                <h3></h3>
-                <a href="#" class="switch-btn all-href">All &nbsp</a>
-                <a href="#" class="switch-btn public-href">Public &nbsp</a>
-                <a href="#" class="switch-btn for-friends-href">For Friends &nbsp</a>
-                <a href="#" class="switch-btn private-href">Private</a>
-
-                <button class="btn btn-default delete-btn action-btn"
-                        data-toggle="modal" data-target="#deleteDialog">Delete</button>
-                <button class="btn btn-default replace-btn action-btn">Replace</button>
-                <button class="btn btn-default copy-btn action-btn">Copy</button>
-                <button class="btn btn-default rename-btn action-btn single-selection">Rename</button>
-            </caption>
-            <tr>
-                <th><input type="checkbox" class="check-box big-check-box select-all"/></th>
-                <th id="file-name">Name</th>
-                <th>Size</th>
-                <th>Changed</th>
-                <th width="15"></th>
-                <th width="15"></th>
-            </tr>
-
-            <c:forEach items="${directoriesMap[tableName]}" var="dir">
-                <tr class="tr-dir${dir.id}">
-                    <td width="20">
-                        <input type="checkbox" class="check-box select select-dir big-check-box" value="${dir.id}"/>
-                    </td>
-                    <td class="directory-name">
-                        <a href="<c:url value='/document/get-directory-content-${dir.hashName}' />">${dir.name}</a>
-                    </td>
-                    <td>--</td>
-                    <td>--</td>
-                    <td width="15"></td>
-                    <td width="15">
-                        <button type="button" class="btn btn-default btn-sm share-dir-btn"
-                                data-toggle="modal" data-target="#shareDialog" value="${dir.id}">Share</button>
-                    </td>
+                    <button class="btn btn-default delete-btn action-btn"
+                            data-toggle="modal" data-target="#deleteDialog">Delete</button>
+                    <button class="btn btn-default replace-btn action-btn">Replace</button>
+                    <button class="btn btn-default copy-btn action-btn">Copy</button>
+                    <button class="btn btn-default rename-btn action-btn single-selection">Rename</button>
+                </caption>
+                <tr>
+                    <th><input type="checkbox" class="check-box big-check-box select-all"/></th>
+                    <th id="file-name">Name</th>
+                    <th>Size</th>
+                    <th>Changed</th>
+                    <th width="15"></th>
+                    <th width="15"></th>
                 </tr>
-            </c:forEach>
 
-            <c:forEach items="${documentsMap[tableName]}" var="doc" varStatus="counter">
-                <tr class="tr-doc${doc.id}">
-                    <td width="20">
-                        <input type="checkbox" class="check-box select select-doc big-check-box" value="${doc.id}"/>
-                    </td>
-                    <td class="document-name">
-                        <a href="/document/browse-${doc.id}">${doc.name}</a>
-                    </td>
-                    <td>${doc.size}</td>
-                    <td class="document-date">
-                        <fmt:formatDate type="date" timeStyle="short" dateStyle="short" value="${doc.lastModifyTime}"/>
-                    </td>
-                    <td width="15">
-                        <a href="<c:url value='/document/download-${doc.id}'/>"
-                           class="btn btn-default btn-sm custom-width">Download</a>
-                    </td>
-                    <td width="15">
-                        <button type="button" class="btn btn-default btn-sm share-doc-btn"
-                                data-toggle="modal" data-target="#shareDialog" value="${doc.id}">Share</button>
-                    </td>
-                </tr>
-            </c:forEach>
-        </table>
-    </c:forEach>
+                <c:forEach items="${directoriesMap[tableName]}" var="dir">
+                    <tr class="file-tr tr-dir${dir.id}">
+                        <td width="20">
+                            <input type="checkbox" class="check-box select select-dir big-check-box" value="${dir.id}"/>
+                        </td>
+                        <td class="directory-name">
+                            <a href="/document/get-directory-content-${dir.hashName}"
+                               class="get-dir-content">${dir.name}</a>
+                        </td>
+                        <td>--</td>
+                        <td>--</td>
+                        <td width="15"></td>
+                        <td width="15">
+                            <button type="button" class="btn btn-default btn-sm share-dir-btn"
+                                    data-toggle="modal" data-target="#shareDialog" value="${dir.id}">Share</button>
+                        </td>
+                    </tr>
+                </c:forEach>
+
+                <c:forEach items="${documentsMap[tableName]}" var="doc" varStatus="counter">
+                    <tr class="file-tr tr-doc${doc.id}">
+                        <td width="20">
+                            <input type="checkbox" class="check-box select select-doc big-check-box" value="${doc.id}"/>
+                        </td>
+                        <td class="document-name">
+                            <a href="/document/browse-${doc.id}">${doc.name}</a>
+                        </td>
+                        <td>${doc.size}</td>
+                        <td class="document-date">
+                            <fmt:formatDate type="date" timeStyle="short" dateStyle="short" value="${doc.lastModifyTime}"/>
+                        </td>
+                        <td width="15">
+                            <a href="<c:url value='/document/download-${doc.id}'/>"
+                               class="btn btn-default btn-sm custom-width">Download</a>
+                        </td>
+                        <td width="15">
+                            <button type="button" class="btn btn-default btn-sm share-doc-btn"
+                                    data-toggle="modal" data-target="#shareDialog" value="${doc.id}">Share</button>
+                        </td>
+                    </tr>
+                </c:forEach>
+            </table>
+        </c:forEach>
+    </div>
 </div>
 
 <div id="deleteDialog" class="modal fade" role="dialog">
