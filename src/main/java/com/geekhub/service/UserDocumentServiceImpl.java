@@ -47,13 +47,7 @@ public class UserDocumentServiceImpl implements UserDocumentService {
 
     @Override
     public Long save(UserDocument entity) {
-        Long docId = userDocumentDao.save(entity);
-        Long ownerId = entity.getOwner().getId();
-        entity.setId(docId);
-        String hashName = UserFileUtil.createHashName(ownerId, docId);
-        entity.setHashName(hashName);
-        userDocumentDao.update(entity);
-        return docId;
+        return userDocumentDao.save(entity);
     }
 
     @Override

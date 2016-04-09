@@ -43,13 +43,7 @@ public class UserDirectoryServiceImpl implements UserDirectoryService {
 
     @Override
     public Long save(UserDirectory entity) {
-        Long dirId = userDirectoryDao.save(entity);
-        Long ownerId = entity.getOwner().getId();
-        entity.setId(dirId);
-        String hashName = UserFileUtil.createHashName(ownerId, dirId);
-        entity.setHashName(hashName);
-        userDirectoryDao.update(entity);
-        return dirId;
+        return userDirectoryDao.save(entity);
     }
 
     @Override

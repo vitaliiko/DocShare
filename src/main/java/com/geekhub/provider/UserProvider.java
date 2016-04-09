@@ -78,8 +78,6 @@ public class UserProvider {
     }
 
     private void createRootDir() {
-        UserDirectory directory = new UserDirectory();
-        directory.setParentDirectoryHash(UserFileUtil.ROOT_DIRECTORY_HASH);
         File file = new File("C:\\spring_docs");
         if (!file.exists()) {
             file.mkdir();
