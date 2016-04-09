@@ -37,28 +37,28 @@
         <br>
         <div class="form-actions floatRight">
             <input type="submit" value="Upload" class="btn btn-primary btn-sm">
+            <button type="button" class="btn btn-default btn-sm make-dir-btn"
+                    data-toggle="modal" data-target="#makeDirDialog">Make dir</button>
         </div>
     </form>
 </div>
 
-<div class="container" style="width: 900px;">
-    <form action="/document/search">
-        <input type="text" name="search" class="form-control input-sm">
-        <input type="submit" value="Search" class="btn btn-primary btn-sm">
-    </form>
-</div>
+<%--<div class="container" style="width: 900px;">--%>
+    <%--<form action="/document/search">--%>
+        <%--<input type="text" name="search" class="form-control input-sm">--%>
+        <%--<input type="submit" value="Search" class="btn btn-primary btn-sm">--%>
+    <%--</form>--%>
+<%--</div>--%>
 
 <div class="container" style="width: 900px;">
     <c:forEach items="${tableNames}" var="tableName">
         <table class="table table-hover tbody tr:hover td doc-table ${tableName}">
             <caption>
-                <button type="button" class="btn btn-default make-dir-btn"
-                        data-toggle="modal" data-target="#makeDirDialog">Make dir</button>
                 <h3></h3>
-                <a href="#" class="all-href">All &nbsp</a>
-                <a href="#" class="public-href">Public &nbsp</a>
-                <a href="#" class="for-friends-href">For Friends &nbsp</a>
-                <a href="#" class="private-href">Private</a>
+                <a href="#" class="switch-btn all-href">All &nbsp</a>
+                <a href="#" class="switch-btn public-href">Public &nbsp</a>
+                <a href="#" class="switch-btn for-friends-href">For Friends &nbsp</a>
+                <a href="#" class="switch-btn private-href">Private</a>
 
                 <button class="btn btn-default delete-btn action-btn"
                         data-toggle="modal" data-target="#deleteDialog">Delete</button>

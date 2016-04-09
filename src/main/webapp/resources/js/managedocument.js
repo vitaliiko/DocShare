@@ -13,41 +13,48 @@ $(document).ready(function() {
     var handlebarsPath = '/resources/js/templates/';
 
     function changeTab() {
-        publicTable.hide(true);
-        forFriendsTable.hide(true);
-        privateTable.hide(true);
-        allTable.hide(true);
+        $('.doc-table').hide(true);
         $("input:checkbox:checked").each(function() {
             $(this).prop('checked', false);
         });
         $('.action-btn').hide(true);
+        $('.switch-btn').css('font-weight', 'normal');
+    }
+
+    function setSelectionStyle(element) {
+        $(element).css('font-weight', 'bold');
     }
 
     changeTab();
     allTable.show(true);
+    setSelectionStyle($('.all-href'));
 
     $('.all-href').click(function() {
         event.preventDefault();
         changeTab();
         allTable.show(true);
+        setSelectionStyle($('.all-href'));
     });
 
     $('.public-href').click(function() {
         event.preventDefault();
         changeTab();
         publicTable.show(true);
+        setSelectionStyle($('.public-href'));
     });
 
     $('.for-friends-href').click(function() {
         event.preventDefault();
         changeTab();
         forFriendsTable.show(true);
+        setSelectionStyle($('.for-friends-href'));
     });
 
     $('.private-href').click(function() {
         event.preventDefault();
         changeTab();
         privateTable.show(true);
+        setSelectionStyle($('.private-href'));
     });
 
     $('.select-all').click(function() {
