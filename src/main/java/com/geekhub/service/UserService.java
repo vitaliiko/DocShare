@@ -45,4 +45,6 @@ public interface UserService extends EntityService<User, Long> {
     void removeFromFriends(User friend);
 
     void update(List<User> users);
+
+    Set<User> getSetByIds(Long[] usersIds);
 }

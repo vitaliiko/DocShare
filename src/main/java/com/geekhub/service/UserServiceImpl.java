@@ -4,10 +4,9 @@ import com.geekhub.dao.UserDao;
 import com.geekhub.entity.FriendsGroup;
 import com.geekhub.entity.Message;
 import com.geekhub.entity.User;
-import com.geekhub.entity.UserDirectory;
-import com.geekhub.entity.enums.DocumentAttribute;
-import com.geekhub.util.UserFileUtil;
+import java.util.Arrays;
 import java.util.Calendar;
+import java.util.HashSet;
 import org.hibernate.HibernateException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -192,5 +191,12 @@ public class UserServiceImpl implements UserService {
     @Override
     public void update(List<User> users) {
         users.forEach(this::update);
+    }
+
+    @Override
+    public Set<User> getSetByIds(Long[] usersIds) {
+        Set<User> users = new HashSet<>();
+        Arrays.stream(usersIds).forEach(id -> users.add(getById(id)));
+        return users;
     }
 }

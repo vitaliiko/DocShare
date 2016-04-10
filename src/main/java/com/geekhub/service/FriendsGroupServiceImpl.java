@@ -91,37 +91,6 @@ public class FriendsGroupServiceImpl implements FriendsGroupService {
     }
 
     @Override
-    public Long addFriendsGroup(Long ownerId, String name, Long[] friendsIds) {
-        Set<User> friendsSet = new HashSet<>();
-        Arrays.stream(friendsIds).forEach(id -> friendsSet.add(userService.getById(id)));
-        FriendsGroup group = new FriendsGroup(name, friendsSet);
-        group.setOwner(userService.getById(ownerId));
-        return friendsGroupDao.save(group);
-    }
-
-    @Override
-    public void update(Long groupId, Long ownerId, String groupName, Long[] friendsIds) {
-        User owner = userService.getById(ownerId);
-        FriendsGroup group = friendsGroupDao.getById(groupId);
-        if (!group.getName().equals(groupName) && friendsGroupDao.getFriendsGroups(owner, "name", groupName).size() == 0) {
-            group.setName(groupName);
-        } else {
-//            throw new HibernateException("Friends group with such name already exist");
-        }
-        Set<User> friendsSet = new HashSet<>();
-        Arrays.stream(friendsIds).forEach(id -> friendsSet.add(userService.getById(id)));
-        group.setFriends(friendsSet);
-        friendsGroupDao.update(group);
-    }
-
-    @Override
-    public FriendsGroup getWithFriends(Long groupId) {
-        FriendsGroup group = getById(groupId);
-        Hibernate.initialize(group.getFriends());
-        return group;
-    }
-
-    @Override
     public List<FriendsGroup> getByFriend(User friend) {
         return friendsGroupDao.getByFriend(friend);
     }
