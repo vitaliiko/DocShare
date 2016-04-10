@@ -73,7 +73,7 @@ public class UserDirectoryServiceImpl implements UserDirectoryService {
         RemovedDirectory removedDirectory = UserFileUtil.wrapUserDirectory(directory, removerId);
         removedDirectoryService.save(removedDirectory);
         directory.setOwner(null);
-        userDirectoryDao.save(directory);
+        userDirectoryDao.update(directory);
     }
 
     @Override
@@ -124,5 +124,10 @@ public class UserDirectoryServiceImpl implements UserDirectoryService {
     @Override
     public UserDirectory getByHashName(String hashName) {
         return userDirectoryDao.get("hashName", hashName);
+    }
+
+    @Override
+    public List<UserDirectory> getByIds(List<Long> dirIds) {
+        return userDirectoryDao.getAll("id", dirIds);
     }
 }

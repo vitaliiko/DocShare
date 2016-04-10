@@ -11,6 +11,8 @@ import com.geekhub.entity.enums.DocumentAttribute;
 import com.geekhub.dto.UserFileDto;
 import com.geekhub.dto.DocumentOldVersionDto;
 import com.geekhub.dto.SharedDto;
+import com.geekhub.security.UserDirectoryAccessProvider;
+import com.geekhub.security.UserDocumentAccessProvider;
 import com.geekhub.service.CommentService;
 import com.geekhub.service.DocumentOldVersionService;
 import com.geekhub.service.EntityService;
@@ -83,6 +85,12 @@ public class DocumentController {
     @Autowired
     private DocumentOldVersionService documentOldVersionService;
 
+    @Autowired
+    private UserDirectoryAccessProvider directoryAccessProvider;
+
+    @Autowired
+    private UserDocumentAccessProvider documentAccessProvider;
+
     @InitBinder("multipartFile")
     protected void initBinder(WebDataBinder binder) {
         binder.setValidator(fileValidator);
@@ -105,12 +113,15 @@ public class DocumentController {
 
         User user = userService.getById((Long) session.getAttribute("userId"));
         UserDocument document = userDocumentService.getById(docId);
-        File file = UserFileUtil.createFile(document.getHashName());
-        response.setContentType(document.getType());
-        response.setContentLength((int) file.length());
-        response.setHeader("Content-Disposition", "attachment; filename=\"" + document.getName() +"\"");
 
-        FileCopyUtils.copy(Files.newInputStream(file.toPath()), response.getOutputStream());
+        if (documentAccessProvider.canRead(document, user)) {
+            File file = UserFileUtil.createFile(document.getHashName());
+            response.setContentType(document.getType());
+            response.setContentLength((int) file.length());
+            response.setHeader("Content-Disposition", "attachment; filename=\"" + document.getName() + "\"");
+
+            FileCopyUtils.copy(Files.newInputStream(file.toPath()), response.getOutputStream());
+        }
     }
 
     @RequestMapping(value = "/move-to-trash", method = RequestMethod.POST)
@@ -119,12 +130,19 @@ public class DocumentController {
                                     @RequestParam(value = "dirIds[]", required = false) Long[] dirIds,
                                     HttpSession session) {
 
-        Long removerId = (Long) session.getAttribute("userId");
+        Long userId = (Long) session.getAttribute("userId");
+        User user = userService.getById(userId);
         if (docIds != null) {
-            userDocumentService.moveToTrash(docIds, removerId);
+            List<UserDocument> documents = userDocumentService.getByIds(Arrays.asList(docIds));
+            if (documentAccessProvider.canRemove(documents, user)) {
+                userDocumentService.moveToTrash(docIds, userId);
+            }
         }
         if (dirIds != null) {
-            userDirectoryService.moveToTrash(dirIds, removerId);
+            List<UserDirectory> directories = userDirectoryService.getByIds(Arrays.asList(dirIds));
+            if (directoryAccessProvider.canRemove(directories, user)) {
+                userDirectoryService.moveToTrash(dirIds, userId);
+            }
         }
     }
 

@@ -215,9 +215,7 @@ public class UserDocument extends UserFile implements Comparable<UserDocument> {
         if (lastModifyTime != null ? !lastModifyTime.equals(document.lastModifyTime) : document.lastModifyTime != null)
             return false;
         if (size != null ? !size.equals(document.size) : document.size != null) return false;
-        if (owner != null ? !owner.equals(document.owner) : document.owner != null) return false;
-        if (readers != null ? !readers.equals(document.readers) : document.readers != null) return false;
-        return comments != null ? comments.equals(document.comments) : document.comments == null;
+        return (owner != null ? !owner.equals(document.owner) : document.owner != null);
 
     }
 
@@ -229,8 +227,6 @@ public class UserDocument extends UserFile implements Comparable<UserDocument> {
         result = 31 * result + (lastModifyTime != null ? lastModifyTime.hashCode() : 0);
         result = 31 * result + (size != null ? size.hashCode() : 0);
         result = 31 * result + (owner != null ? owner.hashCode() : 0);
-        result = 31 * result + (readers != null ? readers.hashCode() : 0);
-        result = 31 * result + (comments != null ? comments.hashCode() : 0);
         return result;
     }
 

@@ -14,6 +14,8 @@ import java.util.List;
 @Service
 public interface UserDocumentService extends EntityService<UserDocument, Long> {
 
+    List<UserDocument> getByIds(List<Long> docIds);
+
     List<UserDocument> getAllByOwnerId(Long ownerId);
 
     void moveToTrash(Long docId, Long removerId);

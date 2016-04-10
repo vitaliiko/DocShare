@@ -34,6 +34,9 @@ public class RemovedDirectory {
     @Column
     private Date removalDate;
 
+    @Column
+    private String description;
+
     public Long getId() {
         return id;
     }
@@ -72,6 +75,14 @@ public class RemovedDirectory {
 
     public void setRemovalDate(Date removalDate) {
         this.removalDate = removalDate;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     @Override

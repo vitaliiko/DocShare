@@ -77,7 +77,7 @@ public class UserDocumentServiceImpl implements UserDocumentService {
         RemovedDocument removedDocument = UserFileUtil.wrapUserDocument(document, removerId);
         removedDocumentService.save(removedDocument);
         document.setOwner(null);
-        userDocumentDao.save(document);
+        userDocumentDao.update(document);
     }
 
     @Override
@@ -165,5 +165,10 @@ public class UserDocumentServiceImpl implements UserDocumentService {
     @Override
     public List<UserDocument> getAllByParentDirectoryHash(String parentDirectoryHash) {
         return userDocumentDao.getList("parentDirectoryHash", parentDirectoryHash);
+    }
+
+    @Override
+    public List<UserDocument> getByIds(List<Long> docIds) {
+        return userDocumentDao.getAll("id", docIds);
     }
 }

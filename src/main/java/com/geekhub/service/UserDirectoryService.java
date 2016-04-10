@@ -8,6 +8,8 @@ import org.springframework.stereotype.Service;
 @Service
 public interface UserDirectoryService extends EntityService<UserDirectory, Long> {
 
+    List<UserDirectory> getByIds(List<Long> dirIds);
+
     List<UserDirectory> getAllByOwnerId(Long ownerId);
 
     void moveToTrash(Long dirIds, Long removerId);
