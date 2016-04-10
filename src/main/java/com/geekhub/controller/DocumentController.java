@@ -2,6 +2,7 @@ package com.geekhub.controller;
 
 import com.geekhub.entity.Comment;
 import com.geekhub.entity.DocumentOldVersion;
+import com.geekhub.entity.Event;
 import com.geekhub.entity.RemovedDirectory;
 import com.geekhub.entity.RemovedDocument;
 import com.geekhub.entity.User;
@@ -16,6 +17,7 @@ import com.geekhub.security.UserDocumentAccessProvider;
 import com.geekhub.service.CommentService;
 import com.geekhub.service.DocumentOldVersionService;
 import com.geekhub.service.EntityService;
+import com.geekhub.service.EventService;
 import com.geekhub.service.FriendsGroupService;
 import com.geekhub.service.RemovedDirectoryService;
 import com.geekhub.service.RemovedDocumentService;
@@ -90,6 +92,9 @@ public class DocumentController {
 
     @Autowired
     private UserDocumentAccessProvider documentAccessProvider;
+
+    @Autowired
+    private EventService eventService;
 
     private User getUserFromSession(HttpSession session) {
         return userService.getById((Long) session.getAttribute("userId"));

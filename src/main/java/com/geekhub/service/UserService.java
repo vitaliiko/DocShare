@@ -1,7 +1,6 @@
 package com.geekhub.service;
 
 import com.geekhub.entity.FriendsGroup;
-import com.geekhub.entity.Message;
 import com.geekhub.entity.User;
 import org.springframework.stereotype.Service;
 
@@ -13,10 +12,6 @@ import java.util.Set;
 public interface UserService extends EntityService<User, Long> {
 
     User getByLogin(String login);
-
-    void addMessage(Long userId, Message message);
-
-    void deleteMessage(Long userId, Long messageId);
 
     Set<User> getFriends(Long userId);
 

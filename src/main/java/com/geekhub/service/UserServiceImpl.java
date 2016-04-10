@@ -2,7 +2,6 @@ package com.geekhub.service;
 
 import com.geekhub.dao.UserDao;
 import com.geekhub.entity.FriendsGroup;
-import com.geekhub.entity.Message;
 import com.geekhub.entity.User;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -24,9 +23,6 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private UserDao userDao;
-
-    @Autowired
-    private MessageService messageService;
 
     @Autowired
     private FriendsGroupService friendsGroupService;
@@ -82,21 +78,6 @@ public class UserServiceImpl implements UserService {
     @Override
     public User getByLogin(String login) {
         return userDao.get("login", login);
-    }
-
-    @Override
-    public void addMessage(Long userId, Message message) {
-        User user = userDao.getById(userId);
-        user.getMessageSet().add(message);
-        userDao.update(user);
-    }
-
-    @Override
-    public void deleteMessage(Long userId, Long messageId) {
-        Message message = messageService.getById(messageId);
-        User user = userDao.getById(userId);
-        user.getMessageSet().remove(message);
-        userDao.update(user);
     }
 
     @Override

@@ -2,6 +2,7 @@ package com.geekhub.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.Date;
+import java.util.TreeSet;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -53,8 +54,8 @@ public class User {
 
     @JsonIgnore
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-    @JoinColumn(name = "user_id")
-    private Set<Message> messageSet = new HashSet<>();
+    @JoinColumn(name = "event_id")
+    private TreeSet<Event> events = new TreeSet<>();
 
     @JsonIgnore
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
@@ -142,12 +143,12 @@ public class User {
         this.login = login;
     }
 
-    public Set<Message> getMessageSet() {
-        return messageSet;
+    public Set<Event> getEvents() {
+        return events;
     }
 
-    public void setMessageSet(Set<Message> messageSet) {
-        this.messageSet = messageSet;
+    public void setEvents(Set<Event> events) {
+        this.events = (TreeSet<Event>) events;
     }
 
     public Set<FriendsGroup> getFriendsGroups() {
