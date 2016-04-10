@@ -40,6 +40,21 @@ public class FriendsGroupDao implements EntityDao<FriendsGroup, Long> {
                 .uniqueResult();
     }
 
+    public List<FriendsGroup> getList(String propertyName, Object value) {
+        return (List<FriendsGroup>) sessionFactory.getCurrentSession()
+                .createCriteria(clazz)
+                .add(Restrictions.eq(propertyName, value))
+                .list();
+    }
+
+    public FriendsGroup get(User owner, String propertyName, Object value) {
+        return (FriendsGroup) sessionFactory.getCurrentSession()
+                .createCriteria(clazz)
+                .add(Restrictions.eq("owner", owner))
+                .add(Restrictions.eq(propertyName, value))
+                .uniqueResult();
+    }
+
     @Override
     public Long save(FriendsGroup entity) {
         return (Long) sessionFactory.getCurrentSession().save(entity);

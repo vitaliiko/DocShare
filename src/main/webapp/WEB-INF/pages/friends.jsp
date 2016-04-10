@@ -17,29 +17,15 @@
 
     <div id="wrapper" class="container">
         <div id="page-content-wrapper">
-            <table id="groupTable" class="table table-hover tbody tr:hover td">
+            <table id="groupTable" class="table table-hover tbody tr:hover td group-table">
                 <caption>
                     Groups
                     <button type="button" id="addGroupButton" class="btn btn-primary btn-sm"
                             data-toggle="modal" data-target="#groupInfo">Add group</button>
                 </caption>
-
-                <c:forEach var="group" items="${groups}">
-                    <c:url var="groupPage" value="/main/userpage/${group.id}"/>
-                    <tr class="group${group.id}">
-                        <td>
-                            <a href="#" name="groupInfoButton" class="group-info-btn group${group.id}"
-                                    id="${group.id}" data-toggle="modal" data-target="#groupInfo"> ${group.name} </a>
-                        </td>
-                        <td>
-                            <input type="button" class="btn btn-default removeGroupButton"
-                                   id="${group.id}" value="Remove friends group">
-                        </td>
-                    </tr>
-                </c:forEach>
             </table>
 
-            <table id="friendsTable" class="table table-hover tbody tr:hover td">
+            <table id="friendsTable" class="table table-hover tbody tr:hover td friend-table">
                 <caption>
                     Friends <a href="/main/search" class="btn btn-primary btn-sm">Add friends</a>
                 </caption>
@@ -50,7 +36,7 @@
                         <td>
                             <a href="${friendPage}" class="btn btn-link"> ${friendEntry.key} </a>
                         </td>
-                        <td class="td${friendEntry.key.id}">
+                        <td class="td-friend${friendEntry.key.id}">
                             <c:forEach var="group" items="${friendEntry.value}">
                                 <a href="#" name="groupInfoButton" data-toggle="modal" data-target="#groupInfo"
                                         id="${group.id}" class="group-info-btn group${group.id}">

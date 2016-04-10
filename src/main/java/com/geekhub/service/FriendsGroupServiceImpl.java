@@ -99,4 +99,14 @@ public class FriendsGroupServiceImpl implements FriendsGroupService {
     public void update(List<FriendsGroup> groups) {
         groups.forEach(this::update);
     }
+
+    @Override
+    public FriendsGroup getByOwnerAndName(User owner, String name) {
+        return friendsGroupDao.get(owner, "name", name);
+    }
+
+    @Override
+    public List<FriendsGroup> getListByOwner(User owner) {
+        return friendsGroupDao.getList("owner", owner);
+    }
 }

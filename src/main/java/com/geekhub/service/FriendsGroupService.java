@@ -23,4 +23,8 @@ public interface FriendsGroupService extends EntityService<FriendsGroup, Long> {
     List<FriendsGroup> getByFriend(User friend);
 
     void update(List<FriendsGroup> groups);
+
+    FriendsGroup getByOwnerAndName(User owner, String name);
+
+    List<FriendsGroup> getListByOwner(User owner);
 }

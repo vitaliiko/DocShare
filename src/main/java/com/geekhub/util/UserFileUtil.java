@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -86,13 +87,13 @@ public class UserFileUtil {
     }
 
     public static String createHashName() {
-        return DocumentNameDigest.hashName("" + new Date().getTime());
+        return DigestUtils.md5Hex("" + new Date().getTime());
     }
 
     public static String createHashName(long... parameters) {
         StringBuilder preparedHashName = new StringBuilder("");
         Arrays.stream(parameters).forEach(preparedHashName::append);
-        return DocumentNameDigest.hashName(preparedHashName.toString());
+        return DigestUtils.md5Hex(preparedHashName.toString());
     }
 
     public static File createFile(String fileName) {

@@ -12,6 +12,8 @@ import com.geekhub.entity.UserDirectory;
 import com.geekhub.entity.UserDocument;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Set;
+import java.util.TreeSet;
 
 public class EntityToDtoConverter {
 
@@ -72,7 +74,10 @@ public class EntityToDtoConverter {
         FriendsGroupDto groupDto = new FriendsGroupDto();
         groupDto.setId(group.getId());
         groupDto.setName(group.getName());
-        groupDto.setFriends(group.getFriends());
+
+        Set<UserDto> friends = new TreeSet<>();
+        group.getFriends().forEach(f -> friends.add(convert(f)));
+        groupDto.setFriends(friends);
         return groupDto;
     }
 }

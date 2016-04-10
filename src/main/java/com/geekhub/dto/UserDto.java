@@ -1,6 +1,6 @@
 package com.geekhub.dto;
 
-public class UserDto {
+public class UserDto implements Comparable<UserDto> {
 
     private long id;
     private String firstName;
@@ -73,5 +73,15 @@ public class UserDto {
 
     public void setCity(String city) {
         this.city = city;
+    }
+
+    @Override
+    public int compareTo(UserDto o) {
+        return this.toString().compareTo(o.toString());
+    }
+
+    @Override
+    public String toString() {
+        return firstName + " " + lastName;
     }
 }

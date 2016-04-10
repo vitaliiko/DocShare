@@ -6,6 +6,7 @@ import com.geekhub.dto.FriendsGroupDto;
 import com.geekhub.service.FriendsGroupService;
 import com.geekhub.service.UserService;
 import com.geekhub.util.EntityToDtoConverter;
+import java.util.TreeSet;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -46,25 +47,35 @@ public class FriendsController {
     }
 
     @RequestMapping("/create_group")
-    public Long createGroup(String groupName, @RequestParam("friends[]") Long[] friends, HttpSession session) {
+    public Long createGroup(@RequestParam(value = "friends[]", required = false) Long[] friends,
+                            String groupName, HttpSession session) {
+
         User user = getUserFromSession(session);
-        FriendsGroup group = new FriendsGroup();
-        group.setOwner(user);
-        group.setName(groupName);
-        group.setFriends(userService.getSetByIds(friends));
-        return friendsGroupService.save(group);
+        FriendsGroup group = friendsGroupService.getByOwnerAndName(user, groupName);
+        if (group == null) {
+            group = new FriendsGroup();
+            group.setOwner(user);
+            group.setName(groupName);
+            if (friends != null) {
+                group.setFriends(userService.getSetByIds(friends));
+            }
+            return friendsGroupService.save(group);
+        }
+        return null;
     }
 
     @RequestMapping("/update_group")
     @ResponseStatus(HttpStatus.OK)
-    public void updateGroup(@RequestParam("friends[]") Long[] friends,
+    public void updateGroup(@RequestParam(value = "friends[]", required = false) Long[] friends,
                             Long groupId, String groupName, HttpSession session) {
 
         User user = getUserFromSession(session);
         FriendsGroup group = friendsGroupService.getById(groupId);
         if (group != null && group.getOwner().equals(user)) {
             group.setName(groupName);
-            group.setFriends(userService.getSetByIds(friends));
+            if (friends != null) {
+                group.setFriends(userService.getSetByIds(friends));
+            }
             friendsGroupService.update(group);
         }
     }
@@ -104,5 +115,14 @@ public class FriendsController {
         if (group != null && group.getOwner().equals(user)) {
             friendsGroupService.delete(group);
         }
+    }
+
+    @RequestMapping("/get-friends-groups")
+    public Set<FriendsGroupDto> getFriendsGroups(HttpSession session) {
+        User user = getUserFromSession(session);
+        List<FriendsGroup> groups = friendsGroupService.getListByOwner(user);
+        Set<FriendsGroupDto> groupDtos = new TreeSet<>();
+        groups.forEach(g -> groupDtos.add(EntityToDtoConverter.convert(g)));
+        return groupDtos;
     }
 }

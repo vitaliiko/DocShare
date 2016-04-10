@@ -11,6 +11,14 @@ $(document).ready(function() {
         $('#groupName').val('');
     }
 
+    $.getJSON('/friends/get-friends-groups', function(groups) {
+        $.each(groups, function (k, group) {
+            loadTemplate(handlebarsPath + 'groupInfoRow.html', function (template) {
+                $('#groupTable').append(template(group));
+            });
+        });
+    });
+
     $('#saveGroupButton').click(function() {
         var groupName = $('#groupName').val();
         var friends = [];
@@ -21,13 +29,13 @@ $(document).ready(function() {
             url: '/friends/create_group',
             data: {groupName: groupName, friends: friends},
             success: function(groupId) {
-                var group = {groupId: groupId, groupName: groupName};
-                loadTemplate(handlebarsPath + 'groupTableRow.html', function(template) {
-                    $('#groupTable').append(template(group));
+                var group = {id: groupId, name: groupName};
+                loadTemplate(handlebarsPath + 'groupInfoRow.html', function(template) {
+                    $('.group-table').append(template(group));
                 });
                 $.each(friends, function (k, v) {
                     loadTemplate(handlebarsPath + 'groupInfoButton.html', function (template) {
-                        $('.td' +  v).append(template(group));
+                        $('.td-friend' +  v).append(template(group));
                     });
                 });
                 clearModalWindow();
@@ -46,13 +54,13 @@ $(document).ready(function() {
             contentType: 'json',
             data: {groupId: friendsGroupId, groupName: groupName, friends: friends},
             success: function() {
-                $('.group' + friendsGroupId).html(groupName);
+                $('.table').find($('.group' + friendsGroupId)).html(groupName);
                 clearModalWindow();
             }
         });
     });
 
-    $('.table').on('click', '.group-info-btn', function(event) {
+    $('.group-table').on('click', '.group-info-btn', function(event) {
         event.preventDefault();
         clearModalWindow();
         $('#saveGroupButton').hide();
@@ -89,13 +97,13 @@ $(document).ready(function() {
         })
     });
 
-    $('.removeGroupButton').click(function() {
+    $('#groupTable').on('click', '.removeGroupButton', function() {
         var groupId = this.id;
         $.ajax({
             url: '/friends/delete_group',
             data: {groupId: groupId},
             success: function() {
-                $('.group' + groupId).remove();
+                $('.group-table').find($('.tr-group' + groupId)).remove();
             }
         })
     });
