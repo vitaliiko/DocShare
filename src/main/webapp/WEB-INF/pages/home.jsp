@@ -138,9 +138,9 @@
 
             <div class="modal-body">
                 <div class="btn-group" data-toggle="buttons">
-                    <input type="radio" name="access" id="PRIVATE" value="PRIVATE" checked>Private
-                    <input type="radio" name="access" id="FOR_FRIENDS" value="FOR_FRIENDS">For friends
                     <input type="radio" name="access" id="PUBLIC" value="PUBLIC">Public
+                    <input type="radio" name="access" id="FOR_FRIENDS" value="FOR_FRIENDS">For friends
+                    <input type="radio" name="access" id="PRIVATE" value="PRIVATE" checked>Private
                 </div>
                 <table class="checkbox checkbox-table" id="friends-list">
                     <tr>

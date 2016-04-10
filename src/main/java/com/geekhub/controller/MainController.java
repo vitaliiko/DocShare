@@ -1,10 +1,11 @@
 package com.geekhub.controller;
 
+import com.geekhub.dto.RegistrationInfo;
 import com.geekhub.entity.User;
 import com.geekhub.exception.UserValidateException;
+import com.geekhub.security.UserProfileManager;
 import com.geekhub.service.UserService;
 import com.geekhub.provider.UserProvider;
-import com.geekhub.util.UserFileUtil;
 import org.hibernate.HibernateException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -28,32 +29,33 @@ public class MainController {
     @Autowired
     private UserProvider userProvider;
 
+    @Autowired
+    private UserProfileManager userProfileManager;
+
     @RequestMapping(value = "/home", method = RequestMethod.GET)
     public ModelAndView home() {
-        return new ModelAndView("home");
+        return new ModelAndView("redirect:/document/upload");
     }
 
     @RequestMapping(value = "/sign_in", method = RequestMethod.GET)
     public ModelAndView signIn() {
-        int size = userService.getAll("id").size();
-        if (size == 0) {
-            userProvider.fillDB();
-        }
+        userProvider.fillDB();
         return new ModelAndView("signIn");
     }
 
     @RequestMapping(value = "/sign_in", method = RequestMethod.POST)
     public ModelAndView signIn(String j_username, String j_password, HttpSession session) {
         ModelAndView model = new ModelAndView();
-        User user = userService.getByLogin(j_username);
-        if (user != null && user.getPassword().equals(j_password)) {
-            model.setViewName("redirect:/document/upload");
+        User user;
+        try {
+            user = userProfileManager.authenticateUser(j_username, j_password);
             session.setAttribute("userId", user.getId());
             session.setAttribute("parentDirectoryHash", user.getLogin());
             session.setAttribute("currentLocation", user.getLogin());
-        } else {
-            model.addObject("errorMessage", "Wrong login or password")
-                    .setViewName("signIn");
+            model.setViewName("redirect:/document/upload");
+        } catch (UserValidateException e) {
+            model.addObject("errorMessage", e.getMessage());
+            model.setViewName("singIn");
         }
         return model;
     }
@@ -64,23 +66,16 @@ public class MainController {
     }
 
     @RequestMapping(value = "/sign_up", method = RequestMethod.POST)
-    public ModelAndView signUp(String firstName,
-                               String lastName,
-                               String login,
-                               String password,
-                               String confirmPassword)
+    public ModelAndView signUp(RegistrationInfo registrationInfo)
             throws HibernateException {
 
         ModelAndView model = new ModelAndView();
         try {
-            userProvider.validateUser(login, password, confirmPassword);
-            userService.createUser(firstName, lastName, login, password);
+            userProfileManager.registerNewUser(registrationInfo);
             model.setViewName("signIn");
             model.addObject("message", "Your account created successfully");
         } catch (UserValidateException e) {
-            model.addObject("login", login)
-                    .addObject("firstName", firstName)
-                    .addObject("lastName", lastName)
+            model.addObject("registrationInfo", registrationInfo)
                     .addObject("errorMessage", e.getMessage())
                     .setViewName("signUp");
         }

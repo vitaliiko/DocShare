@@ -9,7 +9,7 @@ public class DocumentNameDigest {
         MessageDigest md5 ;
         StringBuilder hexString = new StringBuilder();
         try {
-            md5 = MessageDigest.getInstance("md5");
+            md5 = MessageDigest.getInstance("SHA-1");
             md5.reset();
             md5.update(text.getBytes());
 

@@ -10,6 +10,7 @@ import com.geekhub.service.UserDirectoryService;
 import com.geekhub.service.UserService;
 import com.geekhub.util.UserFileUtil;
 import java.io.File;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -38,14 +39,16 @@ public class UserProvider {
     }
 
     public void fillDB() {
-        createRootDir();
-        addDefaultUsers();
+        if (userService.getAll("id").size() == 0) {
+            createRootDir();
+            addDefaultUsers();
+        }
     }
 
     private void addDefaultUsers() {
         for (int i = 0; i < 20; i++) {
             String value = String.valueOf(i) + i + i;
-            User user = new User(value, value, value, value);
+            User user = new User(value, value, DigestUtils.sha1Hex(value), value);
             Long userId = userService.save(user);
             user.setId(userId);
             userService.update(user);

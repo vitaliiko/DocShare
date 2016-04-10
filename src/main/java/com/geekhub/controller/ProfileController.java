@@ -2,6 +2,8 @@ package com.geekhub.controller;
 
 import com.geekhub.dto.UserDto;
 import com.geekhub.entity.User;
+import com.geekhub.exception.UserValidateException;
+import com.geekhub.security.UserProfileManager;
 import com.geekhub.service.UserService;
 import com.geekhub.util.DtoToEntityConverter;
 import com.geekhub.util.EntityToDtoConverter;
@@ -24,6 +26,9 @@ public class ProfileController {
     @Autowired
     private UserService userService;
 
+    @Autowired
+    private UserProfileManager userProfileManager;
+
     @RequestMapping(value = "/view", method = RequestMethod.GET)
     public ModelAndView profile(HttpSession session) {
         User user = userService.getById((Long) session.getAttribute("userId"));
@@ -33,51 +38,46 @@ public class ProfileController {
     }
 
     @RequestMapping(value = "/changeProfile", method = RequestMethod.POST)
-    public ModelAndView changeName(UserDto userDto, HttpSession session) {
+    public ModelAndView changeProfile(UserDto userDto, HttpSession session) {
         ModelAndView model = new ModelAndView("profile");
         User user = userService.getById((Long) session.getAttribute("userId"));
 
-        if (user.getLogin().equals(userDto.getLogin()) || userService.getByLogin(userDto.getLogin()) == null) {
-            DtoToEntityConverter.merge(userDto, user);
-            userService.update(user);
+        try {
+            userProfileManager.updateUserProfile(userDto, user);
             model.addObject("message", "Your account updated successfully");
-        } else {
-            model.addObject("errorMessage", "User with such login already exist");
+        } catch (UserValidateException e){
+            model.addObject("errorMessage", e.getMessage());
         }
         model.addObject("user", userDto);
         return model;
     }
 
     @RequestMapping(value = "/changePassword", method = RequestMethod.POST)
-    public ModelAndView changePassword(HttpSession session,
-                                       String currentPassword,
+    public ModelAndView changePassword(String currentPassword,
                                        String newPassword,
-                                       String confirmNewPassword) {
+                                       String confirmNewPassword,
+                                       HttpSession session) {
 
         User user = userService.getById((Long) session.getAttribute("userId"));
         ModelAndView model = new ModelAndView("profile");
-        if (!user.getPassword().equals(currentPassword)) {
-            model.addObject("errorMessage", "Wrong password");
-        } else if (!newPassword.equals(confirmNewPassword)) {
-            model.addObject("errorMessage", "Passwords doesn't match");
-        } else {
-            user.setPassword(newPassword);
-            userService.update(user);
-            model.addObject("message", "Your password was changed successfully");
+        try {
+            userProfileManager.changePassword(currentPassword, newPassword, confirmNewPassword, user);
+            model.addObject("message", "Your password updated successfully");
+        } catch (UserValidateException e) {
+            model.addObject("errorMessage", e.getMessage());
         }
+        model.addObject("user", EntityToDtoConverter.convert(user));
         return model;
     }
 
     @RequestMapping("/removeAccount")
     public ModelAndView removeAccount(HttpSession session) {
-        ModelAndView model = new ModelAndView();
         User user = userService.getById((Long) session.getAttribute("userId"));
-        userService.removeFromFriends(user);
-        UserFileUtil.removeUserFiles(user);
-        userService.delete(user);
+        userProfileManager.removeAccount(user);
         session.invalidate();
-        model.addObject("message", "Your account removed successfully")
-                .setViewName("signIn");
+
+        ModelAndView model = new ModelAndView("signIn");
+        model.addObject("message", "Your account removed successfully");
         return model;
     }
 }

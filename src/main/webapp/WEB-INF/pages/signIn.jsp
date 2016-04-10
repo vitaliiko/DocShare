@@ -4,7 +4,6 @@
 <head>
     <title>Sign In</title>
     <jsp:include page="../include/include.jsp"/>
-    <script src="${pageContext.request.contextPath}/view/js/signIn.js"></script>
 </head>
 <body>
     <div class="container" style="width: 600px;" align="center">

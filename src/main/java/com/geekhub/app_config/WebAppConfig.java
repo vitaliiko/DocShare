@@ -1,7 +1,6 @@
 package com.geekhub.app_config;
 
 import com.geekhub.controller.MainInterceptor;
-import com.geekhub.security.UserDetailsServiceImpl;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -51,11 +50,6 @@ public class WebAppConfig extends WebMvcConfigurerAdapter {
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(new MainInterceptor());
-    }
-
-    @Bean
-    public UserDetailsService getUserDetailsService(){
-        return new UserDetailsServiceImpl();
     }
 
     @Bean(name = "multipartResolver")

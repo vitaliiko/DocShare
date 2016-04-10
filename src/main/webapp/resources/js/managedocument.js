@@ -141,7 +141,7 @@ $(document).ready(function() {
         if (dirCount > 1) {
             message += dirCount + ' directories ';
         }
-        message += 'into trash';
+        message += 'into trash?';
         $('#delete-dialog-text').text(message);
     });
 
