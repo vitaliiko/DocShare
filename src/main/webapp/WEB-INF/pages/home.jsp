@@ -44,7 +44,7 @@
     </form>
 
     <div  class="back-links">
-        <h3 id="location">DocShare</h3>
+        <h3 id="location">${userLogin}</h3>
     </div>
     <div>
         <a href="" class="back-link"><-Back</a>

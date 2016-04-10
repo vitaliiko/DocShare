@@ -245,12 +245,17 @@ public class User {
 
         User user = (User) o;
 
-        return firstName.equals(user.firstName) && lastName.equals(user.lastName) && login.equals(user.login);
+        return id.equals(user.id)
+                && firstName.equals(user.firstName)
+                && lastName.equals(user.lastName)
+                && login.equals(user.login);
+
     }
 
     @Override
     public int hashCode() {
-        int result = firstName.hashCode();
+        int result = id.hashCode();
+        result = 31 * result + firstName.hashCode();
         result = 31 * result + lastName.hashCode();
         result = 31 * result + login.hashCode();
         return result;

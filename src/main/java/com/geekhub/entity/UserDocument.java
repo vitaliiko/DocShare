@@ -2,12 +2,15 @@ package com.geekhub.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import com.geekhub.entity.enums.DocumentAttribute;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -20,7 +23,7 @@ import javax.persistence.Table;
 
 @Entity
 @Table(name = "user_document")
-public class UserDocument extends UserFile implements Comparable<UserDocument> {
+public class UserDocument implements Comparable<UserDocument> {
 
     @Id
     @GeneratedValue
@@ -37,6 +40,19 @@ public class UserDocument extends UserFile implements Comparable<UserDocument> {
 
     @Column
     private String size;
+
+    @Column
+    private String name;
+
+    @Column
+    private String parentDirectoryHash;
+
+    @Column
+    private String hashName;
+
+    @Column(name = "documentAttribute")
+    @Enumerated(EnumType.STRING)
+    private DocumentAttribute documentAttribute;
 
     @JsonIgnore
     @ManyToOne
@@ -201,6 +217,38 @@ public class UserDocument extends UserFile implements Comparable<UserDocument> {
         this.editorsGroups = editorsGroups;
     }
 
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getParentDirectoryHash() {
+        return parentDirectoryHash;
+    }
+
+    public void setParentDirectoryHash(String parentDirectoryHash) {
+        this.parentDirectoryHash = parentDirectoryHash;
+    }
+
+    public String getHashName() {
+        return hashName;
+    }
+
+    public void setHashName(String hashName) {
+        this.hashName = hashName;
+    }
+
+    public DocumentAttribute getDocumentAttribute() {
+        return documentAttribute;
+    }
+
+    public void setDocumentAttribute(DocumentAttribute documentAttribute) {
+        this.documentAttribute = documentAttribute;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -208,25 +256,22 @@ public class UserDocument extends UserFile implements Comparable<UserDocument> {
 
         UserDocument document = (UserDocument) o;
 
-        if (id != null ? !id.equals(document.id) : document.id != null) return false;
-        if (type != null ? !type.equals(document.type) : document.type != null) return false;
-        if (description != null ? !description.equals(document.description) : document.description != null)
-            return false;
-        if (lastModifyTime != null ? !lastModifyTime.equals(document.lastModifyTime) : document.lastModifyTime != null)
-            return false;
-        if (size != null ? !size.equals(document.size) : document.size != null) return false;
-        return (owner != null ? !owner.equals(document.owner) : document.owner != null);
-
+        return id.equals(document.id)
+                && type.equals(document.type)
+                && lastModifyTime.equals(document.lastModifyTime)
+                && name.equals(document.name)
+                && parentDirectoryHash.equals(document.parentDirectoryHash)
+                && hashName.equals(document.hashName);
     }
 
     @Override
     public int hashCode() {
-        int result = id != null ? id.hashCode() : 0;
-        result = 31 * result + (type != null ? type.hashCode() : 0);
-        result = 31 * result + (description != null ? description.hashCode() : 0);
-        result = 31 * result + (lastModifyTime != null ? lastModifyTime.hashCode() : 0);
-        result = 31 * result + (size != null ? size.hashCode() : 0);
-        result = 31 * result + (owner != null ? owner.hashCode() : 0);
+        int result = id.hashCode();
+        result = 31 * result + type.hashCode();
+        result = 31 * result + lastModifyTime.hashCode();
+        result = 31 * result + name.hashCode();
+        result = 31 * result + parentDirectoryHash.hashCode();
+        result = 31 * result + hashName.hashCode();
         return result;
     }
 

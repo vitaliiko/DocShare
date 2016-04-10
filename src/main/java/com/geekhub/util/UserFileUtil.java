@@ -5,7 +5,6 @@ import com.geekhub.entity.RemovedDocument;
 import com.geekhub.entity.User;
 import com.geekhub.entity.UserDirectory;
 import com.geekhub.entity.UserDocument;
-import com.geekhub.entity.UserFile;
 import com.geekhub.entity.enums.DocumentAttribute;
 import java.io.File;
 import java.util.Arrays;
@@ -25,31 +24,6 @@ public class UserFileUtil {
 
     public static final String ROOT_LOCATION = "C:\\spring_docs\\";
     public static final String SYSTEM_EXTENSION = ".curva";
-    public static final String ROOT_DIRECTORY_NAME = "DocShare";
-
-    public static <T extends UserFile> Map<String, Set<T>> prepareUserFileListMap(List<T> allDocumentsList) {
-        Set<T> allDocuments = new TreeSet<>(allDocumentsList);
-        Set<T> privateDocuments = new TreeSet<>();
-        Set<T> publicDocuments = new TreeSet<>();
-        Set<T> forFriendsDocuments = new TreeSet<>();
-        allDocuments.forEach(doc -> {
-            if (doc.getDocumentAttribute() == DocumentAttribute.PRIVATE) {
-                privateDocuments.add(doc);
-            }
-            if (doc.getDocumentAttribute() == DocumentAttribute.PUBLIC) {
-                publicDocuments.add(doc);
-            }
-            if (doc.getDocumentAttribute() == DocumentAttribute.FOR_FRIENDS) {
-                forFriendsDocuments.add(doc);
-            }
-        });
-        Map<String, Set<T>> userDocumentsListMap = new HashMap<>();
-        userDocumentsListMap.put("ALL", allDocuments);
-        userDocumentsListMap.put("PRIVATE", privateDocuments);
-        userDocumentsListMap.put("PUBLIC", publicDocuments);
-        userDocumentsListMap.put("FOR_FRIENDS", forFriendsDocuments);
-        return userDocumentsListMap;
-    }
 
     public static UserDocument createUserDocument(MultipartFile multipartFile,
                                                   String parentDirectoryHash,

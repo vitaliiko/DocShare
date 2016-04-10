@@ -1,11 +1,14 @@
 package com.geekhub.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.geekhub.entity.enums.DocumentAttribute;
 import java.util.HashSet;
 import java.util.Set;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -17,7 +20,7 @@ import javax.persistence.Table;
 
 @Entity
 @Table(name = "user_directory")
-public class UserDirectory extends UserFile implements Comparable<UserDirectory> {
+public class UserDirectory implements Comparable<UserDirectory> {
 
     @Id
     @GeneratedValue
@@ -27,6 +30,19 @@ public class UserDirectory extends UserFile implements Comparable<UserDirectory>
     @ManyToOne
     @JoinColumn(name = "owner_id")
     private User owner;
+
+    @Column
+    private String name;
+
+    @Column
+    private String parentDirectoryHash;
+
+    @Column
+    private String hashName;
+
+    @Column(name = "documentAttribute")
+    @Enumerated(EnumType.STRING)
+    private DocumentAttribute documentAttribute;
 
     @JsonIgnore
     @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH},
@@ -86,6 +102,38 @@ public class UserDirectory extends UserFile implements Comparable<UserDirectory>
         this.readersGroups = readersGroups;
     }
 
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getParentDirectoryHash() {
+        return parentDirectoryHash;
+    }
+
+    public void setParentDirectoryHash(String parentDirectoryHash) {
+        this.parentDirectoryHash = parentDirectoryHash;
+    }
+
+    public String getHashName() {
+        return hashName;
+    }
+
+    public void setHashName(String hashName) {
+        this.hashName = hashName;
+    }
+
+    public DocumentAttribute getDocumentAttribute() {
+        return documentAttribute;
+    }
+
+    public void setDocumentAttribute(DocumentAttribute documentAttribute) {
+        this.documentAttribute = documentAttribute;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -93,15 +141,18 @@ public class UserDirectory extends UserFile implements Comparable<UserDirectory>
 
         UserDirectory directory = (UserDirectory) o;
 
-        if (id != null ? !id.equals(directory.id) : directory.id != null) return false;
-        return (owner != null ? !owner.equals(directory.owner) : directory.owner != null);
-
+        return id.equals(directory.id)
+                && name.equals(directory.name)
+                && parentDirectoryHash.equals(directory.parentDirectoryHash)
+                && hashName.equals(directory.hashName);
     }
 
     @Override
     public int hashCode() {
-        int result = id != null ? id.hashCode() : 0;
-        result = 31 * result + (owner != null ? owner.hashCode() : 0);
+        int result = id.hashCode();
+        result = 31 * result + name.hashCode();
+        result = 31 * result + parentDirectoryHash.hashCode();
+        result = 31 * result + hashName.hashCode();
         return result;
     }
 

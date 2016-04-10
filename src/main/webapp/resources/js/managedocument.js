@@ -32,7 +32,7 @@ $(document).ready(function() {
     allTable.show(true);
     setSelectionStyle($('.all-href'));
     backLink.hide();
-    $.getJSON('/document/get-directory-content-DocShare', function(files) {
+    $.getJSON('/document/get-directory-content-root', function(files) {
         renderDirectories(files);
         renderDocuments(files);
     });
@@ -316,8 +316,8 @@ $(document).ready(function() {
     });
 
     function hideShowBackLink() {
-        var url = '' + backLink.prop('href');
-        if (url.endsWith('DocShare')) {
+        var location = $('#location').text();
+        if (location.lastIndexOf('/') == -1) {
             backLink.hide();
         } else {
             backLink.show();
