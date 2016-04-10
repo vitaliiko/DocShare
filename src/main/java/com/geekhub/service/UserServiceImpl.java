@@ -184,10 +184,13 @@ public class UserServiceImpl implements UserService {
         users.forEach(u -> u.getFriends().remove(friend));
         update(users);
 
+        List<FriendsGroup> groups = friendsGroupService.getByFriend(friend);
+        groups.forEach(g -> g.getFriends().remove(friend));
+        friendsGroupService.update(groups);
     }
 
     @Override
     public void update(List<User> users) {
-        userDao.update(users);
+        users.forEach(this::update);
     }
 }

@@ -2,8 +2,6 @@ package com.geekhub.dao;
 
 import com.geekhub.entity.FriendsGroup;
 import com.geekhub.entity.User;
-import com.geekhub.service.UserService;
-import org.hibernate.Hibernate;
 import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
@@ -82,6 +80,13 @@ public class FriendsGroupDao implements EntityDao<FriendsGroup, Long> {
                         "where fg.owner = :owner " +
                         "and :friend in elements(fg.friends)")
                 .setParameter("owner", owner)
+                .setParameter("friend", friend)
+                .list();
+    }
+
+    public List<FriendsGroup> getByFriend(User friend) {
+        return sessionFactory.getCurrentSession()
+                .createQuery("from FriendsGroup fg where :friend in elements(fg.friends)")
                 .setParameter("friend", friend)
                 .list();
     }

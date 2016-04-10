@@ -120,4 +120,14 @@ public class FriendsGroupServiceImpl implements FriendsGroupService {
         Hibernate.initialize(group.getFriends());
         return group;
     }
+
+    @Override
+    public List<FriendsGroup> getByFriend(User friend) {
+        return friendsGroupDao.getByFriend(friend);
+    }
+
+    @Override
+    public void update(List<FriendsGroup> groups) {
+        groups.forEach(this::update);
+    }
 }

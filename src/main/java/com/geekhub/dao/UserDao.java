@@ -49,10 +49,6 @@ public class UserDao implements EntityDao<User, Long> {
         sessionFactory.getCurrentSession().update(entity);
     }
 
-    public void update(List<User> users) {
-        users.forEach(this::update);
-    }
-
     @Override
     public void saveOrUpdate(User entity) {
         sessionFactory.getCurrentSession().saveOrUpdate(entity);
