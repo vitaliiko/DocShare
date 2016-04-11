@@ -9,10 +9,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
 import javax.persistence.Table;
-import javax.xml.crypto.Data;
 
 @Entity
 @Table
@@ -84,21 +81,15 @@ public class Comment {
 
         Comment comment = (Comment) o;
 
-        if (id != null ? !id.equals(comment.id) : comment.id != null) return false;
-        if (text != null ? !text.equals(comment.text) : comment.text != null) return false;
-        if (owner != null ? !owner.equals(comment.owner) : comment.owner != null) return false;
-        if (date != null ? !date.equals(comment.date) : comment.date != null) return false;
-        return userDocument != null ? userDocument.equals(comment.userDocument) : comment.userDocument == null;
+        return id.equals(comment.id) && date.equals(comment.date) && userDocument.equals(comment.userDocument);
 
     }
 
     @Override
     public int hashCode() {
-        int result = id != null ? id.hashCode() : 0;
-        result = 31 * result + (text != null ? text.hashCode() : 0);
-        result = 31 * result + (owner != null ? owner.hashCode() : 0);
-        result = 31 * result + (date != null ? date.hashCode() : 0);
-        result = 31 * result + (userDocument != null ? userDocument.hashCode() : 0);
+        int result = id.hashCode();
+        result = 31 * result + date.hashCode();
+        result = 31 * result + userDocument.hashCode();
         return result;
     }
 

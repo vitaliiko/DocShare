@@ -7,10 +7,11 @@ import java.util.Calendar;
 
 public class CommentUtil {
 
-    public static Comment createComment(String text, User owner) {
+    public static Comment createComment(String text, User owner, UserDocument document) {
         Comment comment = new Comment();
         comment.setText(text);
         comment.setOwner(owner);
+        comment.setUserDocument(document);
         comment.setDate(Calendar.getInstance().getTime());
         return comment;
     }

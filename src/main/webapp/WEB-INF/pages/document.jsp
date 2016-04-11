@@ -7,6 +7,7 @@
     <jsp:include page="../include/include.jsp"/>
     <link href="${pageContext.request.contextPath}/resources/bootstrap/css/comment-box.css" rel="stylesheet">
     <script src="${pageContext.request.contextPath}/resources/js/document.js"></script>
+    <script src="${pageContext.request.contextPath}/resources/js/templateHandler.js"></script>
 </head>
 <body>
 <jsp:include page="../include/header.jsp"/>
@@ -15,7 +16,7 @@
 <div class="container" style="width: 900px;">
     ${doc.name} <br>
     ${doc.size} <br>
-    Changed: <fmt:formatDate type="both" timeStyle="short" dateStyle="long" value="${doc.lastModifyTime}"/>
+    Changed: ${doc.lastModifyTime}
     <a href="<c:url value='/document/download-${doc.id}' />" class="btn btn-default custom-width">Download</a>
     <a href="<c:url value='/document/history-${doc.id}' />" class="btn btn-default custom-width">Previous versions</a>
     <br>
@@ -32,20 +33,7 @@
             <button type="button" class="close" aria-hidden="true">&times;</button>
         </div>
         <div class="actionBox">
-            <ul class="commentList">
-            <c:forEach items="${doc.comments}" var="comment">
-                <li>
-                    <%--<div class="commenterImage">--%>
-                        <%--<img src="http://lorempixel.com/50/50/people/6" />--%>
-                    <%--</div>--%>
-                    <div class="commentText">
-                        <p class=""><strong>${comment.owner}</strong></p>
-                        <p class="">${comment.text}</p> <span class="date sub-text">
-                        <fmt:formatDate type="both" dateStyle="long" timeStyle="short" value="${comment.date}"/></span>
-                    </div>
-                </li>
-            </c:forEach>
-            </ul>
+            <ul class="commentList"></ul>
             <form class="form-inline" role="form">
                 <div class="form-group">
                     <input class="form-control comment-text" type="text" placeholder="Your comments" />

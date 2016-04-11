@@ -1,25 +1,25 @@
 
 $(document).ready(function() {
+    var handlebarsPath = '/resources/js/templates/comment.html';
+    var docId = $('.doc-id').val();
+
+    $.getJSON('/document/get-comments', {docId: docId}, function(comments) {
+        $.each(comments, function(k, v) {
+            loadTemplate(handlebarsPath, function (template) {
+                $('.commentList').prepend(template(v));
+            });
+        });
+    });
+
+
     $('.add-comment').click(function() {
         var text = $('.comment-text').val();
-        var docId = $('.doc-id').val();
         if (text != '') {
-            $.ajax({
-                url: 'add-comment',
-                contentType: 'json',
-                data: {text: text, docId: docId},
-                success: function (comment) {
-                    $('.commentList').append("<li>" +
-                        "<div class='commentText'>" +
-                        "<p class=''><strong>" + comment.owner.firstName + ' ' + comment.owner.lastName +
-                        "</strong></p>" +
-                        "<p class=''>" + comment.text +
-                        "</p> <span class='date sub-text'>" +
-                        "<fmt:formatDate type='both' dateStyle='long' timeStyle='short' value='" + comment.date +
-                        "'/></span>" +
-                        "</div> </li>");
-                    $('.comment-text').val('');
-                }
+            $.post('add-comment', {text: text, docId: docId}, function(comment) {
+                loadTemplate(handlebarsPath, function (template) {
+                    $('.commentList').prepend(template(comment));
+                });
+                $('.comment-text').val('');
             });
         }
     });

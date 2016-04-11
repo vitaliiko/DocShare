@@ -2,7 +2,6 @@ package com.geekhub.dto;
 
 import com.geekhub.entity.FriendsGroup;
 import com.geekhub.entity.User;
-import java.util.Date;
 import java.util.Set;
 
 public class UserFileDto implements Comparable<UserFileDto> {
@@ -10,6 +9,7 @@ public class UserFileDto implements Comparable<UserFileDto> {
     private long id;
     private String type;
     private String name;
+    private String description;
     private String hashName;
     private String access;
     private String size;
@@ -46,6 +46,14 @@ public class UserFileDto implements Comparable<UserFileDto> {
 
     public String getHashName() {
         return hashName;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public void setHashName(String hashName) {

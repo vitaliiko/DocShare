@@ -1,9 +1,11 @@
 package com.geekhub.util;
 
+import com.geekhub.dto.CommentDto;
 import com.geekhub.dto.FriendsGroupDto;
 
 import com.geekhub.dto.UserFileDto;
 import com.geekhub.dto.UserDto;
+import com.geekhub.entity.Comment;
 import com.geekhub.entity.DocumentOldVersion;
 import com.geekhub.dto.DocumentOldVersionDto;
 import com.geekhub.entity.FriendsGroup;
@@ -35,6 +37,7 @@ public class EntityToDtoConverter {
         documentDto.setSize(document.getSize());
         documentDto.setLastModifyTime(df.format(document.getLastModifyTime()));
         documentDto.setName(document.getName());
+        documentDto.setDescription(document.getDescription());
         documentDto.setParentDirectoryHash(document.getParentDirectoryHash());
         documentDto.setAccess(document.getDocumentAttribute().toString());
         documentDto.setReaders(document.getReaders());
@@ -79,5 +82,14 @@ public class EntityToDtoConverter {
         group.getFriends().forEach(f -> friends.add(convert(f)));
         groupDto.setFriends(friends);
         return groupDto;
+    }
+
+    public static CommentDto convert(Comment comment) {
+        DateFormat df = new SimpleDateFormat("MM.dd.yy hh:mm");
+        CommentDto commentDto = new CommentDto();
+        commentDto.setText(comment.getText());
+        commentDto.setDate(df.format(comment.getDate()));
+        commentDto.setSenderName(comment.getOwner().toString());
+        return commentDto;
     }
 }

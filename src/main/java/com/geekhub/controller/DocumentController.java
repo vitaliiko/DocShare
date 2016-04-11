@@ -1,5 +1,6 @@
 package com.geekhub.controller;
 
+import com.geekhub.dto.CommentDto;
 import com.geekhub.entity.Comment;
 import com.geekhub.entity.DocumentOldVersion;
 import com.geekhub.entity.RemovedDirectory;
@@ -234,25 +235,36 @@ public class DocumentController {
     public ModelAndView browseDocument(@PathVariable Long docId, HttpSession session) {
         ModelAndView model = new ModelAndView();
         User user = getUserFromSession(session);
-        UserDocument document = userDocumentService.getDocumentWithComments(docId);
+        UserDocument document = userDocumentService.getById(docId);
         if (documentAccessProvider.canRead(document, user)) {
             model.setViewName("document");
-            model.addObject("doc", document);
+            model.addObject("doc", EntityToDtoConverter.convert(document));
             return model;
         }
         return null;
     }
 
-    @RequestMapping(value = "/add-comment", method = RequestMethod.POST)
-    public Comment addComment(String text, Long docId, HttpSession session) {
+    @RequestMapping(value = "/get-comments", method = RequestMethod.GET)
+    public Set<CommentDto> getComments(Long docId, HttpSession session) {
         User user = getUserFromSession(session);
         UserDocument document = userDocumentService.getDocumentWithComments(docId);
         if (documentAccessProvider.canRead(document, user)) {
+            Set<CommentDto> comments = new TreeSet<>();
+            document.getComments().forEach(c -> comments.add(EntityToDtoConverter.convert(c)));
+            return comments;
+        }
+        return null;
+    }
+
+    @RequestMapping(value = "/add-comment", method = RequestMethod.POST)
+    public CommentDto addComment(String text, Long docId, HttpSession session) {
+        User user = getUserFromSession(session);
+        UserDocument document = userDocumentService.getById(docId);
+        if (documentAccessProvider.canRead(document, user)) {
             if (!text.isEmpty()) {
-                Comment comment = CommentUtil.createComment(text, user);
-                document.getComments().add(comment);
-                userDocumentService.update(document);
-                return comment;
+                Comment comment = CommentUtil.createComment(text, user, document);
+                commentService.save(comment);
+                return EntityToDtoConverter.convert(comment);
             }
         }
         return null;
