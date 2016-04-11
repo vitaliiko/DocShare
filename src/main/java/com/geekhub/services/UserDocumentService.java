@@ -3,6 +3,7 @@ package com.geekhub.services;
 import com.geekhub.entities.DocumentOldVersion;
 import com.geekhub.entities.User;
 import com.geekhub.entities.UserDocument;
+import com.geekhub.entities.enums.DocumentAttribute;
 import java.util.Set;
 import org.springframework.stereotype.Service;
 
@@ -42,4 +43,6 @@ public interface UserDocumentService extends EntityService<UserDocument, Long> {
     Set<UserDocument> getAllCanRead(User reader);
 
     String getLocation(UserDocument document);
+
+    Set<UserDocument> getAllByOwnerAndAttribute(User owner, DocumentAttribute attribute);
 }

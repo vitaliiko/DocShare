@@ -4,6 +4,7 @@ import com.geekhub.dao.UserDirectoryDao;
 import com.geekhub.entities.RemovedDirectory;
 import com.geekhub.entities.User;
 import com.geekhub.entities.UserDirectory;
+import com.geekhub.entities.enums.DocumentAttribute;
 import com.geekhub.utils.UserFileUtil;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -146,5 +147,10 @@ public class UserDirectoryServiceImpl implements UserDirectoryService {
         }
 
         return location;
+    }
+
+    @Override
+    public Set<UserDirectory> getAllByOwnerAndAttribute(User owner, DocumentAttribute attribute) {
+        return new HashSet<>(userDirectoryDao.getList(owner, "documentAttribute", attribute));
     }
 }

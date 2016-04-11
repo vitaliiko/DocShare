@@ -28,7 +28,6 @@
             <c:forEach items="${documents}" var="doc">
                 <tr>
                     <td><a href="/document/browse-${doc.id}">${doc.name}</a></td>
-                    <td>${doc.ownerName}</td>
                     <td>${doc.size}</td>
                     <td>${doc.lastModifyTime}</td>
                     <td>

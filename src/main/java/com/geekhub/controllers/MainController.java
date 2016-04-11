@@ -1,11 +1,19 @@
 package com.geekhub.controllers;
 
 import com.geekhub.dto.RegistrationInfo;
+import com.geekhub.dto.UserFileDto;
+import com.geekhub.dto.convertors.EntityToDtoConverter;
 import com.geekhub.entities.User;
+import com.geekhub.entities.UserDocument;
+import com.geekhub.entities.enums.DocumentAttribute;
 import com.geekhub.exceptions.UserValidateException;
 import com.geekhub.security.UserProfileManager;
+import com.geekhub.services.UserDocumentService;
 import com.geekhub.services.UserService;
 import com.geekhub.providers.UserProvider;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.TreeSet;
 import org.hibernate.HibernateException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -31,6 +39,9 @@ public class MainController {
 
     @Autowired
     private UserProfileManager userProfileManager;
+
+    @Autowired
+    private UserDocumentService userDocumentService;
 
     @RequestMapping(value = "/home", method = RequestMethod.GET)
     public ModelAndView home() {
@@ -102,10 +113,21 @@ public class MainController {
     }
 
     @RequestMapping("/userpage/{ownerId}")
-    public ModelAndView userPage(@PathVariable Long ownerId) {
+    public ModelAndView userPage(@PathVariable Long ownerId, HttpSession session) {
+        User user = userService.getById((Long) session.getAttribute("userId"));
         User owner = userService.getById(ownerId);
+
+        Set<UserDocument> documents = new HashSet<>();
+        documents.addAll(userDocumentService.getAllByOwnerAndAttribute(owner, DocumentAttribute.PUBLIC));
+        if (userService.areFriends(ownerId, user)) {
+            documents.addAll(userDocumentService.getAllByOwnerAndAttribute(owner, DocumentAttribute.FOR_FRIENDS));
+        }
+        Set<UserFileDto> fileDtoSet = new TreeSet<>();
+        documents.forEach(d -> fileDtoSet.add(EntityToDtoConverter.convert(d)));
+
         ModelAndView model = new ModelAndView("userPage");
-        model.addObject("pageOwner", owner);
+        model.addObject("pageOwner", EntityToDtoConverter.convert(owner));
+        model.addObject("documents", fileDtoSet);
         return model;
     }
 }

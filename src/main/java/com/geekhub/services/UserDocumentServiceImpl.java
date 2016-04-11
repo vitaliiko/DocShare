@@ -7,10 +7,12 @@ import com.geekhub.entities.RemovedDocument;
 import com.geekhub.entities.User;
 import com.geekhub.entities.UserDirectory;
 import com.geekhub.entities.UserDocument;
+import com.geekhub.entities.enums.DocumentAttribute;
 import com.geekhub.utils.UserFileUtil;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
 import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -197,5 +199,10 @@ public class UserDocumentServiceImpl implements UserDocumentService {
         }
 
         return location;
+    }
+
+    @Override
+    public Set<UserDocument> getAllByOwnerAndAttribute(User owner, DocumentAttribute attribute) {
+        return new HashSet<>(userDocumentDao.getList(owner, "documentAttribute", attribute));
     }
 }
