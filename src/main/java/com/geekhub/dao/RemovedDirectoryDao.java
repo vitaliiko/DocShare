@@ -38,6 +38,7 @@ public class RemovedDirectoryDao implements EntityDao<RemovedDirectory, Long> {
                 .uniqueResult();
     }
 
+    @Override
     public List<RemovedDirectory> getList(String propertyName, Object value) {
         return sessionFactory.getCurrentSession()
                 .createCriteria(clazz)

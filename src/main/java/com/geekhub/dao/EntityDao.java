@@ -11,6 +11,8 @@ public interface EntityDao<T, PK extends Serializable> {
 
     T get(String propertyName, Object value);
 
+    List<T> getList(String propertyName, Object value);
+
     PK save(T entity);
 
     void update(T entity);

@@ -40,6 +40,14 @@ public class UserDao implements EntityDao<User, Long> {
     }
 
     @Override
+    public List<User> getList(String propertyName, Object value) {
+        return sessionFactory.getCurrentSession()
+                .createCriteria(clazz)
+                .add(Restrictions.eq(propertyName, value))
+                .list();
+    }
+
+    @Override
     public Long save(User entity) {
         return (Long) sessionFactory.getCurrentSession().save(entity);
     }

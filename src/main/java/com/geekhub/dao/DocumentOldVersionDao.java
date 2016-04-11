@@ -39,6 +39,14 @@ public class DocumentOldVersionDao implements EntityDao<DocumentOldVersion, Long
     }
 
     @Override
+    public List<DocumentOldVersion> getList(String propertyName, Object value) {
+        return sessionFactory.getCurrentSession()
+                .createCriteria(clazz)
+                .add(Restrictions.eq(propertyName, value))
+                .list();
+    }
+
+    @Override
     public Long save(DocumentOldVersion entity) {
         return (Long) sessionFactory.getCurrentSession().save(entity);
     }

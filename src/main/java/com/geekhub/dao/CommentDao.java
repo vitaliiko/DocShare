@@ -39,6 +39,14 @@ public class CommentDao implements EntityDao<Comment, Long> {
     }
 
     @Override
+    public List<Comment> getList(String propertyName, Object value) {
+        return sessionFactory.getCurrentSession()
+                .createCriteria(clazz)
+                .add(Restrictions.eq(propertyName, value))
+                .list();
+    }
+
+    @Override
     public Long save(Comment entity) {
         return (Long) sessionFactory.getCurrentSession().save(entity);
     }

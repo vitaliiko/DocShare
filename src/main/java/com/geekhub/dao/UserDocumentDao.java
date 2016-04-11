@@ -75,6 +75,7 @@ public class UserDocumentDao implements EntityDao<UserDocument, Long> {
         sessionFactory.getCurrentSession().delete(userDocument);
     }
 
+    @Override
     public List<UserDocument> getList(String propertyName, Object value) {
         return sessionFactory.getCurrentSession()
                 .createCriteria(clazz)

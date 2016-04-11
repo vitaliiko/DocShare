@@ -55,6 +55,7 @@ public class RemovedDocumentDao implements EntityDao<RemovedDocument, Long> {
                 .uniqueResult();
     }
 
+    @Override
     public List<RemovedDocument> getList(String propertyName, Object value) {
         return sessionFactory.getCurrentSession()
                 .createCriteria(clazz)

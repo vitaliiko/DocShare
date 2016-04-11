@@ -40,6 +40,7 @@ public class FriendsGroupDao implements EntityDao<FriendsGroup, Long> {
                 .uniqueResult();
     }
 
+    @Override
     public List<FriendsGroup> getList(String propertyName, Object value) {
         return (List<FriendsGroup>) sessionFactory.getCurrentSession()
                 .createCriteria(clazz)

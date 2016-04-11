@@ -1,6 +1,7 @@
 package com.geekhub.dao;
 
 import com.geekhub.entity.Event;
+import com.geekhub.entity.User;
 import java.util.List;
 import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Order;
@@ -33,6 +34,22 @@ public class EventDao implements EntityDao<Event, Long> {
     public Event get(String propertyName, Object value) {
         return (Event) sessionFactory.getCurrentSession()
                 .createCriteria(clazz)
+                .add(Restrictions.eq(propertyName, value))
+                .uniqueResult();
+    }
+
+    @Override
+    public List<Event> getList(String propertyName, Object value) {
+        return sessionFactory.getCurrentSession()
+                .createCriteria(clazz)
+                .add(Restrictions.eq(propertyName, value))
+                .list();
+    }
+
+    public Event getList(User recipient, String propertyName, Object value) {
+        return (Event) sessionFactory.getCurrentSession()
+                .createCriteria(clazz)
+                .add(Restrictions.eq("recipient", recipient))
                 .add(Restrictions.eq(propertyName, value))
                 .uniqueResult();
     }
