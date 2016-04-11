@@ -1,8 +1,11 @@
 package com.geekhub.entity;
 
+import com.geekhub.entity.enums.EventStatus;
 import java.util.Date;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
@@ -17,18 +20,28 @@ public class Event implements Comparable<Event> {
     @GeneratedValue
     private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "sender_id")
-    private User sender;
+    @Column
+    private String senderName;
 
     @Column
-    private String name;
+    private long senderId;
+
+    @ManyToOne
+    @JoinColumn(name = "recipient_id")
+    private User recipient;
+
+    @Column
+    private String text;
 
     @Column
     private String link;
 
     @Column
     private Date date;
+
+    @Column(name = "eventStatus")
+    @Enumerated(EnumType.ORDINAL)
+    private EventStatus eventStatus = EventStatus.UNREAD;
 
     public Long getId() {
         return id;
@@ -38,20 +51,36 @@ public class Event implements Comparable<Event> {
         this.id = id;
     }
 
-    public User getSender() {
-        return sender;
+    public String getSenderName() {
+        return senderName;
     }
 
-    public void setSender(User sender) {
-        this.sender = sender;
+    public void setSenderName(String senderName) {
+        this.senderName = senderName;
     }
 
-    public String getName() {
-        return name;
+    public long getSenderId() {
+        return senderId;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setSenderId(long senderId) {
+        this.senderId = senderId;
+    }
+
+    public User getRecipient() {
+        return recipient;
+    }
+
+    public void setRecipient(User recipient) {
+        this.recipient = recipient;
+    }
+
+    public String getText() {
+        return text;
+    }
+
+    public void setText(String text) {
+        this.text = text;
     }
 
     public String getLink() {
@@ -68,6 +97,14 @@ public class Event implements Comparable<Event> {
 
     public void setDate(Date date) {
         this.date = date;
+    }
+
+    public EventStatus getEventStatus() {
+        return eventStatus;
+    }
+
+    public void setEventStatus(EventStatus eventStatus) {
+        this.eventStatus = eventStatus;
     }
 
     @Override

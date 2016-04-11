@@ -6,8 +6,10 @@ import com.geekhub.entity.User;
 import com.geekhub.entity.UserDirectory;
 import com.geekhub.util.UserFileUtil;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -127,7 +129,17 @@ public class UserDirectoryServiceImpl implements UserDirectoryService {
     }
 
     @Override
-    public List<UserDirectory> getByIds(List<Long> dirIds) {
-        return userDirectoryDao.getAll("id", dirIds);
+    public Set<UserDirectory> getByIds(List<Long> dirIds) {
+        return new HashSet<>(userDirectoryDao.getAll("id", dirIds));
+    }
+
+    @Override
+    public Set<User> getAllReaders(Long docId) {
+        Set<User> users = new HashSet<>();
+        UserDirectory document = getById(docId);
+        users.addAll(document.getReaders());
+        document.getReadersGroups().forEach(g -> users.addAll(g.getFriends()));
+        users.add(document.getOwner());
+        return users;
     }
 }

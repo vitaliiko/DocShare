@@ -2,7 +2,6 @@ package com.geekhub.controller;
 
 import com.geekhub.entity.Comment;
 import com.geekhub.entity.DocumentOldVersion;
-import com.geekhub.entity.Event;
 import com.geekhub.entity.RemovedDirectory;
 import com.geekhub.entity.RemovedDocument;
 import com.geekhub.entity.User;
@@ -106,7 +105,7 @@ public class DocumentController {
     }
 
     @RequestMapping(value = "/upload", method = RequestMethod.GET)
-    public ModelAndView addDocuments(HttpSession session) {
+    public ModelAndView upload(HttpSession session) {
         ModelAndView model = new ModelAndView("home");
         User user = getUserFromSession(session);
         model.addObject("tableNames", new String[] {"ALL", "PRIVATE", "PUBLIC", "FOR_FRIENDS"});
@@ -143,15 +142,23 @@ public class DocumentController {
         Long userId = (Long) session.getAttribute("userId");
         User user = getUserFromSession(session);
         if (docIds != null) {
-            List<UserDocument> documents = userDocumentService.getByIds(Arrays.asList(docIds));
+            Set<UserDocument> documents = userDocumentService.getByIds(Arrays.asList(docIds));
             if (documentAccessProvider.canRemove(documents, user)) {
                 userDocumentService.moveToTrash(docIds, userId);
+                documents.forEach(doc -> {
+                    String text = user.toString() + " remove document: " + doc.getName();
+                    eventService.sendEvent(userDocumentService.getAllReadersAndEditors(doc.getId()), text, user);
+                });
             }
         }
         if (dirIds != null) {
-            List<UserDirectory> directories = userDirectoryService.getByIds(Arrays.asList(dirIds));
+            Set<UserDirectory> directories = userDirectoryService.getByIds(Arrays.asList(dirIds));
             if (directoryAccessProvider.canRemove(directories, user)) {
                 userDirectoryService.moveToTrash(dirIds, userId);
+                directories.forEach(dir -> {
+                    String text = user.toString() + " remove directory: " + dir.getName();
+                    eventService.sendEvent(userDirectoryService.getAllReaders(dir.getId()), text, user);
+                });
             }
         }
     }

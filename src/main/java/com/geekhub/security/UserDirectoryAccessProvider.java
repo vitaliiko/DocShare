@@ -7,6 +7,7 @@ import com.geekhub.entity.UserDirectory;
 import com.geekhub.service.RemovedDirectoryService;
 import com.geekhub.service.UserDirectoryService;
 import java.util.List;
+import java.util.Set;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -123,7 +124,7 @@ public class UserDirectoryAccessProvider implements UserFileAccessProvider<UserD
     }
 
     @Override
-    public boolean canRemove(List<UserDirectory> files, User user) {
+    public boolean canRemove(Set<UserDirectory> files, User user) {
         if (files != null && files.size() > 0) {
             for (UserDirectory file : files) {
                 if (!canRemove(file, user)) {

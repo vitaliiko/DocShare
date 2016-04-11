@@ -1,6 +1,5 @@
 package com.geekhub.controller;
 
-import com.geekhub.service.MessageService;
 import com.geekhub.service.UserService;
 import com.geekhub.provider.UserProvider;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,9 +10,6 @@ import org.springframework.web.servlet.ModelAndView;
 @Controller
 @RequestMapping({"/", "/index"})
 public class IndexController {
-
-    @Autowired
-    private MessageService messageService;
 
     @Autowired
     private UserService userService;

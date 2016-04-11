@@ -20,13 +20,11 @@ public class UserDirectoryDao implements EntityDao<UserDirectory, Long> {
     private SessionFactory sessionFactory;
 
     private Class<UserDirectory> clazz = UserDirectory.class;
-    private Criterion notRoot = Restrictions.ne("documentAttribute", DocumentAttribute.ROOT);
 
     @Override
     public List<UserDirectory> getAll(String orderParameter) {
         return sessionFactory.getCurrentSession()
                 .createCriteria(clazz)
-                .add(notRoot)
                 .addOrder(Order.asc(orderParameter))
                 .list();
     }
@@ -81,7 +79,6 @@ public class UserDirectoryDao implements EntityDao<UserDirectory, Long> {
         return sessionFactory.getCurrentSession()
                 .createCriteria(clazz)
                 .add(Restrictions.eq(propertyName, value))
-                .add(notRoot)
                 .list();
     }
 
@@ -90,7 +87,6 @@ public class UserDirectoryDao implements EntityDao<UserDirectory, Long> {
                 .createCriteria(clazz)
                 .add(Restrictions.eq("owner", owner))
                 .add(Restrictions.eq(propertyName, value))
-                .add(notRoot)
                 .list();
     }
 
@@ -99,7 +95,6 @@ public class UserDirectoryDao implements EntityDao<UserDirectory, Long> {
                 .createCriteria(clazz)
                 .add(Restrictions.eq("owner", owner))
                 .add(Restrictions.eq(propertyName, value))
-                .add(notRoot)
                 .uniqueResult();
     }
 
@@ -107,7 +102,6 @@ public class UserDirectoryDao implements EntityDao<UserDirectory, Long> {
         return (UserDirectory) sessionFactory.getCurrentSession()
                 .createCriteria(clazz)
                 .add(Restrictions.allEq(propertiesMap))
-                .add(notRoot)
                 .uniqueResult();
     }
 }

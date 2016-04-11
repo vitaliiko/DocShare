@@ -2,6 +2,7 @@ package com.geekhub.security;
 
 import com.geekhub.entity.User;
 import java.util.List;
+import java.util.Set;
 
 public interface UserFileAccessProvider<T, R> {
 
@@ -19,7 +20,7 @@ public interface UserFileAccessProvider<T, R> {
 
     boolean canRemove(T file, User user);
 
-    boolean canRemove(List<T> files, User user);
+    boolean canRemove(Set<T> files, User user);
 
     boolean canRemove(Long fileId, User user);
 

@@ -2,11 +2,16 @@ package com.geekhub.service;
 
 import com.geekhub.dao.EventDao;
 import com.geekhub.entity.Event;
+import com.geekhub.entity.User;
+import java.util.Calendar;
 import java.util.List;
+import java.util.Set;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@Transactional
 public class EventServiceImpl implements EventService {
 
     @Autowired
@@ -45,5 +50,19 @@ public class EventServiceImpl implements EventService {
     @Override
     public void deleteById(Long entityId) {
         eventDao.deleteById(entityId);
+    }
+
+    @Override
+    public void sendEvent(Set<User> recipients, String text, User sender) {
+        recipients.forEach(r -> {
+            Event event = new Event();
+            event.setText(text);
+            event.setDate(Calendar.getInstance().getTime());
+            event.setSenderId(sender.getId());
+            event.setSenderName(sender.toString());
+            event.setRecipient(r);
+            save(event);
+        });
+
     }
 }

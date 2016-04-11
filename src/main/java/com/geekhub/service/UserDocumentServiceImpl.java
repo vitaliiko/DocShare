@@ -7,6 +7,7 @@ import com.geekhub.entity.RemovedDocument;
 import com.geekhub.entity.User;
 import com.geekhub.entity.UserDocument;
 import com.geekhub.util.UserFileUtil;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import org.hibernate.Hibernate;
@@ -168,7 +169,21 @@ public class UserDocumentServiceImpl implements UserDocumentService {
     }
 
     @Override
-    public List<UserDocument> getByIds(List<Long> docIds) {
-        return userDocumentDao.getAll("id", docIds);
+    public Set<UserDocument> getByIds(List<Long> docIds) {
+        return new HashSet<>(userDocumentDao.getAll("id", docIds));
+    }
+
+    @Override
+    public Set<User> getAllReadersAndEditors(Long docId) {
+        Set<User> users = new HashSet<>();
+        UserDocument document = getById(docId);
+        users.addAll(document.getReaders());
+        users.addAll(document.getEditors());
+        document.getReadersGroups().forEach(g -> users.addAll(g.getFriends()));
+        document.getEditorsGroups().forEach(g -> users.addAll(g.getFriends()));
+        if (document.getOwner() != null) {
+            users.add(document.getOwner());
+        }
+        return users;
     }
 }

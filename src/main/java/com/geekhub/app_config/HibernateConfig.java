@@ -2,8 +2,8 @@ package com.geekhub.app_config;
 
 import com.geekhub.entity.Comment;
 import com.geekhub.entity.DocumentOldVersion;
+import com.geekhub.entity.Event;
 import com.geekhub.entity.FriendsGroup;
-import com.geekhub.entity.Message;
 import com.geekhub.entity.RemovedDirectory;
 import com.geekhub.entity.RemovedDocument;
 import com.geekhub.entity.User;
@@ -32,7 +32,7 @@ public class HibernateConfig {
 
     private Class[] annotatedClasses = new Class[] {
             User.class,
-            Message.class,
+            Event.class,
             Comment.class,
             FriendsGroup.class,
             UserDocument.class,

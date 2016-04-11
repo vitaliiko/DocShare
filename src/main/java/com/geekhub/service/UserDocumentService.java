@@ -14,7 +14,7 @@ import java.util.List;
 @Service
 public interface UserDocumentService extends EntityService<UserDocument, Long> {
 
-    List<UserDocument> getByIds(List<Long> docIds);
+    Set<UserDocument> getByIds(List<Long> docIds);
 
     List<UserDocument> getAllByOwnerId(Long ownerId);
 
@@ -37,6 +37,8 @@ public interface UserDocumentService extends EntityService<UserDocument, Long> {
     UserDocument getDocumentWithOldVersions(Long docId);
 
     Set<User> getReaders(Long docId);
+
+    Set<User> getAllReadersAndEditors(Long docId);
 
     Set<FriendsGroup> getReadersGroup(Long docId);
 

@@ -7,6 +7,7 @@ import com.geekhub.entity.UserDocument;
 import com.geekhub.service.RemovedDocumentService;
 import com.geekhub.service.UserDocumentService;
 import java.util.List;
+import java.util.Set;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -140,7 +141,7 @@ public class UserDocumentAccessProvider implements UserFileAccessProvider<UserDo
     }
 
     @Override
-    public boolean canRemove(List<UserDocument> files, User user) {
+    public boolean canRemove(Set<UserDocument> files, User user) {
         if (files != null && files.size() > 0) {
             for (UserDocument file : files) {
                 if (!canRemove(file, user)) {

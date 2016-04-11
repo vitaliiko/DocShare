@@ -54,8 +54,8 @@ public class User {
 
     @JsonIgnore
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-    @JoinColumn(name = "event_id")
-    private TreeSet<Event> events = new TreeSet<>();
+    @JoinColumn(name = "recipient_id")
+    private Set<Event> events = new TreeSet<>();
 
     @JsonIgnore
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
