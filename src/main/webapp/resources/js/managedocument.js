@@ -14,6 +14,8 @@ $(document).ready(function() {
     var forFriendsTable = $('.FOR_FRIENDS');
     var handlebarsPath = '/resources/js/templates/';
     var backLink = $('.back-link');
+    var dangerAlert = $('.alert-danger');
+    var successAlert = $('.alert-success');
 
     function changeTab() {
         $('.doc-table').hide(true);

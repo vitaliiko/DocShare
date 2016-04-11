@@ -41,4 +41,6 @@ public interface UserDocumentService extends EntityService<UserDocument, Long> {
     UserDocument getWithOldVersions(Long docId);
 
     List<UserDocument> getAllByParentDirectoryHash(String parentDirectoryHash);
+
+    Set<UserDocument> getAllCanRead(User reader);
 }

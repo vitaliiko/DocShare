@@ -35,8 +35,6 @@ public interface UserService extends EntityService<User, Long> {
 
     Map<User, List<FriendsGroup>> getFriendsGroupsMap(Long ownerId);
 
-    Long createUser(String firstName, String lastName, String login, String password);
-
     void removeFromFriends(User friend);
 
     void update(List<User> users);

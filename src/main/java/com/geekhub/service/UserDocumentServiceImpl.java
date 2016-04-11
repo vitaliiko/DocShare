@@ -1,5 +1,6 @@
 package com.geekhub.service;
 
+import com.geekhub.dao.FriendsGroupDao;
 import com.geekhub.dao.UserDocumentDao;
 import com.geekhub.entity.DocumentOldVersion;
 import com.geekhub.entity.FriendsGroup;
@@ -10,6 +11,7 @@ import com.geekhub.util.UserFileUtil;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
 import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -30,6 +32,9 @@ public class UserDocumentServiceImpl implements UserDocumentService {
 
     @Autowired
     private RemovedDocumentService removedDocumentService;
+
+    @Autowired
+    private FriendsGroupDao friendsGroupDao;
 
     @Override
     public List<UserDocument> getAll(String orderParameter) {
@@ -161,5 +166,20 @@ public class UserDocumentServiceImpl implements UserDocumentService {
             users.add(document.getOwner());
         }
         return users;
+    }
+
+    @Override
+    public Set<UserDocument> getAllCanRead(User reader) {
+        Set<UserDocument> documents = new HashSet<>();
+        documents.addAll(userDocumentDao.getByReader(reader));
+        documents.addAll(userDocumentDao.getByEditor(reader));
+
+        List<FriendsGroup> groups = friendsGroupDao.getByFriend(reader);
+        groups.forEach(g -> {
+            documents.addAll(userDocumentDao.getByReadersGroup(g));
+            documents.addAll(userDocumentDao.getByEditorsGroup(g));
+        });
+
+        return documents;
     }
 }

@@ -30,6 +30,7 @@ import com.geekhub.util.EntityToDtoConverter;
 import com.geekhub.util.EventUtil;
 import com.geekhub.util.UserFileUtil;
 import com.geekhub.validation.FileValidator;
+import com.sun.org.apache.xpath.internal.operations.Mod;
 import java.io.File;
 import java.nio.file.Files;
 import java.util.ArrayList;
@@ -385,6 +386,17 @@ public class DocumentController {
             return model;
         }
         return null;
+    }
+
+    @RequestMapping("/accessible-documents")
+    public ModelAndView getAccessibleDocuments(HttpSession session) {
+        User user = getUserFromSession(session);
+        Set<UserDocument> documents = userDocumentService.getAllCanRead(user);
+        Set<UserFileDto> documentDtos = new TreeSet<>();
+        documents.forEach(d -> documentDtos.add(EntityToDtoConverter.convert(d)));
+        ModelAndView model = new ModelAndView("friendsDocuments");
+        model.addObject("documents", documentDtos);
+        return model;
     }
 
     @RequestMapping("/get-directory-content-{dirHashName}")

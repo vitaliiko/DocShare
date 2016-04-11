@@ -3,16 +3,34 @@
 <div id="sidebar-wrapper">
     <ul class="sidebar-nav nav-pills nav-stacked" id="menu">
         <li>
-            <a href="/document/upload"><span class="fa-stack fa-lg pull-left"><i class="fa fa-cloud-download fa-stack-1x "></i></span>Files</a>
+            <a href="/document/upload">
+            <span class="fa-stack fa-lg pull-left">
+                <i class="fa fa-cloud-download fa-stack-1x "></i>
+            </span>Files</a>
         </li>
         <li>
-            <a href="/friends/view"> <span class="fa-stack fa-lg pull-left"><i class="fa fa-cart-plus fa-stack-1x "></i></span>Friends</a>
+            <a href="/document/accessible-documents">
+            <span class="fa-stack fa-lg pull-left">
+                <i class="fa fa-cart-plus fa-stack-1x "></i>
+            </span>Accessible files</a>
         </li>
         <li>
-            <a href="/event/browse"> <span class="fa-stack fa-lg pull-left"><i class="fa fa-cart-plus fa-stack-1x "></i></span>Events</a>
+            <a href="/friends/view">
+            <span class="fa-stack fa-lg pull-left">
+                <i class="fa fa-cart-plus fa-stack-1x "></i>
+            </span>Friends</a>
         </li>
         <li>
-            <a href="/document/recover"> <span class="fa-stack fa-lg pull-left"><i class="fa fa-cart-plus fa-stack-1x "></i></span>Removed Files</a>
+            <a href="/event/browse">
+            <span class="fa-stack fa-lg pull-left">
+                <i class="fa fa-cart-plus fa-stack-1x "></i>
+            </span>Events</a>
+        </li>
+        <li>
+            <a href="/document/recover">
+            <span class="fa-stack fa-lg pull-left">
+                <i class="fa fa-cart-plus fa-stack-1x "></i>
+            </span>Removed Files</a>
         </li>
     </ul>
 </div>

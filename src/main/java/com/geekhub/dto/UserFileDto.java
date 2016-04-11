@@ -9,6 +9,7 @@ public class UserFileDto implements Comparable<UserFileDto> {
     private long id;
     private String type;
     private String name;
+    private String ownerName;
     private String description;
     private String hashName;
     private String access;
@@ -42,6 +43,14 @@ public class UserFileDto implements Comparable<UserFileDto> {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getOwnerName() {
+        return ownerName;
+    }
+
+    public void setOwnerName(String ownerName) {
+        this.ownerName = ownerName;
     }
 
     public String getHashName() {

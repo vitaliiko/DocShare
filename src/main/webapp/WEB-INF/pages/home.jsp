@@ -28,6 +28,17 @@
 <jsp:include page="../include/sidebar.jsp"/>
 
 <div class="container" style="width: 900px;">
+
+    <div class='alert alert-danger' hidden>
+        <a href='#' class='close' data-dismiss='alert'>&times;</a>
+        <strong>Error!</strong> <p class="alert-text"></p>
+    </div>
+
+    <div class='alert alert-success' hidden>
+        <a href='#' class='close' data-dismiss='alert'>&times;</a>
+        <p class="alert-text"></p>
+    </div>
+
     <form action="/document/upload" method="post" enctype="multipart/form-data">
         <label class="col-md-3 control-lable" for="files">Upload a document</label>
         <input type="file" multiple name="files[]" id="files" class="form-control input-sm"/>

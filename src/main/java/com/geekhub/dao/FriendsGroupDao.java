@@ -92,9 +92,7 @@ public class FriendsGroupDao implements EntityDao<FriendsGroup, Long> {
 
     public List<FriendsGroup> getByOwnerAndFriend(User owner, User friend) {
         return sessionFactory.getCurrentSession()
-                .createQuery("from FriendsGroup fg " +
-                        "where fg.owner = :owner " +
-                        "and :friend in elements(fg.friends)")
+                .createQuery("from FriendsGroup fg where fg.owner = :owner and :friend in elements(fg.friends)")
                 .setParameter("owner", owner)
                 .setParameter("friend", friend)
                 .list();

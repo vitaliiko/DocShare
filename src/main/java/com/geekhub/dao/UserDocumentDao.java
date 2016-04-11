@@ -1,5 +1,6 @@
 package com.geekhub.dao;
 
+import com.geekhub.entity.FriendsGroup;
 import com.geekhub.entity.User;
 import com.geekhub.entity.UserDocument;
 import java.util.Map;
@@ -117,5 +118,33 @@ public class UserDocumentDao implements EntityDao<UserDocument, Long> {
         UserDocument document = getById(docId);
         Hibernate.initialize(document.getDocumentOldVersions());
         return document;
+    }
+
+    public List<UserDocument> getByReader(User reader) {
+        return sessionFactory.getCurrentSession()
+                .createQuery("from UserDocument doc where :reader in elements(doc.readers)")
+                .setParameter("reader", reader)
+                .list();
+    }
+
+    public List<UserDocument> getByEditor(User editor) {
+        return sessionFactory.getCurrentSession()
+                .createQuery("from UserDocument doc where :editor in elements(doc.editors)")
+                .setParameter("editor", editor)
+                .list();
+    }
+
+    public List<UserDocument> getByReadersGroup(FriendsGroup readersGroup) {
+        return sessionFactory.getCurrentSession()
+                .createQuery("from UserDocument doc where :readersGroup in elements(doc.readersGroups)")
+                .setParameter("readersGroup", readersGroup)
+                .list();
+    }
+
+    public List<UserDocument> getByEditorsGroup(FriendsGroup editorsGroup) {
+        return sessionFactory.getCurrentSession()
+                .createQuery("from UserDocument doc where :editorsGroup in elements(doc.editorsGroups)")
+                .setParameter("editorsGroup", editorsGroup)
+                .list();
     }
 }

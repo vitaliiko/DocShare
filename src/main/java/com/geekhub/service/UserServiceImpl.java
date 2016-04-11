@@ -51,16 +51,6 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Long createUser(String firstName, String lastName, String login, String password) {
-        if (userDao.get("login", login) == null) {
-            User user = new User(firstName, lastName, password, login);
-            user.setRegistrationDate(Calendar.getInstance().getTime());
-            return userDao.save(user);
-        }
-        return null;
-    }
-
-    @Override
     public void update(User entity) {
         userDao.update(entity);
     }
