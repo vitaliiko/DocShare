@@ -128,30 +128,6 @@ public class UserDocumentServiceImpl implements UserDocumentService {
     }
 
     @Override
-    public Set<User> getReaders(Long docId) {
-        UserDocument document = getById(docId);
-        Hibernate.initialize(document.getReaders());
-        return document.getReaders();
-    }
-
-    @Override
-    public Set<FriendsGroup> getReadersGroup(Long docId) {
-        UserDocument document = getById(docId);
-        Hibernate.initialize(document.getReadersGroups());
-        return document.getReadersGroups();
-    }
-
-    @Override
-    public UserDocument getDocumentWithReadersAndEditors(Long docId) {
-        UserDocument document = getById(docId);
-        Hibernate.initialize(document.getReadersGroups());
-        Hibernate.initialize(document.getReaders());
-        Hibernate.initialize(document.getEditorsGroups());
-        Hibernate.initialize(document.getEditors());
-        return document;
-    }
-
-    @Override
     public Set<DocumentOldVersion> getOldVersions(Long docId) {
         UserDocument document = getById(docId);
         Hibernate.initialize(document.getDocumentOldVersions());

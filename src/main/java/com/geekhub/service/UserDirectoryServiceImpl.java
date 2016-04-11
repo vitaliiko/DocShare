@@ -111,14 +111,6 @@ public class UserDirectoryServiceImpl implements UserDirectoryService {
     }
 
     @Override
-    public UserDirectory getDirectoryWithReaders(Long dirId) {
-        UserDirectory directory = getById(dirId);
-        Hibernate.initialize(directory.getReadersGroups());
-        Hibernate.initialize(directory.getReaders());
-        return directory;
-    }
-
-    @Override
     public List<UserDirectory> getAllByParentDirectoryHash(String parentDirectoryHash) {
         return userDirectoryDao.getList("parentDirectoryHash", parentDirectoryHash);
     }

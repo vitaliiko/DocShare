@@ -53,16 +53,21 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
-    public void sendEvent(Set<User> recipients, String text, User sender) {
+    public void sendEvent(Set<User> recipients, String text, String link, User sender) {
         recipients.forEach(r -> {
             Event event = new Event();
             event.setText(text);
+            event.setLink(link);
             event.setDate(Calendar.getInstance().getTime());
             event.setSenderId(sender.getId());
             event.setSenderName(sender.toString());
             event.setRecipient(r);
             save(event);
         });
+    }
 
+    @Override
+    public void sendEvent(Set<User> recipients, String text, User sender) {
+        sendEvent(recipients, text, null, sender);
     }
 }

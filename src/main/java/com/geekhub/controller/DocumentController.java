@@ -146,8 +146,8 @@ public class DocumentController {
             if (documentAccessProvider.canRemove(documents, user)) {
                 userDocumentService.moveToTrash(docIds, userId);
                 documents.forEach(doc -> {
-                    String text = user.toString() + " remove document: " + doc.getName();
-                    eventService.sendEvent(userDocumentService.getAllReadersAndEditors(doc.getId()), text, user);
+                    String eventTxt = "Document " + doc.getName() + " has been removed by " + user.toString();
+                    eventService.sendEvent(userDocumentService.getAllReadersAndEditors(doc.getId()), eventTxt, user);
                 });
             }
         }
@@ -156,8 +156,8 @@ public class DocumentController {
             if (directoryAccessProvider.canRemove(directories, user)) {
                 userDirectoryService.moveToTrash(dirIds, userId);
                 directories.forEach(dir -> {
-                    String text = user.toString() + " remove directory: " + dir.getName();
-                    eventService.sendEvent(userDirectoryService.getAllReaders(dir.getId()), text, user);
+                    String eventText = "Directory " + dir.getName() + " has been removed by " + user.toString();
+                    eventService.sendEvent(userDirectoryService.getAllReaders(dir.getId()), eventText, user);
                 });
             }
         }
@@ -180,7 +180,12 @@ public class DocumentController {
     public ModelAndView recoverDocument(@PathVariable Long remDocId, HttpSession session) {
         User user = getUserFromSession(session);
         if (documentAccessProvider.canRecover(remDocId, user)) {
-            userDocumentService.recover(remDocId);
+            Long docId = userDocumentService.recover(remDocId);
+
+            String docName = userDocumentService.getById(docId).getName();
+            String eventText = "Document " + docName + " has been removed by " + user.toString();
+            String eventLink = "/document/browse-" + docId;
+            eventService.sendEvent(userDocumentService.getAllReadersAndEditors(docId), eventText, eventLink, user);
             return new ModelAndView("redirect:/document/upload");
         }
         return null;
@@ -190,7 +195,11 @@ public class DocumentController {
     public ModelAndView recoverDirectory(@PathVariable Long remDirId, HttpSession session) {
         User user = getUserFromSession(session);
         if (directoryAccessProvider.canRecover(remDirId, user)) {
-            userDirectoryService.recover(remDirId);
+            Long dirId = userDirectoryService.recover(remDirId);
+
+            String dirName = userDirectoryService.getById(dirId).getName();
+            String eventText = "Directory " + dirName + " has been removed by " + user.toString();
+            eventService.sendEvent(userDirectoryService.getAllReaders(dirId), eventText, user);
             return new ModelAndView("redirect:/document/upload");
         }
         return null;
@@ -273,7 +282,7 @@ public class DocumentController {
     @RequestMapping("/get_directory")
     public UserFileDto getUserDirectory(Long dirId, HttpSession session) {
         User user = getUserFromSession(session);
-        UserDirectory directory = userDirectoryService.getDirectoryWithReaders(dirId);
+        UserDirectory directory = userDirectoryService.getById(dirId);
         if (directoryAccessProvider.isOwner(directory, user)) {
             return EntityToDtoConverter.convert(directory);
         }
@@ -283,7 +292,8 @@ public class DocumentController {
     @RequestMapping(value = "/share_document", method = RequestMethod.POST)
     public UserFileDto shareUserDocument(@RequestBody SharedDto shared, HttpSession session) {
         User user = getUserFromSession(session);
-        UserDocument document = userDocumentService.getDocumentWithReadersAndEditors(shared.getDocId());
+        UserDocument document = userDocumentService.getById(shared.getDocId());
+        Set<User> readersAndEditors = userDocumentService.getAllReadersAndEditors(document.getId());
 
         if (documentAccessProvider.isOwner(document, user)) {
             document.setDocumentAttribute(DocumentAttribute.valueOf(shared.getAccess()));
@@ -292,6 +302,17 @@ public class DocumentController {
             document.setEditors(createEntitySet(shared.getEditors(), userService));
             document.setEditorsGroups(createEntitySet(shared.getEditorsGroups(), friendsGroupService));
             userDocumentService.update(document);
+
+            Set<User> newReadersAndEditorsSet = userDocumentService.getAllReadersAndEditors(document.getId());
+            newReadersAndEditorsSet.removeAll(readersAndEditors);
+            String eventText = "User " + user.toString() + " has shared document " + document.getName();
+            String eventLink = "/document/browse-" + document.getId();
+            eventService.sendEvent(newReadersAndEditorsSet, eventText, eventLink, user);
+
+            newReadersAndEditorsSet = userDocumentService.getAllReadersAndEditors(document.getId());
+            readersAndEditors.removeAll(newReadersAndEditorsSet);
+            eventText = "User " + user.toString() + " has prohibited access to document " + document.getName();
+            eventService.sendEvent(readersAndEditors, eventText, user);
             return EntityToDtoConverter.convert(document);
         }
         return null;
@@ -300,13 +321,24 @@ public class DocumentController {
     @RequestMapping(value = "/share_directory", method = RequestMethod.POST)
     public UserFileDto shareUserDirectory(@RequestBody SharedDto shared, HttpSession session) {
         User user = getUserFromSession(session);
-        UserDirectory directory = userDirectoryService.getDirectoryWithReaders(shared.getDocId());
+        UserDirectory directory = userDirectoryService.getById(shared.getDocId());
+        Set<User> readers = userDirectoryService.getAllReaders(directory.getId());
 
         if (directoryAccessProvider.isOwner(directory, user)) {
             directory.setDocumentAttribute(DocumentAttribute.valueOf(shared.getAccess()));
             directory.setReaders(createEntitySet(shared.getReaders(), userService));
             directory.setReadersGroups(createEntitySet(shared.getReadersGroups(), friendsGroupService));
             userDirectoryService.update(directory);
+
+            Set<User> newReaderSet = userDocumentService.getAllReadersAndEditors(directory.getId());
+            newReaderSet.removeAll(readers);
+            String eventText = "User " + user.toString() + " has shared directory " + directory.getName();
+            eventService.sendEvent(newReaderSet, eventText, user);
+
+            newReaderSet = userDocumentService.getAllReadersAndEditors(directory.getId());
+            readers.removeAll(newReaderSet);
+            eventText = "User " + user.toString() + " has prohibited access to directory " + directory.getName();
+            eventService.sendEvent(readers, eventText, user);
             return EntityToDtoConverter.convert(directory);
         }
         return null;
@@ -403,11 +435,15 @@ public class DocumentController {
         }
     }
 
-    private void updateDocument(UserDocument document, User owner, String description, MultipartFile multipartFile)
+    private void updateDocument(UserDocument document, User user, String description, MultipartFile multipartFile)
             throws IOException {
-        DocumentOldVersion oldVersion = DocumentVersionUtil.saveOldVersion(document, "Changed by " + owner.toString());
+        DocumentOldVersion oldVersion = DocumentVersionUtil.saveOldVersion(document, "Changed by " + user.toString());
         document.getDocumentOldVersions().add(oldVersion);
         userDocumentService.update(UserFileUtil.updateUserDocument(document, multipartFile, description));
+
+        String eventText = "Document " + document.getName() + " has been updated by " + user.toString();
+        String eventLink = "/document/browse-" + document.getId();
+        eventService.sendEvent(userDocumentService.getAllReadersAndEditors(document.getId()), eventText, eventLink, user);
     }
 
     private UserDirectory makeDirectory(User owner, String parentDirectoryHash, String dirName) {

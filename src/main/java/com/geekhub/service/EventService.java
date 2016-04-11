@@ -9,4 +9,6 @@ import org.springframework.stereotype.Service;
 public interface EventService extends EntityService<Event, Long> {
 
     void sendEvent(Set<User> recipients, String text, User sender);
+
+    void sendEvent(Set<User> recipients, String text, String link, User sender);
 }
