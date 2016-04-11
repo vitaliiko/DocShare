@@ -46,12 +46,12 @@ public class EventDao implements EntityDao<Event, Long> {
                 .list();
     }
 
-    public Event getList(User recipient, String propertyName, Object value) {
-        return (Event) sessionFactory.getCurrentSession()
+    public List<Event> getList(User recipient, String propertyName, Object value) {
+        return sessionFactory.getCurrentSession()
                 .createCriteria(clazz)
                 .add(Restrictions.eq("recipient", recipient))
                 .add(Restrictions.eq(propertyName, value))
-                .uniqueResult();
+                .list();
     }
 
     @Override

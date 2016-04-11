@@ -34,7 +34,10 @@ public class Event implements Comparable<Event> {
     private String text;
 
     @Column
-    private String link;
+    private String linkText;
+
+    @Column
+    private String linkUrl;
 
     @Column
     private Date date;
@@ -83,12 +86,20 @@ public class Event implements Comparable<Event> {
         this.text = text;
     }
 
-    public String getLink() {
-        return link;
+    public String getLinkText() {
+        return linkText;
     }
 
-    public void setLink(String link) {
-        this.link = link;
+    public void setLinkText(String linkText) {
+        this.linkText = linkText;
+    }
+
+    public String getLinkUrl() {
+        return linkUrl;
+    }
+
+    public void setLinkUrl(String linkUrl) {
+        this.linkUrl = linkUrl;
     }
 
     public Date getDate() {

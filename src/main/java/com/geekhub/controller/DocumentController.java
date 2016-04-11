@@ -26,6 +26,7 @@ import com.geekhub.service.UserService;
 import com.geekhub.util.CommentUtil;
 import com.geekhub.util.DocumentVersionUtil;
 import com.geekhub.util.EntityToDtoConverter;
+import com.geekhub.util.EventUtil;
 import com.geekhub.util.UserFileUtil;
 import com.geekhub.validation.FileValidator;
 import java.io.File;
@@ -147,7 +148,9 @@ public class DocumentController {
                 userDocumentService.moveToTrash(docIds, userId);
                 documents.forEach(doc -> {
                     String eventTxt = "Document " + doc.getName() + " has been removed by " + user.toString();
-                    eventService.sendEvent(userDocumentService.getAllReadersAndEditors(doc.getId()), eventTxt, user);
+                    eventService.save(EventUtil.createEvents(
+                            userDocumentService.getAllReadersAndEditors(doc.getId()), eventTxt, user
+                    ));
                 });
             }
         }
@@ -157,7 +160,9 @@ public class DocumentController {
                 userDirectoryService.moveToTrash(dirIds, userId);
                 directories.forEach(dir -> {
                     String eventText = "Directory " + dir.getName() + " has been removed by " + user.toString();
-                    eventService.sendEvent(userDirectoryService.getAllReaders(dir.getId()), eventText, user);
+                    eventService.save(EventUtil.createEvents(
+                            userDirectoryService.getAllReaders(dir.getId()), eventText, user
+                    ));
                 });
             }
         }
@@ -183,9 +188,12 @@ public class DocumentController {
             Long docId = userDocumentService.recover(remDocId);
 
             String docName = userDocumentService.getById(docId).getName();
-            String eventText = "Document " + docName + " has been removed by " + user.toString();
-            String eventLink = "/document/browse-" + docId;
-            eventService.sendEvent(userDocumentService.getAllReadersAndEditors(docId), eventText, eventLink, user);
+            String eventText = "Document " + docName + " has been recovered by " + user.toString();
+            String eventLinkText = "Browse";
+            String eventLinkUrl = "/document/browse-" + docId;
+            eventService.save(EventUtil.createEvents(
+                    userDocumentService.getAllReadersAndEditors(docId), eventText, eventLinkText, eventLinkUrl, user
+            ));
             return new ModelAndView("redirect:/document/upload");
         }
         return null;
@@ -199,7 +207,7 @@ public class DocumentController {
 
             String dirName = userDirectoryService.getById(dirId).getName();
             String eventText = "Directory " + dirName + " has been removed by " + user.toString();
-            eventService.sendEvent(userDirectoryService.getAllReaders(dirId), eventText, user);
+            eventService.save(EventUtil.createEvents(userDirectoryService.getAllReaders(dirId), eventText, user));
             return new ModelAndView("redirect:/document/upload");
         }
         return null;
@@ -306,13 +314,16 @@ public class DocumentController {
             Set<User> newReadersAndEditorsSet = userDocumentService.getAllReadersAndEditors(document.getId());
             newReadersAndEditorsSet.removeAll(readersAndEditors);
             String eventText = "User " + user.toString() + " has shared document " + document.getName();
-            String eventLink = "/document/browse-" + document.getId();
-            eventService.sendEvent(newReadersAndEditorsSet, eventText, eventLink, user);
+            String eventLinkUrl = "/document/browse-" + document.getId();
+            String eventLinkText = "Browse";
+            eventService.save(EventUtil.createEvents(
+                    newReadersAndEditorsSet, eventText, eventLinkText, eventLinkUrl, user
+            ));
 
             newReadersAndEditorsSet = userDocumentService.getAllReadersAndEditors(document.getId());
             readersAndEditors.removeAll(newReadersAndEditorsSet);
             eventText = "User " + user.toString() + " has prohibited access to document " + document.getName();
-            eventService.sendEvent(readersAndEditors, eventText, user);
+            eventService.save(EventUtil.createEvents(readersAndEditors, eventText, user));
             return EntityToDtoConverter.convert(document);
         }
         return null;
@@ -333,12 +344,12 @@ public class DocumentController {
             Set<User> newReaderSet = userDocumentService.getAllReadersAndEditors(directory.getId());
             newReaderSet.removeAll(readers);
             String eventText = "User " + user.toString() + " has shared directory " + directory.getName();
-            eventService.sendEvent(newReaderSet, eventText, user);
+            eventService.save(EventUtil.createEvents(newReaderSet, eventText, user));
 
             newReaderSet = userDocumentService.getAllReadersAndEditors(directory.getId());
             readers.removeAll(newReaderSet);
             eventText = "User " + user.toString() + " has prohibited access to directory " + directory.getName();
-            eventService.sendEvent(readers, eventText, user);
+            eventService.save(EventUtil.createEvents(readers, eventText, user));
             return EntityToDtoConverter.convert(directory);
         }
         return null;
@@ -442,8 +453,10 @@ public class DocumentController {
         userDocumentService.update(UserFileUtil.updateUserDocument(document, multipartFile, description));
 
         String eventText = "Document " + document.getName() + " has been updated by " + user.toString();
-        String eventLink = "/document/browse-" + document.getId();
-        eventService.sendEvent(userDocumentService.getAllReadersAndEditors(document.getId()), eventText, eventLink, user);
+        String eventLinkUrl = "/document/browse-" + document.getId();
+        String eventLinkText = "Browse";
+        eventService.save(EventUtil.createEvents(userDocumentService.getAllReadersAndEditors(document.getId()),
+                eventText, eventLinkText, eventLinkUrl, user));
     }
 
     private UserDirectory makeDirectory(User owner, String parentDirectoryHash, String dirName) {

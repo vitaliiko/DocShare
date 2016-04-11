@@ -180,4 +180,11 @@ public class UserServiceImpl implements UserService {
         Arrays.stream(usersIds).forEach(id -> users.add(getById(id)));
         return users;
     }
+
+    @Override
+    public void clearEvents(Long userId) {
+        User user = getById(userId);
+        user.getEvents().clear();
+        update(user);
+    }
 }

@@ -42,4 +42,6 @@ public interface UserService extends EntityService<User, Long> {
     void update(List<User> users);
 
     Set<User> getSetByIds(Long[] usersIds);
+
+    void clearEvents(Long userId);
 }

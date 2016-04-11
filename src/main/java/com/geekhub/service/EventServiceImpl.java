@@ -3,7 +3,10 @@ package com.geekhub.service;
 import com.geekhub.dao.EventDao;
 import com.geekhub.entity.Event;
 import com.geekhub.entity.User;
+import com.geekhub.entity.enums.EventStatus;
 import java.util.Calendar;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +23,11 @@ public class EventServiceImpl implements EventService {
     @Override
     public List<Event> getAll(String orderParameter) {
         return eventDao.getAll(orderParameter);
+    }
+
+    @Override
+    public List<Event> getAllByRecipient(User recipient) {
+        return eventDao.getList("recipient", recipient);
     }
 
     @Override
@@ -53,21 +61,22 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
-    public void sendEvent(Set<User> recipients, String text, String link, User sender) {
-        recipients.forEach(r -> {
-            Event event = new Event();
-            event.setText(text);
-            event.setLink(link);
-            event.setDate(Calendar.getInstance().getTime());
-            event.setSenderId(sender.getId());
-            event.setSenderName(sender.toString());
-            event.setRecipient(r);
-            save(event);
-        });
+    public List<Event> getUnread(User recipient) {
+        return eventDao.getList(recipient, "eventStatus", EventStatus.UNREAD);
     }
 
     @Override
-    public void sendEvent(Set<User> recipients, String text, User sender) {
-        sendEvent(recipients, text, null, sender);
+    public void makeRead(Collection<Event> events) {
+        if (events != null) {
+            events.forEach(e -> {
+                e.setEventStatus(EventStatus.READ);
+                update(e);
+            });
+        }
+    }
+
+    @Override
+    public void save(List<Event> events) {
+        events.forEach(this::save);
     }
 }

@@ -9,6 +9,9 @@
             <a href="/friends/view"> <span class="fa-stack fa-lg pull-left"><i class="fa fa-cart-plus fa-stack-1x "></i></span>Friends</a>
         </li>
         <li>
+            <a href="/event/browse"> <span class="fa-stack fa-lg pull-left"><i class="fa fa-cart-plus fa-stack-1x "></i></span>Events</a>
+        </li>
+        <li>
             <a href="/document/recover"> <span class="fa-stack fa-lg pull-left"><i class="fa fa-cart-plus fa-stack-1x "></i></span>Removed Files</a>
         </li>
     </ul>
