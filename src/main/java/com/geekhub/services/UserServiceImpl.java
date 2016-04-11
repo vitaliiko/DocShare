@@ -5,6 +5,7 @@ import com.geekhub.entities.FriendsGroup;
 import com.geekhub.entities.User;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.TreeSet;
 import org.hibernate.HibernateException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -127,13 +128,6 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<User> getAllWithoutCurrentUser(Long userId) {
-        return userDao.getAll("id").stream()
-                .filter(u -> !u.getId().equals(userId))
-                .collect(Collectors.toList());
-    }
-
-    @Override
     public boolean areFriends(Long userId, User friend) {
         Set<User> friends = userDao.getById(userId).getFriends();
         return friends.contains(friend);
@@ -175,5 +169,14 @@ public class UserServiceImpl implements UserService {
         User user = getById(userId);
         user.getEvents().clear();
         update(user);
+    }
+
+    @Override
+    public Set<User> searchByName(String name) {
+        String[] names = name.split(" ");
+        Set<User> users = new TreeSet<>();
+        Arrays.stream(names).forEach(n -> users.addAll(userDao.search("firstName", n)));
+        Arrays.stream(names).forEach(n -> users.addAll(userDao.search("lastName", n)));
+        return users;
     }
 }

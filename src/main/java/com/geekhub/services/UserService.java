@@ -29,8 +29,6 @@ public interface UserService extends EntityService<User, Long> {
 
     void deleteFriend(Long userId, Long friendId);
 
-    List<User> getAllWithoutCurrentUser(Long userId);
-
     boolean areFriends(Long userId, User friend);
 
     Map<User, List<FriendsGroup>> getFriendsGroupsMap(Long ownerId);
@@ -42,4 +40,6 @@ public interface UserService extends EntityService<User, Long> {
     Set<User> getSetByIds(Long[] usersIds);
 
     void clearEvents(Long userId);
+
+    Set<User> searchByName(String name);
 }

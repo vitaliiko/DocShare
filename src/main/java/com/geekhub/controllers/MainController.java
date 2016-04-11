@@ -1,6 +1,7 @@
 package com.geekhub.controllers;
 
 import com.geekhub.dto.RegistrationInfo;
+import com.geekhub.dto.UserDto;
 import com.geekhub.dto.UserFileDto;
 import com.geekhub.dto.convertors.EntityToDtoConverter;
 import com.geekhub.entities.User;
@@ -101,11 +102,26 @@ public class MainController {
 
     @RequestMapping(value = "/search", method = RequestMethod.GET)
     public ModelAndView search(HttpSession session) {
-        Long userId = (Long) session.getAttribute("userId");
+        User user = userService.getById((Long) session.getAttribute("userId"));
 
-        List<User> users = userService.getAllWithoutCurrentUser(userId);
-        Map<User, Boolean> usersMap = users.stream()
-                .collect(Collectors.toMap(u -> u, u -> !userService.areFriends(userId, u)));
+        List<User> users = userService.getAll("firstName");
+        users.remove(user);
+        Map<UserDto, Boolean> usersMap = users.stream()
+                .collect(Collectors.toMap(EntityToDtoConverter::convert, u -> !userService.areFriends(user.getId(), u)));
+
+        ModelAndView model = new ModelAndView("search");
+        model.addObject("usersMap", usersMap);
+        return model;
+    }
+
+    @RequestMapping(value = "/search", method = RequestMethod.POST)
+    public ModelAndView search(String searchParameter, HttpSession session) {
+        User user = userService.getById((Long) session.getAttribute("userId"));
+
+        Set<User> users = userService.searchByName(searchParameter);
+        users.remove(user);
+        Map<UserDto, Boolean> usersMap = users.stream()
+                .collect(Collectors.toMap(EntityToDtoConverter::convert, u -> !userService.areFriends(user.getId(), u)));
 
         ModelAndView model = new ModelAndView("search");
         model.addObject("usersMap", usersMap);

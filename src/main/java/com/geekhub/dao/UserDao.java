@@ -79,4 +79,11 @@ public class UserDao implements EntityDao<User, Long> {
                 .setParameter("friend", friend)
                 .list();
     }
+
+    public List<User> search(String propertyName, String value) {
+        return sessionFactory.getCurrentSession()
+                .createCriteria(clazz)
+                .add(Restrictions.like(propertyName, "%" + value + "%"))
+                .list();
+    }
  }

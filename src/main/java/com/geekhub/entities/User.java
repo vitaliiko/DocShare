@@ -18,7 +18,7 @@ import java.util.Set;
 
 @Entity
 @Table
-public class User {
+public class User implements Comparable<User> {
 
     @Id
     @GeneratedValue
@@ -260,6 +260,11 @@ public class User {
         result = 31 * result + lastName.hashCode();
         result = 31 * result + login.hashCode();
         return result;
+    }
+
+    @Override
+    public int compareTo(User o) {
+        return this.getFirstName().compareTo(o.getFirstName());
     }
 
     @Override
