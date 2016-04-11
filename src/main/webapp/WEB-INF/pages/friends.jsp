@@ -17,7 +17,7 @@
 
 <div id="wrapper" class="container">
     <div id="page-content-wrapper">
-        <table id="groupTable" class="table table-hover tbody tr:hover td group-table">
+        <table id="groupTable" class="table table-hover tbody tr:hover td info-table group-table">
             <caption>
                 Groups
                 <button type="button" id="addGroupButton" class="btn btn-primary btn-sm"
@@ -25,7 +25,7 @@
             </caption>
         </table>
 
-        <table id="friendsTable" class="table table-hover tbody tr:hover td friend-table">
+        <table id="friendsTable" class="table table-hover tbody tr:hover td info-table friend-table">
             <caption>
                 Friends <a href="/main/search" class="btn btn-primary btn-sm">Add friends</a>
             </caption>

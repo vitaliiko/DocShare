@@ -186,6 +186,7 @@ $(document).ready(function() {
         var dirId = $(this).val();
         $.getJSON('/document/get_directory', {dirId: dirId}, function(directory) {
             fileId = directory.id;
+            fileAccess = directory.access;
             checkedBoxes(directory.readers, $('.reader-check-box'));
             checkedBoxes(directory.readersGroups, $('.readers-group-check-box'));
             $('.modal-title').text('Share ' + directory.name);

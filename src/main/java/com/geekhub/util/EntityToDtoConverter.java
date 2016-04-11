@@ -63,7 +63,7 @@ public class EntityToDtoConverter {
 
     public static UserDto convert(User user) {
         UserDto userDto = new UserDto();
-        userDto.setId(userDto.getId());
+        userDto.setId(user.getId());
         userDto.setFirstName(user.getFirstName());
         userDto.setLastName(user.getLastName());
         userDto.setLogin(user.getLogin());

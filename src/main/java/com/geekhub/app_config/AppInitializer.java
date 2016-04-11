@@ -32,11 +32,6 @@ public class AppInitializer extends AbstractAnnotationConfigDispatcherServletIni
         return new String[] {"/"};
     }
 
-//    @Override
-//    protected void customizeRegistration(ServletRegistration.Dynamic registration) {
-//        registration.setMultipartConfig(getMultipartConfigElement());
-//    }
-
     @Override
     protected Filter[] getServletFilters() {
         return new Filter[]{new HiddenHttpMethodFilter(), new MultipartFilter(), new OpenEntityManagerInViewFilter()};
@@ -54,30 +49,4 @@ public class AppInitializer extends AbstractAnnotationConfigDispatcherServletIni
         registration.setMultipartConfig(multipartConfigElement);
 
     }
-
-//    @Override
-//    public void onStartup(ServletContext servletContext) throws ServletException {
-////        AnnotationConfigWebApplicationContext context = new AnnotationConfigWebApplicationContext();
-////        context.register(WebAppConfig.class);
-////        servletContext.addListener(new ContextLoaderListener(context));
-////
-////        context.setServletContext(servletContext);
-////
-////        ServletRegistration.Dynamic servlet = servletContext.addServlet(DISPATCHER_SERVLET_NAME, new DispatcherServlet(context));
-////        servlet.addMapping("/");
-////        servlet.setLoadOnStartup(1);
-//
-//        AnnotationConfigWebApplicationContext rootContext =
-//                new AnnotationConfigWebApplicationContext();
-//        rootContext.register(WebAppConfig.class);
-//        rootContext.register(HibernateConfig.class);
-//        rootContext.register(SecurityConfig.class);
-//
-//        servletContext.addListener(new ContextLoaderListener(rootContext));
-//
-//        ServletRegistration.Dynamic dispatcher =
-//                servletContext.addServlet("dispatcher", new DispatcherServlet(rootContext));
-//        dispatcher.setLoadOnStartup(1);
-//        dispatcher.addMapping("/");
-//    }
 }

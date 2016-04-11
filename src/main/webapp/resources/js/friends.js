@@ -54,13 +54,13 @@ $(document).ready(function() {
             contentType: 'json',
             data: {groupId: friendsGroupId, groupName: groupName, friends: friends},
             success: function() {
-                $('.table').find($('.group' + friendsGroupId)).html(groupName);
+                $('.info-table').find($('.group' + friendsGroupId)).html(groupName);
                 clearModalWindow();
             }
         });
     });
 
-    $('.group-table').on('click', '.group-info-btn', function(event) {
+    $('.info-table').on('click', '.group-info-btn', function(event) {
         event.preventDefault();
         clearModalWindow();
         $('#saveGroupButton').hide();
@@ -99,11 +99,13 @@ $(document).ready(function() {
 
     $('#groupTable').on('click', '.removeGroupButton', function() {
         var groupId = this.id;
+        var button = $(this);
         $.ajax({
             url: '/friends/delete_group',
             data: {groupId: groupId},
             success: function() {
-                $('.group-table').find($('.tr-group' + groupId)).remove();
+                button.parent().parent().remove();
+                $('.friend-table').find($('.group' + groupId)).remove();
             }
         })
     });
