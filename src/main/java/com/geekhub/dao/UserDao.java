@@ -1,6 +1,6 @@
 package com.geekhub.dao;
 
-import com.geekhub.entity.User;
+import com.geekhub.entities.User;
 import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;

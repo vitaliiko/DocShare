@@ -56,4 +56,22 @@ public class SharedDto {
     public void setEditorsGroups(long[] editorsGroups) {
         this.editorsGroups = editorsGroups;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        SharedDto sharedDto = (SharedDto) o;
+
+        return docId == sharedDto.docId && access.equals(sharedDto.access);
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = (int) (docId ^ (docId >>> 32));
+        result = 31 * result + access.hashCode();
+        return result;
+    }
 }

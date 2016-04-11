@@ -1,12 +1,10 @@
 package com.geekhub.dao;
 
-import com.geekhub.entity.User;
-import com.geekhub.entity.UserDirectory;
-import com.geekhub.entity.enums.DocumentAttribute;
+import com.geekhub.entities.User;
+import com.geekhub.entities.UserDirectory;
 import java.util.List;
 import java.util.Map;
 import org.hibernate.SessionFactory;
-import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;

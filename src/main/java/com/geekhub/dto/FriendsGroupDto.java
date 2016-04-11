@@ -1,6 +1,5 @@
 package com.geekhub.dto;
 
-import com.geekhub.entity.User;
 import java.util.Set;
 
 public class FriendsGroupDto implements Comparable<FriendsGroupDto> {
@@ -36,5 +35,26 @@ public class FriendsGroupDto implements Comparable<FriendsGroupDto> {
     @Override
     public int compareTo(FriendsGroupDto o) {
         return this.getName().compareTo(o.getName());
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        FriendsGroupDto groupDto = (FriendsGroupDto) o;
+
+        return id == groupDto.id
+                && name.equals(groupDto.name)
+                && friends.equals(groupDto.friends);
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = (int) (id ^ (id >>> 32));
+        result = 31 * result + name.hashCode();
+        result = 31 * result + friends.hashCode();
+        return result;
     }
 }

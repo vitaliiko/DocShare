@@ -2,11 +2,11 @@ package com.geekhub.security;
 
 import com.geekhub.dto.RegistrationInfo;
 import com.geekhub.dto.UserDto;
-import com.geekhub.entity.User;
-import com.geekhub.exception.UserValidateException;
-import com.geekhub.service.UserService;
-import com.geekhub.util.DtoToEntityConverter;
-import com.geekhub.util.UserFileUtil;
+import com.geekhub.entities.User;
+import com.geekhub.exceptions.UserValidateException;
+import com.geekhub.services.UserService;
+import com.geekhub.dto.convertors.DtoToEntityConverter;
+import com.geekhub.utils.UserFileUtil;
 import java.util.regex.Pattern;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.beans.factory.annotation.Autowired;

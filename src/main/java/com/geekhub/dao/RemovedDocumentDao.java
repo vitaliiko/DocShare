@@ -1,7 +1,7 @@
 package com.geekhub.dao;
 
-import com.geekhub.entity.RemovedDocument;
-import com.geekhub.entity.User;
+import com.geekhub.entities.RemovedDocument;
+import com.geekhub.entities.User;
 import java.util.List;
 import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Order;

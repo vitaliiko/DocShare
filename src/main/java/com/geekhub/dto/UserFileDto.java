@@ -1,7 +1,7 @@
 package com.geekhub.dto;
 
-import com.geekhub.entity.FriendsGroup;
-import com.geekhub.entity.User;
+import com.geekhub.entities.FriendsGroup;
+import com.geekhub.entities.User;
 import java.util.Set;
 
 public class UserFileDto implements Comparable<UserFileDto> {
@@ -131,6 +131,31 @@ public class UserFileDto implements Comparable<UserFileDto> {
 
     public void setEditorsGroups(Set<FriendsGroup> editorsGroups) {
         this.editorsGroups = editorsGroups;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        UserFileDto that = (UserFileDto) o;
+
+        return id == that.id
+                && type.equals(that.type)
+                && name.equals(that.name)
+                && ownerName.equals(that.ownerName)
+                && hashName.equals(that.hashName);
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = (int) (id ^ (id >>> 32));
+        result = 31 * result + type.hashCode();
+        result = 31 * result + name.hashCode();
+        result = 31 * result + ownerName.hashCode();
+        result = 31 * result + hashName.hashCode();
+        return result;
     }
 
     @Override

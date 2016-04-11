@@ -1,13 +1,13 @@
 package com.geekhub.security;
 
-import com.geekhub.entity.FriendsGroup;
-import com.geekhub.entity.RemovedDirectory;
-import com.geekhub.entity.User;
-import com.geekhub.entity.UserDirectory;
-import com.geekhub.entity.enums.DocumentAttribute;
-import com.geekhub.service.RemovedDirectoryService;
-import com.geekhub.service.UserDirectoryService;
-import com.geekhub.service.UserService;
+import com.geekhub.entities.FriendsGroup;
+import com.geekhub.entities.RemovedDirectory;
+import com.geekhub.entities.User;
+import com.geekhub.entities.UserDirectory;
+import com.geekhub.entities.enums.DocumentAttribute;
+import com.geekhub.services.RemovedDirectoryService;
+import com.geekhub.services.UserDirectoryService;
+import com.geekhub.services.UserService;
 import java.util.List;
 import java.util.Set;
 import org.springframework.beans.factory.annotation.Autowired;

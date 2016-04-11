@@ -76,6 +76,29 @@ public class UserDto implements Comparable<UserDto> {
     }
 
     @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        UserDto userDto = (UserDto) o;
+
+        return id == userDto.id
+                && firstName.equals(userDto.firstName)
+                && lastName.equals(userDto.lastName)
+                && login.equals(userDto.login);
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = (int) (id ^ (id >>> 32));
+        result = 31 * result + firstName.hashCode();
+        result = 31 * result + lastName.hashCode();
+        result = 31 * result + login.hashCode();
+        return result;
+    }
+
+    @Override
     public int compareTo(UserDto o) {
         return this.toString().compareTo(o.toString());
     }

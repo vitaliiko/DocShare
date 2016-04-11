@@ -1,14 +1,14 @@
 package com.geekhub.app_config;
 
-import com.geekhub.entity.Comment;
-import com.geekhub.entity.DocumentOldVersion;
-import com.geekhub.entity.Event;
-import com.geekhub.entity.FriendsGroup;
-import com.geekhub.entity.RemovedDirectory;
-import com.geekhub.entity.RemovedDocument;
-import com.geekhub.entity.User;
-import com.geekhub.entity.UserDirectory;
-import com.geekhub.entity.UserDocument;
+import com.geekhub.entities.Comment;
+import com.geekhub.entities.DocumentOldVersion;
+import com.geekhub.entities.Event;
+import com.geekhub.entities.FriendsGroup;
+import com.geekhub.entities.RemovedDirectory;
+import com.geekhub.entities.RemovedDocument;
+import com.geekhub.entities.User;
+import com.geekhub.entities.UserDirectory;
+import com.geekhub.entities.UserDocument;
 import org.apache.tomcat.dbcp.dbcp.BasicDataSource;
 import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;

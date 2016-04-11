@@ -1,8 +1,8 @@
 package com.geekhub.dao;
 
-import com.geekhub.entity.FriendsGroup;
-import com.geekhub.entity.User;
-import com.geekhub.entity.UserDocument;
+import com.geekhub.entities.FriendsGroup;
+import com.geekhub.entities.User;
+import com.geekhub.entities.UserDocument;
 import java.util.Map;
 import org.hibernate.Hibernate;
 import org.hibernate.SessionFactory;

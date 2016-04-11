@@ -1,6 +1,6 @@
 package com.geekhub.dao;
 
-import com.geekhub.entity.DocumentOldVersion;
+import com.geekhub.entities.DocumentOldVersion;
 import java.util.List;
 import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Order;

@@ -51,4 +51,28 @@ public class DocumentOldVersionDto {
     public void setSize(String size) {
         this.size = size;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        DocumentOldVersionDto that = (DocumentOldVersionDto) o;
+
+        return id == that.id && name.equals(that.name)
+                && changedBy.equals(that.changedBy)
+                && lastModifyTime.equals(that.lastModifyTime)
+                && size.equals(that.size);
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = (int) (id ^ (id >>> 32));
+        result = 31 * result + name.hashCode();
+        result = 31 * result + changedBy.hashCode();
+        result = 31 * result + lastModifyTime.hashCode();
+        result = 31 * result + size.hashCode();
+        return result;
+    }
 }

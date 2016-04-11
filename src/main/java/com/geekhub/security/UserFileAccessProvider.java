@@ -1,6 +1,6 @@
 package com.geekhub.security;
 
-import com.geekhub.entity.User;
+import com.geekhub.entities.User;
 import java.util.List;
 import java.util.Set;
 

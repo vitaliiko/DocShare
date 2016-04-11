@@ -47,4 +47,25 @@ public class RegistrationInfo {
     public void setConfirmationPassword(String confirmationPassword) {
         this.confirmationPassword = confirmationPassword;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        RegistrationInfo that = (RegistrationInfo) o;
+
+        return firstName.equals(that.firstName)
+                && lastName.equals(that.lastName)
+                && login.equals(that.login);
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = firstName.hashCode();
+        result = 31 * result + lastName.hashCode();
+        result = 31 * result + login.hashCode();
+        return result;
+    }
 }
