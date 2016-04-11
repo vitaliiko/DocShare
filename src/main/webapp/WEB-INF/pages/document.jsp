@@ -14,11 +14,11 @@
 <jsp:include page="../include/sidebar.jsp"/>
 
 <div class="container" style="width: 900px;">
-    <h3>${doc.name}</h3>
-    <h4>${doc.size} &nbsp&nbsp Changed: ${doc.lastModifyTime}
+    <h4>${location}${doc.name}</h4>
+    <h5>${doc.size} &nbsp&nbsp Changed: ${doc.lastModifyTime}
         <a href="<c:url value='/document/download-${doc.id}' />" class="btn btn-default custom-width">Download</a>
         <a href="<c:url value='/document/history-${doc.id}' />" class="btn btn-default custom-width">Previous versions</a>
-    </h4>
+    </h5>
     <c:if test="${doc.description != null}">
         Description: ${doc.description}
     </c:if>

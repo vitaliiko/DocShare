@@ -30,4 +30,6 @@ public interface UserDirectoryService extends EntityService<UserDirectory, Long>
     List<UserDirectory> getAllByParentDirectoryHash(String parentDirectoryHash);
 
     Set<User> getAllReaders(Long docId);
+
+    String getLocation(UserDirectory directory);
 }

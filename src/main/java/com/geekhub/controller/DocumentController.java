@@ -240,6 +240,7 @@ public class DocumentController {
         if (documentAccessProvider.canRead(document, user)) {
             model.setViewName("document");
             model.addObject("doc", EntityToDtoConverter.convert(document));
+            model.addObject("location", userDocumentService.getLocation(document));
             return model;
         }
         return null;

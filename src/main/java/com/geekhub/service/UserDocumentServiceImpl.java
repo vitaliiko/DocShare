@@ -1,17 +1,16 @@
 package com.geekhub.service;
 
-import com.geekhub.dao.FriendsGroupDao;
 import com.geekhub.dao.UserDocumentDao;
 import com.geekhub.entity.DocumentOldVersion;
 import com.geekhub.entity.FriendsGroup;
 import com.geekhub.entity.RemovedDocument;
 import com.geekhub.entity.User;
+import com.geekhub.entity.UserDirectory;
 import com.geekhub.entity.UserDocument;
 import com.geekhub.util.UserFileUtil;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeSet;
 import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -34,7 +33,10 @@ public class UserDocumentServiceImpl implements UserDocumentService {
     private RemovedDocumentService removedDocumentService;
 
     @Autowired
-    private FriendsGroupDao friendsGroupDao;
+    private FriendsGroupService friendsGroupService;
+
+    @Autowired
+    private UserDirectoryService userDirectoryService;
 
     @Override
     public List<UserDocument> getAll(String orderParameter) {
@@ -174,12 +176,26 @@ public class UserDocumentServiceImpl implements UserDocumentService {
         documents.addAll(userDocumentDao.getByReader(reader));
         documents.addAll(userDocumentDao.getByEditor(reader));
 
-        List<FriendsGroup> groups = friendsGroupDao.getByFriend(reader);
+        List<FriendsGroup> groups = friendsGroupService.getByFriend(reader);
         groups.forEach(g -> {
             documents.addAll(userDocumentDao.getByReadersGroup(g));
             documents.addAll(userDocumentDao.getByEditorsGroup(g));
         });
 
         return documents;
+    }
+
+    @Override
+    public String getLocation(UserDocument document) {
+        String location = "";
+        String patentDirectoryHash = document.getParentDirectoryHash();
+
+        while(!patentDirectoryHash.equals(document.getOwner().getLogin())) {
+            UserDirectory directory = userDirectoryService.getByHashName(patentDirectoryHash);
+            location = directory.getName() + "/" + location;
+            patentDirectoryHash = directory.getParentDirectoryHash();
+        }
+
+        return location;
     }
 }

@@ -10,7 +10,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -133,5 +132,19 @@ public class UserDirectoryServiceImpl implements UserDirectoryService {
         document.getReadersGroups().forEach(g -> users.addAll(g.getFriends()));
         users.add(document.getOwner());
         return users;
+    }
+
+    @Override
+    public String getLocation(UserDirectory directory) {
+        String location = "";
+        String patentDirectoryHash = directory.getParentDirectoryHash();
+
+        while(!patentDirectoryHash.equals(directory.getOwner().getLogin())) {
+            UserDirectory dir = getByHashName(patentDirectoryHash);
+            location = dir.getName() + "/" + location;
+            patentDirectoryHash = dir.getParentDirectoryHash();
+        }
+
+        return location;
     }
 }
