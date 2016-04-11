@@ -402,10 +402,14 @@ public class DocumentController {
     @RequestMapping("/get-directory-content-{dirHashName}")
     public Set<UserFileDto> getDirectoryContent(@PathVariable String dirHashName, HttpSession session) {
         User user = getUserFromSession(session);
-        dirHashName = dirHashName.equals("root") ? user.getLogin() : dirHashName;
-        UserDirectory directory = userDirectoryService.getByHashName(dirHashName);
-        if (directoryAccessProvider.canRead(directory, user) || dirHashName.equals(user.getLogin())) {
+        if (dirHashName.equals("root")) {
+            dirHashName = user.getLogin();
             return getDirectoryContent(dirHashName);
+        } else {
+            UserDirectory directory = userDirectoryService.getByHashName(dirHashName);
+            if (directoryAccessProvider.canRead(directory, user) || dirHashName.equals(user.getLogin())) {
+                return getDirectoryContent(dirHashName);
+            }
         }
         return null;
     }

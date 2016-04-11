@@ -4,8 +4,10 @@ import com.geekhub.entity.FriendsGroup;
 import com.geekhub.entity.RemovedDocument;
 import com.geekhub.entity.User;
 import com.geekhub.entity.UserDocument;
+import com.geekhub.entity.enums.DocumentAttribute;
 import com.geekhub.service.RemovedDocumentService;
 import com.geekhub.service.UserDocumentService;
+import com.geekhub.service.UserService;
 import java.util.List;
 import java.util.Set;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +17,9 @@ import org.springframework.stereotype.Service;
 public class UserDocumentAccessProvider implements UserFileAccessProvider<UserDocument, RemovedDocument> {
 
     @Autowired
+    private UserService userService;
+
+    @Autowired
     private UserDocumentService userDocumentService;
 
     @Autowired
@@ -22,6 +27,16 @@ public class UserDocumentAccessProvider implements UserFileAccessProvider<UserDo
 
     private UserDocument document;
     private User user;
+
+    private boolean isDocumentPublic() {
+        return document.getDocumentAttribute() == DocumentAttribute.PUBLIC;
+    }
+
+    private boolean isFriend() {
+        User owner = document.getOwner();
+        return document.getDocumentAttribute() == DocumentAttribute.FOR_FRIENDS
+                && userService.areFriends(owner.getId(), user);
+    }
 
     private boolean isOwner() {
         return document != null
@@ -93,7 +108,7 @@ public class UserDocumentAccessProvider implements UserFileAccessProvider<UserDo
     public boolean canRead(UserDocument file, User user) {
         this.user = user;
         document = file;
-        return isOwner() || isReader() || isEditor();
+        return isOwner() || isReader() || isEditor() || isDocumentPublic() || isFriend();
     }
 
     @Override

@@ -4,8 +4,10 @@ import com.geekhub.entity.FriendsGroup;
 import com.geekhub.entity.RemovedDirectory;
 import com.geekhub.entity.User;
 import com.geekhub.entity.UserDirectory;
+import com.geekhub.entity.enums.DocumentAttribute;
 import com.geekhub.service.RemovedDirectoryService;
 import com.geekhub.service.UserDirectoryService;
+import com.geekhub.service.UserService;
 import java.util.List;
 import java.util.Set;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +17,9 @@ import org.springframework.stereotype.Service;
 public class UserDirectoryAccessProvider implements UserFileAccessProvider<UserDirectory, RemovedDirectory> {
 
     @Autowired
+    private UserService userService;
+
+    @Autowired
     private UserDirectoryService userDirectoryService;
 
     @Autowired
@@ -22,6 +27,16 @@ public class UserDirectoryAccessProvider implements UserFileAccessProvider<UserD
 
     private UserDirectory directory;
     private User user;
+
+    private boolean isDocumentPublic() {
+        return directory.getDocumentAttribute() == DocumentAttribute.PUBLIC;
+    }
+
+    private boolean isFriend() {
+        User owner = directory.getOwner();
+        return directory.getDocumentAttribute() == DocumentAttribute.FOR_FRIENDS
+                && userService.areFriends(owner.getId(), user);
+    }
 
     private boolean isOwner() {
         return directory != null
@@ -76,7 +91,7 @@ public class UserDirectoryAccessProvider implements UserFileAccessProvider<UserD
     public boolean canRead(UserDirectory file, User user) {
         this.user = user;
         directory = file;
-        return isOwner() || isReader();
+        return isOwner() || isReader() || isFriend() || isDocumentPublic();
     }
 
     @Override
