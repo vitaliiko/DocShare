@@ -32,6 +32,9 @@ public class UserDirectoryServiceImpl implements UserDirectoryService {
     private RemovedDirectoryService removedDirectoryService;
 
     @Autowired
+    private RemovedDocumentService removedDocumentService;
+
+    @Autowired
     private UserDocumentService userDocumentService;
 
     @Override
@@ -80,7 +83,7 @@ public class UserDirectoryServiceImpl implements UserDirectoryService {
         UserDirectory directory = userDirectoryDao.getById(docId);
         RemovedDirectory removedDirectory = UserFileUtil.wrapUserDirectory(directory, removerId);
         removedDirectoryService.save(removedDirectory);
-        directory.setDocumentStatus(DocumentStatus.REMOVED);
+
         setRemovedStatus(directory);
         userDirectoryDao.update(directory);
     }
@@ -88,10 +91,10 @@ public class UserDirectoryServiceImpl implements UserDirectoryService {
     private void setRemovedStatus(UserDirectory directory) {
         directory.setDocumentStatus(DocumentStatus.REMOVED);
 
-        List<UserDocument> documents = userDocumentService.getAllByParentDirectoryHash(directory.getHashName());
+        List<UserDocument> documents = userDocumentService.getActualByParentDirectoryHash(directory.getHashName());
         documents.forEach(d -> d.setDocumentStatus(DocumentStatus.REMOVED));
 
-        List<UserDirectory> directories = getAllByParentDirectoryHash(directory.getHashName());
+        List<UserDirectory> directories = getActualByParentDirectoryHash(directory.getHashName());
         directories.forEach(this::setRemovedStatus);
     }
 
@@ -104,10 +107,25 @@ public class UserDirectoryServiceImpl implements UserDirectoryService {
     public Long recover(Long removedDirIds) {
         RemovedDirectory removedDocument = removedDirectoryService.getById(removedDirIds);
         UserDirectory directory = removedDocument.getUserDirectory();
-        directory.setDocumentStatus(DocumentStatus.ACTUAL);
         removedDirectoryService.delete(removedDocument);
+
+        setActualStatus(directory);
         userDirectoryDao.update(directory);
         return directory.getId();
+    }
+
+    private void setActualStatus(UserDirectory directory) {
+        directory.setDocumentStatus(DocumentStatus.ACTUAL);
+
+        List<UserDocument> documents = userDocumentService.getRemovedByParentDirectoryHash(directory.getHashName());
+        documents.stream()
+                .filter(d -> removedDocumentService.getByUserDocument(d) == null)
+                .forEach(d -> d.setDocumentStatus(DocumentStatus.ACTUAL));
+
+        List<UserDirectory> directories = getRemovedByParentDirectoryHash(directory.getHashName());
+        directories.stream()
+                .filter(d -> removedDirectoryService.getByUserDirectory(d) == null)
+                .forEach(this::setActualStatus);
     }
 
     @Override
@@ -128,10 +146,18 @@ public class UserDirectoryServiceImpl implements UserDirectoryService {
     }
 
     @Override
-    public List<UserDirectory> getAllByParentDirectoryHash(String parentDirectoryHash) {
+    public List<UserDirectory> getActualByParentDirectoryHash(String parentDirectoryHash) {
         Map<String, Object> propertiesMap = new HashMap<>();
         propertiesMap.put("parentDirectoryHash", parentDirectoryHash);
         propertiesMap.put("documentStatus", DocumentStatus.ACTUAL);
+        return userDirectoryDao.getList(propertiesMap);
+    }
+
+    @Override
+    public List<UserDirectory> getRemovedByParentDirectoryHash(String parentDirectoryHash) {
+        Map<String, Object> propertiesMap = new HashMap<>();
+        propertiesMap.put("parentDirectoryHash", parentDirectoryHash);
+        propertiesMap.put("documentStatus", DocumentStatus.REMOVED);
         return userDirectoryDao.getList(propertiesMap);
     }
 

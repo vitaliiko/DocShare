@@ -3,6 +3,7 @@ package com.geekhub.services;
 import com.geekhub.dao.RemovedDirectoryDao;
 import com.geekhub.entities.RemovedDirectory;
 import com.geekhub.entities.User;
+import com.geekhub.entities.UserDirectory;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -59,5 +60,10 @@ public class RemovedDirectoryServiceImpl implements RemovedDirectoryService {
     public Set<RemovedDirectory> getAllByOwnerId(Long ownerId) {
         User owner = userService.getById(ownerId);
         return new HashSet<>(removedDirectoryDao.getList("owner", owner));
+    }
+
+    @Override
+    public RemovedDirectory getByUserDirectory(UserDirectory directory) {
+        return removedDirectoryDao.get("userDirectory", directory);
     }
 }

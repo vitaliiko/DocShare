@@ -1,6 +1,5 @@
 package com.geekhub.controllers;
 
-import com.geekhub.dao.EntityDao;
 import com.geekhub.dto.CommentDto;
 import com.geekhub.entities.Comment;
 import com.geekhub.entities.DocumentOldVersion;
@@ -418,8 +417,8 @@ public class DocumentController {
     private Set<UserFileDto> getDirectoryContent(String directoryHashName) {
         List<UserDocument> documents;
         List<UserDirectory> directories;
-        documents = userDocumentService.getAllByParentDirectoryHash(directoryHashName);
-        directories = userDirectoryService.getAllByParentDirectoryHash(directoryHashName);
+        documents = userDocumentService.getActualByParentDirectoryHash(directoryHashName);
+        directories = userDirectoryService.getActualByParentDirectoryHash(directoryHashName);
 
         Set<UserFileDto> dtoList = new TreeSet<>();
         if (documents != null) {

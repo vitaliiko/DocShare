@@ -1,5 +1,6 @@
 package com.geekhub.services;
 
+import com.geekhub.entities.RemovedDirectory;
 import com.geekhub.entities.User;
 import com.geekhub.entities.UserDirectory;
 import com.geekhub.entities.enums.DocumentAttribute;
@@ -28,7 +29,9 @@ public interface UserDirectoryService extends EntityService<UserDirectory, Long>
 
     UserDirectory getByHashName(String hashName);
 
-    List<UserDirectory> getAllByParentDirectoryHash(String parentDirectoryHash);
+    List<UserDirectory> getActualByParentDirectoryHash(String parentDirectoryHash);
+
+    List<UserDirectory> getRemovedByParentDirectoryHash(String parentDirectoryHash);
 
     Set<User> getAllReaders(Long docId);
 

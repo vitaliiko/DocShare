@@ -151,10 +151,18 @@ public class UserDocumentServiceImpl implements UserDocumentService {
     }
 
     @Override
-    public List<UserDocument> getAllByParentDirectoryHash(String parentDirectoryHash) {
+    public List<UserDocument> getActualByParentDirectoryHash(String parentDirectoryHash) {
         Map<String, Object> propertiesMap = new HashMap<>();
         propertiesMap.put("parentDirectoryHash", parentDirectoryHash);
         propertiesMap.put("documentStatus", DocumentStatus.ACTUAL);
+        return userDocumentDao.getList(propertiesMap);
+    }
+
+    @Override
+    public List<UserDocument> getRemovedByParentDirectoryHash(String parentDirectoryHash) {
+        Map<String, Object> propertiesMap = new HashMap<>();
+        propertiesMap.put("parentDirectoryHash", parentDirectoryHash);
+        propertiesMap.put("documentStatus", DocumentStatus.REMOVED);
         return userDocumentDao.getList(propertiesMap);
     }
 
