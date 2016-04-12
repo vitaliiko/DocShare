@@ -37,5 +37,5 @@ public interface UserDirectoryService extends EntityService<UserDirectory, Long>
 
     String getLocation(UserDirectory directory);
 
-    Set<UserDirectory> getAllByOwnerAndAttribute(User owner, DocumentAttribute attribute);
+    Set<UserDirectory> getActualByOwner(User owner);
 }

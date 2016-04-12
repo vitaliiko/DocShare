@@ -348,4 +348,12 @@ $(document).ready(function() {
             }
         });
     }
+
+    $('.replace-btn').click(function() {
+        $.getJSON('/document/get_directories_names', function(directoriesMap) {
+            $.each(directoriesMap, function(k, v) {
+                $('#dirTree').append(k);
+            });
+        });
+    });
 });

@@ -37,8 +37,11 @@ import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.TreeSet;
+import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.util.FileCopyUtils;
@@ -138,21 +141,18 @@ public class DocumentController {
 
     @RequestMapping(value = "/download-{docId}", method = RequestMethod.GET)
     @ResponseStatus(HttpStatus.OK)
-    public void downloadDocument(@PathVariable long docId, HttpSession session, HttpServletResponse response) {
-        try {
-            User user = getUserFromSession(session);
-            UserDocument document = userDocumentService.getById(docId);
+    public void downloadDocument(@PathVariable long docId, HttpSession session, HttpServletResponse response)
+            throws IOException {
+        User user = getUserFromSession(session);
+        UserDocument document = userDocumentService.getById(docId);
 
-            if (documentAccessProvider.canRead(document, user)) {
-                File file = UserFileUtil.createFile(document.getHashName());
-                response.setContentType(document.getType());
-                response.setContentLength((int) file.length());
-                response.setHeader("Content-Disposition", "attachment; filename=\"" + document.getName() + "\"");
+        if (documentAccessProvider.canRead(document, user)) {
+            File file = UserFileUtil.createFile(document.getHashName());
+            response.setContentType(document.getType());
+            response.setContentLength((int) file.length());
+            response.setHeader("Content-Disposition", "attachment; filename=\"" + document.getName() + "\"");
 
-                FileCopyUtils.copy(Files.newInputStream(file.toPath()), response.getOutputStream());
-            }
-        } catch (IOException e) {
-
+            FileCopyUtils.copy(Files.newInputStream(file.toPath()), response.getOutputStream());
         }
     }
 
@@ -305,6 +305,17 @@ public class DocumentController {
         return null;
     }
 
+    @RequestMapping("/get_directories_names")
+    public Map<String, String> getDirectoriesNames(HttpSession session) {
+        User user = getUserFromSession(session);
+
+        Set<UserDirectory> directories = userDirectoryService.getActualByOwner(user);
+        Map<String, String> directoriesMap = directories.stream()
+                .collect(Collectors
+                        .toMap(d -> userDirectoryService.getLocation(d) + d.getName(), UserDirectory::getHashName));
+        return directoriesMap;
+    }
+
     @RequestMapping(value = "/share_document", method = RequestMethod.POST)
     public UserFileDto shareUserDocument(@RequestBody SharedDto shared, HttpSession session) {
         User user = getUserFromSession(session);
@@ -422,18 +433,10 @@ public class DocumentController {
 
         Set<UserFileDto> dtoList = new TreeSet<>();
         if (documents != null) {
-            documents.forEach(d -> {
-                if (d.getOwner() != null) {
-                    dtoList.add(EntityToDtoConverter.convert(d));
-                }
-            });
+            documents.forEach(d -> dtoList.add(EntityToDtoConverter.convert(d)));
         }
         if (directories != null) {
-            directories.forEach(d -> {
-                if (d.getOwner() != null) {
-                    dtoList.add(EntityToDtoConverter.convert(d));
-                }
-            });
+            directories.forEach(d -> dtoList.add(EntityToDtoConverter.convert(d)));
         }
         return dtoList;
     }

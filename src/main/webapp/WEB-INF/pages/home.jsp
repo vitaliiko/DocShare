@@ -52,6 +52,7 @@
             <button type="button" class="btn btn-default btn-sm make-dir-btn"
                     data-toggle="modal" data-target="#makeDirDialog">Make dir</button>
         </div>
+        <%--<img src="resources/js/templates/icons/file.png">--%>
     </form>
 
     <div  class="back-links">
@@ -79,9 +80,14 @@
 
                     <button class="btn btn-default delete-btn action-btn"
                             data-toggle="modal" data-target="#deleteDialog">Delete</button>
-                    <button class="btn btn-default replace-btn action-btn">Replace</button>
+
+                    <button class="btn btn-default replace-btn action-btn"
+                            data-toggle="modal" data-target="#replaceDialog">Replace</button>
+
                     <button class="btn btn-default copy-btn action-btn">Copy</button>
+
                     <button class="btn btn-default rename-btn action-btn single-selection">Rename</button>
+
                 </caption>
                 <tr class="table-head">
                     <th><input type="checkbox" class="check-box big-check-box select-all"/></th>
@@ -198,6 +204,28 @@
             </div>
         </div>
 
+    </div>
+
+    <div id="replaceDialog" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">Replace document</h4>
+                </div>
+                <div class="modal-body">
+                    <p>Select directory in which document will be replace</p>
+                    <div id="dirTree">
+
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" id="makeDir" class="btn btn-default" data-dismiss="modal">Make dir</button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                </div>
+            </div>
+
+        </div>
     </div>
 </div>
 

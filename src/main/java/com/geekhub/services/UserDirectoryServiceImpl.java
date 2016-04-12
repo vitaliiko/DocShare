@@ -196,7 +196,7 @@ public class UserDirectoryServiceImpl implements UserDirectoryService {
     }
 
     @Override
-    public Set<UserDirectory> getAllByOwnerAndAttribute(User owner, DocumentAttribute attribute) {
-        return new HashSet<>(userDirectoryDao.getList(owner, "documentAttribute", attribute));
+    public Set<UserDirectory> getActualByOwner(User owner) {
+        return new HashSet<>(userDirectoryDao.getList(owner, "documentAttribute", DocumentStatus.ACTUAL));
     }
 }
