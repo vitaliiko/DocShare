@@ -4,6 +4,7 @@ import com.geekhub.dao.UserDirectoryDao;
 import com.geekhub.entities.RemovedDirectory;
 import com.geekhub.entities.User;
 import com.geekhub.entities.UserDirectory;
+import com.geekhub.entities.UserDocument;
 import com.geekhub.entities.enums.DocumentAttribute;
 import com.geekhub.entities.enums.DocumentStatus;
 import com.geekhub.utils.UserFileUtil;
@@ -29,6 +30,9 @@ public class UserDirectoryServiceImpl implements UserDirectoryService {
 
     @Autowired
     private RemovedDirectoryService removedDirectoryService;
+
+    @Autowired
+    private UserDocumentService userDocumentService;
 
     @Override
     public List<UserDirectory> getAll(String orderParameter) {
@@ -77,7 +81,18 @@ public class UserDirectoryServiceImpl implements UserDirectoryService {
         RemovedDirectory removedDirectory = UserFileUtil.wrapUserDirectory(directory, removerId);
         removedDirectoryService.save(removedDirectory);
         directory.setDocumentStatus(DocumentStatus.REMOVED);
+        setRemovedStatus(directory);
         userDirectoryDao.update(directory);
+    }
+
+    private void setRemovedStatus(UserDirectory directory) {
+        directory.setDocumentStatus(DocumentStatus.REMOVED);
+
+        List<UserDocument> documents = userDocumentService.getAllByParentDirectoryHash(directory.getHashName());
+        documents.forEach(d -> d.setDocumentStatus(DocumentStatus.REMOVED));
+
+        List<UserDirectory> directories = getAllByParentDirectoryHash(directory.getHashName());
+        directories.forEach(this::setRemovedStatus);
     }
 
     @Override
