@@ -5,6 +5,7 @@ import com.geekhub.entities.RemovedDocument;
 import com.geekhub.entities.User;
 import com.geekhub.entities.UserDocument;
 import com.geekhub.entities.enums.DocumentAttribute;
+import com.geekhub.entities.enums.DocumentStatus;
 import com.geekhub.services.RemovedDocumentService;
 import com.geekhub.services.UserDocumentService;
 import com.geekhub.services.UserService;
@@ -100,22 +101,24 @@ public class UserDocumentAccessProvider implements UserFileAccessProvider<UserDo
                     return false;
                 }
             }
+            return true;
         }
-        return true;
+        return false;
     }
 
     @Override
     public boolean canRead(UserDocument file, User user) {
         this.user = user;
         document = file;
-        return isOwner() || isReader() || isEditor() || isDocumentPublic() || isFriend();
+        return document.getDocumentStatus() == DocumentStatus.ACTUAL
+                && (isOwner() || isReader() || isEditor() || isDocumentPublic() || isFriend());
     }
 
     @Override
     public boolean canRemove(UserDocument file, User user) {
         this.user = user;
         document = file;
-        return isOwner();
+        return isOwner() && file.getDocumentStatus() == DocumentStatus.ACTUAL;
     }
 
     @Override
@@ -151,8 +154,9 @@ public class UserDocumentAccessProvider implements UserFileAccessProvider<UserDo
                     return false;
                 }
             }
+            return true;
         }
-        return true;
+        return false;
     }
 
     @Override
@@ -163,8 +167,9 @@ public class UserDocumentAccessProvider implements UserFileAccessProvider<UserDo
                     return false;
                 }
             }
+            return true;
         }
-        return true;
+        return false;
     }
 
     @Override
@@ -175,8 +180,9 @@ public class UserDocumentAccessProvider implements UserFileAccessProvider<UserDo
                     return false;
                 }
             }
+            return true;
         }
-        return true;
+        return false;
     }
 
     @Override
@@ -189,8 +195,6 @@ public class UserDocumentAccessProvider implements UserFileAccessProvider<UserDo
     @Override
     public boolean canRecover(Long removedFileId, User user) {
         RemovedDocument removedDocument = removedDocumentService.getById(removedFileId);
-        return removedDocument != null
-                && user != null
-                && removedDocument.getOwner().equals(user);
+        return canRecover(removedDocument, user);
     }
 }

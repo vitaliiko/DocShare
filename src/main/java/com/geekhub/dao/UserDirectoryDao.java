@@ -89,6 +89,13 @@ public class UserDirectoryDao implements EntityDao<UserDirectory, Long> {
                 .list();
     }
 
+    public List<UserDirectory> getList(Map<String, Object> propertiesMap) {
+        return sessionFactory.getCurrentSession()
+                .createCriteria(clazz)
+                .add(Restrictions.allEq(propertiesMap))
+                .list();
+    }
+
     public UserDirectory get(User owner, String propertyName, Object value) {
         return (UserDirectory) sessionFactory.getCurrentSession()
                 .createCriteria(clazz)

@@ -5,6 +5,7 @@ import com.geekhub.entities.RemovedDirectory;
 import com.geekhub.entities.User;
 import com.geekhub.entities.UserDirectory;
 import com.geekhub.entities.enums.DocumentAttribute;
+import com.geekhub.entities.enums.DocumentStatus;
 import com.geekhub.services.RemovedDirectoryService;
 import com.geekhub.services.UserDirectoryService;
 import com.geekhub.services.UserService;
@@ -83,15 +84,17 @@ public class UserDirectoryAccessProvider implements UserFileAccessProvider<UserD
                     return false;
                 }
             }
+            return true;
         }
-        return true;
+        return false;
     }
 
     @Override
     public boolean canRead(UserDirectory file, User user) {
         this.user = user;
         directory = file;
-        return isOwner() || isReader() || isFriend() || isDocumentPublic();
+        return directory.getDocumentStatus() == DocumentStatus.ACTUAL
+                && (isOwner() || isReader() || isFriend() || isDocumentPublic());
     }
 
     @Override
@@ -105,7 +108,7 @@ public class UserDirectoryAccessProvider implements UserFileAccessProvider<UserD
     public boolean canRemove(UserDirectory file, User user) {
         this.user = user;
         directory = file;
-        return isOwner();
+        return isOwner() && directory.getDocumentStatus() == DocumentStatus.ACTUAL;
     }
 
     @Override
@@ -134,8 +137,9 @@ public class UserDirectoryAccessProvider implements UserFileAccessProvider<UserD
                     return false;
                 }
             }
+            return true;
         }
-        return true;
+        return false;
     }
 
     @Override
@@ -146,8 +150,9 @@ public class UserDirectoryAccessProvider implements UserFileAccessProvider<UserD
                     return false;
                 }
             }
+            return true;
         }
-        return true;
+        return false;
     }
 
     @Override
@@ -158,8 +163,9 @@ public class UserDirectoryAccessProvider implements UserFileAccessProvider<UserD
                     return false;
                 }
             }
+            return true;
         }
-        return true;
+        return false;
     }
 
     @Override

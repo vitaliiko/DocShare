@@ -31,9 +31,9 @@ public class EventUtil {
         return events;
     }
 
-    public static List<Event> createEvents(Set<User> recipients, String linkUtl, User sender) {
+    public static List<Event> createEvents(Set<User> recipients, String text, User sender) {
         List<Event> events = new ArrayList<>();
-        recipients.forEach(r -> events.add(createEvent(r, null, null, linkUtl, sender)));
+        recipients.forEach(r -> events.add(createEvent(r, text, null, null, sender)));
         return events;
     }
 }

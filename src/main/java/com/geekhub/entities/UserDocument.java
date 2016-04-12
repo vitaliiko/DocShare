@@ -2,7 +2,9 @@ package com.geekhub.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import com.geekhub.entities.enums.AbilityToCommentDocument;
 import com.geekhub.entities.enums.DocumentAttribute;
+import com.geekhub.entities.enums.DocumentStatus;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
@@ -39,6 +41,9 @@ public class UserDocument implements Comparable<UserDocument> {
     private Date lastModifyTime;
 
     @Column
+    private String modifiedBy;
+
+    @Column
     private String size;
 
     @Column
@@ -52,7 +57,15 @@ public class UserDocument implements Comparable<UserDocument> {
 
     @Column(name = "documentAttribute")
     @Enumerated(EnumType.STRING)
-    private DocumentAttribute documentAttribute;
+    private DocumentAttribute documentAttribute = DocumentAttribute.PRIVATE;
+
+    @Column(name = "documentStatus")
+    @Enumerated(EnumType.STRING)
+    private DocumentStatus documentStatus = DocumentStatus.ACTUAL;
+
+    @Column(name = "abilityToComment")
+    @Enumerated(EnumType.STRING)
+    private AbilityToCommentDocument abilityToComment = AbilityToCommentDocument.ENABLE;
 
     @JsonIgnore
     @ManyToOne
@@ -248,6 +261,24 @@ public class UserDocument implements Comparable<UserDocument> {
     public void setDocumentAttribute(DocumentAttribute documentAttribute) {
         this.documentAttribute = documentAttribute;
     }
+
+    public DocumentStatus getDocumentStatus() {
+        return documentStatus;
+    }
+
+    public void setDocumentStatus(DocumentStatus documentStatus) {
+        this.documentStatus = documentStatus;
+    }
+
+    public AbilityToCommentDocument getAbilityToComment() {
+        return abilityToComment;
+    }
+
+    public void setAbilityToComment(AbilityToCommentDocument abilityToComment) {
+        this.abilityToComment = abilityToComment;
+    }
+
+
 
     @Override
     public boolean equals(Object o) {

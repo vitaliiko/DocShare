@@ -23,16 +23,20 @@
             <tr>
                 <td>${dir.userDirectory.name}</td>
                 <td><fmt:formatDate type="date" timeStyle="short" dateStyle="short" value="${dir.removalDate}"/></td>
-                <td><a href="<c:url value='/document/recover-dir-${dir.id}' />"
-                       class="btn btn-primary custom-width">Recover</a></td>
+                <td><form action="/document/recover-directory" method="post">
+                    <input type="hidden" name="remDirId" value="${dir.id}">
+                    <input type="submit" class="btn btn-primary custom-width" value="Recover">
+                </form></td>
             </tr>
         </c:forEach>
         <c:forEach items="${documents}" var="doc">
             <tr>
                 <td>${doc.userDocument.name}</td>
                 <td><fmt:formatDate type="date" timeStyle="short" dateStyle="short" value="${doc.removalDate}"/></td>
-                <td><a href="<c:url value='/document/recover-doc-${doc.id}' />"
-                       class="btn btn-primary custom-width">Recover</a></td>
+                <td><form action="/document/recover-document" method="post">
+                    <input type="hidden" name="remDocId" value="${doc.id}">
+                    <input type="submit" class="btn btn-primary custom-width" value="Recover">
+                </form></td>
             </tr>
         </c:forEach>
     </table>

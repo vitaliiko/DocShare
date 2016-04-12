@@ -3,6 +3,7 @@ package com.geekhub.dao;
 import com.geekhub.entities.FriendsGroup;
 import com.geekhub.entities.User;
 import com.geekhub.entities.UserDocument;
+import com.geekhub.entities.enums.DocumentStatus;
 import java.util.Map;
 import org.hibernate.Hibernate;
 import org.hibernate.SessionFactory;
@@ -93,10 +94,10 @@ public class UserDocumentDao implements EntityDao<UserDocument, Long> {
     }
 
     public List<UserDocument> getList(Map<String, Object> propertiesMap) {
-        return (List<UserDocument>) sessionFactory.getCurrentSession()
+        return sessionFactory.getCurrentSession()
                 .createCriteria(clazz)
                 .add(Restrictions.allEq(propertiesMap))
-                .uniqueResult();
+                .list();
     }
 
     public UserDocument get(User owner, String propertyName, Object value) {
@@ -122,29 +123,37 @@ public class UserDocumentDao implements EntityDao<UserDocument, Long> {
 
     public List<UserDocument> getByReader(User reader) {
         return sessionFactory.getCurrentSession()
-                .createQuery("from UserDocument doc where :reader in elements(doc.readers)")
+                .createQuery("from UserDocument doc " +
+                        "where doc.documentStatus = :status and :reader in elements(doc.readers)")
                 .setParameter("reader", reader)
+                .setParameter("status", DocumentStatus.ACTUAL)
                 .list();
     }
 
     public List<UserDocument> getByEditor(User editor) {
         return sessionFactory.getCurrentSession()
-                .createQuery("from UserDocument doc where :editor in elements(doc.editors)")
+                .createQuery("from UserDocument doc " +
+                        "where doc.documentStatus = :status and :editor in elements(doc.editors)")
                 .setParameter("editor", editor)
+                .setParameter("status", DocumentStatus.ACTUAL)
                 .list();
     }
 
     public List<UserDocument> getByReadersGroup(FriendsGroup readersGroup) {
         return sessionFactory.getCurrentSession()
-                .createQuery("from UserDocument doc where :readersGroup in elements(doc.readersGroups)")
+                .createQuery("from UserDocument doc " +
+                        "where doc.documentStatus = :status and :readersGroup in elements(doc.readersGroups)")
                 .setParameter("readersGroup", readersGroup)
+                .setParameter("status", DocumentStatus.ACTUAL)
                 .list();
     }
 
     public List<UserDocument> getByEditorsGroup(FriendsGroup editorsGroup) {
         return sessionFactory.getCurrentSession()
-                .createQuery("from UserDocument doc where :editorsGroup in elements(doc.editorsGroups)")
+                .createQuery("from UserDocument doc " +
+                        "where doc.documentStatus = :status and :editorsGroup in elements(doc.editorsGroups)")
                 .setParameter("editorsGroup", editorsGroup)
+                .setParameter("status", DocumentStatus.ACTUAL)
                 .list();
     }
 }

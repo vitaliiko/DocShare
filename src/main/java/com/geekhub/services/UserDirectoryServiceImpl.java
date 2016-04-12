@@ -5,8 +5,10 @@ import com.geekhub.entities.RemovedDirectory;
 import com.geekhub.entities.User;
 import com.geekhub.entities.UserDirectory;
 import com.geekhub.entities.enums.DocumentAttribute;
+import com.geekhub.entities.enums.DocumentStatus;
 import com.geekhub.utils.UserFileUtil;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -74,7 +76,7 @@ public class UserDirectoryServiceImpl implements UserDirectoryService {
         UserDirectory directory = userDirectoryDao.getById(docId);
         RemovedDirectory removedDirectory = UserFileUtil.wrapUserDirectory(directory, removerId);
         removedDirectoryService.save(removedDirectory);
-        directory.setOwner(null);
+        directory.setDocumentStatus(DocumentStatus.REMOVED);
         userDirectoryDao.update(directory);
     }
 
@@ -87,9 +89,9 @@ public class UserDirectoryServiceImpl implements UserDirectoryService {
     public Long recover(Long removedDirIds) {
         RemovedDirectory removedDocument = removedDirectoryService.getById(removedDirIds);
         UserDirectory directory = removedDocument.getUserDirectory();
-        User owner = removedDocument.getOwner();
-        owner.getUserDirectories().add(directory);
+        directory.setDocumentStatus(DocumentStatus.ACTUAL);
         removedDirectoryService.delete(removedDocument);
+        userDirectoryDao.update(directory);
         return directory.getId();
     }
 
@@ -112,7 +114,10 @@ public class UserDirectoryServiceImpl implements UserDirectoryService {
 
     @Override
     public List<UserDirectory> getAllByParentDirectoryHash(String parentDirectoryHash) {
-        return userDirectoryDao.getList("parentDirectoryHash", parentDirectoryHash);
+        Map<String, Object> propertiesMap = new HashMap<>();
+        propertiesMap.put("parentDirectoryHash", parentDirectoryHash);
+        propertiesMap.put("documentStatus", DocumentStatus.ACTUAL);
+        return userDirectoryDao.getList(propertiesMap);
     }
 
     @Override

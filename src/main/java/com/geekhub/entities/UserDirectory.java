@@ -2,6 +2,7 @@ package com.geekhub.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.geekhub.entities.enums.DocumentAttribute;
+import com.geekhub.entities.enums.DocumentStatus;
 import java.util.HashSet;
 import java.util.Set;
 import javax.persistence.CascadeType;
@@ -42,7 +43,11 @@ public class UserDirectory implements Comparable<UserDirectory> {
 
     @Column(name = "documentAttribute")
     @Enumerated(EnumType.STRING)
-    private DocumentAttribute documentAttribute;
+    private DocumentAttribute documentAttribute = DocumentAttribute.PRIVATE;
+
+    @Column(name = "documentStatus")
+    @Enumerated(EnumType.STRING)
+    private DocumentStatus documentStatus = DocumentStatus.ACTUAL;
 
     @JsonIgnore
     @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH},
@@ -132,6 +137,14 @@ public class UserDirectory implements Comparable<UserDirectory> {
 
     public void setDocumentAttribute(DocumentAttribute documentAttribute) {
         this.documentAttribute = documentAttribute;
+    }
+
+    public DocumentStatus getDocumentStatus() {
+        return documentStatus;
+    }
+
+    public void setDocumentStatus(DocumentStatus documentStatus) {
+        this.documentStatus = documentStatus;
     }
 
     @Override

@@ -4,7 +4,9 @@ import com.geekhub.dao.RemovedDocumentDao;
 import com.geekhub.entities.RemovedDocument;
 import com.geekhub.entities.User;
 import com.geekhub.entities.UserDocument;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -55,9 +57,9 @@ public class RemovedDocumentServiceImpl implements RemovedDocumentService {
     }
 
     @Override
-    public List<RemovedDocument> getAllByOwnerId(Long ownerId) {
+    public Set<RemovedDocument> getAllByOwnerId(Long ownerId) {
         User owner = userService.getById(ownerId);
-        return removedDocumentDao.getList("owner", owner);
+        return new HashSet<>(removedDocumentDao.getList("owner", owner));
     }
 
     @Override

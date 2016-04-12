@@ -8,7 +8,9 @@ import com.geekhub.entities.User;
 import com.geekhub.entities.UserDirectory;
 import com.geekhub.entities.UserDocument;
 import com.geekhub.entities.enums.DocumentAttribute;
+import com.geekhub.entities.enums.DocumentStatus;
 import com.geekhub.utils.UserFileUtil;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -86,7 +88,7 @@ public class UserDocumentServiceImpl implements UserDocumentService {
         UserDocument document = userDocumentDao.getById(docId);
         RemovedDocument removedDocument = UserFileUtil.wrapUserDocument(document, removerId);
         removedDocumentService.save(removedDocument);
-        document.setOwner(null);
+        document.setDocumentStatus(DocumentStatus.REMOVED);
         userDocumentDao.update(document);
     }
 
@@ -99,9 +101,9 @@ public class UserDocumentServiceImpl implements UserDocumentService {
     public Long recover(Long removedDocId) {
         RemovedDocument removedDocument = removedDocumentService.getById(removedDocId);
         UserDocument document = removedDocument.getUserDocument();
-        User owner = removedDocument.getOwner();
-        owner.getUserDocuments().add(document);
+        document.setDocumentStatus(DocumentStatus.ACTUAL);
         removedDocumentService.delete(removedDocument);
+        userDocumentDao.update(document);
         return document.getId();
     }
 
@@ -150,7 +152,10 @@ public class UserDocumentServiceImpl implements UserDocumentService {
 
     @Override
     public List<UserDocument> getAllByParentDirectoryHash(String parentDirectoryHash) {
-        return userDocumentDao.getList("parentDirectoryHash", parentDirectoryHash);
+        Map<String, Object> propertiesMap = new HashMap<>();
+        propertiesMap.put("parentDirectoryHash", parentDirectoryHash);
+        propertiesMap.put("documentStatus", DocumentStatus.ACTUAL);
+        return userDocumentDao.getList(propertiesMap);
     }
 
     @Override
