@@ -448,17 +448,14 @@ public class DocumentController {
         UserDocument document = userDocumentService.getByFullNameAndOwner(user, parentDirectoryHash, docName);
 
         if (document == null) {
-            RemovedDocument removedDocument =
-                    removedDocumentService.getByFullNameAndOwner(user, parentDirectoryHash, docName);
-            if (removedDocument == null) {
-                document = UserFileUtil.createUserDocument(multipartFile, parentDirectoryHash, description, user);
-                multipartFile.transferTo(UserFileUtil.createFile(document.getHashName()));
-                userDocumentService.save(document);
-            } else {
-                Long docId = userDocumentService.recover(removedDocument.getId());
-                document = userDocumentService.getDocumentWithOldVersions(docId);
-                updateDocument(document, user, description, multipartFile);
-            }
+            document = UserFileUtil.createUserDocument(multipartFile, parentDirectoryHash, description, user);
+            multipartFile.transferTo(UserFileUtil.createFile(document.getHashName()));
+            userDocumentService.save(document);
+        } else if (document.getDocumentStatus() == DocumentStatus.REMOVED) {
+            RemovedDocument removedDocument = removedDocumentService.getByUserDocument(document);
+            Long docId = userDocumentService.recover(removedDocument.getId());
+            document = userDocumentService.getDocumentWithOldVersions(docId);
+            updateDocument(document, user, description, multipartFile);
         } else if (documentAccessProvider.canEdit(document, user)) {
             document = userDocumentService.getDocumentWithOldVersions(document.getId());
             updateDocument(document, user, description, multipartFile);

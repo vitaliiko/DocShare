@@ -14,6 +14,4 @@ public interface RemovedDocumentService extends EntityService<RemovedDocument, L
     RemovedDocument getByUserDocument(UserDocument document);
 
     RemovedDocument getByUserDocumentHashName(String userDocumentHashName);
-
-    RemovedDocument getByFullNameAndOwner(User owner, String parentDirectoryHash, String name);
 }

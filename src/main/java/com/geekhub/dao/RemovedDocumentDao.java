@@ -88,14 +88,4 @@ public class RemovedDocumentDao implements EntityDao<RemovedDocument, Long> {
         RemovedDocument RemovedDocument = getById(entityId);
         sessionFactory.getCurrentSession().delete(RemovedDocument);
     }
-
-    public RemovedDocument getByFullNameAndOwner(User owner, String parentDirectoryHash, String name) {
-        return (RemovedDocument) sessionFactory.getCurrentSession()
-                .createCriteria(clazz, "rem")
-                .createAlias("rem.userDocument", "doc")
-                .add(Restrictions.eq("owner", owner))
-                .add(Restrictions.eq("doc.name", name))
-                .add(Restrictions.eq("doc.parentDirectoryHash", parentDirectoryHash))
-                .uniqueResult();
-    }
 }

@@ -71,9 +71,4 @@ public class RemovedDocumentServiceImpl implements RemovedDocumentService {
     public RemovedDocument getByUserDocumentHashName(String userDocumentHashName) {
         return removedDocumentDao.getByUserDocumentHashName(userDocumentHashName);
     }
-
-    @Override
-    public RemovedDocument getByFullNameAndOwner(User owner, String parentDirectoryHash, String name) {
-        return removedDocumentDao.getByFullNameAndOwner(owner, parentDirectoryHash, name);
-    }
 }
