@@ -14,6 +14,7 @@ $(document).ready(function() {
     var forFriendsTable = $('.FOR_FRIENDS');
     var handlebarsPath = '/resources/js/templates/';
     var backLink = $('.back-link');
+    var dirHashName;
     var dangerAlert = $('.alert-danger');
     var successAlert = $('.alert-success');
 
@@ -267,7 +268,7 @@ $(document).ready(function() {
         var dirName = $('#directoryName').val();
         $.ajax({
             url: '/document/make-directory',
-            data: {dirName: dirName},
+            data: {dirName: dirName, dirHashName: dirHashName},
             success: function (directory) {
                 loadTemplate(handlebarsPath + 'directoryRow.html', function(template) {
                     var html = template(directory);
@@ -281,17 +282,17 @@ $(document).ready(function() {
     content.on('click', '.get-dir-content', function(event) {
         event.preventDefault();
         var dirName = $(this).text();
-        var url = '/document/get-directory-content-' + this.id;
+        dirHashName = this.id;
+        var url = '/document/get-directory-content-' + dirHashName;
 
         $.getJSON(url, function(files) {
             var locationElement = $('#location');
             var location = locationElement.text();
             locationElement.text(location + '/' + dirName);
 
-            url = '' + url;
-            url = url.substring(url.lastIndexOf('-'));
-            $('.back-link').prop('href', '/document/get-parent-directory-content' + url);
+            $('.back-link').prop('href', '/document/get-parent-directory-content-' + dirHashName);
             $('.doc-table tr').not('.table-head').remove();
+            $('#dirHashNameHidden').val(dirHashName);
 
             renderDirectories(files);
             renderDocuments(files);
@@ -308,7 +309,7 @@ $(document).ready(function() {
             var location = locationElement.text();
             locationElement.text(location.substring(0, location.lastIndexOf('/')));
 
-            var dirHashName = files[0].parentDirectoryHash;
+            dirHashName = files[0].parentDirectoryHash;
             $('.back-link').prop('href', 'get-parent-directory-content-' + dirHashName);
             $('.doc-table tr').not('.table-head').remove();
 

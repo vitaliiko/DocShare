@@ -133,10 +133,14 @@ public class DocumentController {
     @RequestMapping(value = "/upload", method = RequestMethod.POST)
     public ModelAndView uploadDocument(@RequestParam("files[]") MultipartFile[] files,
                                        String description,
+                                       @RequestParam(required = false, name = "dirHashName") String parentDirectoryHash,
                                        HttpSession session) throws IOException {
 
-        String parentDirectoryHash = (String) session.getAttribute("parentDirectoryHash");
         User user = getUserFromSession(session);
+        if (parentDirectoryHash == null || parentDirectoryHash.isEmpty()) {
+            parentDirectoryHash = user.getLogin();
+        }
+
         if (files != null && files.length > 0) {
             for (MultipartFile file : files) {
                 if (!file.isEmpty() && UserFileUtil.validateDocumentName(file.getOriginalFilename())) {
@@ -291,9 +295,15 @@ public class DocumentController {
     }
 
     @RequestMapping(value = "/make-directory", method = RequestMethod.GET)
-    public UserFileDto makeDir(String dirName, HttpSession session) {
+    public UserFileDto makeDir(String dirName,
+                               @RequestParam(required = false, name = "dirHashName") String parentDirectoryHash,
+                               HttpSession session) {
+
         User owner = getUserFromSession(session);
-        String parentDirectoryHash = (String) session.getAttribute("parentDirectoryHash");
+        if (parentDirectoryHash == null || parentDirectoryHash.isEmpty()) {
+            parentDirectoryHash = owner.getLogin();
+        }
+
         if (dirName != null && !dirName.isEmpty()) {
             UserDirectory directory = makeDirectory(owner, parentDirectoryHash, dirName);
             return EntityToDtoConverter.convert(directory);

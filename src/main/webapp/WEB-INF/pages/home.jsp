@@ -46,6 +46,7 @@
         <label class="col-md-3 control-lable" for="changedBy">Description</label>
         <input type="text" name="changedBy" id="changedBy" class="form-control input-sm"/>
         <br>
+        <input type="hidden" value="" id="dirHashNameHidden" name="dirHashName">
         <div class="form-actions floatRight">
             <input type="submit" value="Upload" class="btn btn-primary btn-sm">
 
