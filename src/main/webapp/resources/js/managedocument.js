@@ -20,11 +20,15 @@ $(document).ready(function() {
 
     function changeTab() {
         $('.doc-table').hide(true);
+        $('.switch-btn').css('font-weight', 'normal');
+        makeBoxesUnchecked();
+    }
+
+    function makeBoxesUnchecked() {
         $("input:checkbox:checked").each(function() {
             $(this).prop('checked', false);
         });
         $('.action-btn').hide(true);
-        $('.switch-btn').css('font-weight', 'normal');
     }
 
     function setSelectionStyle(element) {
@@ -163,6 +167,7 @@ $(document).ready(function() {
 
     content.on('click', '.share-doc-btn', function() {
         clearModalWindow();
+        makeBoxesUnchecked();
         $('.group-check-box').show();
         shareUrl = '/document/share_document';
 
@@ -170,17 +175,18 @@ $(document).ready(function() {
         $.getJSON('/document/get_document', {docId: docId}, function(document) {
             fileId = document.id;
             fileAccess = document.access;
-            checkedBoxes(document.readers, $('.reader-check-box'));
-            checkedBoxes(document.readersGroups, $('.readers-group-check-box'));
-            checkedBoxes(document.editors, $('.editor-check-box'));
-            checkedBoxes(document.editorsGroups, $('.editors-group-check-box'));
-            $('.modal-title').text('Share ' + document.name);
+            makeBoxesChecked(document.readers, $('.reader-check-box'));
+            makeBoxesChecked(document.readersGroups, $('.readers-group-check-box'));
+            makeBoxesChecked(document.editors, $('.editor-check-box'));
+            makeBoxesChecked(document.editorsGroups, $('.editors-group-check-box'));
+            $('.share-modal-title').text('Share ' + document.name);
             $('#' + document.access).prop('checked', true);
         });
     });
 
     content.on('click', '.share-dir-btn', function() {
         clearModalWindow();
+        makeBoxesUnchecked();
         $('.group-check-box').hide();
         shareUrl = '/document/share_directory';
 
@@ -188,14 +194,14 @@ $(document).ready(function() {
         $.getJSON('/document/get_directory', {dirId: dirId}, function(directory) {
             fileId = directory.id;
             fileAccess = directory.access;
-            checkedBoxes(directory.readers, $('.reader-check-box'));
-            checkedBoxes(directory.readersGroups, $('.readers-group-check-box'));
-            $('.modal-title').text('Share ' + directory.name);
+            makeBoxesChecked(directory.readers, $('.reader-check-box'));
+            makeBoxesChecked(directory.readersGroups, $('.readers-group-check-box'));
+            $('.share-modal-title').text('Share ' + directory.name);
             $('#' + directory.access).prop('checked', true);
         });
     });
 
-    function checkedBoxes(readers, checkBoxes) {
+    function makeBoxesChecked(readers, checkBoxes) {
         $.each(readers, function (k, v) {
             readers.push(v.id);
         });

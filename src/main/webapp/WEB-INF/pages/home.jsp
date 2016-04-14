@@ -109,7 +109,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal">&times;</button>
-                <h4 class="modal-title">Removal</h4>
+                <h4 class="modal-title delete-modal-title">Removal</h4>
             </div>
             <div class="modal-body">
                 <h4 id="delete-dialog-text"></h4>
@@ -129,7 +129,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal">&times;</button>
-                <h4 class="modal-title">Make directory</h4>
+                <h4 class="modal-title make-dir-modal-title">Make directory</h4>
             </div>
             <div class="modal-body">
                 <p id="group-action">Input directory name</p>
@@ -151,7 +151,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal">&times;</button>
-                <h4 class="modal-title"></h4>
+                <h4 class="modal-title share-modal-title"></h4>
             </div>
 
             <div class="modal-body">
@@ -213,7 +213,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal">&times;</button>
-                <h4 class="modal-title">Replace document</h4>
+                <h4 class="modal-title replace-modal-title">Replace document</h4>
             </div>
             <div class="modal-body">
                 <p>Select directory in which document will be replace</p>
@@ -235,7 +235,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal">&times;</button>
-                <h4 class="modal-title">Rename</h4>
+                <h4 class="modal-title rename-modal-title">Rename</h4>
             </div>
             <div class="modal-body">
                 <p>Input new name: </p>
