@@ -1,7 +1,9 @@
 package com.geekhub.controllers;
 
 import com.geekhub.dto.CommentDto;
+import com.geekhub.dto.FriendsGroupDto;
 import com.geekhub.dto.RemovedFileDto;
+import com.geekhub.dto.UserDto;
 import com.geekhub.entities.Comment;
 import com.geekhub.entities.DocumentOldVersion;
 import com.geekhub.entities.RemovedDirectory;
@@ -116,9 +118,16 @@ public class DocumentController {
     public ModelAndView uploadDocument(HttpSession session) {
         ModelAndView model = new ModelAndView("home");
         User user = getUserFromSession(session);
+
+        Set<FriendsGroupDto> friendsGroups = new TreeSet<>();
+        userService.getAllFriendsGroups(user.getId()).forEach(g -> friendsGroups.add(EntityToDtoConverter.convert(g)));
+
+        Set<UserDto> friends = new HashSet<>();
+        userService.getAllFriends(user.getId()).forEach(f -> friends.add(EntityToDtoConverter.convert(f)));
+
         model.addObject("tableNames", new String[] {"ALL", "PRIVATE", "PUBLIC", "FOR_FRIENDS"});
-        model.addObject("friendsGroups", userService.getAllFriendsGroups(user.getId()));
-        model.addObject("friends", userService.getAllFriends(user.getId()));
+        model.addObject("friendsGroups", friendsGroups);
+        model.addObject("friends", friends);
         model.addObject("userLogin", user.getLogin());
         return model;
     }
