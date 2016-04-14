@@ -43,7 +43,7 @@ public class EntityToDtoConverter {
         documentDto.setSize(document.getSize());
         documentDto.setLastModifyTime(df.format(document.getLastModifyTime()));
         documentDto.setName(document.getName());
-        documentDto.setOwnerName(document.getOwner().toString());
+        documentDto.setOwnerName(document.getOwner().getFullName());
         documentDto.setDescription(document.getDescription());
         documentDto.setParentDirectoryHash(document.getParentDirectoryHash());
         documentDto.setAccess(document.getDocumentAttribute().toString());
@@ -96,7 +96,7 @@ public class EntityToDtoConverter {
         CommentDto commentDto = new CommentDto();
         commentDto.setText(comment.getText());
         commentDto.setDate(df.format(comment.getDate()));
-        commentDto.setSenderName(comment.getOwner().toString());
+        commentDto.setSenderName(comment.getOwner().getFullName());
         return commentDto;
     }
 

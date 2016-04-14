@@ -191,13 +191,13 @@ public class DocumentController {
         Set<RemovedFileDto> documents = new TreeSet<>();
         removedDocumentService.getAllByOwnerId(ownerId).forEach(d -> {
             User user = userService.getById(d.getRemoverId());
-            documents.add(EntityToDtoConverter.convert(d, user.toString()));
+            documents.add(EntityToDtoConverter.convert(d, user.getFullName()));
         });
 
         Set<RemovedFileDto> directories = new TreeSet<>();
         removedDirectoryService.getAllByOwnerId(ownerId).forEach(d -> {
             User user = userService.getById(d.getRemoverId());
-            directories.add(EntityToDtoConverter.convert(d, user.toString()));
+            directories.add(EntityToDtoConverter.convert(d, user.getFullName()));
         });
 
         model.addObject("documents", documents);
@@ -476,7 +476,7 @@ public class DocumentController {
 
     private void updateDocument(UserDocument document, User user, String description, MultipartFile multipartFile)
             throws IOException {
-        DocumentOldVersion oldVersion = DocumentVersionUtil.saveOldVersion(document, "Changed by " + user.toString());
+        DocumentOldVersion oldVersion = DocumentVersionUtil.saveOldVersion(document, "Changed by " + user.getFullName());
         document.getDocumentOldVersions().add(oldVersion);
         userDocumentService.update(UserFileUtil.updateUserDocument(document, multipartFile, description));
         sendUpdateEvent(document, user);
@@ -494,7 +494,7 @@ public class DocumentController {
     }
 
     private void sendUpdateEvent(UserDocument document, User user) {
-        String eventText = "Document " + document.getName() + " has been updated by " + user.toString();
+        String eventText = "Document " + document.getName() + " has been updated by " + user.getFullName();
         String eventLinkText = "Browse";
         String eventLinkUrl = "/document/browse-" + document.getId();
 
@@ -504,7 +504,7 @@ public class DocumentController {
 
     private <T, S extends EntityService<T, Long>> void sendRemoveEvent(S service, String fileType, String fileName,
                                                                        long fileId, User user) {
-        String eventText = fileType + " " + fileName + " has been removed by " + user.toString();
+        String eventText = fileType + " " + fileName + " has been removed by " + user.getFullName();
 
         Set<User> readers = service instanceof UserDirectoryService
                 ? ((UserDirectoryService) service).getAllReaders(fileId)
@@ -514,7 +514,7 @@ public class DocumentController {
 
     private <T, S extends EntityService<T, Long>> void sendRecoverEvent(S service, String fileType, String fileName,
                                                                         long fileId, User user) {
-        String eventText = fileType + " " + fileName + " has been recovered by " + user.toString();
+        String eventText = fileType + " " + fileName + " has been recovered by " + user.getFullName();
         String eventLinkText = null;
         String eventLinkUrl = null;
         if (fileType.toLowerCase().equals("Document")) {
@@ -530,7 +530,7 @@ public class DocumentController {
     }
 
     private void sendShareEvent(Set<User> readers, String fileType, String fileName, long fileId, User user) {
-        String eventText = "User " + user.toString() + " has shared " + fileType + " " + fileName;
+        String eventText = "User " + user.getFullName() + " has shared " + fileType + " " + fileName;
         String eventLinkText = null;
         String eventLinkUrl = null;
         if (fileType.toLowerCase().equals("document")) {
@@ -541,7 +541,7 @@ public class DocumentController {
     }
 
     private void sendProhibitAccessEvent(Set<User> readers, String fileType, String fileName, User user) {
-        String eventText = "User " + user.toString() + " has prohibited access to " + fileType + " " + fileName;
+        String eventText = "User " + user.getFullName() + " has prohibited access to " + fileType + " " + fileName;
         eventService.save(EventUtil.createEvents(readers, eventText, user));
     }
 }

@@ -16,7 +16,7 @@ public class EventUtil {
         event.setLinkUrl(linkUtl);
         event.setDate(Calendar.getInstance().getTime());
         event.setSenderId(sender.getId());
-        event.setSenderName(sender.toString());
+        event.setSenderName(sender.getFullName());
         event.setRecipient(recipient);
         return event;
     }

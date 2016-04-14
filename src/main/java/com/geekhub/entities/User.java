@@ -255,6 +255,10 @@ public class User implements Comparable<User> {
         this.registrationDate = registrationDate;
     }
 
+    public String getFullName() {
+        return firstName + " " + lastName;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -285,6 +289,6 @@ public class User implements Comparable<User> {
 
     @Override
     public String toString() {
-        return firstName + " " + lastName;
+        return getFullName();
     }
 }
