@@ -3,13 +3,16 @@ package com.geekhub.entities;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.Date;
 import java.util.TreeSet;
+import javax.persistence.Basic;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
+import javax.persistence.Lob;
 import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
@@ -36,6 +39,11 @@ public class User implements Comparable<User> {
 
     @Column(unique = true)
     private String login;
+
+    @Lob
+    @Basic
+    @Column
+    private byte[] avatar;
 
     @Column(unique = true)
     private String email;
@@ -141,6 +149,14 @@ public class User implements Comparable<User> {
 
     public void setLogin(String login) {
         this.login = login;
+    }
+
+    public byte[] getAvatar() {
+        return avatar;
+    }
+
+    public void setAvatar(byte[] avatar) {
+        this.avatar = avatar;
     }
 
     public Set<Event> getEvents() {

@@ -14,6 +14,7 @@
 
 <div class="container" style="width: 900px">
     <div class="container">
+        <img src="/profile/imageDisplay?id=${pageOwner.id}"/>
         <h3>${pageOwner.firstName} ${pageOwner.lastName}</h3>
     </div>
 

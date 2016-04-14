@@ -52,7 +52,6 @@
             <button type="button" class="btn btn-default btn-sm make-dir-btn"
                     data-toggle="modal" data-target="#makeDirDialog">Make dir</button>
         </div>
-        <%--<img src="resources/js/templates/icons/file.png">--%>
     </form>
 
     <div  class="back-links">
