@@ -63,7 +63,7 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
-    public void makeRead(Collection<Event> events) {
+    public void setReadStatus(Collection<Event> events) {
         if (events != null) {
             events.forEach(e -> {
                 e.setEventStatus(EventStatus.READ);

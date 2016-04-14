@@ -13,7 +13,7 @@ public interface EventService extends EntityService<Event, Long> {
 
     List<Event> getUnread(User recipient);
 
-    void makeRead(Collection<Event> events);
+    void setReadStatus(Collection<Event> events);
 
     List<Event> getAllByRecipient(User recipient);
 }

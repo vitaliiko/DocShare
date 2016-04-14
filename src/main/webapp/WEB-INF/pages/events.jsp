@@ -22,6 +22,9 @@
     <table class="table table-hover tbody tr:hover td">
         <c:forEach items="${events}" var="event">
             <tr>
+                <td>
+                    <strong>${event.status}</strong>
+                </td>
                 <td width="470px">
                     ${event.text}<br>
                     <c:if test="${event.linkText != null}">

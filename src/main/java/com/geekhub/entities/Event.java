@@ -120,7 +120,7 @@ public class Event implements Comparable<Event> {
 
     @Override
     public int compareTo(Event o) {
-        return this.getDate().compareTo(o.getDate());
+        return o.getDate().compareTo(this.getDate());
     }
 
     @Override

@@ -1,9 +1,12 @@
 package com.geekhub.controllers;
 
+import com.geekhub.dto.EventDto;
+import com.geekhub.dto.convertors.EntityToDtoConverter;
 import com.geekhub.entities.Event;
 import com.geekhub.entities.User;
 import com.geekhub.services.EventService;
 import com.geekhub.services.UserService;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.TreeSet;
 import javax.servlet.http.HttpSession;
@@ -25,11 +28,13 @@ public class EventController {
     @RequestMapping("/browse")
     public ModelAndView browseEvents(HttpSession session) {
         User user = userService.getById((Long) session.getAttribute("userId"));
-        Set<Event> events = new TreeSet<>(eventService.getAllByRecipient(user));
-        eventService.makeRead(events);
+        Set<Event> events = new HashSet<>(eventService.getAllByRecipient(user));
+        Set<EventDto> eventDtoSet = new TreeSet<>();
+        events.forEach(e -> eventDtoSet.add(EntityToDtoConverter.convert(e)));
+        eventService.setReadStatus(events);
 
         ModelAndView model = new ModelAndView("events");
-        model.addObject("events", events);
+        model.addObject("events", eventDtoSet);
         if (events.size() == 0) {
             model.addObject("message", "You have not events yet");
         }

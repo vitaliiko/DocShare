@@ -1,11 +1,15 @@
 package com.geekhub.controllers;
 
+import com.geekhub.dto.UserDto;
 import com.geekhub.entities.FriendsGroup;
 import com.geekhub.entities.User;
 import com.geekhub.dto.FriendsGroupDto;
 import com.geekhub.services.FriendsGroupService;
 import com.geekhub.services.UserService;
 import com.geekhub.dto.convertors.EntityToDtoConverter;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.TreeMap;
 import java.util.TreeSet;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -36,13 +40,23 @@ public class FriendsController {
     }
 
     @RequestMapping("/view")
-    public ModelAndView friends(HttpSession session) {
+    public ModelAndView getFriendsWithGroups(HttpSession session) {
         Long userId = (Long) session.getAttribute("userId");
-        List<FriendsGroup> groupSet = userService.getAllFriendsGroups(userId);
+
+        List<FriendsGroupDto> groupDtoList = new ArrayList<>();
+        userService.getAllFriendsGroups(userId).forEach(g -> groupDtoList.add(EntityToDtoConverter.convert(g)));
+
         Map<User, List<FriendsGroup>> friendsMap = userService.getFriendsGroupsMap(userId);
+        Map<UserDto, List<FriendsGroupDto>> friendsDtoMap = new TreeMap<>();
+        for (User user : friendsMap.keySet()) {
+            List<FriendsGroupDto> userGroupDtoList = new ArrayList<>();
+            friendsMap.get(user).forEach(g -> userGroupDtoList.add(EntityToDtoConverter.convert(g)));
+            friendsDtoMap.put(EntityToDtoConverter.convert(user), userGroupDtoList);
+        }
+
         ModelAndView model = new ModelAndView("friends");
-        model.addObject("friends", friendsMap);
-        model.addObject("groups", groupSet);
+        model.addObject("friends", friendsDtoMap);
+        model.addObject("groups", groupDtoList);
         return model;
     }
 
@@ -91,8 +105,11 @@ public class FriendsController {
     }
 
     @RequestMapping("/get_friends")
-    public Set<User> getFriends(HttpSession session) {
-        return userService.getFriends((Long) session.getAttribute("userId"));
+    public Set<UserDto> getFriends(HttpSession session) {
+        Long userId = (Long) session.getAttribute("userId");
+        Set<UserDto> userDtoSet = new HashSet<>();
+        userService.getFriends(userId).forEach(u -> userDtoSet.add(EntityToDtoConverter.convert(u)));
+        return userDtoSet;
     }
 
     @RequestMapping("/add_friend")

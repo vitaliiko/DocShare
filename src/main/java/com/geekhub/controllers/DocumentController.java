@@ -1,6 +1,7 @@
 package com.geekhub.controllers;
 
 import com.geekhub.dto.CommentDto;
+import com.geekhub.dto.RemovedFileDto;
 import com.geekhub.entities.Comment;
 import com.geekhub.entities.DocumentOldVersion;
 import com.geekhub.entities.RemovedDirectory;
@@ -187,8 +188,17 @@ public class DocumentController {
         ModelAndView model = new ModelAndView("recover");
 
         Long ownerId = (Long) session.getAttribute("userId");
-        Set<RemovedDocument> documents = removedDocumentService.getAllByOwnerId(ownerId);
-        Set<RemovedDirectory> directories = removedDirectoryService.getAllByOwnerId(ownerId);
+        Set<RemovedFileDto> documents = new TreeSet<>();
+        removedDocumentService.getAllByOwnerId(ownerId).forEach(d -> {
+            User user = userService.getById(d.getRemoverId());
+            documents.add(EntityToDtoConverter.convert(d, user.toString()));
+        });
+
+        Set<RemovedFileDto> directories = new TreeSet<>();
+        removedDirectoryService.getAllByOwnerId(ownerId).forEach(d -> {
+            User user = userService.getById(d.getRemoverId());
+            directories.add(EntityToDtoConverter.convert(d, user.toString()));
+        });
 
         model.addObject("documents", documents);
         model.addObject("directories", directories);

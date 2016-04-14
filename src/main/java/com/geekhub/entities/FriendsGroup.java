@@ -1,7 +1,5 @@
 package com.geekhub.entities;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import java.util.HashSet;
 import java.util.Set;
 import javax.persistence.CascadeType;
@@ -24,7 +22,6 @@ public class FriendsGroup {
     @GeneratedValue
     private Long id;
 
-    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "owner_id")
     private User owner;
@@ -32,7 +29,6 @@ public class FriendsGroup {
     @Column
     private String name;
 
-    @JsonIgnore
     @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH},
             fetch = FetchType.EAGER)
     @JoinTable(name = "user_to_group_relation",

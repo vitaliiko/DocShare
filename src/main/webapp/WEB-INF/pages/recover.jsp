@@ -21,8 +21,11 @@
         </tr>
         <c:forEach items="${directories}" var="dir">
             <tr>
-                <td>${dir.userDirectory.name}</td>
-                <td><fmt:formatDate type="date" timeStyle="short" dateStyle="short" value="${dir.removalDate}"/></td>
+                <td>${dir.name}</td>
+                <td>
+                    <fmt:formatDate type="date" timeStyle="short" dateStyle="short" value="${dir.removalDate}"/>
+                    by ${dir.removerName}
+                </td>
                 <td><form action="/document/recover-directory" method="post">
                     <input type="hidden" name="remDirId" value="${dir.id}">
                     <input type="submit" class="btn btn-primary custom-width" value="Recover">
@@ -31,8 +34,11 @@
         </c:forEach>
         <c:forEach items="${documents}" var="doc">
             <tr>
-                <td>${doc.userDocument.name}</td>
-                <td><fmt:formatDate type="date" timeStyle="short" dateStyle="short" value="${doc.removalDate}"/></td>
+                <td>${doc.name}</td>
+                <td>
+                    <fmt:formatDate type="date" timeStyle="short" dateStyle="short" value="${doc.removalDate}"/>
+                    by ${doc.removerName}
+                </td>
                 <td><form action="/document/recover-document" method="post">
                     <input type="hidden" name="remDocId" value="${doc.id}">
                     <input type="submit" class="btn btn-primary custom-width" value="Recover">

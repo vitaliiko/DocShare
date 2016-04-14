@@ -19,7 +19,6 @@ public class RemovedDirectory {
     @GeneratedValue
     private Long id;
 
-    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "owner_id")
     private User owner;

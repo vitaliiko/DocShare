@@ -1,17 +1,23 @@
 package com.geekhub.dto.convertors;
 
 import com.geekhub.dto.CommentDto;
+import com.geekhub.dto.EventDto;
 import com.geekhub.dto.FriendsGroupDto;
 
+import com.geekhub.dto.RemovedFileDto;
 import com.geekhub.dto.UserFileDto;
 import com.geekhub.dto.UserDto;
 import com.geekhub.entities.Comment;
 import com.geekhub.entities.DocumentOldVersion;
 import com.geekhub.dto.DocumentOldVersionDto;
+import com.geekhub.entities.Event;
 import com.geekhub.entities.FriendsGroup;
+import com.geekhub.entities.RemovedDirectory;
+import com.geekhub.entities.RemovedDocument;
 import com.geekhub.entities.User;
 import com.geekhub.entities.UserDirectory;
 import com.geekhub.entities.UserDocument;
+import com.geekhub.entities.enums.EventStatus;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Set;
@@ -92,5 +98,35 @@ public class EntityToDtoConverter {
         commentDto.setDate(df.format(comment.getDate()));
         commentDto.setSenderName(comment.getOwner().toString());
         return commentDto;
+    }
+
+    public static EventDto convert(Event event) {
+        EventDto eventDto = new EventDto();
+        eventDto.setText(event.getText());
+        eventDto.setLinkText(event.getLinkText());
+        eventDto.setLinkUrl(event.getLinkUrl());
+        eventDto.setDate(event.getDate());
+        eventDto.setStatus(event.getEventStatus() == EventStatus.UNREAD ? "New" : "");
+        return eventDto;
+    }
+
+    public static RemovedFileDto convert(RemovedDocument document, String removerName) {
+        RemovedFileDto removedFileDto = new RemovedFileDto();
+        removedFileDto.setId(document.getId());
+        removedFileDto.setName(document.getUserDocument().getName());
+        removedFileDto.setRemovalDate(document.getRemovalDate());
+        removedFileDto.setRemoverName(removerName);
+        removedFileDto.setType("doc");
+        return removedFileDto;
+    }
+
+    public static RemovedFileDto convert(RemovedDirectory directory, String removerName) {
+        RemovedFileDto removedFileDto = new RemovedFileDto();
+        removedFileDto.setId(directory.getId());
+        removedFileDto.setName(directory.getUserDirectory().getName());
+        removedFileDto.setRemovalDate(directory.getRemovalDate());
+        removedFileDto.setRemoverName(removerName);
+        removedFileDto.setType("dir");
+        return removedFileDto;
     }
 }

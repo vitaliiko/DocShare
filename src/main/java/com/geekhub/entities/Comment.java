@@ -29,7 +29,6 @@ public class Comment {
     @Column
     private Date date;
 
-    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "doc_id")
     private UserDocument userDocument;
