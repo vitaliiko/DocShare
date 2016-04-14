@@ -12,6 +12,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Pattern;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -22,6 +23,8 @@ public class UserFileUtil {
 
     public static final String ROOT_LOCATION = "C:\\spring_docs\\";
     public static final String SYSTEM_EXTENSION = ".curva";
+    public static final Pattern DIRECTORY_NAME_PATTERN = Pattern.compile("^[\\w,\\s,\\.-/)/(]+$");
+    public static final Pattern DOCUMENT_NAME_PATTERN = Pattern.compile("^[\\w,\\s,\\.-/)/(]+\\.[A-Za-z]{1,5}");
 
     public static UserDocument createUserDocument(MultipartFile multipartFile,
                                                   String parentDirectoryHash,
@@ -29,7 +32,7 @@ public class UserFileUtil {
                                                   User user) throws IOException {
 
         UserDocument document = new UserDocument();
-        document.setName(multipartFile.getOriginalFilename());
+        document.setNameWithExtension(multipartFile.getOriginalFilename());
         document.setParentDirectoryHash(parentDirectoryHash);
         document.setDescription(description);
         document.setLastModifyTime(Calendar.getInstance().getTime());
@@ -120,5 +123,18 @@ public class UserFileUtil {
 
     public static void removeUserFiles(User user) {
 
+    }
+
+    public static boolean validateDocumentNameWithoutExtension(String documentName) {
+        return DIRECTORY_NAME_PATTERN.matcher(documentName).matches();
+    }
+
+    public static boolean validateDocumentName(String documentName) {
+        return DOCUMENT_NAME_PATTERN.matcher(documentName).matches();
+    }
+
+    public static boolean validateDirectoryName(String directoryName) {
+        boolean bool = DIRECTORY_NAME_PATTERN.matcher(directoryName).matches();
+        return bool;
     }
 }

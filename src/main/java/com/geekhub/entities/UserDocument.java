@@ -50,6 +50,9 @@ public class UserDocument implements Comparable<UserDocument> {
     private String name;
 
     @Column
+    private String extension;
+
+    @Column
     private String parentDirectoryHash;
 
     @Column
@@ -278,7 +281,26 @@ public class UserDocument implements Comparable<UserDocument> {
         this.abilityToComment = abilityToComment;
     }
 
+    public String getModifiedBy() {
+        return modifiedBy;
+    }
 
+    public void setModifiedBy(String modifiedBy) {
+        this.modifiedBy = modifiedBy;
+    }
+
+    public String getExtension() {
+        return extension;
+    }
+
+    public void setExtension(String extension) {
+        this.extension = extension;
+    }
+
+    public void setNameWithExtension(String name) {
+        this.name = name;
+        this.extension = name.substring(name.lastIndexOf("."));
+    }
 
     @Override
     public boolean equals(Object o) {

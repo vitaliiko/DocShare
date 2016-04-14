@@ -362,7 +362,8 @@ $(document).ready(function() {
         var dirCheckBox = $('.select-dir:visible:checked');
         if (docCheckBox.length == 1) {
             $.getJSON('/document/get_document', {docId: docCheckBox.val()}, function(document) {
-                $('#newFileName').val(document.name);
+                var docName = document.name;
+                $('#newFileName').val(docName.substring(0, docName.lastIndexOf('.')));
             });
         } else if (dirCheckBox.length == 1) {
             $.getJSON('/document/get_directory', {dirId: dirCheckBox.val()}, function(directory) {

@@ -139,7 +139,7 @@ public class DocumentController {
         User user = getUserFromSession(session);
         if (files != null && files.length > 0) {
             for (MultipartFile file : files) {
-                if (!file.isEmpty()) {
+                if (!file.isEmpty() && UserFileUtil.validateDocumentName(file.getOriginalFilename())) {
                     saveOrUpdateDocument(file, parentDirectoryHash, description, user);
                 }
             }
@@ -330,7 +330,7 @@ public class DocumentController {
         if (documentAccessProvider.isOwner(document, user)) {
             UserDocument documentWithNewName =
                     userDocumentService.getByFullNameAndOwner(user, document.getParentDirectoryHash(), newDocName);
-            if (documentWithNewName == null) {
+            if (documentWithNewName == null && UserFileUtil.validateDocumentNameWithoutExtension(newDocName)) {
                 String oldDocName = document.getName();
                 document.setName(newDocName);
                 userDocumentService.update(document);
@@ -352,7 +352,7 @@ public class DocumentController {
         if (directoryAccessProvider.isOwner(directory, user)) {
             UserDirectory directoryWithNewName =
                     userDirectoryService.getByFullNameAndOwner(user, directory.getParentDirectoryHash(), newDirName);
-            if (directoryWithNewName == null) {
+            if (directoryWithNewName == null && UserFileUtil.validateDirectoryName(newDirName)) {
                 String oldDirName = directory.getName();
                 directory.setName(newDirName);
                 userDirectoryService.update(directory);
@@ -536,7 +536,7 @@ public class DocumentController {
     private UserDirectory makeDirectory(User owner, String parentDirectoryHash, String dirName) {
         UserDirectory directory = userDirectoryService.getByFullNameAndOwner(owner, parentDirectoryHash, dirName);
 
-        if (directory == null) {
+        if (directory == null && UserFileUtil.validateDirectoryName(dirName)) {
             directory = UserFileUtil.createUserDirectory(owner, parentDirectoryHash, dirName);
             long dirId = userDirectoryService.save(directory);
             directory.setId(dirId);
