@@ -6,7 +6,6 @@ import com.geekhub.dto.RemovedFileDto;
 import com.geekhub.dto.UserDto;
 import com.geekhub.entities.Comment;
 import com.geekhub.entities.DocumentOldVersion;
-import com.geekhub.entities.RemovedDirectory;
 import com.geekhub.entities.RemovedDocument;
 import com.geekhub.entities.User;
 import com.geekhub.entities.UserDirectory;
@@ -42,7 +41,6 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -292,7 +290,7 @@ public class DocumentController {
         }
     }
 
-    @RequestMapping("/make-directory")
+    @RequestMapping(value = "/make-directory", method = RequestMethod.GET)
     public UserFileDto makeDir(String dirName, HttpSession session) {
         User owner = getUserFromSession(session);
         String parentDirectoryHash = (String) session.getAttribute("parentDirectoryHash");
@@ -303,7 +301,7 @@ public class DocumentController {
         return null;
     }
 
-    @RequestMapping("/get_document")
+    @RequestMapping(value = "/get_document", method = RequestMethod.GET)
     public UserFileDto getUserDocument(long docId, HttpSession session) {
         User user = getUserFromSession(session);
         UserDocument document = userDocumentService.getById(docId);
@@ -320,6 +318,50 @@ public class DocumentController {
         if (directoryAccessProvider.isOwner(directory, user)
                 && directory.getDocumentStatus() == DocumentStatus.ACTUAL) {
             return EntityToDtoConverter.convert(directory);
+        }
+        return null;
+    }
+
+    @RequestMapping(value = "/rename_document", method = RequestMethod.POST)
+    public UserFileDto renameDocument(Long docId, String newDocName, HttpSession session) {
+        UserDocument document = userDocumentService.getById(docId);
+        User user = getUserFromSession(session);
+
+        if (documentAccessProvider.isOwner(document, user)) {
+            UserDocument documentWithNewName =
+                    userDocumentService.getByFullNameAndOwner(user, document.getParentDirectoryHash(), newDocName);
+            if (documentWithNewName == null) {
+                String oldDocName = document.getName();
+                document.setName(newDocName);
+                userDocumentService.update(document);
+
+                sendRenameEvent(userDocumentService.getAllReadersAndEditors(docId), "document", oldDocName,
+                        newDocName, document.getId(), user);
+
+                return EntityToDtoConverter.convert(document);
+            }
+        }
+        return null;
+    }
+
+    @RequestMapping(value = "/rename_directory", method = RequestMethod.POST)
+    public UserFileDto renameDirectory(Long dirId, String newDirName, HttpSession session) {
+        UserDirectory directory = userDirectoryService.getById(dirId);
+        User user = getUserFromSession(session);
+
+        if (directoryAccessProvider.isOwner(directory, user)) {
+            UserDirectory directoryWithNewName =
+                    userDirectoryService.getByFullNameAndOwner(user, directory.getParentDirectoryHash(), newDirName);
+            if (directoryWithNewName == null) {
+                String oldDirName = directory.getName();
+                directory.setName(newDirName);
+                userDirectoryService.update(directory);
+
+                sendRenameEvent(userDirectoryService.getAllReaders(dirId), "directory", oldDirName,
+                        newDirName, directory.getId(), user);
+
+                return EntityToDtoConverter.convert(directory);
+            }
         }
         return null;
     }
@@ -492,7 +534,7 @@ public class DocumentController {
     }
 
     private UserDirectory makeDirectory(User owner, String parentDirectoryHash, String dirName) {
-        UserDirectory directory = userDirectoryService.getByFullNameAndOwnerId(owner, parentDirectoryHash, dirName);
+        UserDirectory directory = userDirectoryService.getByFullNameAndOwner(owner, parentDirectoryHash, dirName);
 
         if (directory == null) {
             directory = UserFileUtil.createUserDirectory(owner, parentDirectoryHash, dirName);
@@ -535,6 +577,20 @@ public class DocumentController {
                 ? ((UserDirectoryService) service).getAllReaders(fileId)
                 : ((UserDocumentService) service).getAllReadersAndEditors(fileId);
 
+        eventService.save(EventUtil.createEvents(readers, eventText, eventLinkText, eventLinkUrl, user));
+    }
+
+    private void sendRenameEvent(Set<User> readers, String fileType, String fileOldName,
+                                 String fileName, long fileId, User user) {
+
+        String eventText = "User " + user.getFullName() + " has renamed "
+                + fileType + " " + fileOldName + " to " + fileName;
+        String eventLinkText = null;
+        String eventLinkUrl = null;
+        if (fileType.toLowerCase().equals("document")) {
+            eventLinkText = "Browse";
+            eventLinkUrl = "/document/browse-" + fileId;
+        }
         eventService.save(EventUtil.createEvents(readers, eventText, eventLinkText, eventLinkUrl, user));
     }
 

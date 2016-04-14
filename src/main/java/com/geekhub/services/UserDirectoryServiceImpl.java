@@ -140,7 +140,7 @@ public class UserDirectoryServiceImpl implements UserDirectoryService {
     }
 
     @Override
-    public UserDirectory getByFullNameAndOwnerId(User owner, String parentDirectoryHash, String name) {
+    public UserDirectory getByFullNameAndOwner(User owner, String parentDirectoryHash, String name) {
         Map<String, Object> propertiesMap = UserFileUtil.createPropertiesMap(owner, parentDirectoryHash, name);
         return userDirectoryDao.get(propertiesMap);
     }

@@ -85,7 +85,8 @@
 
                     <button class="btn btn-default copy-btn action-btn">Copy</button>
 
-                    <button class="btn btn-default rename-btn action-btn single-selection">Rename</button>
+                    <button class="btn btn-default rename-btn action-btn single-selection"
+                            data-toggle="modal" data-target="#renameDialog">Rename</button>
 
                 </caption>
                 <tr class="table-head">
@@ -107,7 +108,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal">&times;</button>
-                <h4 class="modal-title">Removing</h4>
+                <h4 class="modal-title">Removal</h4>
             </div>
             <div class="modal-body">
                 <h4 id="delete-dialog-text"></h4>
@@ -204,27 +205,47 @@
         </div>
 
     </div>
+</div>
 
-    <div id="replaceDialog" class="modal fade" role="dialog">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal">&times;</button>
-                    <h4 class="modal-title">Replace document</h4>
-                </div>
-                <div class="modal-body">
-                    <p>Select directory in which document will be replace</p>
-                    <div id="dirTree">
+<div id="replaceDialog" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Replace document</h4>
+            </div>
+            <div class="modal-body">
+                <p>Select directory in which document will be replace</p>
+                <div id="dirTree">
 
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" id="makeDir" class="btn btn-default" data-dismiss="modal">Make dir</button>
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
                 </div>
             </div>
-
+            <div class="modal-footer">
+                <button type="button" id="makeDir" class="btn btn-default" data-dismiss="modal">Make dir</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+            </div>
         </div>
+
+    </div>
+</div>
+
+<div id="renameDialog" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Rename</h4>
+            </div>
+            <div class="modal-body">
+                <p>Input new name: </p>
+                <input type="text" id="newFileName" class="form-control group-name-input" autofocus="">
+            </div>
+            <div class="modal-footer">
+                <button type="button" id="renameFile" class="btn btn-default" data-dismiss="modal">OK</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+            </div>
+        </div>
+
     </div>
 </div>
 

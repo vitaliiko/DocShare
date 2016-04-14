@@ -356,4 +356,43 @@ $(document).ready(function() {
             });
         });
     });
+
+    $('.rename-btn').click(function() {
+        var docCheckBox = $('.select-doc:visible:checked');
+        var dirCheckBox = $('.select-dir:visible:checked');
+        if (docCheckBox.length == 1) {
+            $.getJSON('/document/get_document', {docId: docCheckBox.val()}, function(document) {
+                $('#newFileName').val(document.name);
+            });
+        } else if (dirCheckBox.length == 1) {
+            $.getJSON('/document/get_directory', {dirId: dirCheckBox.val()}, function(directory) {
+                $('#newFileName').val(directory.name);
+            });
+        }
+    });
+
+    $('#renameFile').click(function() {
+        var newName = $('#newFileName').val();
+        var docCheckBox = $('.select-doc:visible:checked');
+        var dirCheckBox = $('.select-dir:visible:checked');
+        if (docCheckBox.length == 1) {
+            $.post('/document/rename_document', {docId: docCheckBox.val(), newDocName: newName}, function(document) {
+                if (document !== undefined) {
+                    $('.doc-table')
+                        .find($('.tr-doc' + document.id))
+                        .find('.document-name')
+                        .html("<a href='/document/browse-'" + document.id + ">" + document.name + "</a>")
+                }
+            });
+        } else if (dirCheckBox.length == 1) {
+            $.post('/document/rename_directory', {dirId: dirCheckBox.val(), newDirName: newName}, function(directory) {
+                if (directory !== undefined) {
+                    $('.doc-table')
+                        .find($('.tr-dir' + directory.id))
+                        .find('.directory-name')
+                        .html("<a href='#' id='" + directory.hashName + "' class='get-dir-content'>" +directory.name + "</a>")
+                }
+            });
+        }
+    });
 });
