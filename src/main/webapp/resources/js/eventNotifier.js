@@ -1,6 +1,8 @@
 
 $(document).ready(function() {
 
+    var countLabel = $('#unreadEventsCount');
+
     checkUnreadEvents();
 
     setInterval(checkUnreadEvents, 5000);
@@ -11,7 +13,9 @@ $(document).ready(function() {
             type: 'GET',
             success: function(count) {
                 if (count > 0) {
-                    $('#unreadEventsCount').text(count);
+                    countLabel.text(count);
+                } else {
+                    countLabel.text('');
                 }
             }
         });

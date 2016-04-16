@@ -156,4 +156,12 @@ public class UserDocumentDao implements EntityDao<UserDocument, Long> {
                 .setParameter("status", DocumentStatus.ACTUAL)
                 .list();
     }
+
+    public List<UserDocument> search(User owner, String propertyName, String value) {
+        return sessionFactory.getCurrentSession()
+                .createCriteria(clazz)
+                .add(Restrictions.eq("owner", owner))
+                .add(Restrictions.like(propertyName, "%" + value + "%"))
+                .list();
+    }
 }

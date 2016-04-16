@@ -122,4 +122,12 @@ public class UserDirectoryDao implements EntityDao<UserDirectory, Long> {
                 .setParameter("status", DocumentStatus.ACTUAL)
                 .uniqueResult();
     }
+
+    public List<UserDirectory> search(User owner, String propertyName, String value) {
+        return sessionFactory.getCurrentSession()
+                .createCriteria(clazz)
+                .add(Restrictions.eq("owner", owner))
+                .add(Restrictions.like(propertyName, "%" + value + "%"))
+                .list();
+    }
 }

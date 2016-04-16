@@ -10,6 +10,10 @@
                 <li><a href="/main/search">Search Friends</a></li>
                 <li><a href="/profile/view">Profile</a></li>
                 <li><a href="/main/signOut">Sign Out</a></li>
+                <li>
+                    <input id="filesSearch" type="text" placeholder="Search files">
+                    <button type="button" id="searchButton" class="btn btn-default btn-sm">Search</button>
+                </li>
             </ul>
         </div>
     </nav>

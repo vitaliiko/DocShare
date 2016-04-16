@@ -14,6 +14,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -215,5 +216,13 @@ public class UserDirectoryServiceImpl implements UserDirectoryService {
     @Override
     public void replace(Long[] dirIds, String destinationDirectoryHash) {
         Arrays.stream(dirIds).forEach(id -> replace(id, destinationDirectoryHash));
+    }
+
+    @Override
+    public Set<UserDirectory> searchByName(User owner, String name) {
+        String[] names = name.split(" ");
+        Set<UserDirectory> directories = new TreeSet<>();
+        Arrays.stream(names).forEach(n -> directories.addAll(userDirectoryDao.search(owner, "name", n)));
+        return directories;
     }
 }

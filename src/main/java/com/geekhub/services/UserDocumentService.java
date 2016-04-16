@@ -60,4 +60,6 @@ public interface UserDocumentService extends EntityService<UserDocument, Long> {
     Integer getCountByFriendsGroup(FriendsGroup friendsGroup);
 
     List<UserDocument> getAllByOwner(User owner);
+
+    Set<UserDocument> searchByName(User owner, String name);
 }

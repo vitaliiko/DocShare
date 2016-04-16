@@ -342,6 +342,23 @@ $(document).ready(function() {
         });
     });
 
+    $('#searchButton').click(function() {
+        var searchName = $('#filesSearch').val();
+        $.getJSON('/document/search_files', {searchName: searchName}, function(files) {
+            var locationElement = $('#location');
+            var location = locationElement.text();
+            locationElement.text(location.substring(0, location.indexOf('/')));
+
+            dirHashName = files[0].parentDirectoryHash;
+            $('.back-link').prop('href', 'get-parent-directory-content-' + dirHashName);
+            $('.doc-table tr').not('.table-head').remove();
+
+            renderDirectories(files);
+            renderDocuments(files);
+            hideShowBackLink();
+        });
+    });
+
     function hideShowBackLink() {
         var location = $('#location').text();
         if (location.lastIndexOf('/') == -1) {

@@ -14,6 +14,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
 import org.hibernate.Hibernate;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -179,9 +180,6 @@ public class UserDocumentServiceImpl implements UserDocumentService {
         users.addAll(document.getEditors());
         document.getReadersGroups().forEach(g -> users.addAll(g.getFriends()));
         document.getEditorsGroups().forEach(g -> users.addAll(g.getFriends()));
-        if (document.getOwner() != null) {
-            users.add(document.getOwner());
-        }
         return users;
     }
 
@@ -262,5 +260,13 @@ public class UserDocumentServiceImpl implements UserDocumentService {
     @Override
     public void copy(Long[] docIds, String destinationDirectoryHash) {
         Arrays.stream(docIds).forEach(id -> copy(id, destinationDirectoryHash));
+    }
+
+    @Override
+    public Set<UserDocument> searchByName(User owner, String name) {
+        String[] names = name.split(" ");
+        Set<UserDocument> documents = new TreeSet<>();
+        Arrays.stream(names).forEach(n -> documents.addAll(userDocumentDao.search(owner, "name", n)));
+        return documents;
     }
 }

@@ -45,4 +45,6 @@ public interface UserDirectoryService extends EntityService<UserDirectory, Long>
     Set<UserDirectory> getActualByOwner(User owner);
 
     Long getCountByFriendsGroup(FriendsGroup friendsGroup);
+
+    Set<UserDirectory> searchByName(User owner, String name);
 }

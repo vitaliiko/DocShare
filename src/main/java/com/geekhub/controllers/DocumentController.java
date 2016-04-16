@@ -489,6 +489,27 @@ public class DocumentController {
         return null;
     }
 
+    @RequestMapping("/search_files")
+    public Set<UserFileDto> searchFiles(String searchName, HttpSession session) {
+        User user = getUserFromSession(session);
+        Set<UserDocument> documents = null;
+        Set<UserDirectory> directories = null;
+
+        if (searchName != null) {
+            documents = userDocumentService.searchByName(user, searchName);
+            directories = userDirectoryService.searchByName(user, searchName);
+        }
+
+        Set<UserFileDto> dtoSet = new TreeSet<>();
+        if (documents != null) {
+            documents.forEach(d -> dtoSet.add(EntityToDtoConverter.convert(d)));
+        }
+        if (directories != null) {
+            directories.forEach(d -> dtoSet.add(EntityToDtoConverter.convert(d)));
+        }
+        return dtoSet;
+    }
+
     @RequestMapping(value = "/replace_files", method = RequestMethod.POST)
     public void replaceFiles(@RequestParam(value = "docIds[]", required = false) Long[] docIds,
                              @RequestParam(value = "dirIds[]", required = false) Long[] dirIds,
@@ -543,14 +564,14 @@ public class DocumentController {
         documents = userDocumentService.getActualByParentDirectoryHash(directoryHashName);
         directories = userDirectoryService.getActualByParentDirectoryHash(directoryHashName);
 
-        Set<UserFileDto> dtoList = new TreeSet<>();
+        Set<UserFileDto> dtoSet = new TreeSet<>();
         if (documents != null) {
-            documents.forEach(d -> dtoList.add(EntityToDtoConverter.convert(d)));
+            documents.forEach(d -> dtoSet.add(EntityToDtoConverter.convert(d)));
         }
         if (directories != null) {
-            directories.forEach(d -> dtoList.add(EntityToDtoConverter.convert(d)));
+            directories.forEach(d -> dtoSet.add(EntityToDtoConverter.convert(d)));
         }
-        return dtoList;
+        return dtoSet;
     }
 
     private void saveOrUpdateDocument(MultipartFile multipartFile,
