@@ -15,6 +15,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import org.hibernate.Hibernate;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -241,5 +242,25 @@ public class UserDocumentServiceImpl implements UserDocumentService {
     @Override
     public void replace(Long[] docIds, String destinationDirectoryHash) {
         Arrays.stream(docIds).forEach(id -> replace(id, destinationDirectoryHash));
+    }
+
+    @Override
+    public void copy(Long docId, String destinationDirectoryHash) {
+        UserDocument document = userDocumentDao.getById(docId);
+        UserDocument copy = null;
+        BeanUtils.copyProperties(document, copy);
+        copy.setId(null);
+        copy.setParentDirectoryHash(destinationDirectoryHash);
+
+        String newHashName = UserFileUtil.createHashName();
+        UserFileUtil.copyFile(document.getHashName(), newHashName);
+        copy.setHashName(newHashName);
+
+        userDocumentDao.save(copy);
+    }
+
+    @Override
+    public void copy(Long[] docIds, String destinationDirectoryHash) {
+        Arrays.stream(docIds).forEach(id -> copy(id, destinationDirectoryHash));
     }
 }

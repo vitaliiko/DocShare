@@ -35,6 +35,19 @@ $(document).ready(function() {
         $(element).css('font-weight', 'bold');
     }
 
+    function saveSelectedFilesIds() {
+        $('.select-doc:visible:checked').each(function() {
+            var id = $(this).val();
+            docIds.push(id);
+            tableRows.push($('.tr-doc' + id));
+        });
+        $('.select-dir:visible:checked').each(function() {
+            var id = $(this).val();
+            dirIds.push(id);
+            tableRows.push($('.tr-dir' + id));
+        });
+    }
+
     changeTab();
     allTable.show(true);
     setSelectionStyle($('.all-href'));
@@ -304,6 +317,9 @@ $(document).ready(function() {
             renderDirectories(files);
             renderDocuments(files);
             hideShowBackLink();
+            if ($('.add-action-btn').is(':visible')) {
+                copyReplaceMode();
+            }
         });
     });
 
@@ -358,23 +374,19 @@ $(document).ready(function() {
     }
 
     $('.replace-btn').click(function() {
-        $('.select-doc:visible:checked').each(function() {
-            var id = $(this).val();
-            docIds.push(id);
-            tableRows.push($('.tr-doc' + id));
-        });
-        $('.select-dir:visible:checked').each(function() {
-            var id = $(this).val();
-            dirIds.push(id);
-            tableRows.push($('.tr-dir' + id));
-        });
+        saveSelectedFilesIds();
         makeBoxesUnchecked();
-        $(".select").attr("disabled", true);
-        $(".select-all").attr("disabled", true);
-        $('.table-btn').attr("disabled", true);
+        copyReplaceMode();
         $('.replace-message').show(true);
         $('.move-here-btn').show(true);
-        $('.cancel-btn').show(true);
+    });
+
+    $('.copy-btn').click(function() {
+        saveSelectedFilesIds();
+        makeBoxesUnchecked();
+        copyReplaceMode();
+        $('.copy-message').show(true);
+        $('.copy-here-btn').show(true);
     });
 
     $('.move-here-btn').click(function() {
@@ -383,20 +395,36 @@ $(document).ready(function() {
             type: 'POST',
             data: {'docIds[]': docIds, 'dirIds[]': dirIds, 'destinationDirectoryHash': dirHashName},
             success: function() {
-                $.each(tableRows, function(k, v) {
-                    //v.remove();
-                });
+                location.reload();
             }
         });
     });
+
+    $('.copy-here-btn').click(function() {
+        $.ajax({
+            url: '/document/copy_files',
+            type: 'POST',
+            data: {'docIds[]': docIds, 'dirIds[]': dirIds, 'destinationDirectoryHash': dirHashName},
+            success: function() {
+                location.reload();
+            }
+        });
+    });
+
+    function copyReplaceMode() {
+        $(".select").attr("disabled", true);
+        $(".select-all").attr("disabled", true);
+        $('.table-btn').attr("disabled", true);
+        $('.cancel-btn').show(true);
+    }
 
     $('.cancel-btn').click(function() {
         $(".select").attr("disabled", false);
         $(".select-all").attr("disabled", false);
         $('.table-btn').attr("disabled", false);
         $('.replace-message').hide(true);
-        $('.move-here-btn').hide(true);
-        $(this).hide(true);
+        $('.copy-message').hide(true);
+        $('.add-action-btn').hide();
     });
 
     $('.rename-btn').click(function() {

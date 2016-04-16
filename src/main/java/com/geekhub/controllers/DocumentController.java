@@ -490,10 +490,31 @@ public class DocumentController {
     }
 
     @RequestMapping(value = "/replace_files", method = RequestMethod.POST)
-    public void replace(@RequestParam(value = "docIds[]", required = false) Long[] docIds,
-                        @RequestParam(value = "dirIds[]", required = false) Long[] dirIds,
-                        String destinationDirectoryHash,
-                        HttpSession session) {
+    public void replaceFiles(@RequestParam(value = "docIds[]", required = false) Long[] docIds,
+                             @RequestParam(value = "dirIds[]", required = false) Long[] dirIds,
+                             String destinationDirectoryHash,
+                             HttpSession session) {
+
+        User user = getUserFromSession(session);
+        if (docIds != null && destinationDirectoryHash != null) {
+            Set<UserDocument> documents = userDocumentService.getByIds(Arrays.asList(docIds));
+            if (documentAccessProvider.isOwner(documents, user)) {
+                userDocumentService.replace(docIds, destinationDirectoryHash);
+            }
+        }
+        if (dirIds != null && destinationDirectoryHash != null) {
+            Set<UserDirectory> directories = userDirectoryService.getByIds(Arrays.asList(dirIds));
+            if (directoryAccessProvider.canRemove(directories, user)) {
+                userDirectoryService.replace(dirIds, destinationDirectoryHash);
+            }
+        }
+    }
+
+    @RequestMapping(value = "/copy_files", method = RequestMethod.POST)
+    public void copyFiles(@RequestParam(value = "docIds[]", required = false) Long[] docIds,
+                          @RequestParam(value = "dirIds[]", required = false) Long[] dirIds,
+                          String destinationDirectoryHash,
+                          HttpSession session) {
 
         User user = getUserFromSession(session);
         if (docIds != null && destinationDirectoryHash != null) {

@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 import org.apache.commons.codec.digest.DigestUtils;
+import org.springframework.util.FileCopyUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -124,11 +125,18 @@ public class UserFileUtil {
         return propertiesMap;
     }
 
+    public static void copyFile(String originalFileName, String copiedFileName) {
+        try {
+            File originalFile = new File(ROOT_LOCATION + originalFileName + SYSTEM_EXTENSION);
+            File copiedFile = new File(ROOT_LOCATION + copiedFileName + SYSTEM_EXTENSION);
+            FileCopyUtils.copy(originalFile, copiedFile);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     public static void removeUserFiles(List<String> filesNames) {
-        filesNames.forEach(f -> {
-            File file = new File(ROOT_LOCATION + f + SYSTEM_EXTENSION);
-            file.delete();
-        });
+        filesNames.forEach(f -> new File(ROOT_LOCATION + f + SYSTEM_EXTENSION).delete());
     }
 
     public static boolean validateDocumentNameWithoutExtension(String documentName) {
