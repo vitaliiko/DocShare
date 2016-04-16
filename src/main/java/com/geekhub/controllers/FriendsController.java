@@ -7,6 +7,8 @@ import com.geekhub.entities.User;
 import com.geekhub.dto.FriendsGroupDto;
 import com.geekhub.services.EventService;
 import com.geekhub.services.FriendsGroupService;
+import com.geekhub.services.UserDirectoryService;
+import com.geekhub.services.UserDocumentService;
 import com.geekhub.services.UserService;
 import com.geekhub.dto.convertors.EntityToDtoConverter;
 import com.geekhub.utils.EventUtil;
@@ -41,6 +43,12 @@ public class FriendsController {
 
     @Autowired
     private EventService eventService;
+
+    @Autowired
+    private UserDocumentService userDocumentService;
+
+    @Autowired
+    private UserDirectoryService userDirectoryService;
 
     private User getUserFromSession(HttpSession session) {
         return userService.getById((Long) session.getAttribute("userId"));
@@ -92,12 +100,36 @@ public class FriendsController {
 
         User user = getUserFromSession(session);
         FriendsGroup group = friendsGroupService.getById(groupId);
+
         if (group != null && group.getOwner().equals(user)) {
+            Set<User> membersSet = group.getFriends();
+            Set<User> newMembersSet = null;
             group.setName(groupName);
             if (friends != null) {
-                group.setFriends(userService.getSetByIds(friends));
+                newMembersSet = userService.getSetByIds(friends);
+                group.setFriends(newMembersSet);
             }
             friendsGroupService.update(group);
+
+            long documentsCount = Long.valueOf(userDocumentService.getCountByFriendsGroup(group));
+            long directoriesCount = userDirectoryService.getCountByFriendsGroup(group);
+            if (documentsCount != 0 || directoriesCount != 0) {
+                String filesCount = "";
+                if (documentsCount != 0) {
+                    filesCount += documentsCount + " documents";
+                }
+                if (directoriesCount != 0 && documentsCount != 0) {
+                    filesCount += " and ";
+                }
+                if (directoriesCount != 0) {
+                    filesCount += directoriesCount + " directories";
+                }
+                if (newMembersSet != null) {
+                    newMembersSet.removeAll(membersSet);
+                    String eventText = "User " + user.getFullName() + " has shared " + filesCount;
+                    eventService.save(EventUtil.createEvent(newMembersSet, eventText, user));
+                }
+            }
         }
     }
 
@@ -160,7 +192,12 @@ public class FriendsController {
     @RequestMapping("/delete_friend")
     @ResponseStatus(HttpStatus.OK)
     public void deleteFriend(Long friendId, HttpSession session) {
-        userService.deleteFriend((Long) session.getAttribute("userId"), friendId);
+        User user = userService.getById((Long) session.getAttribute("userId"));
+        User friend = userService.getById(friendId);
+        userService.deleteFriend(user.getId(), friend.getId());
+
+        String eventText = "User " + user.getFullName() + " removed you from friends.";
+        eventService.save(EventUtil.createEvent(friend, eventText, user));
     }
 
     @RequestMapping("/delete_group")

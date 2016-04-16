@@ -1,5 +1,6 @@
 package com.geekhub.services;
 
+import com.geekhub.entities.FriendsGroup;
 import com.geekhub.entities.RemovedDirectory;
 import com.geekhub.entities.User;
 import com.geekhub.entities.UserDirectory;
@@ -38,4 +39,6 @@ public interface UserDirectoryService extends EntityService<UserDirectory, Long>
     String getLocation(UserDirectory directory);
 
     Set<UserDirectory> getActualByOwner(User owner);
+
+    Long getCountByFriendsGroup(FriendsGroup friendsGroup);
 }

@@ -1,9 +1,12 @@
 package com.geekhub.dao;
 
+import com.geekhub.entities.FriendsGroup;
 import com.geekhub.entities.User;
 import com.geekhub.entities.UserDirectory;
+import com.geekhub.entities.enums.DocumentStatus;
 import java.util.List;
 import java.util.Map;
+import org.hibernate.Criteria;
 import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
@@ -108,6 +111,15 @@ public class UserDirectoryDao implements EntityDao<UserDirectory, Long> {
         return (UserDirectory) sessionFactory.getCurrentSession()
                 .createCriteria(clazz)
                 .add(Restrictions.allEq(propertiesMap))
+                .uniqueResult();
+    }
+
+    public Long getCountByReadersGroup(FriendsGroup readersGroup) {
+        return (Long) sessionFactory.getCurrentSession()
+                .createQuery("select count(*) from UserDirectory dir " +
+                        "where dir.documentStatus = :status and :readersGroup in elements(dir.readersGroups)")
+                .setParameter("readersGroup", readersGroup)
+                .setParameter("status", DocumentStatus.ACTUAL)
                 .uniqueResult();
     }
 }

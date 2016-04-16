@@ -123,7 +123,11 @@ public class UserServiceImpl implements UserService {
     public void deleteFriend(Long userId, Long friendId) {
         User user = userDao.getById(userId);
         User friend = userDao.getById(friendId);
+
         user.getFriends().remove(friend);
+        userDao.update(user);
+
+        friend.getFriends().remove(user);
         userDao.update(user);
     }
 

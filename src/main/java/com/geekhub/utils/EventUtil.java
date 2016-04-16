@@ -34,15 +34,15 @@ public class EventUtil {
         return createEvent(null, recipient, text, null, null, sender);
     }
 
-    public static List<Event> createEvents(Set<User> recipients, String text, String linkText,
-                                           String linkUtl, User sender) {
+    public static List<Event> createEvent(Set<User> recipients, String text, String linkText,
+                                          String linkUtl, User sender) {
 
         List<Event> events = new ArrayList<>();
         recipients.forEach(r -> events.add(createEvent(null, r, text, linkText, linkUtl, sender)));
         return events;
     }
 
-    public static List<Event> createEvents(Set<User> recipients, String text, User sender) {
+    public static List<Event> createEvent(Set<User> recipients, String text, User sender) {
         List<Event> events = new ArrayList<>();
         recipients.forEach(r -> events.add(createEvent(null, r, text, null, null, sender)));
         return events;

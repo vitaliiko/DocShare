@@ -1,11 +1,11 @@
 package com.geekhub.services;
 
 import com.geekhub.dao.UserDirectoryDao;
+import com.geekhub.entities.FriendsGroup;
 import com.geekhub.entities.RemovedDirectory;
 import com.geekhub.entities.User;
 import com.geekhub.entities.UserDirectory;
 import com.geekhub.entities.UserDocument;
-import com.geekhub.entities.enums.DocumentAttribute;
 import com.geekhub.entities.enums.DocumentStatus;
 import com.geekhub.utils.UserFileUtil;
 import java.util.Arrays;
@@ -198,5 +198,10 @@ public class UserDirectoryServiceImpl implements UserDirectoryService {
     @Override
     public Set<UserDirectory> getActualByOwner(User owner) {
         return new HashSet<>(userDirectoryDao.getList(owner, "documentAttribute", DocumentStatus.ACTUAL));
+    }
+
+    @Override
+    public Long getCountByFriendsGroup(FriendsGroup friendsGroup) {
+        return userDirectoryDao.getCountByReadersGroup(friendsGroup);
     }
 }

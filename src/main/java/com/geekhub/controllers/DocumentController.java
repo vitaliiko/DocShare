@@ -560,7 +560,7 @@ public class DocumentController {
         String eventLinkUrl = "/document/browse-" + document.getId();
 
         Set<User> readers = userDocumentService.getAllReadersAndEditors(document.getId());
-        eventService.save(EventUtil.createEvents(readers, eventText, eventLinkText, eventLinkUrl, user));
+        eventService.save(EventUtil.createEvent(readers, eventText, eventLinkText, eventLinkUrl, user));
     }
 
     private <T, S extends EntityService<T, Long>> void sendRemoveEvent(S service, String fileType, String fileName,
@@ -570,7 +570,7 @@ public class DocumentController {
         Set<User> readers = service instanceof UserDirectoryService
                 ? ((UserDirectoryService) service).getAllReaders(fileId)
                 : ((UserDocumentService) service).getAllReadersAndEditors(fileId);
-        eventService.save(EventUtil.createEvents(readers, eventText, user));
+        eventService.save(EventUtil.createEvent(readers, eventText, user));
     }
 
     private <T, S extends EntityService<T, Long>> void sendRecoverEvent(S service, String fileType, String fileName,
@@ -587,7 +587,7 @@ public class DocumentController {
                 ? ((UserDirectoryService) service).getAllReaders(fileId)
                 : ((UserDocumentService) service).getAllReadersAndEditors(fileId);
 
-        eventService.save(EventUtil.createEvents(readers, eventText, eventLinkText, eventLinkUrl, user));
+        eventService.save(EventUtil.createEvent(readers, eventText, eventLinkText, eventLinkUrl, user));
     }
 
     private void sendRenameEvent(Set<User> readers, String fileType, String fileOldName,
@@ -601,7 +601,7 @@ public class DocumentController {
             eventLinkText = "Browse";
             eventLinkUrl = "/document/browse-" + fileId;
         }
-        eventService.save(EventUtil.createEvents(readers, eventText, eventLinkText, eventLinkUrl, user));
+        eventService.save(EventUtil.createEvent(readers, eventText, eventLinkText, eventLinkUrl, user));
     }
 
     private void sendShareEvent(Set<User> readers, String fileType, String fileName, long fileId, User user) {
@@ -612,11 +612,11 @@ public class DocumentController {
             eventLinkText = "Browse";
             eventLinkUrl = "/document/browse-" + fileId;
         }
-        eventService.save(EventUtil.createEvents(readers, eventText, eventLinkText, eventLinkUrl, user));
+        eventService.save(EventUtil.createEvent(readers, eventText, eventLinkText, eventLinkUrl, user));
     }
 
     private void sendProhibitAccessEvent(Set<User> readers, String fileType, String fileName, User user) {
         String eventText = "User " + user.getFullName() + " has prohibited access to " + fileType + " " + fileName;
-        eventService.save(EventUtil.createEvents(readers, eventText, user));
+        eventService.save(EventUtil.createEvent(readers, eventText, user));
     }
 }

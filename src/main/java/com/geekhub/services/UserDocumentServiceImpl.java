@@ -218,4 +218,12 @@ public class UserDocumentServiceImpl implements UserDocumentService {
     public Set<UserDocument> getAllByOwnerAndAttribute(User owner, DocumentAttribute attribute) {
         return new HashSet<>(userDocumentDao.getList(owner, "documentAttribute", attribute));
     }
+
+    @Override
+    public Integer getCountByFriendsGroup(FriendsGroup friendsGroup) {
+        Set<UserDocument> documents = new HashSet<>();
+        documents.addAll(userDocumentDao.getByEditorsGroup(friendsGroup));
+        documents.addAll(userDocumentDao.getByReadersGroup(friendsGroup));
+        return documents.size();
+    }
 }
