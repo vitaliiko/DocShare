@@ -24,8 +24,8 @@ public class UserFileUtil {
 
     public static final String ROOT_LOCATION = "C:\\spring_docs\\";
     public static final String SYSTEM_EXTENSION = ".curva";
-    public static final Pattern DIRECTORY_NAME_PATTERN = Pattern.compile("^[\\w,\\s,\\.-/)/(]+$");
-    public static final Pattern DOCUMENT_NAME_PATTERN = Pattern.compile("^[\\w,\\s,\\.-/)/(]+\\.[A-Za-z]{1,5}");
+    public static final Pattern DIRECTORY_NAME_PATTERN = Pattern.compile("^[\\w,\\s,\\.\\-/)/(]+$");
+    public static final Pattern DOCUMENT_NAME_PATTERN = Pattern.compile("^[\\w,\\s,\\.\\-/)/(]+\\.[A-Za-z0-9]{1,5}");
 
     public static UserDocument createUserDocument(MultipartFile multipartFile,
                                                   String parentDirectoryHash,
@@ -47,13 +47,15 @@ public class UserFileUtil {
 
     public static UserDocument updateUserDocument(UserDocument document,
                                                   MultipartFile multipartFile,
-                                                  String description) throws IOException {
+                                                  String description,
+                                                  User user) throws IOException {
 
         if (description != null && !description.isEmpty()) {
             document.setDescription(description);
         }
         String hashName = UserFileUtil.createHashName();
         document.setLastModifyTime(Calendar.getInstance().getTime());
+        document.setModifiedBy(user.getFullName());
         document.setSize(convertSize(multipartFile.getSize()));
         document.setHashName(hashName);
         multipartFile.transferTo(UserFileUtil.createFile(hashName));

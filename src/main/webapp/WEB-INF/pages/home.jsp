@@ -72,7 +72,9 @@
         <c:forEach items="${tableNames}" var="tableName">
             <table class="table table-hover tbody tr:hover td doc-table ${tableName}">
                 <caption>
-                    <h3></h3>
+                    <h4 class="replace-message" hidden>Choose the folder in which you want to move files</h4>
+                    <h4 class="copy-message" hidden>Choose the folder in which you want to copy files</h4>
+
                     <a href="#" class="switch-btn all-href">All &nbsp</a>
                     <a href="#" class="switch-btn public-href">Public &nbsp</a>
                     <a href="#" class="switch-btn for-friends-href">For Friends &nbsp</a>
@@ -81,13 +83,16 @@
                     <button class="btn btn-default delete-btn action-btn"
                             data-toggle="modal" data-target="#deleteDialog">Delete</button>
 
-                    <button class="btn btn-default replace-btn action-btn"
-                            data-toggle="modal" data-target="#replaceDialog">Replace</button>
+                    <button class="btn btn-default replace-btn action-btn">Replace</button>
 
                     <button class="btn btn-default copy-btn action-btn">Copy</button>
 
                     <button class="btn btn-default rename-btn action-btn single-selection"
                             data-toggle="modal" data-target="#renameDialog">Rename</button>
+
+                    <button class="btn btn-default add-action-btn move-here-btn">Move here</button>
+                    <button class="btn btn-default add-action-btn copy-here-btn">Copy here</button>
+                    <button class="btn btn-default add-action-btn cancel-btn">Cancel</button>
 
                 </caption>
                 <tr class="table-head">

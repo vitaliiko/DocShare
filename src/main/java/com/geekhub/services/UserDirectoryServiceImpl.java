@@ -204,4 +204,16 @@ public class UserDirectoryServiceImpl implements UserDirectoryService {
     public Long getCountByFriendsGroup(FriendsGroup friendsGroup) {
         return userDirectoryDao.getCountByReadersGroup(friendsGroup);
     }
+
+    @Override
+    public void replace(Long dirId, String destinationDirectoryHash) {
+        UserDirectory directory = userDirectoryDao.getById(dirId);
+        directory.setParentDirectoryHash(destinationDirectoryHash);
+        userDirectoryDao.update(directory);
+    }
+
+    @Override
+    public void replace(Long[] dirIds, String destinationDirectoryHash) {
+        Arrays.stream(dirIds).forEach(id -> replace(id, destinationDirectoryHash));
+    }
 }

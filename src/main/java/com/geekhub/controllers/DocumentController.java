@@ -457,9 +457,8 @@ public class DocumentController {
     @RequestMapping("/accessible-documents")
     public ModelAndView getAccessibleDocuments(HttpSession session) {
         User user = getUserFromSession(session);
-        Set<UserDocument> documents = userDocumentService.getAllCanRead(user);
         Set<UserFileDto> documentDtos = new TreeSet<>();
-        documents.forEach(d -> documentDtos.add(EntityToDtoConverter.convert(d)));
+        userDocumentService.getAllCanRead(user).forEach(d -> documentDtos.add(EntityToDtoConverter.convert(d)));
         ModelAndView model = new ModelAndView("accessibleDocuments");
         model.addObject("documents", documentDtos);
         return model;
@@ -488,6 +487,27 @@ public class DocumentController {
             return getDirectoryContent(currentDirectory.getParentDirectoryHash());
         }
         return null;
+    }
+
+    @RequestMapping(value = "/replace_files", method = RequestMethod.POST)
+    public void replace(@RequestParam(value = "docIds[]", required = false) Long[] docIds,
+                        @RequestParam(value = "dirIds[]", required = false) Long[] dirIds,
+                        String destinationDirectoryHash,
+                        HttpSession session) {
+
+        User user = getUserFromSession(session);
+        if (docIds != null && destinationDirectoryHash != null) {
+            Set<UserDocument> documents = userDocumentService.getByIds(Arrays.asList(docIds));
+            if (documentAccessProvider.isOwner(documents, user)) {
+                userDocumentService.replace(docIds, destinationDirectoryHash);
+            }
+        }
+        if (dirIds != null && destinationDirectoryHash != null) {
+            Set<UserDirectory> directories = userDirectoryService.getByIds(Arrays.asList(dirIds));
+            if (directoryAccessProvider.canRemove(directories, user)) {
+                userDirectoryService.replace(dirIds, destinationDirectoryHash);
+            }
+        }
     }
 
     private <T, S extends EntityService<T, Long>> Set<T> createEntitySet(long[] ids, S service) {
@@ -537,9 +557,9 @@ public class DocumentController {
 
     private void updateDocument(UserDocument document, User user, String description, MultipartFile multipartFile)
             throws IOException {
-        DocumentOldVersion oldVersion = DocumentVersionUtil.saveOldVersion(document, "Changed by " + user.getFullName());
+        DocumentOldVersion oldVersion = DocumentVersionUtil.createOldVersion(document);
         document.getDocumentOldVersions().add(oldVersion);
-        userDocumentService.update(UserFileUtil.updateUserDocument(document, multipartFile, description));
+        userDocumentService.update(UserFileUtil.updateUserDocument(document, multipartFile, description, user));
         sendUpdateEvent(document, user);
     }
 

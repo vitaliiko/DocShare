@@ -1,6 +1,7 @@
 package com.geekhub.security;
 
 import com.geekhub.entities.User;
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
@@ -10,7 +11,7 @@ public interface UserFileAccessProvider<T, R> {
 
     boolean isOwner(Long fileId, User user);
 
-    boolean isOwner(List<T> files, User user);
+    boolean isOwner(Collection<T> files, User user);
 
     boolean canRead(T file, User user);
 

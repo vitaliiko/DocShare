@@ -29,7 +29,7 @@ public class EntityToDtoConverter {
         DocumentOldVersionDto oldVersionDto = new DocumentOldVersionDto();
         oldVersionDto.setId(oldVersion.getId());
         oldVersionDto.setName(oldVersion.getUserDocument().getName());
-        oldVersionDto.setChangedBy(oldVersion.getChangedBy());
+        oldVersionDto.setChangedBy(oldVersion.getModifiedBy());
         oldVersionDto.setLastModifyTime(oldVersion.getUserDocument().getLastModifyTime());
         oldVersionDto.setSize(oldVersion.getUserDocument().getSize());
         return oldVersionDto;

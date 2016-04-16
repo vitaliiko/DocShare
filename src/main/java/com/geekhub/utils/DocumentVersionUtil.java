@@ -6,13 +6,13 @@ import java.io.IOException;
 
 public class DocumentVersionUtil {
 
-    public static DocumentOldVersion saveOldVersion(UserDocument document, String description) throws IOException {
+    public static DocumentOldVersion createOldVersion(UserDocument document) throws IOException {
         DocumentOldVersion oldVersion = new DocumentOldVersion();
-        oldVersion.setChangedBy(description);
+        oldVersion.setModifiedBy(document.getModifiedBy());
         oldVersion.setName(document.getName());
         oldVersion.setSize(document.getSize());
         oldVersion.setHashName(document.getHashName());
-        oldVersion.setLastModifyDate(document.getLastModifyTime());
+        oldVersion.setLastModifyTime(document.getLastModifyTime());
         return oldVersion;
     }
 }

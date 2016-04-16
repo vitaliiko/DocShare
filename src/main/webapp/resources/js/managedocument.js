@@ -39,6 +39,7 @@ $(document).ready(function() {
     allTable.show(true);
     setSelectionStyle($('.all-href'));
     backLink.hide();
+    $('.add-action-btn').hide();
     $.getJSON('/document/get-directory-content-root', function(files) {
         renderDirectories(files);
         renderDocuments(files);
@@ -357,11 +358,45 @@ $(document).ready(function() {
     }
 
     $('.replace-btn').click(function() {
-        $.getJSON('/document/get_directories_names', function(directoriesMap) {
-            $.each(directoriesMap, function(k, v) {
-                $('#dirTree').append(k);
-            });
+        $('.select-doc:visible:checked').each(function() {
+            var id = $(this).val();
+            docIds.push(id);
+            tableRows.push($('.tr-doc' + id));
         });
+        $('.select-dir:visible:checked').each(function() {
+            var id = $(this).val();
+            dirIds.push(id);
+            tableRows.push($('.tr-dir' + id));
+        });
+        makeBoxesUnchecked();
+        $(".select").attr("disabled", true);
+        $(".select-all").attr("disabled", true);
+        $('.table-btn').attr("disabled", true);
+        $('.replace-message').show(true);
+        $('.move-here-btn').show(true);
+        $('.cancel-btn').show(true);
+    });
+
+    $('.move-here-btn').click(function() {
+        $.ajax({
+            url: '/document/replace_files',
+            type: 'POST',
+            data: {'docIds[]': docIds, 'dirIds[]': dirIds, 'destinationDirectoryHash': dirHashName},
+            success: function() {
+                $.each(tableRows, function(k, v) {
+                    //v.remove();
+                });
+            }
+        });
+    });
+
+    $('.cancel-btn').click(function() {
+        $(".select").attr("disabled", false);
+        $(".select-all").attr("disabled", false);
+        $('.table-btn').attr("disabled", false);
+        $('.replace-message').hide(true);
+        $('.move-here-btn').hide(true);
+        $(this).hide(true);
     });
 
     $('.rename-btn').click(function() {

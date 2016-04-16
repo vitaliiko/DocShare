@@ -14,7 +14,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeSet;
 import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -230,5 +229,17 @@ public class UserDocumentServiceImpl implements UserDocumentService {
     @Override
     public List<UserDocument> getAllByOwner(User owner) {
         return userDocumentDao.getList("owner", owner);
+    }
+
+    @Override
+    public void replace(Long docId, String destinationDirectoryHash) {
+        UserDocument document = userDocumentDao.getById(docId);
+        document.setParentDirectoryHash(destinationDirectoryHash);
+        userDocumentDao.update(document);
+    }
+
+    @Override
+    public void replace(Long[] docIds, String destinationDirectoryHash) {
+        Arrays.stream(docIds).forEach(id -> replace(id, destinationDirectoryHash));
     }
 }

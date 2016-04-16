@@ -20,6 +20,10 @@ public interface UserDirectoryService extends EntityService<UserDirectory, Long>
 
     void moveToTrash(Long[] dirIds, Long removerId);
 
+    void replace(Long dirId, String destinationDirectoryHash);
+
+    void replace(Long[] dirIds, String destinationDirectoryHash);
+
     Long recover(Long removedDirId);
 
     void recover(Long[] removedDirIds);

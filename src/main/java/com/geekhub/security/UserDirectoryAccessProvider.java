@@ -9,6 +9,7 @@ import com.geekhub.entities.enums.DocumentStatus;
 import com.geekhub.services.RemovedDirectoryService;
 import com.geekhub.services.UserDirectoryService;
 import com.geekhub.services.UserService;
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -77,7 +78,7 @@ public class UserDirectoryAccessProvider implements UserFileAccessProvider<UserD
     }
 
     @Override
-    public boolean isOwner(List<UserDirectory> files, User user) {
+    public boolean isOwner(Collection<UserDirectory> files, User user) {
         if (files != null && files.size() > 0) {
             for (UserDirectory file : files) {
                 if (!isOwner(file, user)) {

@@ -27,10 +27,10 @@ public class DocumentOldVersion {
     private String size;
     
     @Column
-    private Date lastModifyDate;
+    private Date lastModifyTime;
 
     @Column
-    private String changedBy;
+    private String modifiedBy;
 
     @ManyToOne
     @JoinColumn(name = "userdocument_id")
@@ -52,12 +52,12 @@ public class DocumentOldVersion {
         this.userDocument = userDocument;
     }
 
-    public String getChangedBy() {
-        return changedBy;
+    public String getModifiedBy() {
+        return modifiedBy;
     }
 
-    public void setChangedBy(String changedBy) {
-        this.changedBy = changedBy;
+    public void setModifiedBy(String changedBy) {
+        this.modifiedBy = changedBy;
     }
 
     public String getSize() {
@@ -68,12 +68,12 @@ public class DocumentOldVersion {
         this.size = size;
     }
 
-    public Date getLastModifyDate() {
-        return lastModifyDate;
+    public Date getLastModifyTime() {
+        return lastModifyTime;
     }
 
-    public void setLastModifyDate(Date lastModifyDate) {
-        this.lastModifyDate = lastModifyDate;
+    public void setLastModifyTime(Date lastModifyDate) {
+        this.lastModifyTime = lastModifyDate;
     }
 
     public String getName() {
@@ -101,7 +101,7 @@ public class DocumentOldVersion {
 
         return id != null ? id.equals(that.id) : that.id == null
                 && (userDocument != null ? userDocument.equals(that.userDocument) : that.userDocument == null
-                && (changedBy != null ? changedBy.equals(that.changedBy) : that.changedBy == null));
+                && (modifiedBy != null ? modifiedBy.equals(that.modifiedBy) : that.modifiedBy == null));
 
     }
 
@@ -109,7 +109,7 @@ public class DocumentOldVersion {
     public int hashCode() {
         int result = id != null ? id.hashCode() : 0;
         result = 31 * result + (userDocument != null ? userDocument.hashCode() : 0);
-        result = 31 * result + (changedBy != null ? changedBy.hashCode() : 0);
+        result = 31 * result + (modifiedBy != null ? modifiedBy.hashCode() : 0);
         return result;
     }
 }

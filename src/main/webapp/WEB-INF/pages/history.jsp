@@ -18,7 +18,6 @@
             <th id="file-name">File Name</th>
             <th>Size</th>
             <th>Changed</th>
-            <th>Description</th>
             <th width="15"></th>
             <th width="15"></th>
         </tr>
@@ -26,8 +25,10 @@
             <tr>
                 <td>${doc.name}</td>
                 <td>${doc.size}</td>
-                <td><fmt:formatDate type="date" timeStyle="short" dateStyle="short" value="${doc.lastModifyTime}"/></td>
-                <td>${doc.changedBy}</td>
+                <td>
+                    <fmt:formatDate type="date" timeStyle="short" dateStyle="short" value="${doc.lastModifyTime}"/>
+                     by ${doc.changedBy}
+                </td>
                 <td><a href="<c:url value='/document/version-recover-${doc.id}' />"
                        class="btn btn-primary custom-width">Recover</a></td>
                 <td><a href="<c:url value='/document/download-${doc.id}' />"
