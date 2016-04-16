@@ -11,7 +11,7 @@ public interface EventService extends EntityService<Event, Long> {
 
     void save(List<Event> events);
 
-    List<Event> getUnread(User recipient);
+    Long getUnreadCount(User recipient);
 
     void setReadStatus(Collection<Event> events);
 

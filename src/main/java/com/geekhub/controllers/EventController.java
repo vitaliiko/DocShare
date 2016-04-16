@@ -12,6 +12,7 @@ import java.util.TreeSet;
 import javax.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -45,5 +46,11 @@ public class EventController {
     public ModelAndView clearEventsHistory(HttpSession session) {
         userService.clearEvents((Long) session.getAttribute("userId"));
         return new ModelAndView("events", "message" , "You have not events yet");
+    }
+
+    @RequestMapping(value = "/get_unread_events_count", method = RequestMethod.GET)
+    public long getUnreadEventsCount(HttpSession session) {
+        User user = userService.getById((Long) session.getAttribute("userId"));
+        return eventService.getUnreadCount(user);
     }
 }

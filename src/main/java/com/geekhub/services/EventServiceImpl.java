@@ -58,8 +58,8 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
-    public List<Event> getUnread(User recipient) {
-        return eventDao.getList(recipient, "eventStatus", EventStatus.UNREAD);
+    public Long getUnreadCount(User recipient) {
+        return eventDao.getCount(recipient, "eventStatus", EventStatus.UNREAD);
     }
 
     @Override

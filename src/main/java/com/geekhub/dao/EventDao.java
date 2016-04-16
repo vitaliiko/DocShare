@@ -5,6 +5,8 @@ import com.geekhub.entities.User;
 import java.util.List;
 import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Order;
+import org.hibernate.criterion.Projection;
+import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -52,6 +54,15 @@ public class EventDao implements EntityDao<Event, Long> {
                 .add(Restrictions.eq("recipient", recipient))
                 .add(Restrictions.eq(propertyName, value))
                 .list();
+    }
+
+    public Long getCount(User recipient, String propertyName, Object value) {
+        return (Long) sessionFactory.getCurrentSession()
+                .createCriteria(clazz)
+                .add(Restrictions.eq("recipient", recipient))
+                .add(Restrictions.eq(propertyName, value))
+                .setProjection(Projections.rowCount())
+                .uniqueResult();
     }
 
     @Override

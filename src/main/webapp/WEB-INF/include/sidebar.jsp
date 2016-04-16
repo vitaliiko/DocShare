@@ -1,5 +1,6 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <html>
+<script src="${pageContext.request.contextPath}/resources/js/eventNotifier.js"></script>
 <div id="sidebar-wrapper">
     <ul class="sidebar-nav nav-pills nav-stacked" id="menu">
         <li>
@@ -24,7 +25,7 @@
             <a href="/event/browse">
             <span class="fa-stack fa-lg pull-left">
                 <i class="fa fa-cart-plus fa-stack-1x "></i>
-            </span>Events</a>
+            </span>Events<label id="unreadEventsCount"></label></a>
         </li>
         <li>
             <a href="/document/recover">
