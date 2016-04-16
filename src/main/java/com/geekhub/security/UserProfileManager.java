@@ -4,9 +4,12 @@ import com.geekhub.dto.RegistrationInfo;
 import com.geekhub.dto.UserDto;
 import com.geekhub.entities.User;
 import com.geekhub.exceptions.UserValidateException;
+import com.geekhub.services.UserDocumentService;
 import com.geekhub.services.UserService;
 import com.geekhub.dto.convertors.DtoToEntityConverter;
 import com.geekhub.utils.UserFileUtil;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Pattern;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +26,9 @@ public class UserProfileManager {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private UserDocumentService userDocumentService;
 
     public void registerNewUser(RegistrationInfo regInfo) throws UserValidateException {
         if (regInfo != null) {
@@ -118,11 +124,15 @@ public class UserProfileManager {
         }
     }
 
-    public void removeAccount(User user) {
+    public boolean removeAccount(User user) {
         if (user != null) {
             userService.removeFromFriends(user);
-            UserFileUtil.removeUserFiles(user);
+            List<String> filesHashNames = new ArrayList<>();
+            userDocumentService.getAllByOwner(user).forEach(d -> filesHashNames.add(d.getHashName()));
             userService.delete(user);
+                UserFileUtil.removeUserFiles(filesHashNames);
+                return true;
         }
+        return false;
     }
 }

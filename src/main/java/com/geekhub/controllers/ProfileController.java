@@ -4,11 +4,10 @@ import com.geekhub.dto.UserDto;
 import com.geekhub.entities.User;
 import com.geekhub.exceptions.UserValidateException;
 import com.geekhub.security.UserProfileManager;
+import com.geekhub.services.UserDocumentService;
 import com.geekhub.services.UserService;
 import com.geekhub.dto.convertors.EntityToDtoConverter;
-import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
 import javax.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.FileCopyUtils;
@@ -75,11 +74,13 @@ public class ProfileController {
     @RequestMapping("/removeAccount")
     public ModelAndView removeAccount(HttpSession session) {
         User user = userService.getById((Long) session.getAttribute("userId"));
-        userProfileManager.removeAccount(user);
-        session.invalidate();
-
         ModelAndView model = new ModelAndView("signIn");
-        model.addObject("message", "Your account removed successfully");
+        if (userProfileManager.removeAccount(user)) {
+            session.invalidate();
+            model.addObject("message", "Your account removed successfully");
+        } else {
+            model.addObject("errorMessage", "Your account doesn't removed");
+        }
         return model;
     }
 

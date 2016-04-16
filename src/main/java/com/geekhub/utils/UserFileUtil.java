@@ -11,6 +11,7 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 import org.apache.commons.codec.digest.DigestUtils;
@@ -121,8 +122,11 @@ public class UserFileUtil {
         return propertiesMap;
     }
 
-    public static void removeUserFiles(User user) {
-
+    public static void removeUserFiles(List<String> filesNames) {
+        filesNames.forEach(f -> {
+            File file = new File(ROOT_LOCATION + f + SYSTEM_EXTENSION);
+            file.delete();
+        });
     }
 
     public static boolean validateDocumentNameWithoutExtension(String documentName) {
@@ -134,7 +138,6 @@ public class UserFileUtil {
     }
 
     public static boolean validateDirectoryName(String directoryName) {
-        boolean bool = DIRECTORY_NAME_PATTERN.matcher(directoryName).matches();
-        return bool;
+        return DIRECTORY_NAME_PATTERN.matcher(directoryName).matches();
     }
 }

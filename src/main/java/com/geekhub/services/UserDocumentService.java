@@ -50,4 +50,6 @@ public interface UserDocumentService extends EntityService<UserDocument, Long> {
     Set<UserDocument> getAllByOwnerAndAttribute(User owner, DocumentAttribute attribute);
 
     Integer getCountByFriendsGroup(FriendsGroup friendsGroup);
+
+    List<UserDocument> getAllByOwner(User owner);
 }

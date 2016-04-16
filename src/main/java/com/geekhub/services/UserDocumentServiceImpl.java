@@ -226,4 +226,9 @@ public class UserDocumentServiceImpl implements UserDocumentService {
         documents.addAll(userDocumentDao.getByReadersGroup(friendsGroup));
         return documents.size();
     }
+
+    @Override
+    public List<UserDocument> getAllByOwner(User owner) {
+        return userDocumentDao.getList("owner", owner);
+    }
 }
