@@ -76,4 +76,9 @@ public class EventServiceImpl implements EventService {
     public void save(List<Event> events) {
         events.forEach(this::save);
     }
+
+    @Override
+    public Event getByHashName(String eventHashName) {
+        return eventDao.get("hashName", eventHashName);
+    }
 }

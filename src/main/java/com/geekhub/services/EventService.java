@@ -16,4 +16,6 @@ public interface EventService extends EntityService<Event, Long> {
     void setReadStatus(Collection<Event> events);
 
     List<Event> getAllByRecipient(User recipient);
+
+    Event getByHashName(String eventHashName);
 }

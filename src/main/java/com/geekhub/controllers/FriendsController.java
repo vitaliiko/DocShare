@@ -1,18 +1,22 @@
 package com.geekhub.controllers;
 
 import com.geekhub.dto.UserDto;
+import com.geekhub.entities.Event;
 import com.geekhub.entities.FriendsGroup;
 import com.geekhub.entities.User;
 import com.geekhub.dto.FriendsGroupDto;
+import com.geekhub.services.EventService;
 import com.geekhub.services.FriendsGroupService;
 import com.geekhub.services.UserService;
 import com.geekhub.dto.convertors.EntityToDtoConverter;
+import com.geekhub.utils.EventUtil;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -34,6 +38,9 @@ public class FriendsController {
 
     @Autowired
     private FriendsGroupService friendsGroupService;
+
+    @Autowired
+    private EventService eventService;
 
     private User getUserFromSession(HttpSession session) {
         return userService.getById((Long) session.getAttribute("userId"));
@@ -112,10 +119,42 @@ public class FriendsController {
         return userDtoSet;
     }
 
-    @RequestMapping("/add_friend")
-    public ModelAndView addFriend(Long friendId, HttpSession session) {
-        userService.addFriend((Long) session.getAttribute("userId"), friendId);
-        return new ModelAndView("redirect:/friends/view");
+    @RequestMapping("/add_friend/{friendId}/{eventHash}")
+    public ModelAndView addFriend(@PathVariable Long friendId,
+                                  @PathVariable String eventHash,
+                                  HttpSession session) {
+
+        User user = userService.getById((Long) session.getAttribute("userId"));
+        User friend = userService.getById(friendId);
+
+        Event event = eventService.getByHashName(eventHash);
+        if (event.getSenderId() == friendId) {
+            Long userId = (Long) session.getAttribute("userId");
+            userService.addFriend(userId, friendId);
+            userService.addFriend(friendId, userId);
+
+            String eventText = "User " + user.getFullName() + " confirm your request.";
+            String eventLinkText = "Friends";
+            String eventLinkUrl = "/friends/view";
+
+            eventService.save(EventUtil.createEvent(friend, eventText, eventLinkText, eventLinkUrl, user));
+
+            return new ModelAndView("redirect:/friends/view");
+        }
+        return null;
+    }
+
+    @RequestMapping("send_to_friend_event")
+    public void sendToFriendEvent(Long friendId, HttpSession session) {
+        User user = userService.getById((Long) session.getAttribute("userId"));
+        User friend = userService.getById(friendId);
+
+        String eventHashName = EventUtil.createHashName();
+        String eventText = "User " + user.getFullName() + " wants to add you as a friend.";
+        String eventLinkText = "Confirm";
+        String eventLinkUrl = "/friends/add_friend/" + user.getId() + "/" + eventHashName;
+
+        eventService.save(EventUtil.createEvent(eventHashName, friend, eventText, eventLinkText, eventLinkUrl, user));
     }
 
     @RequestMapping("/delete_friend")

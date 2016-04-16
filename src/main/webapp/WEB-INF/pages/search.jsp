@@ -16,22 +16,29 @@
 <div id="wrapper" class="container" style="width: 900px">
 
     <form action="/main/search" method="post">
-        <input type="text" name="searchParameter" placeholder="Search by name">
-        <input type="submit" value="Search">
+        <input type="text" name="searchParameter" placeholder="Search by name" class="form-control">
+        <input type="submit" value="Search" class="btn btn-default btn-sm">
     </form>
 
+    <br><br>
+
     <div>
-    <c:forEach var="userEntry" items="${usersMap}">
-        <form action="/friends/add_friend">
-            <c:url var="userPage" value="/main/userpage/${userEntry.key.id}"/>
-            <a href="${userPage}" class="btn btn-link">${userEntry.key}</a>
-            <c:if test="${userEntry.value}">
-                <input type="hidden" name="friendId" value="${userEntry.key.id}">
-                <input type="submit" class="btn btn-primary" value="Add to friend"/>
-            </c:if>
-            <hr>
-        </form>
-    </c:forEach>
+        <table class="table table-hover tbody tr:hover td doc-table">
+        <c:forEach var="userEntry" items="${usersMap}">
+            <tr>
+                <td>
+                    <c:url var="userPage" value="/main/userpage/${userEntry.key.id}"/>
+                    <a href="${userPage}" class="btn btn-link">${userEntry.key}</a>
+                </td>
+                <td><form action="/friends/send_to_friend_event">
+                    <c:if test="${userEntry.value}">
+                        <input type="hidden" name="friendId" value="${userEntry.key.id}">
+                        <input type="submit" class="btn btn-default" value="Add to friend"/>
+                    </c:if>
+                </form></td>
+            </tr>
+        </c:forEach>
+        </table>
     </div>
 </div>
 

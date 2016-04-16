@@ -21,6 +21,9 @@ public class Event implements Comparable<Event> {
     private Long id;
 
     @Column
+    private String hashName;
+
+    @Column
     private String senderName;
 
     @Column
@@ -52,6 +55,14 @@ public class Event implements Comparable<Event> {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public String getHashName() {
+        return hashName;
+    }
+
+    public void setHashName(String hashName) {
+        this.hashName = hashName;
     }
 
     public String getSenderName() {
