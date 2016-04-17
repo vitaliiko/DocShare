@@ -7,6 +7,7 @@ import com.geekhub.entities.enums.DocumentStatus;
 import java.util.Map;
 import org.hibernate.Hibernate;
 import org.hibernate.SessionFactory;
+import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
@@ -115,6 +116,14 @@ public class UserDocumentDao implements EntityDao<UserDocument, Long> {
                 .add(Restrictions.eq("owner", owner))
                 .add(Restrictions.eq(propertyName, value))
                 .uniqueResult();
+    }
+
+    public List<UserDocument> getLike(String parentDirectoryHash, String docName) {
+        return sessionFactory.getCurrentSession()
+                .createCriteria(clazz)
+                .add(Restrictions.eq("parentDirectoryHash", parentDirectoryHash))
+                .add(Restrictions.like("name", docName, MatchMode.START))
+                .list();
     }
 
     public UserDocument get(Map<String, Object> propertiesMap) {

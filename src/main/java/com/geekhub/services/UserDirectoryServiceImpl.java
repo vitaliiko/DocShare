@@ -209,8 +209,15 @@ public class UserDirectoryServiceImpl implements UserDirectoryService {
     @Override
     public void replace(Long dirId, String destinationDirectoryHash) {
         UserDirectory directory = userDirectoryDao.getById(dirId);
-        directory.setParentDirectoryHash(destinationDirectoryHash);
-        userDirectoryDao.update(directory);
+        String dirName = directory.getName();
+        if (!directory.getParentDirectoryHash().equals(destinationDirectoryHash)) {
+            if (getByFullNameAndOwner(directory.getOwner(), destinationDirectoryHash, dirName) != null) {
+                int matchesCount = userDirectoryDao.getLike(destinationDirectoryHash, dirName).size();
+                directory.setName(dirName + " (" + (matchesCount + 1) + ")");
+            }
+            directory.setParentDirectoryHash(destinationDirectoryHash);
+            userDirectoryDao.update(directory);
+        }
     }
 
     @Override
@@ -230,8 +237,14 @@ public class UserDirectoryServiceImpl implements UserDirectoryService {
     public void copy(Long dirId, String destinationDirectoryHash) {
         UserDirectory directory = userDirectoryDao.getById(dirId);
         UserDirectory copy = UserFileUtil.copyDirectory(directory);
-        copy.setParentDirectoryHash(destinationDirectoryHash);
+        String copyName = directory.getName();
 
+        if (getByFullNameAndOwner(directory.getOwner(), destinationDirectoryHash, copyName) != null) {
+            int matchesCount = userDirectoryDao.getLike(destinationDirectoryHash, copyName).size();
+            copy.setName(copyName + " (" + (matchesCount + 1) + ")");
+        }
+
+        copy.setParentDirectoryHash(destinationDirectoryHash);
         copy.setHashName(UserFileUtil.createHashName());
         UserFileUtil.copyFile(directory.getHashName(), copy.getHashName());
 

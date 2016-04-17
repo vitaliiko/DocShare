@@ -6,8 +6,8 @@ import com.geekhub.entities.UserDirectory;
 import com.geekhub.entities.enums.DocumentStatus;
 import java.util.List;
 import java.util.Map;
-import org.hibernate.Criteria;
 import org.hibernate.SessionFactory;
+import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -96,6 +96,14 @@ public class UserDirectoryDao implements EntityDao<UserDirectory, Long> {
         return sessionFactory.getCurrentSession()
                 .createCriteria(clazz)
                 .add(Restrictions.allEq(propertiesMap))
+                .list();
+    }
+
+    public List<UserDirectory> getLike(String parentDirectoryHash, String dirName) {
+        return sessionFactory.getCurrentSession()
+                .createCriteria(clazz)
+                .add(Restrictions.eq("parentDirectoryHash", parentDirectoryHash))
+                .add(Restrictions.like("name", dirName, MatchMode.START))
                 .list();
     }
 

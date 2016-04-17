@@ -232,8 +232,16 @@ public class UserDocumentServiceImpl implements UserDocumentService {
     @Override
     public void replace(Long docId, String destinationDirectoryHash) {
         UserDocument document = userDocumentDao.getById(docId);
-        document.setParentDirectoryHash(destinationDirectoryHash);
-        userDocumentDao.update(document);
+        String docName = document.getName();
+        if (!document.getParentDirectoryHash().equals(destinationDirectoryHash)) {
+            if (getByFullNameAndOwner(document.getOwner(), destinationDirectoryHash, docName) != null) {
+                String docNameWithoutExtension = docName.substring(0, docName.lastIndexOf("."));
+                int matchesCount = userDocumentDao.getLike(destinationDirectoryHash, docNameWithoutExtension).size();
+                document.setName(docNameWithoutExtension + " (" + (matchesCount + 1) + ")" + document.getExtension());
+            }
+            document.setParentDirectoryHash(destinationDirectoryHash);
+            userDocumentDao.update(document);
+        }
     }
 
     @Override
@@ -245,8 +253,15 @@ public class UserDocumentServiceImpl implements UserDocumentService {
     public void copy(Long docId, String destinationDirectoryHash) {
         UserDocument document = userDocumentDao.getById(docId);
         UserDocument copy = UserFileUtil.copyDocument(document);
-        copy.setParentDirectoryHash(destinationDirectoryHash);
+        String copyName = document.getName();
 
+        if (getByFullNameAndOwner(document.getOwner(), destinationDirectoryHash, copyName) != null) {
+            String copyNameWithoutExtension = copyName.substring(0, copyName.lastIndexOf("."));
+            int matchesCount = userDocumentDao.getLike(destinationDirectoryHash, copyNameWithoutExtension).size();
+            copy.setName(copyNameWithoutExtension + " (" + (matchesCount + 1) + ")" + document.getExtension());
+        }
+
+        copy.setParentDirectoryHash(destinationDirectoryHash);
         copy.setHashName(UserFileUtil.createHashName());
         UserFileUtil.copyFile(document.getHashName(), copy.getHashName());
 
