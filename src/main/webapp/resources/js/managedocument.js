@@ -57,6 +57,7 @@ $(document).ready(function() {
         renderDirectories(files);
         renderDocuments(files);
     });
+    $('#searchForm').show();
 
     $('.all-href').click(function() {
         event.preventDefault();

@@ -179,8 +179,17 @@ public class UserServiceImpl implements UserService {
     public Set<User> searchByName(String name) {
         String[] names = name.split(" ");
         Set<User> users = new TreeSet<>();
-        Arrays.stream(names).forEach(n -> users.addAll(userDao.search("firstName", n)));
-        Arrays.stream(names).forEach(n -> users.addAll(userDao.search("lastName", n)));
+        Arrays.stream(names).filter(n -> !n.isEmpty()).forEach(n -> users.addAll(userDao.search("firstName", n)));
+        Arrays.stream(names).filter(n -> !n.isEmpty()).forEach(n -> users.addAll(userDao.search("lastName", n)));
+        return users;
+    }
+
+    @Override
+    public Set<User> search(String name, Map<String, String> searchingMap) {
+        String[] names = name.split(" ");
+        Set<User> users = new TreeSet<>();
+        Arrays.stream(names).filter(n -> !n.isEmpty()).forEach(n -> users.addAll(userDao.search("firstName", n, searchingMap)));
+        Arrays.stream(names).filter(n -> !n.isEmpty()).forEach(n -> users.addAll(userDao.search("lastName", n, searchingMap)));
         return users;
     }
 }

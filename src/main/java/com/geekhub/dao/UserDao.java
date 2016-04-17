@@ -1,13 +1,18 @@
 package com.geekhub.dao;
 
 import com.geekhub.entities.User;
+import java.util.Arrays;
+import java.util.Map;
+import org.hibernate.Criteria;
 import org.hibernate.SessionFactory;
+import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import org.springframework.web.bind.annotation.ResponseStatus;
 
 @Repository
 @SuppressWarnings("unchecked")
@@ -83,7 +88,16 @@ public class UserDao implements EntityDao<User, Long> {
     public List<User> search(String propertyName, String value) {
         return sessionFactory.getCurrentSession()
                 .createCriteria(clazz)
-                .add(Restrictions.like(propertyName, "%" + value + "%"))
+                .add(Restrictions.like(propertyName, value, MatchMode.ANYWHERE).ignoreCase())
                 .list();
+    }
+
+    public List<User> search(String propertyName, String value, Map<String, String> searchingMap) {
+        Criteria criteria = sessionFactory.getCurrentSession()
+                .createCriteria(clazz)
+                .add(Restrictions.or(Restrictions.like(propertyName, value, MatchMode.ANYWHERE).ignoreCase()));
+        searchingMap.forEach((k, v) -> criteria
+                .add(Restrictions.or(Restrictions.like(k, v, MatchMode.ANYWHERE).ignoreCase())));
+        return criteria.list();
     }
  }

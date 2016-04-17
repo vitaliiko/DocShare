@@ -12,6 +12,8 @@ import com.geekhub.security.UserProfileManager;
 import com.geekhub.services.UserDocumentService;
 import com.geekhub.services.UserService;
 import com.geekhub.providers.UserProvider;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.TreeSet;
@@ -21,6 +23,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpSession;
@@ -115,16 +118,46 @@ public class MainController {
     }
 
     @RequestMapping(value = "/search", method = RequestMethod.POST)
-    public ModelAndView search(String searchParameter, HttpSession session) {
+    public ModelAndView search(@RequestParam(required = false) String name,
+                               @RequestParam(required = false) String country,
+                               @RequestParam(required = false) String region,
+                               @RequestParam(required = false) String city,
+                               HttpSession session) {
+
         User user = userService.getById((Long) session.getAttribute("userId"));
 
-        Set<User> users = userService.searchByName(searchParameter);
-        users.remove(user);
+        Map<String, String> searchingParametersMap = new HashMap<>();
+        if (!country.isEmpty()) {
+            searchingParametersMap.put("country", country);
+        }
+        if (!region.isEmpty()) {
+            searchingParametersMap.put("state", region);
+        }
+        if (!city.isEmpty()) {
+            searchingParametersMap.put("city", city);
+        }
+
+        ModelAndView model = new ModelAndView();
+        Set<User> users;
+        if (searchingParametersMap.size() > 0) {
+            users = userService.search(name, searchingParametersMap);
+            users.remove(user);
+        } else if (!name.isEmpty()) {
+            users = userService.searchByName(name);
+            users.remove(user);
+        } else {
+            model.setViewName("redirect:/main/search");
+            return model;
+        }
+
         Map<UserDto, Boolean> usersMap = users.stream()
                 .collect(Collectors.toMap(EntityToDtoConverter::convert, u -> !userService.areFriends(user.getId(), u)));
 
-        ModelAndView model = new ModelAndView("search");
+        model.setViewName("search");
         model.addObject("usersMap", usersMap);
+        model.addObject("countOrResults", usersMap.size());
+        model.addObject("name", name);
+        searchingParametersMap.forEach(model::addObject);
         return model;
     }
 

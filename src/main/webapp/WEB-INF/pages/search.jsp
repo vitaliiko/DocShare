@@ -16,13 +16,21 @@
 <div id="wrapper" class="container" style="width: 900px">
 
     <form action="/main/search" method="post">
-        <input type="text" name="searchParameter" placeholder="Search by name" class="form-control">
+        <input type="text" name="name" value="${name}" placeholder="Search by name" class="form-control">
+        <br>
+        <input type="text" name="country" value="${country}" placeholder="Search by country" class="form-control">
+        <br>
+        <input type="text" name="region" value="${region}" placeholder="Search by region" class="form-control">
+        <br>
+        <input type="text" name="city" value="${city}" placeholder="Search by city" class="form-control">
+        <br>
         <input type="submit" value="Search" class="btn btn-default btn-sm">
     </form>
 
     <br><br>
 
     <div>
+        <h5><strong>Count of results: ${countOrResults}</strong></h5>
         <table class="table table-hover tbody tr:hover td doc-table">
         <c:forEach var="userEntry" items="${usersMap}">
             <tr>
