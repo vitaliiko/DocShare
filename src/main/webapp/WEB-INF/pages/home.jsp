@@ -29,6 +29,14 @@
 
 <div class="container" style="width: 900px;">
 
+    <c:if test="${errorMessage != null}">
+        <div class='alert alert-danger'>
+            <a href='#' class='close' data-dismiss='alert'>&times;</a>
+            <strong>Error!</strong> ${errorMessage}
+        </div>
+        <br>
+    </c:if>
+
     <div class='alert alert-danger' hidden>
         <a href='#' class='close' data-dismiss='alert'>&times;</a>
         <strong>Error!</strong> <p class="alert-text"></p>
@@ -61,12 +69,6 @@
     <div>
         <a href="" class="back-link"><-Back</a>
     </div>
-    <%--<div class="container" style="width: 900px;">--%>
-        <%--<form action="/document/search">--%>
-            <%--<input type="text" name="search" class="form-control input-sm">--%>
-            <%--<input type="submit" value="Search" class="btn btn-primary btn-sm">--%>
-        <%--</form>--%>
-    <%--</div>--%>
 
     <div class="content">
         <c:forEach items="${tableNames}" var="tableName">

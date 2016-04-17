@@ -468,21 +468,41 @@ $(document).ready(function() {
         var docCheckBox = $('.select-doc:visible:checked');
         var dirCheckBox = $('.select-dir:visible:checked');
         if (docCheckBox.length == 1) {
-            $.post('/document/rename_document', {docId: docCheckBox.val(), newDocName: newName}, function(document) {
-                if (document !== undefined) {
-                    $('.doc-table')
-                        .find($('.tr-doc' + document.id))
-                        .find('.document-name')
-                        .html("<a href='/document/browse-'" + document.id + ">" + document.name + "</a>")
+            $.ajax({
+                url: '/document/rename_document',
+                type: 'POST',
+                data: {docId: docCheckBox.val(), newDocName: newName},
+                success: function(document) {
+                    if (document !== undefined) {
+                        $('.doc-table')
+                            .find($('.tr-doc' + document.id))
+                            .find('.document-name')
+                            .html("<a href='/document/browse-'" + document.id + ">" + document.name + "</a>")
+                    }
+                    $('.alert-danger').hide(true);
+                },
+                error: function() {
+                    $('.alert-danger').show(true);
+                    $('.alert-text').text("File with such name already exist");
                 }
             });
         } else if (dirCheckBox.length == 1) {
-            $.post('/document/rename_directory', {dirId: dirCheckBox.val(), newDirName: newName}, function(directory) {
-                if (directory !== undefined) {
-                    $('.doc-table')
-                        .find($('.tr-dir' + directory.id))
-                        .find('.directory-name')
-                        .html("<a href='#' id='" + directory.hashName + "' class='get-dir-content'>" +directory.name + "</a>")
+            $.ajax({
+                url: '/document/rename_directory',
+                type: 'POST',
+                data: {dirId: dirCheckBox.val(), newDirName: newName},
+                success: function(directory) {
+                    if (directory !== undefined) {
+                        $('.doc-table')
+                            .find($('.tr-dir' + directory.id))
+                            .find('.directory-name')
+                            .html("<a href='#' id='" + directory.hashName + "' class='get-dir-content'>" + directory.name + "</a>")
+                    }
+                    $('.alert-danger').hide(true);
+                },
+                error: function() {
+                    $('.alert-danger').show(true);
+                    $('.alert-text').text("Directory with such name already exist");
                 }
             });
         }

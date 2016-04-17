@@ -2,7 +2,6 @@ package com.geekhub.controllers;
 
 import com.geekhub.dto.UserDto;
 import com.geekhub.entities.User;
-import com.geekhub.exceptions.UserAuthenticationException;
 import com.geekhub.exceptions.UserProfileException;
 import com.geekhub.security.UserProfileManager;
 import com.geekhub.services.UserService;

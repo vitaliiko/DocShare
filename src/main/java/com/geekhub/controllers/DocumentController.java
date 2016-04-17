@@ -45,6 +45,7 @@ import java.util.TreeSet;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.util.FileCopyUtils;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.InitBinder;
@@ -152,7 +153,6 @@ public class DocumentController {
     }
 
     @RequestMapping(value = "/download-{docId}", method = RequestMethod.GET)
-    @ResponseStatus(HttpStatus.OK)
     public void downloadDocument(@PathVariable long docId, HttpSession session, HttpServletResponse response)
             throws IOException {
         User user = getUserFromSession(session);
@@ -169,7 +169,6 @@ public class DocumentController {
     }
 
     @RequestMapping(value = "/move-to-trash", method = RequestMethod.POST)
-    @ResponseStatus(HttpStatus.OK)
     public void moveDocumentToTrash(@RequestParam(value = "docIds[]", required = false) Long[] docIds,
                                     @RequestParam(value = "dirIds[]", required = false) Long[] dirIds,
                                     HttpSession session) {
@@ -333,9 +332,14 @@ public class DocumentController {
     }
 
     @RequestMapping(value = "/rename_document", method = RequestMethod.POST)
-    public UserFileDto renameDocument(Long docId, String newDocName, HttpSession session) {
+    public ResponseEntity<UserFileDto> renameDocument(Long docId, String newDocName, HttpSession session) {
         UserDocument document = userDocumentService.getById(docId);
         User user = getUserFromSession(session);
+        newDocName = newDocName + document.getExtension();
+
+        if (document.getName().equals(newDocName)) {
+            return null;
+        }
 
         if (documentAccessProvider.isOwner(document, user)) {
             UserDocument documentWithNewName =
@@ -348,16 +352,20 @@ public class DocumentController {
                 sendRenameEvent(userDocumentService.getAllReadersAndEditors(docId), "document", oldDocName,
                         newDocName, document.getId(), user);
 
-                return EntityToDtoConverter.convert(document);
+                return new ResponseEntity<>(EntityToDtoConverter.convert(document), HttpStatus.OK);
             }
         }
-        return null;
+        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
     @RequestMapping(value = "/rename_directory", method = RequestMethod.POST)
-    public UserFileDto renameDirectory(Long dirId, String newDirName, HttpSession session) {
+    public ResponseEntity<UserFileDto> renameDirectory(Long dirId, String newDirName, HttpSession session) {
         UserDirectory directory = userDirectoryService.getById(dirId);
         User user = getUserFromSession(session);
+
+        if (directory.getName().equals(newDirName)) {
+            return null;
+        }
 
         if (directoryAccessProvider.isOwner(directory, user)) {
             UserDirectory directoryWithNewName =
@@ -370,10 +378,10 @@ public class DocumentController {
                 sendRenameEvent(userDirectoryService.getAllReaders(dirId), "directory", oldDirName,
                         newDirName, directory.getId(), user);
 
-                return EntityToDtoConverter.convert(directory);
+                return new ResponseEntity<>(EntityToDtoConverter.convert(directory), HttpStatus.OK);
             }
         }
-        return null;
+        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
     @RequestMapping("/get_directories_names")
