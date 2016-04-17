@@ -50,7 +50,6 @@ public class EventController {
 
     @RequestMapping(value = "/get_unread_events_count", method = RequestMethod.GET)
     public long getUnreadEventsCount(HttpSession session) {
-        User user = userService.getById((Long) session.getAttribute("userId"));
-        return eventService.getUnreadCount(user);
+        return eventService.getUnreadCount((Long) session.getAttribute("userId"));
     }
 }

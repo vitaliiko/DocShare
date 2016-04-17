@@ -3,6 +3,7 @@ $(document).ready(function() {
 
     var friendsGroupId;
     var handlebarsPath = '/resources/js/templates/';
+    var removeButton;
 
     function clearModalWindow() {
         $('.check-box').each(function() {
@@ -39,6 +40,10 @@ $(document).ready(function() {
                     });
                 });
                 clearModalWindow();
+            },
+            error: function() {
+                $('.alert-danger').show();
+                $('.alert-text').text('Friends group with such name already exist');
             }
         });
     });
@@ -49,15 +54,24 @@ $(document).ready(function() {
         $('.check-box:checked').each(function(k, v) {
             friends.push(v.value);
         });
-        $.ajax({
-            url: '/friends/update_group',
-            contentType: 'json',
-            data: {groupId: friendsGroupId, groupName: groupName, friends: friends},
-            success: function() {
-                $('.info-table').find($('.group' + friendsGroupId)).html(groupName);
-                clearModalWindow();
-            }
-        });
+        if (groupName === undefined) {
+            $('.alert-danger').show();
+            $('.alert-text').text('You cannot create friends group without name');
+        } else {
+            $.ajax({
+                url: '/friends/update_group',
+                contentType: 'json',
+                data: {groupId: friendsGroupId, groupName: groupName, friends: friends},
+                success: function() {
+                    $('.info-table').find($('.group' + friendsGroupId)).html(groupName);
+                    clearModalWindow();
+                },
+                error: function() {
+                    $('.alert-danger').show();
+                    $('.alert-text').text('Friends group with such name already exist');
+                }
+            });
+        }
     });
 
     $('.info-table').on('click', '.group-info-btn', function(event) {
@@ -98,15 +112,21 @@ $(document).ready(function() {
     });
 
     $('#groupTable').on('click', '.removeGroupButton', function() {
-        var groupId = this.id;
-        var button = $(this);
+        friendsGroupId = this.id;
+        removeButton = $(this);
+        var message = 'Are you sure yo want to remove friends group?';
+        $('#deleteDialog').modal('show');
+        $('#delete-dialog-text').text(message);
+    });
+
+    $('#deleteGroup').click(function() {
         $.ajax({
             url: '/friends/delete_group',
-            data: {groupId: groupId},
+            data: {groupId: friendsGroupId},
             success: function() {
-                button.parent().parent().remove();
+                removeButton.parent().parent().remove();
                 $('.friend-table').find($('.group' + groupId)).remove();
             }
-        })
+        });
     });
 });

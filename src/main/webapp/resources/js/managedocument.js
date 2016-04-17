@@ -191,8 +191,8 @@ $(document).ready(function() {
             fileId = document.id;
             fileAccess = document.access;
             makeBoxesChecked(document.readers, $('.reader-check-box'));
-            makeBoxesChecked(document.readersGroups, $('.readers-group-check-box'));
             makeBoxesChecked(document.editors, $('.editor-check-box'));
+            makeBoxesChecked(document.readersGroups, $('.readers-group-check-box'));
             makeBoxesChecked(document.editorsGroups, $('.editors-group-check-box'));
             $('.share-modal-title').text('Share ' + document.name);
             $('#' + document.access).prop('checked', true);
@@ -318,10 +318,10 @@ $(document).ready(function() {
             renderDirectories(files);
             renderDocuments(files);
             hideShowBackLink();
-            if ($('.add-action-btn').is(':visible')) {
-                copyReplaceMode();
-            }
         });
+        if ($('.add-action-btn').is(':visible')) {
+            copyReplaceMode();
+        }
     });
 
     backLink.click(function(event) {
@@ -341,6 +341,9 @@ $(document).ready(function() {
             renderDocuments(files);
             hideShowBackLink();
         });
+        if ($('.add-action-btn').is(':visible')) {
+            copyReplaceMode();
+        }
     });
 
     $('#searchButton').click(function() {

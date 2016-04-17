@@ -16,6 +16,17 @@
 <jsp:include page="../include/sidebar.jsp"/>
 
 <div id="wrapper" class="container">
+
+    <div class='alert alert-danger' hidden>
+        <a href='#' class='close' data-dismiss='alert'>&times;</a>
+        <strong>Error!</strong> <p class="alert-text"></p>
+    </div>
+
+    <div class='alert alert-success' hidden>
+        <a href='#' class='close' data-dismiss='alert'>&times;</a>
+        <p class="alert-text"></p>
+    </div>
+
     <div id="page-content-wrapper">
         <table id="groupTable" class="table table-hover tbody tr:hover td info-table group-table">
             <caption>
@@ -87,6 +98,26 @@
             </div>
 
         </div>
+    </div>
+</div>
+
+<div id="deleteDialog" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title delete-modal-title">Removal</h4>
+            </div>
+            <div class="modal-body">
+                <h4 id="delete-dialog-text"></h4>
+            </div>
+            <div class="modal-footer">
+                <button type="button" id="deleteGroup" class="btn btn-success" data-dismiss="modal">YES</button>
+                <button type="button" class="btn btn-danger" data-dismiss="modal">NO</button>
+            </div>
+        </div>
+
     </div>
 </div>
 

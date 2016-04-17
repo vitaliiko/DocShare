@@ -15,6 +15,14 @@
 
 <div id="wrapper" class="container" style="width: 900px">
 
+    <c:if test="${message != null}">
+        <div class='alert alert-success'>
+            <a href='#' class='close' data-dismiss='alert'>&times;</a>
+                ${message}
+        </div>
+        <br>
+    </c:if>
+
     <form action="/main/search" method="post">
         <input type="text" name="name" value="${name}" placeholder="Search by name" class="form-control">
         <br>

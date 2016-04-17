@@ -56,10 +56,11 @@ public class EventDao implements EntityDao<Event, Long> {
                 .list();
     }
 
-    public Long getCount(User recipient, String propertyName, Object value) {
+    public Long getCount(Long recipientId, String propertyName, Object value) {
         return (Long) sessionFactory.getCurrentSession()
-                .createCriteria(clazz)
-                .add(Restrictions.eq("recipient", recipient))
+                .createCriteria(clazz, "event")
+                .createAlias("event.recipient", "rec")
+                .add(Restrictions.eq("rec.id", recipientId))
                 .add(Restrictions.eq(propertyName, value))
                 .setProjection(Projections.rowCount())
                 .uniqueResult();

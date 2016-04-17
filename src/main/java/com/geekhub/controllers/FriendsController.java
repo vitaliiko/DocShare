@@ -18,6 +18,7 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -29,6 +30,7 @@ import javax.servlet.http.HttpSession;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @RestController
 @RequestMapping("/friends")
@@ -76,10 +78,15 @@ public class FriendsController {
     }
 
     @RequestMapping("/create_group")
-    public Long createGroup(@RequestParam(value = "friends[]", required = false) Long[] friends,
-                            String groupName, HttpSession session) {
+    public ResponseEntity<Long> createGroup(@RequestParam(value = "friends[]", required = false) Long[] friends,
+                                            String groupName,
+                                            HttpSession session) {
 
+        long groupId = 0;
         User user = getUserFromSession(session);
+        if (groupName == null || groupName.isEmpty()) {
+            return new ResponseEntity<>(groupId, HttpStatus.BAD_REQUEST);
+        }
         FriendsGroup group = friendsGroupService.getByOwnerAndName(user, groupName);
         if (group == null) {
             group = new FriendsGroup();
@@ -88,20 +95,26 @@ public class FriendsController {
             if (friends != null) {
                 group.setFriends(userService.getSetByIds(friends));
             }
-            return friendsGroupService.save(group);
+            groupId = friendsGroupService.save(group);
+            return new ResponseEntity<>(groupId, HttpStatus.OK);
         }
-        return null;
+        return new ResponseEntity<>(groupId, HttpStatus.BAD_REQUEST);
     }
 
     @RequestMapping("/update_group")
-    @ResponseStatus(HttpStatus.OK)
-    public void updateGroup(@RequestParam(value = "friends[]", required = false) Long[] friends,
-                            Long groupId, String groupName, HttpSession session) {
+    public ResponseEntity<Void> updateGroup(@RequestParam(value = "friends[]", required = false) Long[] friends,
+                                            Long groupId, String groupName, HttpSession session) {
 
         User user = getUserFromSession(session);
         FriendsGroup group = friendsGroupService.getById(groupId);
 
-        if (group != null && group.getOwner().equals(user)) {
+        if (group == null) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+        if (!group.getName().equals(groupName) && friendsGroupService.getByOwnerAndName(user, groupName) != null) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+        if (group.getOwner().equals(user)) {
             Set<User> membersSet = group.getFriends();
             Set<User> newMembersSet = null;
             group.setName(groupName);
@@ -131,16 +144,17 @@ public class FriendsController {
                 }
             }
         }
+        return null;
     }
 
     @RequestMapping("/get_group")
-    public FriendsGroupDto getGroup(Long groupId, HttpSession session) {
+    public ResponseEntity<FriendsGroupDto> getGroup(Long groupId, HttpSession session) {
         User user = getUserFromSession(session);
         FriendsGroup group = friendsGroupService.getById(groupId);
         if (group != null && group.getOwner().equals(user)) {
-            return EntityToDtoConverter.convert(group);
+            return new ResponseEntity<>(EntityToDtoConverter.convert(group), HttpStatus.OK);
         }
-        return null;
+        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
     @RequestMapping("/get_friends")
@@ -160,7 +174,7 @@ public class FriendsController {
         User friend = userService.getById(friendId);
 
         Event event = eventService.getByHashName(eventHash);
-        if (event.getSenderId() == friendId) {
+        if (event.getSenderId() == friendId && !user.getFriends().contains(friend)) {
             Long userId = (Long) session.getAttribute("userId");
             userService.addFriend(userId, friendId);
             userService.addFriend(friendId, userId);
@@ -170,27 +184,27 @@ public class FriendsController {
             String eventLinkUrl = "/friends/view";
 
             eventService.save(EventUtil.createEvent(friend, eventText, eventLinkText, eventLinkUrl, user));
-
-            return new ModelAndView("redirect:/friends/view");
         }
-        return null;
+        return new ModelAndView("redirect:/friends/view");
     }
 
     @RequestMapping("send_to_friend_event")
-    public void sendToFriendEvent(Long friendId, HttpSession session) {
+    public ModelAndView sendToFriendEvent(Long friendId, HttpSession session) {
         User user = userService.getById((Long) session.getAttribute("userId"));
         User friend = userService.getById(friendId);
 
-        String eventHashName = EventUtil.createHashName();
-        String eventText = "User " + user.getFullName() + " wants to add you as a friend.";
-        String eventLinkText = "Confirm";
-        String eventLinkUrl = "/friends/add_friend/" + user.getId() + "/" + eventHashName;
+        if (!userService.areFriends(user.getId(), friend)) {
+            String eventHashName = EventUtil.createHashName();
+            String eventText = "User " + user.getFullName() + " wants to add you as a friend.";
+            String eventLinkText = "Confirm";
+            String eventLinkUrl = "/friends/add_friend/" + user.getId() + "/" + eventHashName;
 
-        eventService.save(EventUtil.createEvent(eventHashName, friend, eventText, eventLinkText, eventLinkUrl, user));
+            eventService.save(EventUtil.createEvent(eventHashName, friend, eventText, eventLinkText, eventLinkUrl, user));
+        }
+        return new ModelAndView("redirect:/main/search");
     }
 
     @RequestMapping("/delete_friend")
-    @ResponseStatus(HttpStatus.OK)
     public void deleteFriend(Long friendId, HttpSession session) {
         User user = userService.getById((Long) session.getAttribute("userId"));
         User friend = userService.getById(friendId);
@@ -201,7 +215,6 @@ public class FriendsController {
     }
 
     @RequestMapping("/delete_group")
-    @ResponseStatus(HttpStatus.OK)
     public void deleteGroup(Long groupId, HttpSession session) {
         User user = getUserFromSession(session);
         FriendsGroup group = friendsGroupService.getById(groupId);

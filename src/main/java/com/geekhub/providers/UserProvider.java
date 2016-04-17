@@ -2,7 +2,6 @@ package com.geekhub.providers;
 
 import com.geekhub.entities.FriendsGroup;
 import com.geekhub.entities.User;
-import com.geekhub.exceptions.UserValidateException;
 import com.geekhub.services.FriendsGroupService;
 import com.geekhub.services.UserDirectoryService;
 import com.geekhub.services.UserService;

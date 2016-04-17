@@ -2,9 +2,9 @@ package com.geekhub.controllers;
 
 import com.geekhub.dto.UserDto;
 import com.geekhub.entities.User;
-import com.geekhub.exceptions.UserValidateException;
+import com.geekhub.exceptions.UserAuthenticationException;
+import com.geekhub.exceptions.UserProfileException;
 import com.geekhub.security.UserProfileManager;
-import com.geekhub.services.UserDocumentService;
 import com.geekhub.services.UserService;
 import com.geekhub.dto.convertors.EntityToDtoConverter;
 import java.io.IOException;
@@ -46,7 +46,7 @@ public class ProfileController {
         try {
             userProfileManager.updateUserProfile(userDto, user);
             model.addObject("message", "Your account updated successfully");
-        } catch (UserValidateException e){
+        } catch (UserProfileException e){
             model.addObject("errorMessage", e.getMessage());
         }
         model.addObject("user", userDto);
@@ -64,7 +64,7 @@ public class ProfileController {
         try {
             userProfileManager.changePassword(currentPassword, newPassword, confirmNewPassword, user);
             model.addObject("message", "Your password updated successfully");
-        } catch (UserValidateException e) {
+        } catch (UserProfileException e) {
             model.addObject("errorMessage", e.getMessage());
         }
         model.addObject("user", EntityToDtoConverter.convert(user));

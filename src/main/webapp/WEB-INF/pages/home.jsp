@@ -72,8 +72,8 @@
         <c:forEach items="${tableNames}" var="tableName">
             <table class="table table-hover tbody tr:hover td doc-table ${tableName}">
                 <caption>
-                    <h4 class="replace-message" hidden>Choose the folder in which you want to move files</h4>
-                    <h4 class="copy-message" hidden>Choose the folder in which you want to copy files</h4>
+                    <h4 class="replace-message" hidden>Choose the folder in which you want to move files and press "Move here"</h4>
+                    <h4 class="copy-message" hidden>Choose the folder in which you want to copy files and press "Copy here"</h4>
 
                     <a href="#" class="switch-btn all-href">All &nbsp</a>
                     <a href="#" class="switch-btn public-href">Public &nbsp</a>
@@ -96,7 +96,9 @@
 
                 </caption>
                 <tr class="table-head">
-                    <th><input type="checkbox" class="check-box big-check-box select-all"/></th>
+                    <th>
+                        <input type="checkbox" class="check-box big-check-box select-all"/>
+                    </th>
                     <th id="file-name">Name</th>
                     <th>Size</th>
                     <th>Changed</th>
