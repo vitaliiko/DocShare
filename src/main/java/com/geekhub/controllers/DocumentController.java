@@ -16,6 +16,7 @@ import com.geekhub.dto.UserFileDto;
 import com.geekhub.dto.DocumentOldVersionDto;
 import com.geekhub.dto.SharedDto;
 import com.geekhub.entities.enums.DocumentStatus;
+import com.geekhub.exceptions.ResourceNotFoundException;
 import com.geekhub.security.UserDirectoryAccessService;
 import com.geekhub.security.UserDocumentAccessService;
 import com.geekhub.services.CommentService;
@@ -48,6 +49,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.FileCopyUtils;
 import org.springframework.web.bind.WebDataBinder;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -165,6 +167,8 @@ public class DocumentController {
             response.setHeader("Content-Disposition", "attachment; filename=\"" + document.getName() + "\"");
 
             FileCopyUtils.copy(Files.newInputStream(file.toPath()), response.getOutputStream());
+        } else {
+            throw new ResourceNotFoundException();
         }
     }
 
@@ -224,8 +228,9 @@ public class DocumentController {
             String docName = userDocumentService.getById(docId).getName();
             sendRecoverEvent(userDocumentService, "Document", docName, docId, user);
             return new ModelAndView("redirect:/document/upload");
+        } else {
+            throw new ResourceNotFoundException();
         }
-        return null;
     }
 
     @RequestMapping(value = "/recover-directory", method = RequestMethod.POST)
@@ -237,8 +242,9 @@ public class DocumentController {
             String dirName = userDirectoryService.getById(dirId).getName();
             sendRecoverEvent(userDirectoryService, "Directory", dirName, dirId, user);
             return new ModelAndView("redirect:/document/upload");
+        }else {
+            throw new ResourceNotFoundException();
         }
-        return null;
     }
 
     @RequestMapping(value = "/browse-{docId}", method = RequestMethod.GET)
@@ -251,21 +257,22 @@ public class DocumentController {
             model.addObject("doc", EntityToDtoConverter.convert(document));
             model.addObject("location", userDocumentService.getLocation(document));
             return model;
+        } else {
+            throw new ResourceNotFoundException();
         }
-        return null;
     }
 
     @RequestMapping(value = "/get-comments", method = RequestMethod.GET)
-    public Set<CommentDto> getComments(long docId, HttpSession session) {
+    public ResponseEntity<Set<CommentDto>> getComments(long docId, HttpSession session) {
         User user = getUserFromSession(session);
         UserDocument document = userDocumentService.getDocumentWithComments(docId);
         if (documentAccessProvider.canRead(document, user)
                 && document.getAbilityToComment() == AbilityToCommentDocument.ENABLE) {
             Set<CommentDto> comments = new TreeSet<>();
             document.getComments().forEach(c -> comments.add(EntityToDtoConverter.convert(c)));
-            return comments;
+            return new ResponseEntity<>(comments, HttpStatus.OK);
         }
-        return null;
+        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
     @RequestMapping(value = "/add-comment", method = RequestMethod.POST)
@@ -278,23 +285,25 @@ public class DocumentController {
             Comment comment = CommentUtil.createComment(text, user, document);
             commentService.save(comment);
             return EntityToDtoConverter.convert(comment);
+        } else {
+            throw new ResourceNotFoundException();
         }
-        return null;
     }
 
     @RequestMapping("/clear-comments")
-    @ResponseStatus(HttpStatus.OK)
     public void clearComments(long docId, HttpSession session) {
         User user = getUserFromSession(session);
         UserDocument document = userDocumentService.getDocumentWithComments(docId);
         if (documentAccessProvider.isOwner(document, user)) {
             document.getComments().clear();
             userDocumentService.update(document);
+        } else {
+            throw new ResourceNotFoundException();
         }
     }
 
     @RequestMapping(value = "/make-directory", method = RequestMethod.GET)
-    public UserFileDto makeDir(String dirName,
+    public ResponseEntity<UserFileDto> makeDir(String dirName,
                                @RequestParam(required = false, name = "dirHashName") String parentDirectoryHash,
                                HttpSession session) {
 
@@ -305,9 +314,11 @@ public class DocumentController {
 
         if (dirName != null && !dirName.isEmpty()) {
             UserDirectory directory = makeDirectory(owner, parentDirectoryHash, dirName);
-            return EntityToDtoConverter.convert(directory);
+            if (directory != null) {
+                return new ResponseEntity<>(EntityToDtoConverter.convert(directory), HttpStatus.OK);
+            }
         }
-        return null;
+        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
     @RequestMapping(value = "/get_document", method = RequestMethod.GET)
@@ -384,17 +395,8 @@ public class DocumentController {
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
-    @RequestMapping("/get_directories_names")
-    public Map<String, String> getDirectoriesNames(HttpSession session) {
-        User user = getUserFromSession(session);
-
-        Set<UserDirectory> directories = userDirectoryService.getActualByOwner(user);
-        return directories.stream().collect(Collectors
-                        .toMap(d -> userDirectoryService.getLocation(d) + d.getName(), UserDirectory::getHashName));
-    }
-
     @RequestMapping(value = "/share_document", method = RequestMethod.POST)
-    public UserFileDto shareUserDocument(@RequestBody SharedDto shared, HttpSession session) {
+    public ResponseEntity<UserFileDto> shareUserDocument(@RequestBody SharedDto shared, HttpSession session) {
         User user = getUserFromSession(session);
         UserDocument document = userDocumentService.getById(shared.getDocId());
         Set<User> readersAndEditors = userDocumentService.getAllReadersAndEditors(document.getId());
@@ -415,13 +417,13 @@ public class DocumentController {
             readersAndEditors.removeAll(newReadersAndEditorsSet);
             sendProhibitAccessEvent(readersAndEditors, "document", document.getName(), user);
 
-            return EntityToDtoConverter.convert(document);
+            return new ResponseEntity<>(EntityToDtoConverter.convert(document), HttpStatus.OK);
         }
-        return null;
+        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
     @RequestMapping(value = "/share_directory", method = RequestMethod.POST)
-    public UserFileDto shareUserDirectory(@RequestBody SharedDto shared, HttpSession session) {
+    public ResponseEntity<UserFileDto> shareUserDirectory(@RequestBody SharedDto shared, HttpSession session) {
         User user = getUserFromSession(session);
         UserDirectory directory = userDirectoryService.getById(shared.getDocId());
         Set<User> readers = userDirectoryService.getAllReaders(directory.getId());
@@ -441,9 +443,9 @@ public class DocumentController {
             readers.removeAll(newReaderSet);
             sendProhibitAccessEvent(readers, "directory", directory.getName(), user);
 
-            return EntityToDtoConverter.convert(directory);
+            return new ResponseEntity<>(EntityToDtoConverter.convert(directory), HttpStatus.OK);
         }
-        return null;
+        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
     @RequestMapping("/history-{docId}")
@@ -456,8 +458,9 @@ public class DocumentController {
             document.getDocumentOldVersions().forEach(v -> versions.add(EntityToDtoConverter.convert(v)));
             model.addObject("versions", versions);
             return model;
+        } else {
+            throw new ResourceNotFoundException();
         }
-        return null;
     }
 
     @RequestMapping("/accessible-documents")
@@ -471,28 +474,30 @@ public class DocumentController {
     }
 
     @RequestMapping("/get-directory-content-{dirHashName}")
-    public Set<UserFileDto> getDirectoryContent(@PathVariable String dirHashName, HttpSession session) {
+    public ResponseEntity<Set<UserFileDto>> getDirectoryContent(@PathVariable String dirHashName, HttpSession session) {
         User user = getUserFromSession(session);
         if (dirHashName.equals("root")) {
             dirHashName = user.getLogin();
-            return getDirectoryContent(dirHashName);
+            return new ResponseEntity<>(getDirectoryContent(dirHashName), HttpStatus.OK);
         } else {
             UserDirectory directory = userDirectoryService.getByHashName(dirHashName);
             if (directoryAccessProvider.canRead(directory, user)) {
-                return getDirectoryContent(dirHashName);
+                return new ResponseEntity<>(getDirectoryContent(dirHashName), HttpStatus.OK);
             }
         }
-        return null;
+        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
     @RequestMapping("get-parent-directory-content-{dirHashName}")
-    public Set<UserFileDto> getParentDirectoryContent(@PathVariable String dirHashName, HttpSession session) {
+    public ResponseEntity<Set<UserFileDto>> getParentDirectoryContent(@PathVariable String dirHashName,
+                                                                      HttpSession session) {
+
         User user = getUserFromSession(session);
         UserDirectory currentDirectory = userDirectoryService.getByHashName(dirHashName);
         if (directoryAccessProvider.canRead(currentDirectory, user)) {
-            return getDirectoryContent(currentDirectory.getParentDirectoryHash());
+            return new ResponseEntity<>(getDirectoryContent(currentDirectory.getParentDirectoryHash()), HttpStatus.OK);
         }
-        return null;
+        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
     @RequestMapping("/search_files")
@@ -517,45 +522,55 @@ public class DocumentController {
     }
 
     @RequestMapping(value = "/replace_files", method = RequestMethod.POST)
-    public void replaceFiles(@RequestParam(value = "docIds[]", required = false) Long[] docIds,
-                             @RequestParam(value = "dirIds[]", required = false) Long[] dirIds,
-                             String destinationDirectoryHash,
-                             HttpSession session) {
+    public ResponseEntity<Void> replaceFiles(@RequestParam(value = "docIds[]", required = false) Long[] docIds,
+                                             @RequestParam(value = "dirIds[]", required = false) Long[] dirIds,
+                                             String destinationDirectoryHash,
+                                             HttpSession session) {
 
         User user = getUserFromSession(session);
         if (docIds != null && destinationDirectoryHash != null) {
             Set<UserDocument> documents = userDocumentService.getByIds(Arrays.asList(docIds));
             if (documentAccessProvider.isOwner(documents, user)) {
                 userDocumentService.replace(docIds, destinationDirectoryHash);
+            } else {
+                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
             }
         }
         if (dirIds != null && destinationDirectoryHash != null) {
             Set<UserDirectory> directories = userDirectoryService.getByIds(Arrays.asList(dirIds));
-            if (directoryAccessProvider.canRemove(directories, user)) {
+            if (directoryAccessProvider.isOwner(directories, user)) {
                 userDirectoryService.replace(dirIds, destinationDirectoryHash);
+            } else {
+                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
             }
         }
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @RequestMapping(value = "/copy_files", method = RequestMethod.POST)
-    public void copyFiles(@RequestParam(value = "docIds[]", required = false) Long[] docIds,
-                          @RequestParam(value = "dirIds[]", required = false) Long[] dirIds,
-                          String destinationDirectoryHash,
-                          HttpSession session) {
+    public ResponseEntity<Void> copyFiles(@RequestParam(value = "docIds[]", required = false) Long[] docIds,
+                                @RequestParam(value = "dirIds[]", required = false) Long[] dirIds,
+                                String destinationDirectoryHash,
+                                HttpSession session) {
 
         User user = getUserFromSession(session);
         if (docIds != null && destinationDirectoryHash != null) {
             Set<UserDocument> documents = userDocumentService.getByIds(Arrays.asList(docIds));
             if (documentAccessProvider.isOwner(documents, user)) {
                 userDocumentService.copy(docIds, destinationDirectoryHash);
+            } else {
+                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
             }
         }
         if (dirIds != null && destinationDirectoryHash != null) {
             Set<UserDirectory> directories = userDirectoryService.getByIds(Arrays.asList(dirIds));
-            if (directoryAccessProvider.canRemove(directories, user)) {
+            if (directoryAccessProvider.isOwner(directories, user)) {
                 userDirectoryService.copy(dirIds, destinationDirectoryHash);
+            } else {
+                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
             }
         }
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     private <T, S extends EntityService<T, Long>> Set<T> createEntitySet(long[] ids, S service) {
@@ -618,8 +633,9 @@ public class DocumentController {
             directory = UserFileUtil.createUserDirectory(owner, parentDirectoryHash, dirName);
             long dirId = userDirectoryService.save(directory);
             directory.setId(dirId);
+            return directory;
         }
-        return directory;
+        return null;
     }
 
     private void sendUpdateEvent(UserDocument document, User user) {

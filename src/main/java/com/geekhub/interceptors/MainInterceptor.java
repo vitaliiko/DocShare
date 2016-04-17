@@ -1,4 +1,4 @@
-package com.geekhub.controllers;
+package com.geekhub.interceptors;
 
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 

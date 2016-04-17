@@ -296,6 +296,11 @@ $(document).ready(function() {
                     allTable.append(html);
                     privateTable.append(html);
                 });
+                $('.alert-danger').hide(true);
+            },
+            error: function() {
+                $('.alert-danger').show(true);
+                $('.alert-text').text("Directory with such name already exist");
             }
         });
     });

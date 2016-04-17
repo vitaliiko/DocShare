@@ -1,6 +1,6 @@
 package com.geekhub.app_config;
 
-import com.geekhub.controllers.MainInterceptor;
+import com.geekhub.interceptors.MainInterceptor;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
