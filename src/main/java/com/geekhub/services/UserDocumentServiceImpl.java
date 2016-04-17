@@ -16,7 +16,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 import org.hibernate.Hibernate;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -87,7 +86,7 @@ public class UserDocumentServiceImpl implements UserDocumentService {
     @Override
     public void moveToTrash(Long docId, Long removerId) {
         UserDocument document = userDocumentDao.getById(docId);
-        RemovedDocument removedDocument = UserFileUtil.wrapUserDocument(document, removerId);
+        RemovedDocument removedDocument = UserFileUtil.wrapUserDocumentInRemoved(document, removerId);
         removedDocumentService.save(removedDocument);
         document.setDocumentStatus(DocumentStatus.REMOVED);
         userDocumentDao.update(document);
@@ -245,14 +244,11 @@ public class UserDocumentServiceImpl implements UserDocumentService {
     @Override
     public void copy(Long docId, String destinationDirectoryHash) {
         UserDocument document = userDocumentDao.getById(docId);
-        UserDocument copy = null;
-        BeanUtils.copyProperties(document, copy);
-        copy.setId(null);
+        UserDocument copy = UserFileUtil.copyDocument(document);
         copy.setParentDirectoryHash(destinationDirectoryHash);
 
-        String newHashName = UserFileUtil.createHashName();
-        UserFileUtil.copyFile(document.getHashName(), newHashName);
-        copy.setHashName(newHashName);
+        copy.setHashName(UserFileUtil.createHashName());
+        UserFileUtil.copyFile(document.getHashName(), copy.getHashName());
 
         userDocumentDao.save(copy);
     }
@@ -268,5 +264,10 @@ public class UserDocumentServiceImpl implements UserDocumentService {
         Set<UserDocument> documents = new TreeSet<>();
         Arrays.stream(names).forEach(n -> documents.addAll(userDocumentDao.search(owner, "name", n)));
         return documents;
+    }
+
+    @Override
+    public List<Object> getActualIdsByParentDirectoryHash(String parentDirectoryHash) {
+        return userDocumentDao.getPropertiesList("id", "parentDirectoryHash", parentDirectoryHash);
     }
 }

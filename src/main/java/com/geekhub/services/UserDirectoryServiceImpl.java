@@ -82,7 +82,7 @@ public class UserDirectoryServiceImpl implements UserDirectoryService {
     @Override
     public void moveToTrash(Long docId, Long removerId) {
         UserDirectory directory = userDirectoryDao.getById(docId);
-        RemovedDirectory removedDirectory = UserFileUtil.wrapUserDirectory(directory, removerId);
+        RemovedDirectory removedDirectory = UserFileUtil.wrapUserDirectoryInRemoved(directory, removerId);
         removedDirectoryService.save(removedDirectory);
 
         setRemovedStatus(directory);
@@ -224,5 +224,25 @@ public class UserDirectoryServiceImpl implements UserDirectoryService {
         Set<UserDirectory> directories = new TreeSet<>();
         Arrays.stream(names).forEach(n -> directories.addAll(userDirectoryDao.search(owner, "name", n)));
         return directories;
+    }
+
+    @Override
+    public void copy(Long dirId, String destinationDirectoryHash) {
+        UserDirectory directory = userDirectoryDao.getById(dirId);
+        UserDirectory copy = UserFileUtil.copyDirectory(directory);
+        copy.setParentDirectoryHash(destinationDirectoryHash);
+
+        copy.setHashName(UserFileUtil.createHashName());
+        UserFileUtil.copyFile(directory.getHashName(), copy.getHashName());
+
+        List<Object> docIds = userDocumentService.getActualIdsByParentDirectoryHash(directory.getHashName());
+        docIds.forEach(id -> userDocumentService.copy((Long) id, copy.getHashName()));
+
+        userDirectoryDao.save(copy);
+    }
+
+    @Override
+    public void copy(Long[] dirIds, String destinationDirectoryHash) {
+        Arrays.stream(dirIds).forEach(id -> copy(id, destinationDirectoryHash));
     }
 }

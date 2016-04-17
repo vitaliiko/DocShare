@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 import org.apache.commons.codec.digest.DigestUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.util.FileCopyUtils;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -72,7 +73,7 @@ public class UserFileUtil {
         return new DecimalFormat("#,##0.#").format(size/Math.pow(1024, digitGroups)) + " " + units[digitGroups];
     }
 
-    public static RemovedDocument wrapUserDocument(UserDocument document, Long removerId) {
+    public static RemovedDocument wrapUserDocumentInRemoved(UserDocument document, Long removerId) {
         RemovedDocument removedDocument = new RemovedDocument();
         removedDocument.setOwner(document.getOwner());
         removedDocument.setRemoverId(removerId);
@@ -81,7 +82,7 @@ public class UserFileUtil {
         return removedDocument;
     }
 
-    public static RemovedDirectory wrapUserDirectory(UserDirectory directory, Long removerId) {
+    public static RemovedDirectory wrapUserDirectoryInRemoved(UserDirectory directory, Long removerId) {
         RemovedDirectory removedDirectory = new RemovedDirectory();
         removedDirectory.setOwner(directory.getOwner());
         removedDirectory.setRemoverId(removerId);
@@ -133,6 +134,25 @@ public class UserFileUtil {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public static UserDocument copyDocument(UserDocument original) {
+        String[] ignoredProperties = new String[] {
+                "id", "parentDirectoryHash", "hashName", "comments", "readers",
+                "readersGroups", "editors", "editorsGroups", "documentOldVersions"
+        };
+        UserDocument copy = new UserDocument();
+        BeanUtils.copyProperties(original, copy, ignoredProperties);
+        return copy;
+    }
+
+    public static UserDirectory copyDirectory(UserDirectory original) {
+        String[] ignoredProperties = new String[] {
+                "id", "parentDirectoryHash", "hashName", "readers", "readersGroups"
+        };
+        UserDirectory copy = new UserDirectory();
+        BeanUtils.copyProperties(original, copy, ignoredProperties);
+        return copy;
     }
 
     public static void removeUserFiles(List<String> filesNames) {

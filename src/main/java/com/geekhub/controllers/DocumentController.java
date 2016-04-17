@@ -381,10 +381,8 @@ public class DocumentController {
         User user = getUserFromSession(session);
 
         Set<UserDirectory> directories = userDirectoryService.getActualByOwner(user);
-        Map<String, String> directoriesMap = directories.stream()
-                .collect(Collectors
+        return directories.stream().collect(Collectors
                         .toMap(d -> userDirectoryService.getLocation(d) + d.getName(), UserDirectory::getHashName));
-        return directoriesMap;
     }
 
     @RequestMapping(value = "/share_document", method = RequestMethod.POST)
@@ -541,13 +539,13 @@ public class DocumentController {
         if (docIds != null && destinationDirectoryHash != null) {
             Set<UserDocument> documents = userDocumentService.getByIds(Arrays.asList(docIds));
             if (documentAccessProvider.isOwner(documents, user)) {
-                userDocumentService.replace(docIds, destinationDirectoryHash);
+                userDocumentService.copy(docIds, destinationDirectoryHash);
             }
         }
         if (dirIds != null && destinationDirectoryHash != null) {
             Set<UserDirectory> directories = userDirectoryService.getByIds(Arrays.asList(dirIds));
             if (directoryAccessProvider.canRemove(directories, user)) {
-                userDirectoryService.replace(dirIds, destinationDirectoryHash);
+                userDirectoryService.copy(dirIds, destinationDirectoryHash);
             }
         }
     }

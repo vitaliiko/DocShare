@@ -26,6 +26,10 @@ public interface UserDirectoryService extends EntityService<UserDirectory, Long>
 
     Long recover(Long removedDirId);
 
+    void copy(Long dirId, String destinationDirectoryHash);
+
+    void copy(Long[] dirIds, String destinationDirectoryHash);
+
     void recover(Long[] removedDirIds);
 
     UserDirectory getByNameAndOwnerId(Long ownerId, String name);
