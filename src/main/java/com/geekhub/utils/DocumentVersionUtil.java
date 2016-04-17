@@ -2,11 +2,10 @@ package com.geekhub.utils;
 
 import com.geekhub.entities.DocumentOldVersion;
 import com.geekhub.entities.UserDocument;
-import java.io.IOException;
 
 public class DocumentVersionUtil {
 
-    public static DocumentOldVersion createOldVersion(UserDocument document) throws IOException {
+    public static DocumentOldVersion createOldVersion(UserDocument document) {
         DocumentOldVersion oldVersion = new DocumentOldVersion();
         oldVersion.setModifiedBy(document.getModifiedBy());
         oldVersion.setName(document.getName());
@@ -14,5 +13,14 @@ public class DocumentVersionUtil {
         oldVersion.setHashName(document.getHashName());
         oldVersion.setLastModifyTime(document.getLastModifyTime());
         return oldVersion;
+    }
+
+    public static UserDocument recoverOldVersion(DocumentOldVersion oldVersion) {
+        UserDocument document = oldVersion.getUserDocument();
+        document.setHashName(oldVersion.getHashName());
+        document.setLastModifyTime(oldVersion.getLastModifyTime());
+        document.setModifiedBy(oldVersion.getModifiedBy());
+        document.setSize(oldVersion.getSize());
+        return document;
     }
 }

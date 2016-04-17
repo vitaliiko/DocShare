@@ -20,14 +20,14 @@
                 <th>Changed</th>
                 <th width="15"></th>
             </tr>
-        <c:forEach items="${documents}" var="doc">
+        <c:forEach items="${documents}" var="version">
             <tr>
-                <td><a href="/document/browse-${doc.id}">${doc.name}</a></td>
-                <td>${doc.ownerName}</td>
-                <td>${doc.size}</td>
-                <td>${doc.lastModifyTime}</td>
+                <td><a href="/document/browse-${version.id}">${version.name}</a></td>
+                <td>${version.ownerName}</td>
+                <td>${version.size}</td>
+                <td>${version.lastModifyTime}</td>
                 <td>
-                    <a href="/document/download-${doc.id}" class="btn btn-default btn-sm custom-width">Download</a>
+                    <a href="/document/download-${version.id}" class="btn btn-default btn-sm custom-width">Download</a>
                 </td>
             </tr>
         </c:forEach>

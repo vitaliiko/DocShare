@@ -133,12 +133,6 @@ public class UserDocumentDao implements EntityDao<UserDocument, Long> {
                 .uniqueResult();
     }
 
-    public UserDocument getWithOldVersions(Long docId) {
-        UserDocument document = getById(docId);
-        Hibernate.initialize(document.getDocumentOldVersions());
-        return document;
-    }
-
     public List<UserDocument> getByReader(User reader) {
         return sessionFactory.getCurrentSession()
                 .createQuery("from UserDocument doc " +

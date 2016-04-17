@@ -2,7 +2,9 @@ package com.geekhub.services;
 
 import com.geekhub.dao.DocumentOldVersionDao;
 import com.geekhub.entities.DocumentOldVersion;
+import com.geekhub.entities.UserDocument;
 import java.util.List;
+import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,7 +26,10 @@ public class DocumentOldVersionServiceImpl implements DocumentOldVersionService 
 
     @Override
     public DocumentOldVersion getById(Long id) {
-        return documentOldVersionDao.getById(id);
+        DocumentOldVersion oldVersion = documentOldVersionDao.getById(id);
+        UserDocument document = oldVersion.getUserDocument();
+        Hibernate.initialize(document.getDocumentOldVersions());
+        return oldVersion;
     }
 
     @Override

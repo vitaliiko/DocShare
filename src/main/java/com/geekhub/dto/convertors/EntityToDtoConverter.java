@@ -31,7 +31,7 @@ public class EntityToDtoConverter {
         oldVersionDto.setName(oldVersion.getUserDocument().getName());
         oldVersionDto.setChangedBy(oldVersion.getModifiedBy());
         oldVersionDto.setLastModifyTime(oldVersion.getUserDocument().getLastModifyTime());
-        oldVersionDto.setSize(oldVersion.getUserDocument().getSize());
+        oldVersionDto.setSize(oldVersion.getSize());
         return oldVersionDto;
     }
 

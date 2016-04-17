@@ -40,23 +40,19 @@ import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
-import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.FileCopyUtils;
 import org.springframework.web.bind.WebDataBinder;
-import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
@@ -98,10 +94,10 @@ public class DocumentController {
     private DocumentOldVersionService documentOldVersionService;
 
     @Autowired
-    private UserDirectoryAccessService directoryAccessProvider;
+    private UserDirectoryAccessService directoryAccessService;
 
     @Autowired
-    private UserDocumentAccessService documentAccessProvider;
+    private UserDocumentAccessService documentAccessService;
 
     @Autowired
     private EventService eventService;
@@ -160,16 +156,15 @@ public class DocumentController {
         User user = getUserFromSession(session);
         UserDocument document = userDocumentService.getById(docId);
 
-        if (documentAccessProvider.canRead(document, user)) {
+        if (documentAccessService.canRead(document, user)) {
             File file = UserFileUtil.createFile(document.getHashName());
             response.setContentType(document.getType());
             response.setContentLength((int) file.length());
             response.setHeader("Content-Disposition", "attachment; filename=\"" + document.getName() + "\"");
 
             FileCopyUtils.copy(Files.newInputStream(file.toPath()), response.getOutputStream());
-        } else {
-            throw new ResourceNotFoundException();
         }
+        throw new ResourceNotFoundException();
     }
 
     @RequestMapping(value = "/move-to-trash", method = RequestMethod.POST)
@@ -181,7 +176,7 @@ public class DocumentController {
         User user = getUserFromSession(session);
         if (docIds != null) {
             Set<UserDocument> documents = userDocumentService.getByIds(Arrays.asList(docIds));
-            if (documentAccessProvider.canRemove(documents, user)) {
+            if (documentAccessService.canRemove(documents, user)) {
                 userDocumentService.moveToTrash(docIds, userId);
                 documents.forEach(doc ->
                         sendRemoveEvent(userDocumentService, "Document", doc.getName(), doc.getId(), user));
@@ -189,7 +184,7 @@ public class DocumentController {
         }
         if (dirIds != null) {
             Set<UserDirectory> directories = userDirectoryService.getByIds(Arrays.asList(dirIds));
-            if (directoryAccessProvider.canRemove(directories, user)) {
+            if (directoryAccessService.canRemove(directories, user)) {
                 userDirectoryService.moveToTrash(dirIds, userId);
                 directories.forEach(dir ->
                         sendRemoveEvent(userDirectoryService, "Directory", dir.getName(), dir.getId(), user));
@@ -222,29 +217,27 @@ public class DocumentController {
     @RequestMapping(value = "/recover-document", method = RequestMethod.POST)
     public ModelAndView recoverDocument(long remDocId, HttpSession session) {
         User user = getUserFromSession(session);
-        if (documentAccessProvider.canRecover(remDocId, user)) {
+        if (documentAccessService.canRecover(remDocId, user)) {
             Long docId = userDocumentService.recover(remDocId);
 
             String docName = userDocumentService.getById(docId).getName();
             sendRecoverEvent(userDocumentService, "Document", docName, docId, user);
             return new ModelAndView("redirect:/document/upload");
-        } else {
-            throw new ResourceNotFoundException();
         }
+        throw new ResourceNotFoundException();
     }
 
     @RequestMapping(value = "/recover-directory", method = RequestMethod.POST)
     public ModelAndView recoverDirectory(long remDirId, HttpSession session) {
         User user = getUserFromSession(session);
-        if (directoryAccessProvider.canRecover(remDirId, user)) {
+        if (directoryAccessService.canRecover(remDirId, user)) {
             Long dirId = userDirectoryService.recover(remDirId);
 
             String dirName = userDirectoryService.getById(dirId).getName();
             sendRecoverEvent(userDirectoryService, "Directory", dirName, dirId, user);
             return new ModelAndView("redirect:/document/upload");
-        }else {
-            throw new ResourceNotFoundException();
         }
+        throw new ResourceNotFoundException();
     }
 
     @RequestMapping(value = "/browse-{docId}", method = RequestMethod.GET)
@@ -252,21 +245,20 @@ public class DocumentController {
         ModelAndView model = new ModelAndView();
         User user = getUserFromSession(session);
         UserDocument document = userDocumentService.getById(docId);
-        if (documentAccessProvider.canRead(document, user)) {
+        if (documentAccessService.canRead(document, user)) {
             model.setViewName("document");
             model.addObject("doc", EntityToDtoConverter.convert(document));
             model.addObject("location", userDocumentService.getLocation(document));
             return model;
-        } else {
-            throw new ResourceNotFoundException();
         }
+        throw new ResourceNotFoundException();
     }
 
     @RequestMapping(value = "/get-comments", method = RequestMethod.GET)
     public ResponseEntity<Set<CommentDto>> getComments(long docId, HttpSession session) {
         User user = getUserFromSession(session);
         UserDocument document = userDocumentService.getDocumentWithComments(docId);
-        if (documentAccessProvider.canRead(document, user)
+        if (documentAccessService.canRead(document, user)
                 && document.getAbilityToComment() == AbilityToCommentDocument.ENABLE) {
             Set<CommentDto> comments = new TreeSet<>();
             document.getComments().forEach(c -> comments.add(EntityToDtoConverter.convert(c)));
@@ -279,27 +271,25 @@ public class DocumentController {
     public CommentDto addComment(String text, long docId, HttpSession session) {
         User user = getUserFromSession(session);
         UserDocument document = userDocumentService.getById(docId);
-        if (documentAccessProvider.canRead(document, user)
+        if (documentAccessService.canRead(document, user)
                 && document.getAbilityToComment() == AbilityToCommentDocument.ENABLE
                 && !text.isEmpty()) {
             Comment comment = CommentUtil.createComment(text, user, document);
             commentService.save(comment);
             return EntityToDtoConverter.convert(comment);
-        } else {
-            throw new ResourceNotFoundException();
         }
+        throw new ResourceNotFoundException();
     }
 
     @RequestMapping("/clear-comments")
     public void clearComments(long docId, HttpSession session) {
         User user = getUserFromSession(session);
         UserDocument document = userDocumentService.getDocumentWithComments(docId);
-        if (documentAccessProvider.isOwner(document, user)) {
+        if (documentAccessService.isOwner(document, user)) {
             document.getComments().clear();
             userDocumentService.update(document);
-        } else {
-            throw new ResourceNotFoundException();
         }
+        throw new ResourceNotFoundException();
     }
 
     @RequestMapping(value = "/make-directory", method = RequestMethod.GET)
@@ -325,7 +315,7 @@ public class DocumentController {
     public UserFileDto getUserDocument(long docId, HttpSession session) {
         User user = getUserFromSession(session);
         UserDocument document = userDocumentService.getById(docId);
-        if (documentAccessProvider.isOwner(document, user) && document.getDocumentStatus() == DocumentStatus.ACTUAL) {
+        if (documentAccessService.isOwner(document, user) && document.getDocumentStatus() == DocumentStatus.ACTUAL) {
             return EntityToDtoConverter.convert(document);
         }
         return null;
@@ -335,7 +325,7 @@ public class DocumentController {
     public UserFileDto getUserDirectory(Long dirId, HttpSession session) {
         User user = getUserFromSession(session);
         UserDirectory directory = userDirectoryService.getById(dirId);
-        if (directoryAccessProvider.isOwner(directory, user)
+        if (directoryAccessService.isOwner(directory, user)
                 && directory.getDocumentStatus() == DocumentStatus.ACTUAL) {
             return EntityToDtoConverter.convert(directory);
         }
@@ -352,7 +342,7 @@ public class DocumentController {
             return null;
         }
 
-        if (documentAccessProvider.isOwner(document, user)) {
+        if (documentAccessService.isOwner(document, user)) {
             UserDocument documentWithNewName =
                     userDocumentService.getByFullNameAndOwner(user, document.getParentDirectoryHash(), newDocName);
             if (documentWithNewName == null && UserFileUtil.validateDocumentNameWithoutExtension(newDocName)) {
@@ -378,7 +368,7 @@ public class DocumentController {
             return null;
         }
 
-        if (directoryAccessProvider.isOwner(directory, user)) {
+        if (directoryAccessService.isOwner(directory, user)) {
             UserDirectory directoryWithNewName =
                     userDirectoryService.getByFullNameAndOwner(user, directory.getParentDirectoryHash(), newDirName);
             if (directoryWithNewName == null && UserFileUtil.validateDirectoryName(newDirName)) {
@@ -401,7 +391,7 @@ public class DocumentController {
         UserDocument document = userDocumentService.getById(shared.getDocId());
         Set<User> readersAndEditors = userDocumentService.getAllReadersAndEditors(document.getId());
 
-        if (documentAccessProvider.isOwner(document, user) && document.getDocumentStatus() == DocumentStatus.ACTUAL) {
+        if (documentAccessService.isOwner(document, user) && document.getDocumentStatus() == DocumentStatus.ACTUAL) {
             document.setDocumentAttribute(DocumentAttribute.valueOf(shared.getAccess()));
             document.setReaders(createEntitySet(shared.getReaders(), userService));
             document.setEditors(createEntitySet(shared.getEditors(), userService));
@@ -428,7 +418,7 @@ public class DocumentController {
         UserDirectory directory = userDirectoryService.getById(shared.getDocId());
         Set<User> readers = userDirectoryService.getAllReaders(directory.getId());
 
-        if (directoryAccessProvider.isOwner(directory, user)
+        if (directoryAccessService.isOwner(directory, user)
                 && directory.getDocumentStatus() == DocumentStatus.ACTUAL) {
             directory.setDocumentAttribute(DocumentAttribute.valueOf(shared.getAccess()));
             directory.setReaders(createEntitySet(shared.getReaders(), userService));
@@ -453,14 +443,30 @@ public class DocumentController {
         ModelAndView model = new ModelAndView("history");
         User user = getUserFromSession(session);
         UserDocument document = userDocumentService.getWithOldVersions(docId);
-        if (documentAccessProvider.isOwner(document, user) && document.getDocumentStatus() == DocumentStatus.ACTUAL) {
+        if (documentAccessService.isOwner(document, user) && document.getDocumentStatus() == DocumentStatus.ACTUAL) {
             List<DocumentOldVersionDto> versions = new ArrayList<>();
             document.getDocumentOldVersions().forEach(v -> versions.add(EntityToDtoConverter.convert(v)));
             model.addObject("versions", versions);
             return model;
-        } else {
-            throw new ResourceNotFoundException();
         }
+        throw new ResourceNotFoundException();
+    }
+
+    @RequestMapping("/version_recover/{oldVersionId}")
+    public ModelAndView recoverVersion(@PathVariable Long oldVersionId, HttpSession session) {
+        User user = getUserFromSession(session);
+        DocumentOldVersion oldVersion = documentOldVersionService.getById(oldVersionId);
+        UserDocument document = oldVersion.getUserDocument();
+
+        if (documentAccessService.isOwner(document, user)) {
+            DocumentOldVersion currentVersion = DocumentVersionUtil.createOldVersion(document);
+            document.getDocumentOldVersions().add(currentVersion);
+            document = DocumentVersionUtil.recoverOldVersion(oldVersion);
+            userDocumentService.update(document);
+            documentOldVersionService.delete(oldVersion);
+            return new ModelAndView("redirect:/document/upload");
+        }
+        throw new ResourceNotFoundException();
     }
 
     @RequestMapping("/accessible-documents")
@@ -481,7 +487,7 @@ public class DocumentController {
             return new ResponseEntity<>(getDirectoryContent(dirHashName), HttpStatus.OK);
         } else {
             UserDirectory directory = userDirectoryService.getByHashName(dirHashName);
-            if (directoryAccessProvider.canRead(directory, user)) {
+            if (directoryAccessService.canRead(directory, user)) {
                 return new ResponseEntity<>(getDirectoryContent(dirHashName), HttpStatus.OK);
             }
         }
@@ -494,7 +500,7 @@ public class DocumentController {
 
         User user = getUserFromSession(session);
         UserDirectory currentDirectory = userDirectoryService.getByHashName(dirHashName);
-        if (directoryAccessProvider.canRead(currentDirectory, user)) {
+        if (directoryAccessService.canRead(currentDirectory, user)) {
             return new ResponseEntity<>(getDirectoryContent(currentDirectory.getParentDirectoryHash()), HttpStatus.OK);
         }
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -530,7 +536,7 @@ public class DocumentController {
         User user = getUserFromSession(session);
         if (docIds != null && destinationDirectoryHash != null) {
             Set<UserDocument> documents = userDocumentService.getByIds(Arrays.asList(docIds));
-            if (documentAccessProvider.isOwner(documents, user)) {
+            if (documentAccessService.isOwner(documents, user)) {
                 userDocumentService.replace(docIds, destinationDirectoryHash);
             } else {
                 return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -538,7 +544,7 @@ public class DocumentController {
         }
         if (dirIds != null && destinationDirectoryHash != null) {
             Set<UserDirectory> directories = userDirectoryService.getByIds(Arrays.asList(dirIds));
-            if (directoryAccessProvider.isOwner(directories, user)) {
+            if (directoryAccessService.isOwner(directories, user)) {
                 userDirectoryService.replace(dirIds, destinationDirectoryHash);
             } else {
                 return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -556,7 +562,7 @@ public class DocumentController {
         User user = getUserFromSession(session);
         if (docIds != null && destinationDirectoryHash != null) {
             Set<UserDocument> documents = userDocumentService.getByIds(Arrays.asList(docIds));
-            if (documentAccessProvider.isOwner(documents, user)) {
+            if (documentAccessService.isOwner(documents, user)) {
                 userDocumentService.copy(docIds, destinationDirectoryHash);
             } else {
                 return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -564,7 +570,7 @@ public class DocumentController {
         }
         if (dirIds != null && destinationDirectoryHash != null) {
             Set<UserDirectory> directories = userDirectoryService.getByIds(Arrays.asList(dirIds));
-            if (directoryAccessProvider.isOwner(directories, user)) {
+            if (directoryAccessService.isOwner(directories, user)) {
                 userDirectoryService.copy(dirIds, destinationDirectoryHash);
             } else {
                 return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -612,7 +618,7 @@ public class DocumentController {
             Long docId = userDocumentService.recover(removedDocument.getId());
             document = userDocumentService.getDocumentWithOldVersions(docId);
             updateDocument(document, user, description, multipartFile);
-        } else if (documentAccessProvider.canEdit(document, user)) {
+        } else if (documentAccessService.canEdit(document, user)) {
             document = userDocumentService.getDocumentWithOldVersions(document.getId());
             updateDocument(document, user, description, multipartFile);
         }
@@ -620,6 +626,7 @@ public class DocumentController {
 
     private void updateDocument(UserDocument document, User user, String description, MultipartFile multipartFile)
             throws IOException {
+
         DocumentOldVersion oldVersion = DocumentVersionUtil.createOldVersion(document);
         document.getDocumentOldVersions().add(oldVersion);
         userDocumentService.update(UserFileUtil.updateUserDocument(document, multipartFile, description, user));
