@@ -1,8 +1,8 @@
 package com.geekhub.entities;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.geekhub.entities.enums.DocumentAttribute;
 import com.geekhub.entities.enums.DocumentStatus;
+import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 import javax.persistence.CascadeType;
@@ -21,13 +21,12 @@ import javax.persistence.Table;
 
 @Entity
 @Table(name = "user_directory")
-public class UserDirectory implements Comparable<UserDirectory> {
+public class UserDirectory implements Comparable<UserDirectory>, Serializable {
 
     @Id
     @GeneratedValue
     private Long id;
 
-    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "owner_id")
     private User owner;
@@ -49,7 +48,6 @@ public class UserDirectory implements Comparable<UserDirectory> {
     @Enumerated(EnumType.STRING)
     private DocumentStatus documentStatus = DocumentStatus.ACTUAL;
 
-    @JsonIgnore
     @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH},
             fetch = FetchType.EAGER)
     @JoinTable(name = "reader_to_directory_relation",
@@ -62,7 +60,6 @@ public class UserDirectory implements Comparable<UserDirectory> {
     )
     private Set<User> readers = new HashSet<>();
 
-    @JsonIgnore
     @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH},
             fetch = FetchType.EAGER)
     @JoinTable(name = "readers_group_to_directory_relation",

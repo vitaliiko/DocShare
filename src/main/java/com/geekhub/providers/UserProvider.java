@@ -26,15 +26,6 @@ public class UserProvider {
     @Autowired
     private UserDirectoryService userDirectoryService;
 
-    public void validateUser(String login, String password, String confirmPassword) throws UserValidateException {
-        if (userService.getByLogin(login) != null) {
-            throw new UserValidateException("User with such login already exist");
-        }
-        if (!password.equals(confirmPassword)) {
-            throw new UserValidateException("Passwords doesn't much");
-        }
-    }
-
     public void fillDB() {
         if (userService.getAll("id").size() == 0) {
             createRootDir();

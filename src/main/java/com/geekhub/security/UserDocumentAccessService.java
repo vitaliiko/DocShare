@@ -16,7 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
-public class UserDocumentAccessProvider implements UserFileAccessProvider<UserDocument, RemovedDocument> {
+public class UserDocumentAccessService implements UserFileAccessService<UserDocument, RemovedDocument> {
 
     @Autowired
     private UserService userService;

@@ -5,7 +5,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
-public interface UserFileAccessProvider<T, R> {
+public interface UserFileAccessService<T, R> {
 
     boolean isOwner(T file, User user);
 

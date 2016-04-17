@@ -16,8 +16,8 @@ import com.geekhub.dto.UserFileDto;
 import com.geekhub.dto.DocumentOldVersionDto;
 import com.geekhub.dto.SharedDto;
 import com.geekhub.entities.enums.DocumentStatus;
-import com.geekhub.security.UserDirectoryAccessProvider;
-import com.geekhub.security.UserDocumentAccessProvider;
+import com.geekhub.security.UserDirectoryAccessService;
+import com.geekhub.security.UserDocumentAccessService;
 import com.geekhub.services.CommentService;
 import com.geekhub.services.DocumentOldVersionService;
 import com.geekhub.services.EntityService;
@@ -95,10 +95,10 @@ public class DocumentController {
     private DocumentOldVersionService documentOldVersionService;
 
     @Autowired
-    private UserDirectoryAccessProvider directoryAccessProvider;
+    private UserDirectoryAccessService directoryAccessProvider;
 
     @Autowired
-    private UserDocumentAccessProvider documentAccessProvider;
+    private UserDocumentAccessService documentAccessProvider;
 
     @Autowired
     private EventService eventService;
@@ -132,8 +132,8 @@ public class DocumentController {
 
     @RequestMapping(value = "/upload", method = RequestMethod.POST)
     public ModelAndView uploadDocument(@RequestParam("files[]") MultipartFile[] files,
-                                       String description,
                                        @RequestParam(required = false, name = "dirHashName") String parentDirectoryHash,
+                                       String description,
                                        HttpSession session) throws IOException {
 
         User user = getUserFromSession(session);
@@ -472,7 +472,7 @@ public class DocumentController {
             return getDirectoryContent(dirHashName);
         } else {
             UserDirectory directory = userDirectoryService.getByHashName(dirHashName);
-            if (directoryAccessProvider.canRead(directory, user) || dirHashName.equals(user.getLogin())) {
+            if (directoryAccessProvider.canRead(directory, user)) {
                 return getDirectoryContent(dirHashName);
             }
         }
