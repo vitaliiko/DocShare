@@ -29,7 +29,7 @@ public class ProfileController {
     @Autowired
     private UserProfileManager userProfileManager;
 
-    @RequestMapping(value = "/view", method = RequestMethod.GET)
+    @RequestMapping(value = "/", method = RequestMethod.GET)
     public ModelAndView profile(HttpSession session) {
         User user = userService.getById((Long) session.getAttribute("userId"));
         ModelAndView model = new ModelAndView("profile");
@@ -37,7 +37,7 @@ public class ProfileController {
         return model;
     }
 
-    @RequestMapping(value = "/changeProfile", method = RequestMethod.POST)
+    @RequestMapping(value = "/change_profile", method = RequestMethod.POST)
     public ModelAndView changeProfile(UserDto userDto, HttpSession session) {
         ModelAndView model = new ModelAndView("profile");
         User user = userService.getById((Long) session.getAttribute("userId"));
@@ -52,7 +52,7 @@ public class ProfileController {
         return model;
     }
 
-    @RequestMapping(value = "/changePassword", method = RequestMethod.POST)
+    @RequestMapping(value = "/change_password", method = RequestMethod.POST)
     public ModelAndView changePassword(String currentPassword,
                                        String newPassword,
                                        String confirmNewPassword,
@@ -70,7 +70,7 @@ public class ProfileController {
         return model;
     }
 
-    @RequestMapping("/removeAccount")
+    @RequestMapping("/remove_account")
     public ModelAndView removeAccount(HttpSession session) {
         User user = userService.getById((Long) session.getAttribute("userId"));
         ModelAndView model = new ModelAndView("signIn");
@@ -83,7 +83,7 @@ public class ProfileController {
         return model;
     }
 
-    @RequestMapping(value = "/uploadAvatar", method = RequestMethod.POST)
+    @RequestMapping(value = "/upload_avatar", method = RequestMethod.POST)
     public ModelAndView uploadAvatar(MultipartFile avatar, HttpSession session) throws IOException {
         User user = userService.getById((Long) session.getAttribute("userId"));
         if (avatar != null && !avatar.isEmpty()) {
@@ -96,7 +96,7 @@ public class ProfileController {
         return model;
     }
 
-    @RequestMapping(value = "/avatarDisplay", method = RequestMethod.GET)
+    @RequestMapping(value = "/avatar_display", method = RequestMethod.GET)
     public void showImage(Long userId, HttpServletResponse response, HttpSession session) throws IOException {
         User user = userService.getById(userId);
         byte[] avatar = user.getAvatar();

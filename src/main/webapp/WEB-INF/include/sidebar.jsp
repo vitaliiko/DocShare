@@ -10,13 +10,13 @@
             </span>Files</a>
         </li>
         <li>
-            <a href="/document/accessible-documents">
+            <a href="/document/accessible">
             <span class="fa-stack fa-lg pull-left">
                 <i class="fa fa-cart-plus fa-stack-1x "></i>
             </span>Accessible files</a>
         </li>
         <li>
-            <a href="/friends/view">
+            <a href="/friends/">
             <span class="fa-stack fa-lg pull-left">
                 <i class="fa fa-cart-plus fa-stack-1x "></i>
             </span>Friends</a>

@@ -22,12 +22,12 @@
             </tr>
         <c:forEach items="${documents}" var="version">
             <tr>
-                <td><a href="/document/browse-${version.id}">${version.name}</a></td>
+                <td><a href="/document/browse/${version.id}">${version.name}</a></td>
                 <td>${version.ownerName}</td>
                 <td>${version.size}</td>
                 <td>${version.lastModifyTime}</td>
                 <td>
-                    <a href="/document/download-${version.id}" class="btn btn-default btn-sm custom-width">Download</a>
+                    <a href="/document/download/${version.id}" class="btn btn-default btn-sm custom-width">Download</a>
                 </td>
             </tr>
         </c:forEach>

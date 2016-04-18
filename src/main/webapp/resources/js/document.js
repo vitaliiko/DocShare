@@ -3,7 +3,7 @@ $(document).ready(function() {
     var handlebarsPath = '/resources/js/templates/comment.html';
     var docId = $('.doc-id').val();
 
-    $.getJSON('/document/get-comments', {docId: docId}, function(comments) {
+    $.getJSON('/document/get_comments', {docId: docId}, function(comments) {
         $.each(comments, function(k, v) {
             loadTemplate(handlebarsPath, function (template) {
                 $('.commentList').prepend(template(v));
@@ -15,7 +15,7 @@ $(document).ready(function() {
     $('.add-comment').click(function() {
         var text = $('.comment-text').val();
         if (text != '') {
-            $.post('add-comment', {text: text, docId: docId}, function(comment) {
+            $.post('add_comment', {text: text, docId: docId}, function(comment) {
                 loadTemplate(handlebarsPath, function (template) {
                     $('.commentList').prepend(template(comment));
                 });

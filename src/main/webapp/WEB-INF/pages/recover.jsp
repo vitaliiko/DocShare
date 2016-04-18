@@ -26,7 +26,7 @@
                     <fmt:formatDate type="date" timeStyle="short" dateStyle="short" value="${dir.removalDate}"/>
                     by ${dir.removerName}
                 </td>
-                <td><form action="/document/recover-directory" method="post">
+                <td><form action="/document/recover_directory" method="post">
                     <input type="hidden" name="remDirId" value="${dir.id}">
                     <input type="submit" class="btn btn-primary custom-width" value="Recover">
                 </form></td>
@@ -39,7 +39,7 @@
                     <fmt:formatDate type="date" timeStyle="short" dateStyle="short" value="${version.removalDate}"/>
                     by ${version.removerName}
                 </td>
-                <td><form action="/document/recover-document" method="post">
+                <td><form action="/document/recover_document" method="post">
                     <input type="hidden" name="remDocId" value="${version.id}">
                     <input type="submit" class="btn btn-primary custom-width" value="Recover">
                 </form></td>

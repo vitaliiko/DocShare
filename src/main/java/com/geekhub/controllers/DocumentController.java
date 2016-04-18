@@ -150,7 +150,7 @@ public class DocumentController {
         return new ModelAndView("redirect:/document/upload");
     }
 
-    @RequestMapping(value = "/download-{docId}", method = RequestMethod.GET)
+    @RequestMapping(value = {"/download/{docId}", "/download-{docId}"}, method = RequestMethod.GET)
     public void downloadDocument(@PathVariable long docId, HttpSession session, HttpServletResponse response)
             throws IOException {
         User user = getUserFromSession(session);
@@ -167,7 +167,7 @@ public class DocumentController {
         throw new ResourceNotFoundException();
     }
 
-    @RequestMapping(value = "/move-to-trash", method = RequestMethod.POST)
+    @RequestMapping(value = "/move_to_trash", method = RequestMethod.POST)
     public void moveDocumentToTrash(@RequestParam(value = "docIds[]", required = false) Long[] docIds,
                                     @RequestParam(value = "dirIds[]", required = false) Long[] dirIds,
                                     HttpSession session) {
@@ -214,7 +214,7 @@ public class DocumentController {
         return model;
     }
 
-    @RequestMapping(value = "/recover-document", method = RequestMethod.POST)
+    @RequestMapping(value = "/recover_document", method = RequestMethod.POST)
     public ModelAndView recoverDocument(long remDocId, HttpSession session) {
         User user = getUserFromSession(session);
         if (documentAccessService.canRecover(remDocId, user)) {
@@ -227,7 +227,7 @@ public class DocumentController {
         throw new ResourceNotFoundException();
     }
 
-    @RequestMapping(value = "/recover-directory", method = RequestMethod.POST)
+    @RequestMapping(value = "/recover_directory", method = RequestMethod.POST)
     public ModelAndView recoverDirectory(long remDirId, HttpSession session) {
         User user = getUserFromSession(session);
         if (directoryAccessService.canRecover(remDirId, user)) {
@@ -240,7 +240,7 @@ public class DocumentController {
         throw new ResourceNotFoundException();
     }
 
-    @RequestMapping(value = "/browse-{docId}", method = RequestMethod.GET)
+    @RequestMapping(value = {"/browse/{docId}", "/browse-{docId}"}, method = RequestMethod.GET)
     public ModelAndView browseDocument(@PathVariable long docId, HttpSession session) {
         ModelAndView model = new ModelAndView();
         User user = getUserFromSession(session);
@@ -254,7 +254,7 @@ public class DocumentController {
         throw new ResourceNotFoundException();
     }
 
-    @RequestMapping(value = "/get-comments", method = RequestMethod.GET)
+    @RequestMapping(value = "/get_comments", method = RequestMethod.GET)
     public ResponseEntity<Set<CommentDto>> getComments(long docId, HttpSession session) {
         User user = getUserFromSession(session);
         UserDocument document = userDocumentService.getDocumentWithComments(docId);
@@ -281,7 +281,7 @@ public class DocumentController {
         throw new ResourceNotFoundException();
     }
 
-    @RequestMapping("/clear-comments")
+    @RequestMapping("/clear_comments")
     public void clearComments(long docId, HttpSession session) {
         User user = getUserFromSession(session);
         UserDocument document = userDocumentService.getDocumentWithComments(docId);
@@ -438,7 +438,7 @@ public class DocumentController {
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
-    @RequestMapping("/history-{docId}")
+    @RequestMapping("/history/{docId}")
     public ModelAndView showHistory(@PathVariable Long docId, HttpSession session) {
         ModelAndView model = new ModelAndView("history");
         User user = getUserFromSession(session);
@@ -469,7 +469,7 @@ public class DocumentController {
         throw new ResourceNotFoundException();
     }
 
-    @RequestMapping("/accessible-documents")
+    @RequestMapping("/accessible")
     public ModelAndView getAccessibleDocuments(HttpSession session) {
         User user = getUserFromSession(session);
         Set<UserFileDto> documentDtos = new TreeSet<>();
@@ -648,7 +648,7 @@ public class DocumentController {
     private void sendUpdateEvent(UserDocument document, User user) {
         String eventText = "Document " + document.getName() + " has been updated by " + user.getFullName();
         String eventLinkText = "Browse";
-        String eventLinkUrl = "/document/browse-" + document.getId();
+        String eventLinkUrl = "/document/browse/" + document.getId();
 
         Set<User> readers = userDocumentService.getAllReadersAndEditors(document.getId());
         eventService.save(EventUtil.createEvent(readers, eventText, eventLinkText, eventLinkUrl, user));
@@ -671,7 +671,7 @@ public class DocumentController {
         String eventLinkUrl = null;
         if (fileType.toLowerCase().equals("Document")) {
             eventLinkText = "Browse";
-            eventLinkUrl = "/document/browse-" + fileId;
+            eventLinkUrl = "/document/browse/" + fileId;
         }
 
         Set<User> readers = service instanceof UserDirectoryService
@@ -690,7 +690,7 @@ public class DocumentController {
         String eventLinkUrl = null;
         if (fileType.toLowerCase().equals("document")) {
             eventLinkText = "Browse";
-            eventLinkUrl = "/document/browse-" + fileId;
+            eventLinkUrl = "/document/browse/" + fileId;
         }
         eventService.save(EventUtil.createEvent(readers, eventText, eventLinkText, eventLinkUrl, user));
     }
@@ -701,7 +701,7 @@ public class DocumentController {
         String eventLinkUrl = null;
         if (fileType.toLowerCase().equals("document")) {
             eventLinkText = "Browse";
-            eventLinkUrl = "/document/browse-" + fileId;
+            eventLinkUrl = "/document/browse/" + fileId;
         }
         eventService.save(EventUtil.createEvent(readers, eventText, eventLinkText, eventLinkUrl, user));
     }

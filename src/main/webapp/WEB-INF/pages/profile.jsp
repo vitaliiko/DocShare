@@ -36,7 +36,7 @@
 
         <h5>Avatar</h5>
         <img src="/profile/imageDisplay?id=${user.id}"/>
-        <form action="/profile/uploadAvatar" method="post" enctype="multipart/form-data">
+        <form action="/profile/upload_avatar" method="post" enctype="multipart/form-data">
             <label class="col-md-3 control-lable" for="avatar">Upload an avatar</label>
             <input type="file" name="avatar" id="avatar" class="form-control input-sm"/>
             <br>
@@ -45,7 +45,7 @@
             </div>
         </form>
 
-        <form action="/profile/changeProfile" method="post">
+        <form action="/profile/change_profile" method="post">
             <label for="firstName">First name: </label>
             <input type="text" name="firstName" value="${user.firstName}" id="firstName"
                    class="form-control" required="" autofocus="">
@@ -64,21 +64,21 @@
             <br>
             <label for="country">Country: </label>
             <input type="text" name="country" value="${user.country}" id="country"
-                   class="form-control" required="" autofocus="">
+                   class="form-control" autofocus="">
             <br>
             <label for="state">State: </label>
             <input type="text" name="state" id="state" value="${user.state}"
-                   class="form-control" required="" autofocus="">
+                   class="form-control" autofocus="">
             <br>
             <label for="city">City: </label>
             <input type="text" name="city" value="${user.city}" id="city"
-                   class="form-control" required="" autofocus="">
+                   class="form-control" autofocus="">
             <br>
             <button class="btn btn-primary btn-sm" type="submit">Save</button>
         </form>
         <hr/>
 
-        <form class="form-signin" action="/profile/changePassword" method="post">
+        <form class="form-signin" action="/profile/change_password" method="post">
             <h4>To change password enter your current password</h4>
 
             <label for="currentPassword">Your current password: </label>
@@ -117,7 +117,7 @@
                     <h4>Your files will be removed irretrievably.</h4>
                 </div>
                 <div class="modal-footer">
-                    <form action="/profile/removeAccount">
+                    <form action="/profile/remove_account">
                         <input type="submit" id="deleteDocument" class="btn btn-success" value="YES">
                         <button type="button" class="btn btn-danger" data-dismiss="modal">NO</button>
                     </form>

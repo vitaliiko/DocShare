@@ -6,6 +6,7 @@ import com.geekhub.entities.User;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.TreeSet;
+import org.hibernate.Hibernate;
 import org.hibernate.HibernateException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -73,6 +74,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public Set<User> getFriends(Long userId) {
         User user = userDao.getById(userId);
+        Hibernate.initialize(user.getFriends());
         return user.getFriends();
     }
 

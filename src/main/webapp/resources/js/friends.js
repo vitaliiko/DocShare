@@ -12,7 +12,7 @@ $(document).ready(function() {
         $('#groupName').val('');
     }
 
-    $.getJSON('/friends/get-friends-groups', function(groups) {
+    $.getJSON('/friends/friend_groups', function(groups) {
         $.each(groups, function (k, group) {
             loadTemplate(handlebarsPath + 'groupInfoRow.html', function (template) {
                 $('#groupTable').append(template(group));

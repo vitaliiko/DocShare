@@ -56,7 +56,7 @@ public class FriendsController {
         return userService.getById((Long) session.getAttribute("userId"));
     }
 
-    @RequestMapping("/view")
+    @RequestMapping("/")
     public ModelAndView getFriendsWithGroups(HttpSession session) {
         Long userId = (Long) session.getAttribute("userId");
 
@@ -174,18 +174,18 @@ public class FriendsController {
         User friend = userService.getById(friendId);
 
         Event event = eventService.getByHashName(eventHash);
-        if (event.getSenderId() == friendId && !user.getFriends().contains(friend)) {
+        if (event.getSenderId() == friendId && !userService.getFriends(user.getId()).contains(friend)) {
             Long userId = (Long) session.getAttribute("userId");
             userService.addFriend(userId, friendId);
             userService.addFriend(friendId, userId);
 
             String eventText = "User " + user.getFullName() + " confirm your request.";
             String eventLinkText = "Friends";
-            String eventLinkUrl = "/friends/view";
+            String eventLinkUrl = "/friends/";
 
             eventService.save(EventUtil.createEvent(friend, eventText, eventLinkText, eventLinkUrl, user));
         }
-        return new ModelAndView("redirect:/friends/view");
+        return new ModelAndView("redirect:/friends/");
     }
 
     @RequestMapping("send_to_friend_event")
@@ -223,7 +223,7 @@ public class FriendsController {
         }
     }
 
-    @RequestMapping("/get-friends-groups")
+    @RequestMapping("/friend_groups")
     public Set<FriendsGroupDto> getFriendsGroups(HttpSession session) {
         User user = getUserFromSession(session);
         List<FriendsGroup> groups = friendsGroupService.getListByOwner(user);

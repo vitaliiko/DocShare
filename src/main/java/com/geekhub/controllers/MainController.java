@@ -99,7 +99,7 @@ public class MainController {
         return model;
     }
 
-    @RequestMapping("/signOut")
+    @RequestMapping("/sign_out")
     public String signOut(HttpSession session) {
         session.invalidate();
         return "signIn";
