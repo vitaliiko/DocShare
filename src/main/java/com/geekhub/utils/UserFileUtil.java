@@ -30,13 +30,13 @@ public class UserFileUtil {
     public static final Pattern DOCUMENT_NAME_PATTERN = Pattern.compile("^[\\w,\\s,\\.\\-/)/(]+\\.[A-Za-z0-9]{1,5}");
 
     public static UserDocument createUserDocument(MultipartFile multipartFile,
-                                                  String parentDirectoryHash,
+                                                  UserDirectory directory,
                                                   String description,
                                                   User user) throws IOException {
 
         UserDocument document = new UserDocument();
         document.setNameWithExtension(multipartFile.getOriginalFilename());
-        document.setParentDirectoryHash(parentDirectoryHash);
+        document.setParentDirectoryHash(directory == null ? user.getLogin() : directory.getHashName());
         document.setDescription(description);
         document.setLastModifyTime(Calendar.getInstance().getTime());
         document.setType(multipartFile.getContentType());
@@ -44,7 +44,14 @@ public class UserFileUtil {
         document.setOwner(user);
         document.setModifiedBy(user.getFullName());
         document.setHashName(createHashName());
-        document.setDocumentAttribute(DocumentAttribute.PRIVATE);
+        if (directory == null) {
+            document.setDocumentAttribute(DocumentAttribute.PRIVATE);
+        } else {
+            document.setDocumentAttribute(directory.getDocumentAttribute());
+            directory.getReaders().forEach(document.getReaders()::add);
+            directory.getReadersGroups().forEach(document.getReadersGroups()::add);
+        }
+
         return document;
     }
 

@@ -137,14 +137,18 @@ public class DocumentController {
                                        HttpSession session) throws IOException {
 
         User user = getUserFromSession(session);
-        if (parentDirectoryHash == null || parentDirectoryHash.isEmpty()) {
-            parentDirectoryHash = user.getLogin();
+        UserDirectory directory = null;
+        if (parentDirectoryHash != null && !parentDirectoryHash.isEmpty()) {
+            directory = userDirectoryService.getByHashName(parentDirectoryHash);
+            if (!directoryAccessService.isOwner(directory, user)) {
+                throw new ResourceNotFoundException();
+            }
         }
 
         if (files != null && files.length > 0) {
             for (MultipartFile file : files) {
                 if (!file.isEmpty() && UserFileUtil.validateDocumentName(file.getOriginalFilename())) {
-                    saveOrUpdateDocument(file, parentDirectoryHash, description, user);
+                    saveOrUpdateDocument(file, directory, description, user);
                 }
             }
         }
@@ -653,15 +657,16 @@ public class DocumentController {
     }
 
     private void saveOrUpdateDocument(MultipartFile multipartFile,
-                                      String parentDirectoryHash,
+                                      UserDirectory directory,
                                       String description,
                                       User user) throws IOException {
 
         String docName = multipartFile.getOriginalFilename();
+        String parentDirectoryHash = directory == null ? user.getLogin() : directory.getHashName();
         UserDocument document = userDocumentService.getByFullNameAndOwner(user, parentDirectoryHash, docName);
 
         if (document == null) {
-            document = UserFileUtil.createUserDocument(multipartFile, parentDirectoryHash, description, user);
+            document = UserFileUtil.createUserDocument(multipartFile, directory, description, user);
             multipartFile.transferTo(UserFileUtil.createFile(document.getHashName()));
             userDocumentService.save(document);
         } else if (document.getDocumentStatus() == DocumentStatus.REMOVED) {
