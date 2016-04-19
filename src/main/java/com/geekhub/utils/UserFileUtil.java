@@ -42,6 +42,7 @@ public class UserFileUtil {
         document.setType(multipartFile.getContentType());
         document.setSize(convertSize(multipartFile.getSize()));
         document.setOwner(user);
+        document.setModifiedBy(user.getFullName());
         document.setHashName(createHashName());
         document.setDocumentAttribute(DocumentAttribute.PRIVATE);
         return document;

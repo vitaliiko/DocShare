@@ -31,7 +31,7 @@
                 </td>
                 <td><a href="<c:url value='/document/version_recover/${version.id}' />"
                        class="btn btn-primary custom-width">Recover</a></td>
-                <td><a href="<c:url value='/document/download/${version.id}' />"
+                <td><a href="<c:url value='/document/download_old_version/${version.id}' />"
                        class="btn btn-primary custom-width">Download</a></td>
             </tr>
         </c:forEach>

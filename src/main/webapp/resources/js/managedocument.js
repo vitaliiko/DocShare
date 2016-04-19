@@ -170,7 +170,7 @@ $(document).ready(function() {
 
     $('#deleteDocument').click(function() {
         $.ajax({
-            url: '/document/move-to-trash',
+            url: '/document/move_to_trash',
             type: 'POST',
             data: {'docIds[]': docIds, 'dirIds[]': dirIds},
             success: function() {

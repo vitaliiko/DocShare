@@ -22,7 +22,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -30,7 +29,6 @@ import javax.servlet.http.HttpSession;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @RestController
 @RequestMapping("/friends")
@@ -115,7 +113,7 @@ public class FriendsController {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
         if (group.getOwner().equals(user)) {
-            Set<User> membersSet = group.getFriends();
+            Set<User> membersSet = new HashSet<>(group.getFriends());
             Set<User> newMembersSet = null;
             group.setName(groupName);
             if (friends != null) {

@@ -159,12 +159,7 @@ public class DocumentController {
         UserDocument document = userDocumentService.getById(docId);
 
         if (documentAccessService.canRead(document, user)) {
-            File file = UserFileUtil.createFile(document.getHashName());
-            response.setContentType(document.getType());
-            response.setContentLength((int) file.length());
-            response.setHeader("Content-Disposition", "attachment; filename=\"" + document.getName() + "\"");
-
-            FileCopyUtils.copy(Files.newInputStream(file.toPath()), response.getOutputStream());
+            openOutputStream(document.getHashName(), document.getType(), document.getName(), response);
         }
         throw new ResourceNotFoundException();
     }
@@ -392,7 +387,7 @@ public class DocumentController {
     public ResponseEntity<UserFileDto> shareUserDocument(@RequestBody SharedDto shared, HttpSession session) {
         User user = getUserFromSession(session);
         UserDocument document = userDocumentService.getById(shared.getDocId());
-        Set<User> readersAndEditors = userDocumentService.getAllReadersAndEditors(document.getId());
+        Set<User> currentReadersAndEditors = userDocumentService.getAllReadersAndEditors(document.getId());
 
         if (documentAccessService.isOwner(document, user) && document.getDocumentStatus() == DocumentStatus.ACTUAL) {
             document.setDocumentAttribute(DocumentAttribute.valueOf(shared.getAccess()));
@@ -403,12 +398,12 @@ public class DocumentController {
             userDocumentService.update(document);
 
             Set<User> newReadersAndEditorsSet = userDocumentService.getAllReadersAndEditors(document.getId());
-            newReadersAndEditorsSet.removeAll(readersAndEditors);
+            newReadersAndEditorsSet.removeAll(currentReadersAndEditors);
             sendShareEvent(newReadersAndEditorsSet, "document", document.getName(), document.getId(), user);
 
             newReadersAndEditorsSet = userDocumentService.getAllReadersAndEditors(document.getId());
-            readersAndEditors.removeAll(newReadersAndEditorsSet);
-            sendProhibitAccessEvent(readersAndEditors, "document", document.getName(), user);
+            currentReadersAndEditors.removeAll(newReadersAndEditorsSet);
+            sendProhibitAccessEvent(currentReadersAndEditors, "document", document.getName(), user);
 
             return new ResponseEntity<>(EntityToDtoConverter.convert(document), HttpStatus.OK);
         }
@@ -440,11 +435,11 @@ public class DocumentController {
 
             userDirectoryService.update(directory);
 
-            Set<User> newReaderSet = userDocumentService.getAllReadersAndEditors(directory.getId());
+            Set<User> newReaderSet = userDirectoryService.getAllReaders(directory.getId());
             newReaderSet.removeAll(currentReaders);
             sendShareEvent(newReaderSet, "directory", directory.getName(), directory.getId(), user);
 
-            newReaderSet = userDocumentService.getAllReadersAndEditors(directory.getId());
+            newReaderSet = userDirectoryService.getAllReaders(directory.getId());
             currentReaders.removeAll(newReaderSet);
             sendProhibitAccessEvent(currentReaders, "directory", directory.getName(), user);
 
@@ -480,6 +475,20 @@ public class DocumentController {
             userDocumentService.update(document);
             documentOldVersionService.delete(oldVersion);
             return new ModelAndView("redirect:/document/upload");
+        }
+        throw new ResourceNotFoundException();
+    }
+
+    @RequestMapping(value = "/download_old_version/{versionId}", method = RequestMethod.GET)
+    public void downloadDocumentOldVersion(@PathVariable long versionId, HttpSession session, HttpServletResponse response)
+            throws IOException {
+
+        User user = getUserFromSession(session);
+        DocumentOldVersion oldVersion = documentOldVersionService.getById(versionId);
+        UserDocument document = oldVersion.getUserDocument();
+
+        if (documentAccessService.canRead(document, user)) {
+            openOutputStream(oldVersion.getHashName(), document.getType(), oldVersion.getName(), response);
         }
         throw new ResourceNotFoundException();
     }
@@ -608,6 +617,17 @@ public class DocumentController {
             }
         }
         return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    private void openOutputStream(String docHashName, String docType, String docName, HttpServletResponse response)
+            throws IOException {
+
+        File file = UserFileUtil.createFile(docHashName);
+        response.setContentType(docType);
+        response.setContentLength((int) file.length());
+        response.setHeader("Content-Disposition", "attachment; filename=\"" + docName + "\"");
+
+        FileCopyUtils.copy(Files.newInputStream(file.toPath()), response.getOutputStream());
     }
 
     private <T, S extends EntityService<T, Long>> Set<T> createEntitySet(long[] ids, S service) {

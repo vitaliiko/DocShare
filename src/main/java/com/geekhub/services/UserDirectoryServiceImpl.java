@@ -178,7 +178,6 @@ public class UserDirectoryServiceImpl implements UserDirectoryService {
         UserDirectory document = getById(docId);
         users.addAll(document.getReaders());
         document.getReadersGroups().forEach(g -> users.addAll(g.getFriends()));
-        users.add(document.getOwner());
         return users;
     }
 
