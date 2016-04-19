@@ -9,6 +9,7 @@ import java.util.Map;
 import org.hibernate.SessionFactory;
 import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Order;
+import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -96,6 +97,14 @@ public class UserDirectoryDao implements EntityDao<UserDirectory, Long> {
         return sessionFactory.getCurrentSession()
                 .createCriteria(clazz)
                 .add(Restrictions.allEq(propertiesMap))
+                .list();
+    }
+
+    public List<Object> getPropertiesList(String selectProperty, String propertyName, String value) {
+        return sessionFactory.getCurrentSession()
+                .createCriteria(this.clazz)
+                .add(Restrictions.eq(propertyName, value))
+                .setProjection(Projections.property(selectProperty))
                 .list();
     }
 

@@ -14,7 +14,7 @@ $(document).ready(function() {
     var forFriendsTable = $('.FOR_FRIENDS');
     var handlebarsPath = '/resources/js/templates/';
     var backLink = $('.back-link');
-    var dirHashName;
+    var dirHashName = 'root';
     var dangerAlert = $('.alert-danger');
     var successAlert = $('.alert-success');
     var alertText = $('.alert-text');
@@ -420,7 +420,7 @@ $(document).ready(function() {
         $.ajax({
             url: '/document/replace_files',
             type: 'POST',
-            data: {'docIds[]': docIds, 'dirIds[]': dirIds, 'destinationDirectoryHash': dirHashName},
+            data: {'docIds[]': docIds, 'dirIds[]': dirIds, "destinationDirHash": dirHashName},
             success: function() {
                 location.reload();
             }
@@ -431,7 +431,7 @@ $(document).ready(function() {
         $.ajax({
             url: '/document/copy_files',
             type: 'POST',
-            data: {'docIds[]': docIds, 'dirIds[]': dirIds, 'destinationDirectoryHash': dirHashName},
+            data: {'docIds[]': docIds, 'dirIds[]': dirIds, "destinationDirHash": dirHashName},
             success: function() {
                 location.reload();
             }

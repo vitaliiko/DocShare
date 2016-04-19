@@ -42,6 +42,8 @@ public interface UserDirectoryService extends EntityService<UserDirectory, Long>
 
     List<UserDirectory> getRemovedByParentDirectoryHash(String parentDirectoryHash);
 
+    List<Object> getActualIdsByParentDirectoryHash(String parentDirectoryHash);
+
     Set<User> getAllReaders(Long docId);
 
     String getLocation(UserDirectory directory);

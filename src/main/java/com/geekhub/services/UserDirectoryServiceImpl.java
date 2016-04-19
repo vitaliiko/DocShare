@@ -210,7 +210,10 @@ public class UserDirectoryServiceImpl implements UserDirectoryService {
     public void replace(Long dirId, String destinationDirectoryHash) {
         UserDirectory directory = userDirectoryDao.getById(dirId);
         String dirName = directory.getName();
-        if (!directory.getParentDirectoryHash().equals(destinationDirectoryHash)) {
+        String dirLocation = getLocation(directory) + dirName;
+        String destinationDirLocation = getDestinationDirectoryLocation(directory, destinationDirectoryHash);
+
+        if (!destinationDirLocation.startsWith(dirLocation)) {
             if (getByFullNameAndOwner(directory.getOwner(), destinationDirectoryHash, dirName) != null) {
                 int matchesCount = userDirectoryDao.getLike(destinationDirectoryHash, dirName).size();
                 directory.setName(dirName + " (" + (matchesCount + 1) + ")");
@@ -238,24 +241,49 @@ public class UserDirectoryServiceImpl implements UserDirectoryService {
         UserDirectory directory = userDirectoryDao.getById(dirId);
         UserDirectory copy = UserFileUtil.copyDirectory(directory);
         String copyName = directory.getName();
+        String copyLocation = getLocation(directory) + copyName;
+        String destinationDirLocation = getDestinationDirectoryLocation(directory, destinationDirectoryHash);
 
-        if (getByFullNameAndOwner(directory.getOwner(), destinationDirectoryHash, copyName) != null) {
-            int matchesCount = userDirectoryDao.getLike(destinationDirectoryHash, copyName).size();
-            copy.setName(copyName + " (" + (matchesCount + 1) + ")");
+        if (!destinationDirLocation.startsWith(copyLocation)) {
+            if (getByFullNameAndOwner(directory.getOwner(), destinationDirectoryHash, copyName) != null) {
+                int matchesCount = userDirectoryDao.getLike(destinationDirectoryHash, copyName).size();
+                copy.setName(copyName + " (" + (matchesCount + 1) + ")");
+            }
+
+            copy.setParentDirectoryHash(destinationDirectoryHash);
+            copy.setHashName(UserFileUtil.createHashName());
+            userDirectoryDao.save(copy);
+
+            List<Object> docIds = userDocumentService.getActualIdsByParentDirectoryHash(directory.getHashName());
+            docIds.forEach(id -> userDocumentService.copy((Long) id, copy.getHashName()));
+
+            List<Object> dirIds = getActualIdsByParentDirectoryHash(directory.getHashName());
+            dirIds.forEach(id -> copy((Long) id, copy.getHashName()));
         }
-
-        copy.setParentDirectoryHash(destinationDirectoryHash);
-        copy.setHashName(UserFileUtil.createHashName());
-        UserFileUtil.copyFile(directory.getHashName(), copy.getHashName());
-
-        List<Object> docIds = userDocumentService.getActualIdsByParentDirectoryHash(directory.getHashName());
-        docIds.forEach(id -> userDocumentService.copy((Long) id, copy.getHashName()));
-
-        userDirectoryDao.save(copy);
     }
 
     @Override
     public void copy(Long[] dirIds, String destinationDirectoryHash) {
         Arrays.stream(dirIds).forEach(id -> copy(id, destinationDirectoryHash));
+    }
+
+    @Override
+    public List<Object> getActualIdsByParentDirectoryHash(String parentDirectoryHash) {
+        return userDirectoryDao.getPropertiesList("id", "parentDirectoryHash", parentDirectoryHash);
+    }
+
+    private String getDestinationDirectoryLocation(UserDirectory directory, String destinationDirHash) {
+        UserDirectory destinationDir = null;
+        if (!directory.getOwner().getLogin().equals(destinationDirHash)) {
+            destinationDir = getByHashName(destinationDirHash);
+        }
+
+        String destinationDirLocation;
+        if (destinationDir != null) {
+            destinationDirLocation = getLocation(destinationDir) + destinationDir.getName();
+        } else {
+            destinationDirLocation = directory.getOwner().getLogin();
+        }
+        return destinationDirLocation;
     }
 }

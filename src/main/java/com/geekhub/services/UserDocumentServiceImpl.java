@@ -234,7 +234,13 @@ public class UserDocumentServiceImpl implements UserDocumentService {
     @Override
     public void replace(Long docId, String destinationDirectoryHash) {
         UserDocument document = userDocumentDao.getById(docId);
-        UserDirectory destinationDir = userDirectoryService.getByHashName(destinationDirectoryHash);
+        UserDirectory destinationDir = null;
+        if (!document.getOwner().getLogin().equals(destinationDirectoryHash)) {
+            destinationDir = userDirectoryService.getByHashName(destinationDirectoryHash);
+            if (destinationDir == null) {
+                return;
+            }
+        }
         String docName = document.getName();
 
         if (!document.getParentDirectoryHash().equals(destinationDirectoryHash)) {
@@ -244,13 +250,17 @@ public class UserDocumentServiceImpl implements UserDocumentService {
                 document.setName(docNameWithoutExtension + " (" + (matchesCount + 1) + ")" + document.getExtension());
             }
             document.setParentDirectoryHash(destinationDirectoryHash);
-            document.setDocumentAttribute(destinationDir.getDocumentAttribute());
+            if (destinationDir != null) {
+                document.setDocumentAttribute(destinationDir.getDocumentAttribute());
 
-            document.getReaders().clear();
-            document.getReadersGroups().clear();
+                document.getReaders().clear();
+                document.getReadersGroups().clear();
 
-            destinationDir.getReaders().forEach(document.getReaders()::add);
-            destinationDir.getReadersGroups().forEach(document.getReadersGroups()::add);
+                destinationDir.getReaders().forEach(document.getReaders()::add);
+                destinationDir.getReadersGroups().forEach(document.getReadersGroups()::add);
+            } else {
+                document.setDocumentAttribute(DocumentAttribute.PRIVATE);
+            }
 
             userDocumentDao.update(document);
         }
@@ -265,7 +275,14 @@ public class UserDocumentServiceImpl implements UserDocumentService {
     public void copy(Long docId, String destinationDirectoryHash) {
         UserDocument document = userDocumentDao.getById(docId);
         UserDocument copy = UserFileUtil.copyDocument(document);
-        UserDirectory destinationDir = userDirectoryService.getByHashName(destinationDirectoryHash);
+        UserDirectory destinationDir = null;
+
+        if (!document.getOwner().getLogin().equals(destinationDirectoryHash)) {
+            destinationDir = userDirectoryService.getByHashName(destinationDirectoryHash);
+            if (destinationDir == null) {
+                return;
+            }
+        }
         String copyName = document.getName();
 
         if (getByFullNameAndOwner(document.getOwner(), destinationDirectoryHash, copyName) != null) {
@@ -275,10 +292,15 @@ public class UserDocumentServiceImpl implements UserDocumentService {
         }
         copy.setParentDirectoryHash(destinationDirectoryHash);
         copy.setHashName(UserFileUtil.createHashName());
-        copy.setDocumentAttribute(destinationDir.getDocumentAttribute());
 
-        destinationDir.getReaders().forEach(copy.getReaders()::add);
-        destinationDir.getReadersGroups().forEach(copy.getReadersGroups()::add);
+        if (destinationDir != null) {
+            copy.setDocumentAttribute(destinationDir.getDocumentAttribute());
+
+            destinationDir.getReaders().forEach(copy.getReaders()::add);
+            destinationDir.getReadersGroups().forEach(copy.getReadersGroups()::add);
+        } else {
+            copy.setDocumentAttribute(DocumentAttribute.PRIVATE);
+        }
 
         UserFileUtil.copyFile(document.getHashName(), copy.getHashName());
         userDocumentDao.save(copy);

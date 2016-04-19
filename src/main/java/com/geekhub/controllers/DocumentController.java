@@ -545,22 +545,22 @@ public class DocumentController {
     @RequestMapping(value = "/replace_files", method = RequestMethod.POST)
     public ResponseEntity<Void> replaceFiles(@RequestParam(value = "docIds[]", required = false) Long[] docIds,
                                              @RequestParam(value = "dirIds[]", required = false) Long[] dirIds,
-                                             String destinationDirectoryHash,
+                                             String destinationDirHash,
                                              HttpSession session) {
 
         User user = getUserFromSession(session);
-        if (docIds != null && destinationDirectoryHash != null) {
+        if (docIds != null && destinationDirHash != null) {
             Set<UserDocument> documents = userDocumentService.getByIds(Arrays.asList(docIds));
             if (documentAccessService.isOwner(documents, user)) {
-                userDocumentService.replace(docIds, destinationDirectoryHash);
+                userDocumentService.replace(docIds, destinationDirHash);
             } else {
                 return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
             }
         }
-        if (dirIds != null && destinationDirectoryHash != null) {
+        if (dirIds != null && destinationDirHash != null) {
             Set<UserDirectory> directories = userDirectoryService.getByIds(Arrays.asList(dirIds));
             if (directoryAccessService.isOwner(directories, user)) {
-                userDirectoryService.replace(dirIds, destinationDirectoryHash);
+                userDirectoryService.replace(dirIds, destinationDirHash);
             } else {
                 return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
             }
@@ -571,22 +571,38 @@ public class DocumentController {
     @RequestMapping(value = "/copy_files", method = RequestMethod.POST)
     public ResponseEntity<Void> copyFiles(@RequestParam(value = "docIds[]", required = false) Long[] docIds,
                                           @RequestParam(value = "dirIds[]", required = false) Long[] dirIds,
-                                          String destinationDirectoryHash,
+                                          String destinationDirHash,
                                           HttpSession session) {
 
         User user = getUserFromSession(session);
-        if (docIds != null && destinationDirectoryHash != null) {
+        if (destinationDirHash == null) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+
+        if (destinationDirHash.equals("root")) {
+            destinationDirHash = user.getLogin();
+            if (docIds != null) {
+                userDocumentService.copy(docIds, user.getLogin());
+            }
+            if (dirIds != null) {
+                userDirectoryService.copy(dirIds, destinationDirHash);
+            }
+            return new ResponseEntity<>(HttpStatus.OK);
+        }
+
+        if (docIds != null) {
             Set<UserDocument> documents = userDocumentService.getByIds(Arrays.asList(docIds));
             if (documentAccessService.isOwner(documents, user)) {
-                userDocumentService.copy(docIds, destinationDirectoryHash);
+                userDocumentService.copy(docIds, destinationDirHash);
             } else {
                 return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
             }
         }
-        if (dirIds != null && destinationDirectoryHash != null) {
+
+        if (dirIds != null) {
             Set<UserDirectory> directories = userDirectoryService.getByIds(Arrays.asList(dirIds));
             if (directoryAccessService.isOwner(directories, user)) {
-                userDirectoryService.copy(dirIds, destinationDirectoryHash);
+                userDirectoryService.copy(dirIds, destinationDirHash);
             } else {
                 return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
             }
