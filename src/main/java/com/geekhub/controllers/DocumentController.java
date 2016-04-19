@@ -6,6 +6,7 @@ import com.geekhub.dto.RemovedFileDto;
 import com.geekhub.dto.UserDto;
 import com.geekhub.entities.Comment;
 import com.geekhub.entities.DocumentOldVersion;
+import com.geekhub.entities.FriendsGroup;
 import com.geekhub.entities.RemovedDocument;
 import com.geekhub.entities.User;
 import com.geekhub.entities.UserDirectory;
@@ -153,6 +154,7 @@ public class DocumentController {
     @RequestMapping(value = {"/download/{docId}", "/download-{docId}"}, method = RequestMethod.GET)
     public void downloadDocument(@PathVariable long docId, HttpSession session, HttpServletResponse response)
             throws IOException {
+
         User user = getUserFromSession(session);
         UserDocument document = userDocumentService.getById(docId);
 
@@ -294,8 +296,9 @@ public class DocumentController {
 
     @RequestMapping(value = "/make-directory", method = RequestMethod.GET)
     public ResponseEntity<UserFileDto> makeDir(String dirName,
-                               @RequestParam(required = false, name = "dirHashName") String parentDirectoryHash,
-                               HttpSession session) {
+                                               @RequestParam(required = false, name = "dirHashName")
+                                               String parentDirectoryHash,
+                                               HttpSession session) {
 
         User owner = getUserFromSession(session);
         if (parentDirectoryHash == null || parentDirectoryHash.isEmpty()) {
@@ -416,22 +419,34 @@ public class DocumentController {
     public ResponseEntity<UserFileDto> shareUserDirectory(@RequestBody SharedDto shared, HttpSession session) {
         User user = getUserFromSession(session);
         UserDirectory directory = userDirectoryService.getById(shared.getDocId());
-        Set<User> readers = userDirectoryService.getAllReaders(directory.getId());
+        Set<User> currentReaders = userDirectoryService.getAllReaders(directory.getId());
 
         if (directoryAccessService.isOwner(directory, user)
                 && directory.getDocumentStatus() == DocumentStatus.ACTUAL) {
             directory.setDocumentAttribute(DocumentAttribute.valueOf(shared.getAccess()));
-            directory.setReaders(createEntitySet(shared.getReaders(), userService));
-            directory.setReadersGroups(createEntitySet(shared.getReadersGroups(), friendsGroupService));
+
+            Set<User> readers = createEntitySet(shared.getReaders(), userService);
+            Set<FriendsGroup> readerGroups = createEntitySet(shared.getReadersGroups(), friendsGroupService);
+
+            directory.setReaders(readers);
+            directory.setReadersGroups(readerGroups);
+
+            userDocumentService.getActualByParentDirectoryHash(directory.getHashName()).forEach(d -> {
+                d.setDocumentAttribute(DocumentAttribute.valueOf(shared.getAccess()));
+                d.setReaders(readers);
+                d.setReadersGroups(readerGroups);
+                userDocumentService.update(d);
+            });
+
             userDirectoryService.update(directory);
 
             Set<User> newReaderSet = userDocumentService.getAllReadersAndEditors(directory.getId());
-            newReaderSet.removeAll(readers);
+            newReaderSet.removeAll(currentReaders);
             sendShareEvent(newReaderSet, "directory", directory.getName(), directory.getId(), user);
 
             newReaderSet = userDocumentService.getAllReadersAndEditors(directory.getId());
-            readers.removeAll(newReaderSet);
-            sendProhibitAccessEvent(readers, "directory", directory.getName(), user);
+            currentReaders.removeAll(newReaderSet);
+            sendProhibitAccessEvent(currentReaders, "directory", directory.getName(), user);
 
             return new ResponseEntity<>(EntityToDtoConverter.convert(directory), HttpStatus.OK);
         }
@@ -555,9 +570,9 @@ public class DocumentController {
 
     @RequestMapping(value = "/copy_files", method = RequestMethod.POST)
     public ResponseEntity<Void> copyFiles(@RequestParam(value = "docIds[]", required = false) Long[] docIds,
-                                @RequestParam(value = "dirIds[]", required = false) Long[] dirIds,
-                                String destinationDirectoryHash,
-                                HttpSession session) {
+                                          @RequestParam(value = "dirIds[]", required = false) Long[] dirIds,
+                                          String destinationDirectoryHash,
+                                          HttpSession session) {
 
         User user = getUserFromSession(session);
         if (docIds != null && destinationDirectoryHash != null) {
@@ -656,6 +671,7 @@ public class DocumentController {
 
     private <T, S extends EntityService<T, Long>> void sendRemoveEvent(S service, String fileType, String fileName,
                                                                        long fileId, User user) {
+
         String eventText = fileType + " " + fileName + " has been removed by " + user.getFullName();
 
         Set<User> readers = service instanceof UserDirectoryService
@@ -666,6 +682,7 @@ public class DocumentController {
 
     private <T, S extends EntityService<T, Long>> void sendRecoverEvent(S service, String fileType, String fileName,
                                                                         long fileId, User user) {
+
         String eventText = fileType + " " + fileName + " has been recovered by " + user.getFullName();
         String eventLinkText = null;
         String eventLinkUrl = null;

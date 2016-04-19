@@ -17,6 +17,7 @@ $(document).ready(function() {
     var dirHashName;
     var dangerAlert = $('.alert-danger');
     var successAlert = $('.alert-success');
+    var alertText = $('.alert-text');
 
     function changeTab() {
         $('.doc-table').hide(true);
@@ -296,11 +297,11 @@ $(document).ready(function() {
                     allTable.append(html);
                     privateTable.append(html);
                 });
-                $('.alert-danger').hide(true);
+                dangerAlert.hide(true);
             },
             error: function() {
-                $('.alert-danger').show(true);
-                $('.alert-text').text("Directory with such name already exist");
+                dangerAlert.show(true);
+                alertText.text("Directory with such name already exist");
             }
         });
     });
@@ -484,11 +485,11 @@ $(document).ready(function() {
                             .find('.document-name')
                             .html("<a href='/document/browse-'" + document.id + ">" + document.name + "</a>")
                     }
-                    $('.alert-danger').hide(true);
+                    dangerAlert.hide(true);
                 },
                 error: function() {
-                    $('.alert-danger').show(true);
-                    $('.alert-text').text("File with such name already exist");
+                    dangerAlert.show(true);
+                    alertText.text("File with such name already exist");
                 }
             });
         } else if (dirCheckBox.length == 1) {
@@ -503,11 +504,11 @@ $(document).ready(function() {
                             .find('.directory-name')
                             .html("<a href='#' id='" + directory.hashName + "' class='get-dir-content'>" + directory.name + "</a>")
                     }
-                    $('.alert-danger').hide(true);
+                    dangerAlert.hide(true);
                 },
                 error: function() {
-                    $('.alert-danger').show(true);
-                    $('.alert-text').text("Directory with such name already exist");
+                    dangerAlert.show(true);
+                    alertText.text("Directory with such name already exist");
                 }
             });
         }
