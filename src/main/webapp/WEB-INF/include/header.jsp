@@ -16,9 +16,11 @@
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
                        aria-expanded="false">Settings<span class="caret"></span></a>
                     <ul class="dropdown-menu">
-                        <li style="visibility: ${showComments}">
-                            <a href="#" class="comment-box-visible">Hide comment box</a>
-                        </li>
+                        <c:if test="${renderComments}">
+                            <li class="showCommentLi">
+                                <a href="#" class="comment-box-visible">Hide comment box</a>
+                            </li>
+                        </c:if>
                         <c:if test="${changeAbilityToComment != null}">
                             <li><a href="#" class="on-off-comments">${changeAbilityToComment}</a></li>
                             <li><a href="#" class="clear-comments">Delete all comments</a></li>

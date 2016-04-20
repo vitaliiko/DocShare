@@ -1,10 +1,8 @@
 package com.geekhub.controllers;
 
-import com.geekhub.dto.CommentDto;
 import com.geekhub.dto.FriendsGroupDto;
 import com.geekhub.dto.RemovedFileDto;
 import com.geekhub.dto.UserDto;
-import com.geekhub.entities.Comment;
 import com.geekhub.entities.DocumentOldVersion;
 import com.geekhub.entities.FriendsGroup;
 import com.geekhub.entities.RemovedDocument;
@@ -20,7 +18,6 @@ import com.geekhub.entities.enums.DocumentStatus;
 import com.geekhub.exceptions.ResourceNotFoundException;
 import com.geekhub.security.UserDirectoryAccessService;
 import com.geekhub.security.UserDocumentAccessService;
-import com.geekhub.services.CommentService;
 import com.geekhub.services.DocumentOldVersionService;
 import com.geekhub.services.EntityService;
 import com.geekhub.services.EventService;
@@ -30,7 +27,6 @@ import com.geekhub.services.RemovedDocumentService;
 import com.geekhub.services.UserDirectoryService;
 import com.geekhub.services.UserDocumentService;
 import com.geekhub.services.UserService;
-import com.geekhub.utils.CommentUtil;
 import com.geekhub.utils.DocumentVersionUtil;
 import com.geekhub.dto.convertors.EntityToDtoConverter;
 import com.geekhub.utils.EventUtil;
@@ -165,6 +161,22 @@ public class DocumentController {
         throw new ResourceNotFoundException();
     }
 
+    @RequestMapping("/set_comment_ability")
+    public void setCommentAbility(long docId, HttpSession session) {
+        User user = getUserFromSession(session);
+        UserDocument document = userDocumentService.getById(docId);
+
+        if (documentAccessService.isOwner(document, user)) {
+            boolean abilityToComment = document.getAbilityToComment() == AbilityToCommentDocument.ENABLE;
+            document.setAbilityToComment(abilityToComment
+                    ? AbilityToCommentDocument.DISABLE
+                    : AbilityToCommentDocument.ENABLE);
+            userDocumentService.update(document);
+        } else {
+            throw new ResourceNotFoundException();
+        }
+    }
+
     @RequestMapping(value = "/move_to_trash", method = RequestMethod.POST)
     public void moveDocumentToTrash(@RequestParam(value = "docIds[]", required = false) Long[] docIds,
                                     @RequestParam(value = "dirIds[]", required = false) Long[] dirIds,
@@ -256,7 +268,6 @@ public class DocumentController {
                         ? "Disable comments for this file"
                         : "Enable comments for this file";
                 model.addObject("changeAbilityToComment", action);
-                model.addObject("showComments", abilityToComment ? "visible" : "hidden");
             }
             return model;
         }

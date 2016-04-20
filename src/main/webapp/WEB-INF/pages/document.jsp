@@ -14,6 +14,7 @@
 <jsp:include page="../include/sidebar.jsp"/>
 
 <div class="container" style="width: 900px;">
+    <input type="hidden" class="doc-id" value="${doc.id}">
     <h4>${location}${doc.name}</h4>
     <h5>
         ${doc.size} &nbsp&nbsp Changed: ${doc.lastModifyTime}
@@ -32,7 +33,7 @@
     <br>
     <br>
     <c:if test="${renderComments}">
-        <div class="detailBox commentBox" ${showComments}>
+        <div class="detailBox commentBox">
             <div class="titleBox">
                 <label>Comment Box</label>
                 <button type="button" class="close close-comments" aria-hidden="true">&times;</button>
@@ -44,7 +45,6 @@
                         <input class="form-control comment-text" type="text" placeholder="Your comments" />
                     </div>
                     <div class="form-group">
-                        <input type="hidden" class="doc-id" value="${doc.id}">
                         <button type="button" class="btn btn-default add-comment">Add</button>
                     </div>
                 </form>

@@ -45,11 +45,12 @@ $(document).ready(function() {
     });
 
     $('.on-off-comments').click(function() {
-        $.post('/document/set_comment_ability')
+        $.post('/document/set_comment_ability', {'docId': docId}, function() {
+            location.reload();
+        });
     });
 
     $('.clear-comments').click(function() {
-        var docId = $('.doc-id').val();
         $.post('/comments/clear', {'docId': docId}, function() {
             $('.commentBox').find($('.commentText')).remove();
         });
