@@ -19,9 +19,9 @@ import org.springframework.stereotype.Service;
 @Service
 public class UserProfileManager {
 
-    public static final Pattern LOGIN_PATTERN = Pattern.compile("^[\\.a-zA-Z0-9_-]{3,20}$");
-    public static final Pattern FIRST_NAME_PATTERN = Pattern.compile("[A-Z][a-zA-Z ']{2,20}$");
-    public static final Pattern LAST_NAME_PATTERN = Pattern.compile("[A-Z][a-zA-Z ']{2,20}$");
+    public static final Pattern LOGIN_PATTERN = Pattern.compile("^[\\.a-zA-Z0-9_-]{6,20}$");
+    public static final Pattern FIRST_NAME_PATTERN = Pattern.compile("[A-Z][a-zA-Z ']{2,25}$");
+    public static final Pattern LAST_NAME_PATTERN = Pattern.compile("[A-Z][a-zA-Z ']{2,25}$");
     public static final Pattern EMAIL_PATTERN = Pattern.compile("^[a-zA-Z0-9\\._%+-]+@[a-zA-Z0-9.-]+\\.[a-z]{2,4}$");
     public static final Pattern LOCATION_PATTERN = Pattern.compile("^[A-Z][a-zA-Z-]{2,30}$");
 
@@ -34,33 +34,45 @@ public class UserProfileManager {
     public void registerNewUser(RegistrationInfo regInfo) throws UserProfileException {
         if (regInfo != null) {
             validateNames(regInfo.getFirstName(), regInfo.getLastName(), regInfo.getLogin());
-            checkExistingUserWithLogin(regInfo.getLogin());
-            checkConfirmationPassword(regInfo.getPassword(), regInfo.getConfirmationPassword());
+            validatePassword(regInfo.getPassword(), regInfo.getConfirmationPassword());
+            checkExistingUserWithSuchLogin(regInfo.getLogin());
             createNewUser(regInfo);
         }
     }
 
-    private void checkExistingUserWithLogin(String login) throws UserProfileException {
+    private void checkExistingUserWithSuchLogin(String login) throws UserProfileException {
         if (userService.getByLogin(login) != null) {
             throw new UserProfileException("User with such login already exist");
         }
     }
 
-    private void checkConfirmationPassword(String password, String confirmationPassword) throws UserProfileException {
+    private void validatePassword(String password, String confirmationPassword) throws UserProfileException {
+        if (password.length() < 8) {
+            throw new UserProfileException("Password must contain at least 8 characters");
+        }
         if (!password.equals(confirmationPassword)) {
             throw new UserProfileException("Passwords doesn't match");
         }
     }
 
     private void validateNames(String firstName, String lastName, String login) throws UserProfileException {
+        if (firstName.length() < 2 || firstName.length() > 25) {
+            throw new UserProfileException("First name must contain between 6 and 25 characters");
+        }
         if (!FIRST_NAME_PATTERN.matcher(firstName).matches()) {
-            throw new UserProfileException("Enter a valid first name address");
+            throw new UserProfileException("Enter a valid first name");
+        }
+        if (lastName.length() < 2 || lastName.length() > 25) {
+            throw new UserProfileException("Last name must contain between 6 and 25 characters");
         }
         if (!LAST_NAME_PATTERN.matcher(lastName).matches()) {
-            throw new UserProfileException("Enter a valid last name address");
+            throw new UserProfileException("Enter a valid last name");
+        }
+        if (login.length() < 6 || login.length() > 20) {
+            throw new UserProfileException("Login must contain between 6 and 25 characters");
         }
         if (!LOGIN_PATTERN.matcher(login).matches()) {
-            throw new UserProfileException("Enter a valid login address");
+            throw new UserProfileException("Enter a valid login");
         }
     }
 
@@ -85,7 +97,7 @@ public class UserProfileManager {
         if (userDto != null && user != null) {
             validateNames(userDto.getFirstName(), userDto.getLastName(), userDto.getLogin());
             if (!user.getLogin().equals(userDto.getLogin())) {
-                checkExistingUserWithLogin(userDto.getLogin());
+                checkExistingUserWithSuchLogin(userDto.getLogin());
             }
             if (userDto.getEmail() != null && !userDto.getEmail().isEmpty()) {
                 if (!EMAIL_PATTERN.matcher(userDto.getEmail()).matches()) {
@@ -94,17 +106,17 @@ public class UserProfileManager {
             }
             if (userDto.getCountry() != null && !userDto.getCountry().isEmpty()) {
                 if (!LOCATION_PATTERN.matcher(userDto.getCountry()).matches()) {
-                    throw new UserProfileException("Country contain forbidden characters");
+                    throw new UserProfileException("Country name contain forbidden characters");
                 }
             }
             if (userDto.getState() != null && !userDto.getState().isEmpty()) {
                 if (!LOCATION_PATTERN.matcher(userDto.getState()).matches()) {
-                    throw new UserProfileException("State contain forbidden characters");
+                    throw new UserProfileException("State name contain forbidden characters");
                 }
             }
             if (userDto.getCity() != null && !userDto.getCity().isEmpty()) {
                 if (!LOCATION_PATTERN.matcher(userDto.getCity()).matches()) {
-                    throw new UserProfileException("City contain forbidden characters");
+                    throw new UserProfileException("City name contain forbidden characters");
                 }
             }
             user = DtoToEntityConverter.merge(userDto, user);
@@ -116,9 +128,9 @@ public class UserProfileManager {
             throws UserProfileException {
 
         if (user != null) {
-            checkConfirmationPassword(newPassword, confirmationNewPassword);
+            validatePassword(newPassword, confirmationNewPassword);
             if (!user.getPassword().equals(DigestUtils.sha1Hex(currentPassword))) {
-                throw new UserProfileException("Wrong current password password");
+                throw new UserProfileException("Wrong current password");
             }
             user.setPassword(DigestUtils.sha1Hex(newPassword));
             userService.update(user);
@@ -131,8 +143,8 @@ public class UserProfileManager {
             List<String> filesHashNames = new ArrayList<>();
             userDocumentService.getAllByOwner(user).forEach(d -> filesHashNames.add(d.getHashName()));
             userService.delete(user);
-                UserFileUtil.removeUserFiles(filesHashNames);
-                return true;
+            UserFileUtil.removeUserFiles(filesHashNames);
+            return true;
         }
         return false;
     }
