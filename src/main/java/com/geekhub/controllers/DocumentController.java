@@ -80,9 +80,6 @@ public class DocumentController {
     private FileValidator fileValidator;
 
     @Autowired
-    private CommentService commentService;
-
-    @Autowired
     private RemovedDocumentService removedDocumentService;
 
     @Autowired
@@ -264,45 +261,6 @@ public class DocumentController {
             return model;
         }
         throw new ResourceNotFoundException();
-    }
-
-    @RequestMapping(value = "/get_comments", method = RequestMethod.GET)
-    public ResponseEntity<Set<CommentDto>> getComments(long docId, HttpSession session) {
-        User user = getUserFromSession(session);
-        UserDocument document = userDocumentService.getDocumentWithComments(docId);
-        if (documentAccessService.canRead(document, user)
-                && document.getAbilityToComment() == AbilityToCommentDocument.ENABLE) {
-            Set<CommentDto> comments = new TreeSet<>();
-            document.getComments().forEach(c -> comments.add(EntityToDtoConverter.convert(c)));
-            return new ResponseEntity<>(comments, HttpStatus.OK);
-        }
-        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-    }
-
-    @RequestMapping(value = "/add_comment", method = RequestMethod.POST)
-    public CommentDto addComment(String text, long docId, HttpSession session) {
-        User user = getUserFromSession(session);
-        UserDocument document = userDocumentService.getById(docId);
-        if (documentAccessService.canRead(document, user)
-                && document.getAbilityToComment() == AbilityToCommentDocument.ENABLE
-                && !text.isEmpty()) {
-            Comment comment = CommentUtil.createComment(text, user, document);
-            commentService.save(comment);
-            return EntityToDtoConverter.convert(comment);
-        }
-        throw new ResourceNotFoundException();
-    }
-
-    @RequestMapping("/clear_comments")
-    public void clearComments(long docId, HttpSession session) {
-        User user = getUserFromSession(session);
-        UserDocument document = userDocumentService.getDocumentWithComments(docId);
-        if (documentAccessService.isOwner(document, user)) {
-            document.getComments().clear();
-            userDocumentService.update(document);
-        } else {
-            throw new ResourceNotFoundException();
-        }
     }
 
     @RequestMapping(value = "/make-directory", method = RequestMethod.GET)

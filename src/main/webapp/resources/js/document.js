@@ -8,7 +8,7 @@ $(document).ready(function() {
         e.preventDefault()
     });
 
-    $.getJSON('/document/get_comments', {docId: docId}, function(comments) {
+    $.getJSON('/comments/get', {docId: docId}, function(comments) {
         $.each(comments, function(k, v) {
             loadTemplate(handlebarsPath, function (template) {
                 $('.commentList').prepend(template(v));
@@ -19,7 +19,7 @@ $(document).ready(function() {
     $('.add-comment').click(function() {
         var text = $('.comment-text').val();
         if (text != '') {
-            $.post('/document/add_comment', {text: text, docId: docId}, function(comment) {
+            $.post('/comments/add', {text: text, docId: docId}, function(comment) {
                 loadTemplate(handlebarsPath, function (template) {
                     $('.commentList').prepend(template(comment));
                 });
@@ -50,7 +50,7 @@ $(document).ready(function() {
 
     $('.clear-comments').click(function() {
         var docId = $('.doc-id').val();
-        $.post('/document/clear_comments', {'docId': docId}, function() {
+        $.post('/comments/clear', {'docId': docId}, function() {
             $('.commentBox').find($('.commentText')).remove();
         });
     });
