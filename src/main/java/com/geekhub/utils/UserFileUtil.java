@@ -25,9 +25,9 @@ import java.text.DecimalFormat;
 public class UserFileUtil {
 
     public static final String ROOT_LOCATION = "C:\\spring_docs\\";
-    public static final String SYSTEM_EXTENSION = ".curva";
-    public static final Pattern DIRECTORY_NAME_PATTERN = Pattern.compile("^[\\w,\\s,\\.\\-/)/(]+$");
-    public static final Pattern DOCUMENT_NAME_PATTERN = Pattern.compile("^[\\w,\\s,\\.\\-/)/(]+\\.[A-Za-z0-9]{1,5}");
+    public static final String SYSTEM_EXTENSION = ".ud";
+    public static final Pattern DIRECTORY_NAME_PATTERN = Pattern.compile("^[а-яА-Я\\w,\\s,\\.\\-/)/(]+$");
+    public static final Pattern DOCUMENT_NAME_PATTERN = Pattern.compile("^[а-яА-Я\\w,\\s,\\.\\-/)/(]+\\.[A-Za-z0-9]{1,5}");
 
     public static UserDocument createUserDocument(MultipartFile multipartFile,
                                                   UserDirectory directory,
@@ -177,5 +177,12 @@ public class UserFileUtil {
 
     public static boolean validateDirectoryName(String directoryName) {
         return DIRECTORY_NAME_PATTERN.matcher(directoryName).matches();
+    }
+
+    public static void createRootDir() {
+        File file = new File("C:\\spring_docs");
+        if (!file.exists()) {
+            file.mkdir();
+        }
     }
 }

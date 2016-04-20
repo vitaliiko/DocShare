@@ -12,7 +12,7 @@ import com.geekhub.exceptions.UserProfileException;
 import com.geekhub.security.UserProfileManager;
 import com.geekhub.services.UserDocumentService;
 import com.geekhub.services.UserService;
-import com.geekhub.providers.UserProvider;
+import com.geekhub.utils.UserFileUtil;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
@@ -30,7 +30,6 @@ import javax.servlet.http.HttpSession;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
 @RequestMapping("/main")
@@ -38,9 +37,6 @@ public class MainController {
 
     @Autowired
     private UserService userService;
-
-    @Autowired
-    private UserProvider userProvider;
 
     @Autowired
     private UserProfileManager userProfileManager;
@@ -55,7 +51,7 @@ public class MainController {
 
     @RequestMapping(value = "/sign_in", method = RequestMethod.GET)
     public ModelAndView signIn() {
-        userProvider.fillDB();
+        UserFileUtil.createRootDir();
         return new ModelAndView("signIn");
     }
 
