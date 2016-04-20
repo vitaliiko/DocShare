@@ -54,13 +54,13 @@ public class UserProfileManager {
 
     private void validateNames(String firstName, String lastName, String login) throws UserProfileException {
         if (!FIRST_NAME_PATTERN.matcher(firstName).matches()) {
-            throw new UserProfileException("First name contain forbidden characters");
+            throw new UserProfileException("Enter a valid first name address");
         }
         if (!LAST_NAME_PATTERN.matcher(lastName).matches()) {
-            throw new UserProfileException("Last name contain forbidden characters");
+            throw new UserProfileException("Enter a valid last name address");
         }
         if (!LOGIN_PATTERN.matcher(login).matches()) {
-            throw new UserProfileException("Login contain forbidden characters");
+            throw new UserProfileException("Enter a valid login address");
         }
     }
 
@@ -89,7 +89,7 @@ public class UserProfileManager {
             }
             if (userDto.getEmail() != null && !userDto.getEmail().isEmpty()) {
                 if (!EMAIL_PATTERN.matcher(userDto.getEmail()).matches()) {
-                    throw new UserProfileException("E-Mail contain forbidden characters");
+                    throw new UserProfileException("Enter a valid email address");
                 }
             }
             if (userDto.getCountry() != null && !userDto.getCountry().isEmpty()) {

@@ -247,9 +247,20 @@ public class DocumentController {
         User user = getUserFromSession(session);
         UserDocument document = userDocumentService.getById(docId);
         if (documentAccessService.canRead(document, user)) {
+            boolean abilityToComment = document.getAbilityToComment() == AbilityToCommentDocument.ENABLE;
             model.setViewName("document");
             model.addObject("doc", EntityToDtoConverter.convert(document));
             model.addObject("location", userDocumentService.getLocation(document));
+            model.addObject("renderSettings", documentAccessService.isOwner(document, user) || abilityToComment);
+            model.addObject("renderComments", abilityToComment);
+            if (documentAccessService.isOwner(document, user)) {
+                model.addObject("historyLink", "/document/history/" + document.getId());
+                String action = abilityToComment
+                        ? "Disable comments for this file"
+                        : "Enable comments for this file";
+                model.addObject("changeAbilityToComment", action);
+                model.addObject("showComments", abilityToComment ? "visible" : "hidden");
+            }
             return model;
         }
         throw new ResourceNotFoundException();
@@ -268,7 +279,7 @@ public class DocumentController {
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
-    @RequestMapping(value = "/add-comment", method = RequestMethod.POST)
+    @RequestMapping(value = "/add_comment", method = RequestMethod.POST)
     public CommentDto addComment(String text, long docId, HttpSession session) {
         User user = getUserFromSession(session);
         UserDocument document = userDocumentService.getById(docId);
@@ -289,23 +300,23 @@ public class DocumentController {
         if (documentAccessService.isOwner(document, user)) {
             document.getComments().clear();
             userDocumentService.update(document);
+        } else {
+            throw new ResourceNotFoundException();
         }
-        throw new ResourceNotFoundException();
     }
 
     @RequestMapping(value = "/make-directory", method = RequestMethod.GET)
     public ResponseEntity<UserFileDto> makeDir(String dirName,
-                                               @RequestParam(required = false, name = "dirHashName")
-                                               String parentDirectoryHash,
+                                               @RequestParam(required = false, name = "dirHashName") String parentDirHash,
                                                HttpSession session) {
 
         User owner = getUserFromSession(session);
-        if (parentDirectoryHash == null || parentDirectoryHash.isEmpty()) {
-            parentDirectoryHash = owner.getLogin();
+        if (parentDirHash == null || parentDirHash.isEmpty()) {
+            parentDirHash = owner.getLogin();
         }
 
         if (dirName != null && !dirName.isEmpty()) {
-            UserDirectory directory = makeDirectory(owner, parentDirectoryHash, dirName);
+            UserDirectory directory = makeDirectory(owner, parentDirHash, dirName);
             if (directory != null) {
                 return new ResponseEntity<>(EntityToDtoConverter.convert(directory), HttpStatus.OK);
             }
@@ -484,8 +495,9 @@ public class DocumentController {
     }
 
     @RequestMapping(value = "/download_old_version/{versionId}", method = RequestMethod.GET)
-    public void downloadDocumentOldVersion(@PathVariable long versionId, HttpSession session, HttpServletResponse response)
-            throws IOException {
+    public void downloadDocumentOldVersion(@PathVariable long versionId,
+                                           HttpSession session,
+                                           HttpServletResponse response) throws IOException {
 
         User user = getUserFromSession(session);
         DocumentOldVersion oldVersion = documentOldVersionService.getById(versionId);

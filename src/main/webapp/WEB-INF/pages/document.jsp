@@ -15,9 +15,14 @@
 
 <div class="container" style="width: 900px;">
     <h4>${location}${doc.name}</h4>
-    <h5>${doc.size} &nbsp&nbsp Changed: ${doc.lastModifyTime}
+    <h5>
+        ${doc.size} &nbsp&nbsp Changed: ${doc.lastModifyTime}
         <a href="<c:url value='/document/download/${doc.id}' />" class="btn btn-default custom-width">Download</a>
-        <a href="<c:url value='/document/history/${doc.id}' />" class="btn btn-default custom-width">Previous versions</a>
+        <c:if test="${historyLink != null}">
+            <a href="${historyLink}" class="btn btn-default custom-width">
+                Previous versions
+            </a>
+        </c:if>
     </h5>
     <c:if test="${doc.description != null}">
         Description: ${doc.description}
@@ -26,24 +31,26 @@
     <br>
     <br>
     <br>
-    <div class="detailBox">
-        <div class="titleBox">
-            <label>Comment Box</label>
-            <button type="button" class="close" aria-hidden="true">&times;</button>
+    <c:if test="${renderComments}">
+        <div class="detailBox commentBox" ${showComments}>
+            <div class="titleBox">
+                <label>Comment Box</label>
+                <button type="button" class="close close-comments" aria-hidden="true">&times;</button>
+            </div>
+            <div class="actionBox">
+                <ul class="commentList"></ul>
+                <form class="form-inline" role="form">
+                    <div class="form-group">
+                        <input class="form-control comment-text" type="text" placeholder="Your comments" />
+                    </div>
+                    <div class="form-group">
+                        <input type="hidden" class="doc-id" value="${doc.id}">
+                        <button type="button" class="btn btn-default add-comment">Add</button>
+                    </div>
+                </form>
+            </div>
         </div>
-        <div class="actionBox">
-            <ul class="commentList"></ul>
-            <form class="form-inline" role="form">
-                <div class="form-group">
-                    <input class="form-control comment-text" type="text" placeholder="Your comments" />
-                </div>
-                <div class="form-group">
-                    <input type="hidden" class="doc-id" value="${doc.id}">
-                    <button type="button" class="btn btn-default add-comment">Add</button>
-                </div>
-            </form>
-        </div>
-    </div>
+    </c:if>
 </div>
 
 </body>

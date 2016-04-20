@@ -58,7 +58,7 @@ $(document).ready(function() {
         renderDirectories(files);
         renderDocuments(files);
     });
-    $('#searchForm').show();
+    $('.form-search').show();
 
     $('.all-href').click(function() {
         event.preventDefault();
