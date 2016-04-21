@@ -47,7 +47,7 @@
                     <td>
                         <a href="${friendPage}" class="btn btn-link"> ${friendEntry.key} </a>
                     </td>
-                    <td class="td-friend${friendEntry.key.id}">
+                    <td class="td td-friend${friendEntry.key.id}">
                         <c:forEach var="group" items="${friendEntry.value}">
                             <a href="#" name="groupInfoButton" data-toggle="modal" data-target="#groupInfo"
                                     id="${group.id}" class="group-info-btn group${group.id}">

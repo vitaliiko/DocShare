@@ -125,7 +125,7 @@ $(document).ready(function() {
             data: {groupId: friendsGroupId},
             success: function() {
                 removeButton.parent().parent().remove();
-                $('.friend-table').find($('.group' + groupId)).remove();
+                $('.friend-table').find($('.group' + friendsGroupId)).remove();
             }
         });
     });

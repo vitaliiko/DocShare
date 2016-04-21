@@ -126,11 +126,18 @@ public class UserServiceImpl implements UserService {
         User user = userDao.getById(userId);
         User friend = userDao.getById(friendId);
 
+        deleteFriend(user, friend);
+        deleteFriend(friend, user);
+    }
+
+    private void deleteFriend(User user, User friend) {
         user.getFriends().remove(friend);
         userDao.update(user);
-
-        friend.getFriends().remove(user);
-        userDao.update(user);
+        List<FriendsGroup> groups = friendsGroupService.getByOwnerAndFriend(user, friend);
+        groups.forEach(g -> {
+            g.getFriends().remove(friend);
+            friendsGroupService.update(g);
+        });
     }
 
     @Override

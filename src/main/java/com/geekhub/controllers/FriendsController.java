@@ -119,6 +119,8 @@ public class FriendsController {
             if (friends != null) {
                 newMembersSet = userService.getSetByIds(friends);
                 group.setFriends(newMembersSet);
+            } else {
+                group.getFriends().clear();
             }
             friendsGroupService.update(group);
 
