@@ -20,7 +20,7 @@ import com.geekhub.security.UserDirectoryAccessService;
 import com.geekhub.security.UserDocumentAccessService;
 import com.geekhub.services.DocumentOldVersionService;
 import com.geekhub.services.EntityService;
-import com.geekhub.services.EventService;
+import com.geekhub.services.EventSendingService;
 import com.geekhub.services.FriendsGroupService;
 import com.geekhub.services.RemovedDirectoryService;
 import com.geekhub.services.RemovedDocumentService;
@@ -29,7 +29,6 @@ import com.geekhub.services.UserDocumentService;
 import com.geekhub.services.UserService;
 import com.geekhub.utils.DocumentVersionUtil;
 import com.geekhub.dto.convertors.EntityToDtoConverter;
-import com.geekhub.utils.EventUtil;
 import com.geekhub.utils.UserFileUtil;
 import com.geekhub.validators.FileValidator;
 import java.io.File;
@@ -94,7 +93,7 @@ public class DocumentController {
     private UserDocumentAccessService documentAccessService;
 
     @Autowired
-    private EventService eventService;
+    private EventSendingService eventSendingService;
 
     private User getUserFromSession(HttpSession session) {
         return userService.getById((Long) session.getAttribute("userId"));
@@ -188,16 +187,16 @@ public class DocumentController {
             Set<UserDocument> documents = userDocumentService.getByIds(Arrays.asList(docIds));
             if (documentAccessService.canRemove(documents, user)) {
                 userDocumentService.moveToTrash(docIds, userId);
-                documents.forEach(doc ->
-                        sendRemoveEvent(userDocumentService, "Document", doc.getName(), doc.getId(), user));
+                documents.forEach(doc -> eventSendingService
+                        .sendRemoveEvent(userDocumentService, "Document", doc.getName(), doc.getId(), user));
             }
         }
         if (dirIds != null) {
             Set<UserDirectory> directories = userDirectoryService.getByIds(Arrays.asList(dirIds));
             if (directoryAccessService.canRemove(directories, user)) {
                 userDirectoryService.moveToTrash(dirIds, userId);
-                directories.forEach(dir ->
-                        sendRemoveEvent(userDirectoryService, "Directory", dir.getName(), dir.getId(), user));
+                directories.forEach(dir -> eventSendingService
+                        .sendRemoveEvent(userDirectoryService, "Directory", dir.getName(), dir.getId(), user));
             }
         }
     }
@@ -231,7 +230,7 @@ public class DocumentController {
             Long docId = userDocumentService.recover(remDocId);
 
             String docName = userDocumentService.getById(docId).getName();
-            sendRecoverEvent(userDocumentService, "Document", docName, docId, user);
+            eventSendingService.sendRecoverEvent(userDocumentService, "Document", docName, docId, user);
             return new ModelAndView("redirect:/document/upload");
         }
         throw new ResourceNotFoundException();
@@ -244,7 +243,7 @@ public class DocumentController {
             Long dirId = userDirectoryService.recover(remDirId);
 
             String dirName = userDirectoryService.getById(dirId).getName();
-            sendRecoverEvent(userDirectoryService, "Directory", dirName, dirId, user);
+            eventSendingService.sendRecoverEvent(userDirectoryService, "Directory", dirName, dirId, user);
             return new ModelAndView("redirect:/document/upload");
         }
         throw new ResourceNotFoundException();
@@ -332,8 +331,8 @@ public class DocumentController {
                 document.setName(newDocName);
                 userDocumentService.update(document);
 
-                sendRenameEvent(userDocumentService.getAllReadersAndEditors(docId), "document", oldDocName,
-                        newDocName, document.getId(), user);
+                eventSendingService.sendRenameEvent(userDocumentService
+                        .getAllReadersAndEditors(docId), "document", oldDocName, newDocName, document.getId(), user);
 
                 return new ResponseEntity<>(EntityToDtoConverter.convert(document), HttpStatus.OK);
             }
@@ -358,8 +357,8 @@ public class DocumentController {
                 directory.setName(newDirName);
                 userDirectoryService.update(directory);
 
-                sendRenameEvent(userDirectoryService.getAllReaders(dirId), "directory", oldDirName,
-                        newDirName, directory.getId(), user);
+                eventSendingService.sendRenameEvent(userDirectoryService
+                        .getAllReaders(dirId), "directory", oldDirName, newDirName, directory.getId(), user);
 
                 return new ResponseEntity<>(EntityToDtoConverter.convert(directory), HttpStatus.OK);
             }
@@ -383,11 +382,12 @@ public class DocumentController {
 
             Set<User> newReadersAndEditorsSet = userDocumentService.getAllReadersAndEditors(document.getId());
             newReadersAndEditorsSet.removeAll(currentReadersAndEditors);
-            sendShareEvent(newReadersAndEditorsSet, "document", document.getName(), document.getId(), user);
+            eventSendingService
+                    .sendShareEvent(newReadersAndEditorsSet, "document", document.getName(), document.getId(), user);
 
             newReadersAndEditorsSet = userDocumentService.getAllReadersAndEditors(document.getId());
             currentReadersAndEditors.removeAll(newReadersAndEditorsSet);
-            sendProhibitAccessEvent(currentReadersAndEditors, "document", document.getName(), user);
+            eventSendingService.sendProhibitAccessEvent(currentReadersAndEditors, "document", document.getName(), user);
 
             return new ResponseEntity<>(EntityToDtoConverter.convert(document), HttpStatus.OK);
         }
@@ -421,11 +421,11 @@ public class DocumentController {
 
             Set<User> newReaderSet = userDirectoryService.getAllReaders(directory.getId());
             newReaderSet.removeAll(currentReaders);
-            sendShareEvent(newReaderSet, "directory", directory.getName(), directory.getId(), user);
+            eventSendingService.sendShareEvent(newReaderSet, "directory", directory.getName(), directory.getId(), user);
 
             newReaderSet = userDirectoryService.getAllReaders(directory.getId());
             currentReaders.removeAll(newReaderSet);
-            sendProhibitAccessEvent(currentReaders, "directory", directory.getName(), user);
+            eventSendingService.sendProhibitAccessEvent(currentReaders, "directory", directory.getName(), user);
 
             return new ResponseEntity<>(EntityToDtoConverter.convert(directory), HttpStatus.OK);
         }
@@ -667,7 +667,7 @@ public class DocumentController {
         DocumentOldVersion oldVersion = DocumentVersionUtil.createOldVersion(document);
         document.getDocumentOldVersions().add(oldVersion);
         userDocumentService.update(UserFileUtil.updateUserDocument(document, multipartFile, description, user));
-        sendUpdateEvent(document, user);
+        eventSendingService.sendUpdateEvent(document, user);
     }
 
     private UserDirectory makeDirectory(User owner, String parentDirectoryHash, String dirName) {
@@ -680,73 +680,5 @@ public class DocumentController {
             return directory;
         }
         return null;
-    }
-
-    private void sendUpdateEvent(UserDocument document, User user) {
-        String eventText = "Document " + document.getName() + " has been updated by " + user.getFullName();
-        String eventLinkText = "Browse";
-        String eventLinkUrl = "/document/browse/" + document.getId();
-
-        Set<User> readers = userDocumentService.getAllReadersAndEditors(document.getId());
-        eventService.save(EventUtil.createEvent(readers, eventText, eventLinkText, eventLinkUrl, user));
-    }
-
-    private <T, S extends EntityService<T, Long>> void sendRemoveEvent(S service, String fileType, String fileName,
-                                                                       long fileId, User user) {
-
-        String eventText = fileType + " " + fileName + " has been removed by " + user.getFullName();
-
-        Set<User> readers = service instanceof UserDirectoryService
-                ? ((UserDirectoryService) service).getAllReaders(fileId)
-                : ((UserDocumentService) service).getAllReadersAndEditors(fileId);
-        eventService.save(EventUtil.createEvent(readers, eventText, user));
-    }
-
-    private <T, S extends EntityService<T, Long>> void sendRecoverEvent(S service, String fileType, String fileName,
-                                                                        long fileId, User user) {
-
-        String eventText = fileType + " " + fileName + " has been recovered by " + user.getFullName();
-        String eventLinkText = null;
-        String eventLinkUrl = null;
-        if (fileType.toLowerCase().equals("Document")) {
-            eventLinkText = "Browse";
-            eventLinkUrl = "/document/browse/" + fileId;
-        }
-
-        Set<User> readers = service instanceof UserDirectoryService
-                ? ((UserDirectoryService) service).getAllReaders(fileId)
-                : ((UserDocumentService) service).getAllReadersAndEditors(fileId);
-
-        eventService.save(EventUtil.createEvent(readers, eventText, eventLinkText, eventLinkUrl, user));
-    }
-
-    private void sendRenameEvent(Set<User> readers, String fileType, String fileOldName,
-                                 String fileName, long fileId, User user) {
-
-        String eventText = "User " + user.getFullName() + " has renamed "
-                + fileType + " " + fileOldName + " to " + fileName;
-        String eventLinkText = null;
-        String eventLinkUrl = null;
-        if (fileType.toLowerCase().equals("document")) {
-            eventLinkText = "Browse";
-            eventLinkUrl = "/document/browse/" + fileId;
-        }
-        eventService.save(EventUtil.createEvent(readers, eventText, eventLinkText, eventLinkUrl, user));
-    }
-
-    private void sendShareEvent(Set<User> readers, String fileType, String fileName, long fileId, User user) {
-        String eventText = "User " + user.getFullName() + " has shared " + fileType + " " + fileName;
-        String eventLinkText = null;
-        String eventLinkUrl = null;
-        if (fileType.toLowerCase().equals("document")) {
-            eventLinkText = "Browse";
-            eventLinkUrl = "/document/browse/" + fileId;
-        }
-        eventService.save(EventUtil.createEvent(readers, eventText, eventLinkText, eventLinkUrl, user));
-    }
-
-    private void sendProhibitAccessEvent(Set<User> readers, String fileType, String fileName, User user) {
-        String eventText = "User " + user.getFullName() + " has prohibited access to " + fileType + " " + fileName;
-        eventService.save(EventUtil.createEvent(readers, eventText, user));
     }
 }

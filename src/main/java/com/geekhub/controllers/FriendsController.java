@@ -5,13 +5,11 @@ import com.geekhub.entities.Event;
 import com.geekhub.entities.FriendsGroup;
 import com.geekhub.entities.User;
 import com.geekhub.dto.FriendsGroupDto;
+import com.geekhub.services.EventSendingService;
 import com.geekhub.services.EventService;
 import com.geekhub.services.FriendsGroupService;
-import com.geekhub.services.UserDirectoryService;
-import com.geekhub.services.UserDocumentService;
 import com.geekhub.services.UserService;
 import com.geekhub.dto.convertors.EntityToDtoConverter;
-import com.geekhub.utils.EventUtil;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.TreeMap;
@@ -45,10 +43,7 @@ public class FriendsController {
     private EventService eventService;
 
     @Autowired
-    private UserDocumentService userDocumentService;
-
-    @Autowired
-    private UserDirectoryService userDirectoryService;
+    private EventSendingService eventSendingService;
 
     private User getUserFromSession(HttpSession session) {
         return userService.getById((Long) session.getAttribute("userId"));
@@ -124,25 +119,7 @@ public class FriendsController {
             }
             friendsGroupService.update(group);
 
-            long documentsCount = Long.valueOf(userDocumentService.getCountByFriendsGroup(group));
-            long directoriesCount = userDirectoryService.getCountByFriendsGroup(group);
-            if (documentsCount != 0 || directoriesCount != 0) {
-                String filesCount = "";
-                if (documentsCount != 0) {
-                    filesCount += documentsCount + " documents";
-                }
-                if (directoriesCount != 0 && documentsCount != 0) {
-                    filesCount += " and ";
-                }
-                if (directoriesCount != 0) {
-                    filesCount += directoriesCount + " directories";
-                }
-                if (newMembersSet != null) {
-                    newMembersSet.removeAll(membersSet);
-                    String eventText = "User " + user.getFullName() + " has shared " + filesCount;
-                    eventService.save(EventUtil.createEvent(newMembersSet, eventText, user));
-                }
-            }
+            eventSendingService.sendShareEvent(user, group, membersSet, newMembersSet);
         }
         return null;
     }
@@ -179,11 +156,7 @@ public class FriendsController {
             userService.addFriend(userId, friendId);
             userService.addFriend(friendId, userId);
 
-            String eventText = "User " + user.getFullName() + " confirm your request.";
-            String eventLinkText = "Friends";
-            String eventLinkUrl = "/friends/";
-
-            eventService.save(EventUtil.createEvent(friend, eventText, eventLinkText, eventLinkUrl, user));
+            eventSendingService.sendAddToFriendEvent(user, friend);
         }
         return new ModelAndView("redirect:/friends/");
     }
@@ -194,12 +167,7 @@ public class FriendsController {
         User friend = userService.getById(friendId);
 
         if (!userService.areFriends(user.getId(), friend)) {
-            String eventHashName = EventUtil.createHashName();
-            String eventText = "User " + user.getFullName() + " wants to add you as a friend.";
-            String eventLinkText = "Confirm";
-            String eventLinkUrl = "/friends/add_friend/" + user.getId() + "/" + eventHashName;
-
-            eventService.save(EventUtil.createEvent(eventHashName, friend, eventText, eventLinkText, eventLinkUrl, user));
+            eventSendingService.sendToFriendRequestEvent(user, friend);
         }
         return new ModelAndView("redirect:/main/search");
     }
@@ -210,8 +178,7 @@ public class FriendsController {
         User friend = userService.getById(friendId);
         userService.deleteFriend(user.getId(), friend.getId());
 
-        String eventText = "User " + user.getFullName() + " removed you from friends.";
-        eventService.save(EventUtil.createEvent(friend, eventText, user));
+        eventSendingService.sendDeleteFromFriendEvent(user, friend);
     }
 
     @RequestMapping("/delete_group")
