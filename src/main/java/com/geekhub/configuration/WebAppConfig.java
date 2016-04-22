@@ -1,4 +1,4 @@
-package com.geekhub.app_config;
+package com.geekhub.configuration;
 
 import com.geekhub.interceptors.MainInterceptor;
 import org.springframework.context.MessageSource;

@@ -1,4 +1,4 @@
-package com.geekhub.app_config;
+package com.geekhub.configuration;
 
 import com.geekhub.entities.Comment;
 import com.geekhub.entities.DocumentOldVersion;
@@ -25,7 +25,7 @@ import javax.sql.DataSource;
 import java.util.Properties;
 
 @Configuration
-@ComponentScan(basePackages = "com.geekhub")
+@ComponentScan(basePackages = "com.geekhub.entities")
 @EnableTransactionManagement
 @PropertySource("classpath:database.properties")
 public class HibernateConfig {

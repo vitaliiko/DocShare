@@ -16,9 +16,6 @@ public class DocumentOldVersionServiceImpl implements DocumentOldVersionService 
     @Autowired
     private DocumentOldVersionDao documentOldVersionDao;
 
-    @Autowired
-    private UserService userService;
-
     @Override
     public List<DocumentOldVersion> getAll(String orderParameter) {
         return documentOldVersionDao.getAll(orderParameter);

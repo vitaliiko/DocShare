@@ -1,7 +1,6 @@
 package com.geekhub.dao;
 
 import com.geekhub.entities.User;
-import java.util.Arrays;
 import java.util.Map;
 import org.hibernate.Criteria;
 import org.hibernate.SessionFactory;
@@ -12,7 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
-import org.springframework.web.bind.annotation.ResponseStatus;
 
 @Repository
 @SuppressWarnings("unchecked")

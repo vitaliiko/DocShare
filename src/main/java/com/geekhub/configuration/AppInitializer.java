@@ -1,4 +1,4 @@
-package com.geekhub.app_config;
+package com.geekhub.configuration;
 
 import org.springframework.orm.jpa.support.OpenEntityManagerInViewFilter;
 import org.springframework.web.filter.HiddenHttpMethodFilter;
