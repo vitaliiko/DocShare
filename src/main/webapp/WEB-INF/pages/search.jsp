@@ -8,6 +8,7 @@
     <title>Search</title>
 
     <jsp:include page="../include/include.jsp"/>
+    <script src="${pageContext.request.contextPath}/resources/js/navbar.js"></script>
 </head>
 <body>
 <jsp:include page="../include/header.jsp"/>

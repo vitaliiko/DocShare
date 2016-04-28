@@ -116,11 +116,11 @@ public class UserFileUtil {
         return null;
     }
 
-    public static UserDirectory createUserDirectory(User owner, String parentDirectoryHash, String dirName) {
+    public static UserDirectory createUserDirectory(User owner, String parentDirHash, String dirName) {
         UserDirectory directory = new UserDirectory();
         directory.setOwner(owner);
         directory.setName(dirName);
-        directory.setParentDirectoryHash(parentDirectoryHash);
+        directory.setParentDirectoryHash(parentDirHash.equals("root") ? owner.getLogin() : parentDirHash);
         directory.setHashName(createHashName());
         directory.setDocumentAttribute(DocumentAttribute.PRIVATE);
         return directory;

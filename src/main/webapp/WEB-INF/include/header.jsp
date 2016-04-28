@@ -4,12 +4,12 @@
 <nav class="navbar navbar-default">
     <div class="container-fluid">
         <div class="navbar-header">
-            <a class="navbar-brand" href="#">Exchange File System</a>
+            <a class="navbar-brand" href="/document/upload">DocShare</a>
         </div>
         <ul class="nav navbar-nav">
-            <li class="active"><a href="/document/upload">Home</a></li>
-            <li><a href="/main/search">Search Friends</a></li>
-            <li><a href="/profile/">Profile</a></li>
+            <li id="documentUpload"><a href="/document/upload">Home</a></li>
+            <li id="search"><a href="/main/search">Search Friends</a></li>
+            <li id="profile"><a href="/profile/">Profile</a></li>
 
             <c:if test="${renderSettings}">
                 <li class="dropdown">
