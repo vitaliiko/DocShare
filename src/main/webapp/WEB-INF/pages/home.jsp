@@ -23,20 +23,12 @@
     </style>
 </head>
 
-<body>
+<body style="padding-top: 65px;">
 
-<jsp:include page="../include/header.jsp"/>
+<jsp:include page="../include/navbar.jsp"/>
 <jsp:include page="../include/sidebar.jsp"/>
 
-<div class="container" style="width: 900px;">
-
-    <c:if test="${errorMessage != null}">
-        <div class='alert alert-danger'>
-            <a href='#' class='close' data-dismiss='alert'>&times;</a>
-            <strong>Error!</strong> ${errorMessage}
-        </div>
-        <br>
-    </c:if>
+<div class="container col-md-10" style="width: 900px;">
 
     <div class='alert alert-danger' hidden>
         <a href='#' class='close' data-dismiss='alert'>&times;</a>
@@ -73,7 +65,7 @@
 
     <div class="content">
         <c:forEach items="${tableNames}" var="tableName">
-            <table class="table table-hover tbody tr:hover td doc-table ${tableName}">
+            <table class="table table-hover tbody tr:hover td doc-table ${tableName}" style=" font-size: 14px">
                 <caption>
                     <h4 class="replace-message" hidden>Choose the folder in which you want to move files and press "Move here"</h4>
                     <h4 class="copy-message" hidden>Choose the folder in which you want to copy files and press "Copy here"</h4>
@@ -99,7 +91,7 @@
 
                 </caption>
                 <tr class="table-head">
-                    <th>
+                    <th width="20">
                         <input type="checkbox" class="check-box big-check-box select-all"/>
                     </th>
                     <th id="file-name">Name</th>

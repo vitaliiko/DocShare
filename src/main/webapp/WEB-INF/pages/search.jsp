@@ -10,11 +10,12 @@
     <jsp:include page="../include/include.jsp"/>
     <script src="${pageContext.request.contextPath}/resources/js/navbar.js"></script>
 </head>
-<body>
-<jsp:include page="../include/header.jsp"/>
+
+<body style="padding-top: 65px;">
+<jsp:include page="../include/navbar.jsp"/>
 <jsp:include page="../include/sidebar.jsp"/>
 
-<div id="wrapper" class="container" style="width: 900px">
+<div id="wrapper" class="container col-md-10" style="width: 900px">
 
     <c:if test="${message != null}">
         <div class='alert alert-success'>

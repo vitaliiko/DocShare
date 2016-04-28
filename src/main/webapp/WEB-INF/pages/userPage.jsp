@@ -8,11 +8,12 @@
 
     <jsp:include page="../include/include.jsp"/>
 </head>
-<body>
-<jsp:include page="../include/header.jsp"/>
+
+<body style="padding-top: 65px;">
+<jsp:include page="../include/navbar.jsp"/>
 <jsp:include page="../include/sidebar.jsp"/>
 
-<div class="container" style="width: 900px">
+<div class="container col-md-10" style="width: 900px">
     <div class="container">
         <img src="/profile/imageDisplay?id=${pageOwner.id}"/>
         <h3>${pageOwner.firstName} ${pageOwner.lastName}</h3>

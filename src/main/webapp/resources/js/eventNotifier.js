@@ -13,7 +13,7 @@ $(document).ready(function() {
             type: 'GET',
             success: function(count) {
                 if (count > 0) {
-                    countLabel.text(count);
+                    countLabel.text('(' + count + ' new)');
                 } else {
                     countLabel.text('');
                 }

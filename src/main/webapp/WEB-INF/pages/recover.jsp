@@ -5,13 +5,15 @@
 <head>
     <title>Removed documents</title>
     <jsp:include page="../include/include.jsp"/>
+    <script src="${pageContext.request.contextPath}/resources/js/sidebar.js"></script>
 </head>
-<body>
 
-<jsp:include page="../include/header.jsp"/>
+<body style="padding-top: 65px;">
+
+<jsp:include page="../include/navbar.jsp"/>
 <jsp:include page="../include/sidebar.jsp"/>
 
-<div class="container" style="width: 900px;">
+<div class="container col-md-10" style="width: 900px;">
     <table class="table table-hover tbody tr:hover td" id="documentTable">
         <caption><h3>List of Removed Documents</h3></caption>
         <tr>

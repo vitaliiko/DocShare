@@ -9,11 +9,13 @@
     <jsp:include page="../include/include.jsp"/>
     <script src="${pageContext.request.contextPath}/resources/js/navbar.js"></script>
 </head>
-<body>
 
-    <jsp:include page="../include/header.jsp"/>
-    <jsp:include page="../include/sidebar.jsp"/>
+<body style="padding-top: 65px;">
 
+<jsp:include page="../include/navbar.jsp"/>
+<jsp:include page="../include/sidebar.jsp"/>
+
+<div class="container col-md-10">
     <div class="container" style="width: 600px;" align="center">
         <c:if test="${errorMessage != null}">
             <div class='alert alert-danger'>
@@ -104,29 +106,30 @@
                     data-toggle="modal" data-target="#deleteDialog">Delete your account</button>
         </div>
     </div>
+</div>
 
-    <div id="deleteDialog" class="modal fade" role="dialog">
-        <div class="modal-dialog">
+<div id="deleteDialog" class="modal fade" role="dialog">
+    <div class="modal-dialog">
 
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal">&times;</button>
-                    <h4 class="modal-title">Warning!</h4>
-                </div>
-                <div class="modal-body">
-                    <h4>Are you sure you want to delete your account?</h4>
-                    <h4>Your files will be removed irretrievably.</h4>
-                </div>
-                <div class="modal-footer">
-                    <form action="/profile/remove_account">
-                        <input type="submit" id="deleteDocument" class="btn btn-success" value="YES">
-                        <button type="button" class="btn btn-danger" data-dismiss="modal">NO</button>
-                    </form>
-                </div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Warning!</h4>
             </div>
-
+            <div class="modal-body">
+                <h4>Are you sure you want to delete your account?</h4>
+                <h4>Your files will be removed irretrievably.</h4>
+            </div>
+            <div class="modal-footer">
+                <form action="/profile/remove_account">
+                    <input type="submit" id="deleteDocument" class="btn btn-success" value="YES">
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">NO</button>
+                </form>
+            </div>
         </div>
+
     </div>
+</div>
 
 </body>
 </html>

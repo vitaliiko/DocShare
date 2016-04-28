@@ -9,13 +9,15 @@
     <jsp:include page="../include/include.jsp"/>
     <script src="${pageContext.request.contextPath}/resources/js/friends.js"></script>
     <script src="${pageContext.request.contextPath}/resources/js/templateHandler.js"></script>
+    <script src="${pageContext.request.contextPath}/resources/js/sidebar.js"></script>
 </head>
-<body>
 
-<jsp:include page="../include/header.jsp"/>
+<body style="padding-top: 65px;">
+
+<jsp:include page="../include/navbar.jsp"/>
 <jsp:include page="../include/sidebar.jsp"/>
 
-<div id="wrapper" class="container">
+<div id="wrapper" class="container col-md-10">
 
     <div class='alert alert-danger' hidden>
         <a href='#' class='close' data-dismiss='alert'>&times;</a>

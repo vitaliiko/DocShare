@@ -5,7 +5,7 @@
     <jsp:include page="../include/include.jsp"/>
 </head>
 <body>
-<jsp:include page="../include/header.jsp"/>
+<jsp:include page="../include/navbar.jsp"/>
 <jsp:include page="../include/sidebar.jsp"/>
 
 <div class="container" style="width: 400px">
