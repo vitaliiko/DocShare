@@ -4,6 +4,7 @@ import com.geekhub.entities.Comment;
 import com.geekhub.entities.DocumentOldVersion;
 import com.geekhub.entities.Event;
 import com.geekhub.entities.FriendsGroup;
+import com.geekhub.entities.Organization;
 import com.geekhub.entities.RemovedDirectory;
 import com.geekhub.entities.RemovedDocument;
 import com.geekhub.entities.User;
@@ -35,6 +36,7 @@ public class HibernateConfig {
             Event.class,
             Comment.class,
             FriendsGroup.class,
+            Organization.class,
             UserDocument.class,
             UserDirectory.class,
             RemovedDocument.class,

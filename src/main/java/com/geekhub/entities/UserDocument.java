@@ -54,7 +54,7 @@ public class UserDocument implements Comparable<UserDocument>, Serializable {
     @Column
     private String parentDirectoryHash;
 
-    @Column
+    @Column(unique = true)
     private String hashName;
 
     @Column(name = "documentAttribute")
@@ -72,6 +72,10 @@ public class UserDocument implements Comparable<UserDocument>, Serializable {
     @ManyToOne
     @JoinColumn(name = "owner_id")
     private User owner;
+
+    @ManyToOne
+    @JoinColumn(name = "organization_id")
+    private Organization organization;
 
     @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH},
             fetch = FetchType.EAGER)
@@ -287,6 +291,14 @@ public class UserDocument implements Comparable<UserDocument>, Serializable {
 
     public void setExtension(String extension) {
         this.extension = extension;
+    }
+
+    public Organization getOrganization() {
+        return organization;
+    }
+
+    public void setOrganization(Organization organization) {
+        this.organization = organization;
     }
 
     public void setNameWithExtension(String name) {

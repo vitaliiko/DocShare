@@ -37,7 +37,7 @@ public class UserDirectory implements Comparable<UserDirectory>, Serializable {
     @Column
     private String parentDirectoryHash;
 
-    @Column
+    @Column(unique = true)
     private String hashName;
 
     @Column(name = "documentAttribute")

@@ -82,6 +82,11 @@ public class User implements Comparable<User> {
     private Set<User> friends = new HashSet<>();
 
     @JsonIgnore
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "creator_id")
+    private Set<Organization> organizations = new HashSet<>();
+
+    @JsonIgnore
     @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "owner_id")
     private Set<UserDocument> userDocuments = new HashSet<>();
@@ -252,6 +257,14 @@ public class User implements Comparable<User> {
 
     public void setRegistrationDate(Date registrationDate) {
         this.registrationDate = registrationDate;
+    }
+
+    public Set<Organization> getOrganizations() {
+        return organizations;
+    }
+
+    public void setOrganizations(Set<Organization> organizations) {
+        this.organizations = organizations;
     }
 
     public String getFullName() {
