@@ -1,5 +1,6 @@
 package com.geekhub.entities;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
@@ -20,7 +21,7 @@ import javax.persistence.Table;
 
 @Entity
 @Table
-public class Organization {
+public class Organization implements Serializable {
 
     @Id
     @GeneratedValue
