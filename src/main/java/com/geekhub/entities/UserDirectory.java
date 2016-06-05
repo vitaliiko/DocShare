@@ -31,6 +31,10 @@ public class UserDirectory implements Comparable<UserDirectory>, Serializable {
     @JoinColumn(name = "owner_id")
     private User owner;
 
+    @ManyToOne
+    @JoinColumn(name = "organization_id")
+    private Organization organization;
+
     @Column
     private String name;
 
@@ -142,6 +146,14 @@ public class UserDirectory implements Comparable<UserDirectory>, Serializable {
 
     public void setDocumentStatus(DocumentStatus documentStatus) {
         this.documentStatus = documentStatus;
+    }
+
+    public Organization getOrganization() {
+        return organization;
+    }
+
+    public void setOrganization(Organization organization) {
+        this.organization = organization;
     }
 
     @Override
