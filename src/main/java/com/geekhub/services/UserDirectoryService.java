@@ -7,6 +7,8 @@ import com.geekhub.entities.UserDirectory;
 import com.geekhub.entities.enums.DocumentAttribute;
 import java.util.List;
 import java.util.Set;
+
+import com.geekhub.entities.enums.DocumentStatus;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -38,9 +40,7 @@ public interface UserDirectoryService extends EntityService<UserDirectory, Long>
 
     UserDirectory getByHashName(String hashName);
 
-    List<UserDirectory> getActualByParentDirectoryHash(String parentDirectoryHash);
-
-    List<UserDirectory> getRemovedByParentDirectoryHash(String parentDirectoryHash);
+    List<UserDirectory> getByParentDirectoryHashAndStatus(String parentDirectoryHash, DocumentStatus status);
 
     List<Object> getActualIdsByParentDirectoryHash(String parentDirectoryHash);
 

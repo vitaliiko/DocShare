@@ -97,7 +97,8 @@ public class UserDirectoryServiceImpl implements UserDirectoryService {
                 .getByParentDirectoryHashAndStatus(directory.getHashName(), DocumentStatus.ACTUAL);
         documents.forEach(d -> d.setDocumentStatus(DocumentStatus.REMOVED));
 
-        List<UserDirectory> directories = getActualByParentDirectoryHash(directory.getHashName());
+        List<UserDirectory> directories =
+                getByParentDirectoryHashAndStatus(directory.getHashName(), DocumentStatus.ACTUAL);
         directories.forEach(this::setRemovedStatus);
     }
 
@@ -126,7 +127,8 @@ public class UserDirectoryServiceImpl implements UserDirectoryService {
                 .filter(d -> removedDocumentService.getByUserDocument(d) == null)
                 .forEach(d -> d.setDocumentStatus(DocumentStatus.ACTUAL));
 
-        List<UserDirectory> directories = getRemovedByParentDirectoryHash(directory.getHashName());
+        List<UserDirectory> directories =
+                getByParentDirectoryHashAndStatus(directory.getHashName(), DocumentStatus.REMOVED);
         directories.stream()
                 .filter(d -> removedDirectoryService.getByUserDirectory(d) == null)
                 .forEach(this::setActualStatus);
@@ -150,18 +152,10 @@ public class UserDirectoryServiceImpl implements UserDirectoryService {
     }
 
     @Override
-    public List<UserDirectory> getActualByParentDirectoryHash(String parentDirectoryHash) {
+    public List<UserDirectory> getByParentDirectoryHashAndStatus(String parentDirectoryHash, DocumentStatus status) {
         Map<String, Object> propertiesMap = new HashMap<>();
         propertiesMap.put("parentDirectoryHash", parentDirectoryHash);
-        propertiesMap.put("documentStatus", DocumentStatus.ACTUAL);
-        return userDirectoryDao.getList(propertiesMap);
-    }
-
-    @Override
-    public List<UserDirectory> getRemovedByParentDirectoryHash(String parentDirectoryHash) {
-        Map<String, Object> propertiesMap = new HashMap<>();
-        propertiesMap.put("parentDirectoryHash", parentDirectoryHash);
-        propertiesMap.put("documentStatus", DocumentStatus.REMOVED);
+        propertiesMap.put("documentStatus", status);
         return userDirectoryDao.getList(propertiesMap);
     }
 

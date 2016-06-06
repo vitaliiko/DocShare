@@ -626,7 +626,7 @@ public class DocumentController {
         List<UserDocument> documents;
         List<UserDirectory> directories;
         documents = userDocumentService.getByParentDirectoryHashAndStatus(directoryHashName, DocumentStatus.ACTUAL);
-        directories = userDirectoryService.getActualByParentDirectoryHash(directoryHashName);
+        directories = userDirectoryService.getByParentDirectoryHashAndStatus(directoryHashName, DocumentStatus.ACTUAL);
 
         Set<UserFileDto> dtoSet = new TreeSet<>();
         if (documents != null) {
