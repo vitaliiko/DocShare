@@ -1,4 +1,4 @@
-package com.geekhub.services;
+package com.geekhub.services.impl;
 
 import com.geekhub.dao.EventDao;
 import com.geekhub.entities.Event;
@@ -6,6 +6,8 @@ import com.geekhub.entities.User;
 import com.geekhub.entities.enums.EventStatus;
 import java.util.Collection;
 import java.util.List;
+
+import com.geekhub.services.EventService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

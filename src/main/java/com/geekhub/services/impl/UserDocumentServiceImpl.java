@@ -1,4 +1,4 @@
-package com.geekhub.services;
+package com.geekhub.services.impl;
 
 import com.geekhub.dao.UserDocumentDao;
 import com.geekhub.entities.DocumentOldVersion;
@@ -9,6 +9,7 @@ import com.geekhub.entities.UserDirectory;
 import com.geekhub.entities.UserDocument;
 import com.geekhub.entities.enums.DocumentAttribute;
 import com.geekhub.entities.enums.DocumentStatus;
+import com.geekhub.services.*;
 import com.geekhub.utils.UserFileUtil;
 import java.util.HashMap;
 import java.util.HashSet;

@@ -1,9 +1,11 @@
-package com.geekhub.services;
+package com.geekhub.services.impl;
 
 import com.geekhub.dao.OrganizationDao;
 import com.geekhub.entities.Organization;
 import com.geekhub.entities.User;
 import java.util.List;
+
+import com.geekhub.services.OrganizationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

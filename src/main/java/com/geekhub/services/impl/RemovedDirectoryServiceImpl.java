@@ -1,4 +1,4 @@
-package com.geekhub.services;
+package com.geekhub.services.impl;
 
 import com.geekhub.dao.RemovedDirectoryDao;
 import com.geekhub.entities.RemovedDirectory;
@@ -7,6 +7,9 @@ import com.geekhub.entities.UserDirectory;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
+import com.geekhub.services.RemovedDirectoryService;
+import com.geekhub.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

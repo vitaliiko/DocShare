@@ -20,7 +20,7 @@ import com.geekhub.security.UserDirectoryAccessService;
 import com.geekhub.security.UserDocumentAccessService;
 import com.geekhub.services.DocumentOldVersionService;
 import com.geekhub.services.EntityService;
-import com.geekhub.services.EventSendingService;
+import com.geekhub.services.impl.EventSendingService;
 import com.geekhub.services.FriendsGroupService;
 import com.geekhub.services.RemovedDirectoryService;
 import com.geekhub.services.RemovedDocumentService;

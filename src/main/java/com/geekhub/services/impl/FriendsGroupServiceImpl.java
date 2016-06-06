@@ -1,8 +1,10 @@
-package com.geekhub.services;
+package com.geekhub.services.impl;
 
 import com.geekhub.dao.FriendsGroupDao;
 import com.geekhub.entities.FriendsGroup;
 import com.geekhub.entities.User;
+import com.geekhub.services.FriendsGroupService;
+import com.geekhub.services.UserService;
 import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

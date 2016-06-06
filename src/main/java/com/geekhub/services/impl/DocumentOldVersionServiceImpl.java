@@ -1,9 +1,11 @@
-package com.geekhub.services;
+package com.geekhub.services.impl;
 
 import com.geekhub.dao.DocumentOldVersionDao;
 import com.geekhub.entities.DocumentOldVersion;
 import com.geekhub.entities.UserDocument;
 import java.util.List;
+
+import com.geekhub.services.DocumentOldVersionService;
 import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

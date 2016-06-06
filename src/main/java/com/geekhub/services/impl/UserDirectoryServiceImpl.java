@@ -1,4 +1,4 @@
-package com.geekhub.services;
+package com.geekhub.services.impl;
 
 import com.geekhub.dao.UserDirectoryDao;
 import com.geekhub.entities.FriendsGroup;
@@ -7,6 +7,7 @@ import com.geekhub.entities.User;
 import com.geekhub.entities.UserDirectory;
 import com.geekhub.entities.UserDocument;
 import com.geekhub.entities.enums.DocumentStatus;
+import com.geekhub.services.*;
 import com.geekhub.utils.UserFileUtil;
 import java.util.Arrays;
 import java.util.HashMap;

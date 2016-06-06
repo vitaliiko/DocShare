@@ -1,4 +1,4 @@
-package com.geekhub.services;
+package com.geekhub.services.impl;
 
 import com.geekhub.dao.UserDao;
 import com.geekhub.entities.FriendsGroup;
@@ -6,6 +6,9 @@ import com.geekhub.entities.User;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.TreeSet;
+
+import com.geekhub.services.FriendsGroupService;
+import com.geekhub.services.UserService;
 import org.hibernate.Hibernate;
 import org.hibernate.HibernateException;
 import org.springframework.beans.factory.annotation.Autowired;

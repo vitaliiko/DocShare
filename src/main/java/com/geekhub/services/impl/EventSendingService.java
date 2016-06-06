@@ -1,4 +1,4 @@
-package com.geekhub.services;
+package com.geekhub.services.impl;
 
 import com.geekhub.entities.Event;
 import com.geekhub.entities.FriendsGroup;
@@ -9,6 +9,11 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
+
+import com.geekhub.services.EntityService;
+import com.geekhub.services.EventService;
+import com.geekhub.services.UserDirectoryService;
+import com.geekhub.services.UserDocumentService;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -35,7 +40,7 @@ public class EventSendingService {
     }
 
     public <T, S extends EntityService<T, Long>> void sendRemoveEvent(S service, String fileType, String fileName,
-                                                                       long fileId, User user) {
+                                                                      long fileId, User user) {
 
         String eventText = fileType + " " + fileName + " has been removed by " + user.getFullName();
 
