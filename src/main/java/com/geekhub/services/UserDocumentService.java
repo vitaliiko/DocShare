@@ -6,6 +6,8 @@ import com.geekhub.entities.User;
 import com.geekhub.entities.UserDocument;
 import com.geekhub.entities.enums.DocumentAttribute;
 import java.util.Set;
+
+import com.geekhub.entities.enums.DocumentStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -47,9 +49,7 @@ public interface UserDocumentService extends EntityService<UserDocument, Long> {
 
     UserDocument getWithOldVersions(Long docId);
 
-    List<UserDocument> getActualByParentDirectoryHash(String parentDirectoryHash);
-
-    List<UserDocument> getRemovedByParentDirectoryHash(String parentDirectoryHash);
+    List<UserDocument> getByParentDirectoryHashAndStatus(String parentDirectoryHash, DocumentStatus status);
 
     List<Object> getActualIdsByParentDirectoryHash(String parentDirectoryHash);
 

@@ -93,7 +93,8 @@ public class UserDirectoryServiceImpl implements UserDirectoryService {
     private void setRemovedStatus(UserDirectory directory) {
         directory.setDocumentStatus(DocumentStatus.REMOVED);
 
-        List<UserDocument> documents = userDocumentService.getActualByParentDirectoryHash(directory.getHashName());
+        List<UserDocument> documents = userDocumentService
+                .getByParentDirectoryHashAndStatus(directory.getHashName(), DocumentStatus.ACTUAL);
         documents.forEach(d -> d.setDocumentStatus(DocumentStatus.REMOVED));
 
         List<UserDirectory> directories = getActualByParentDirectoryHash(directory.getHashName());
@@ -119,7 +120,8 @@ public class UserDirectoryServiceImpl implements UserDirectoryService {
     private void setActualStatus(UserDirectory directory) {
         directory.setDocumentStatus(DocumentStatus.ACTUAL);
 
-        List<UserDocument> documents = userDocumentService.getRemovedByParentDirectoryHash(directory.getHashName());
+        List<UserDocument> documents = userDocumentService
+                .getByParentDirectoryHashAndStatus(directory.getHashName(), DocumentStatus.REMOVED);
         documents.stream()
                 .filter(d -> removedDocumentService.getByUserDocument(d) == null)
                 .forEach(d -> d.setDocumentStatus(DocumentStatus.ACTUAL));

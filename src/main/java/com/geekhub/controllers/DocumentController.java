@@ -410,7 +410,8 @@ public class DocumentController {
             directory.setReaders(readers);
             directory.setReadersGroups(readerGroups);
 
-            userDocumentService.getActualByParentDirectoryHash(directory.getHashName()).forEach(d -> {
+            userDocumentService
+                    .getByParentDirectoryHashAndStatus(directory.getHashName(), DocumentStatus.ACTUAL).forEach(d -> {
                 d.setDocumentAttribute(DocumentAttribute.valueOf(shared.getAccess()));
                 d.setReaders(readers);
                 d.setReadersGroups(readerGroups);
@@ -624,7 +625,7 @@ public class DocumentController {
     private Set<UserFileDto> getDirectoryContent(String directoryHashName) {
         List<UserDocument> documents;
         List<UserDirectory> directories;
-        documents = userDocumentService.getActualByParentDirectoryHash(directoryHashName);
+        documents = userDocumentService.getByParentDirectoryHashAndStatus(directoryHashName, DocumentStatus.ACTUAL);
         directories = userDirectoryService.getActualByParentDirectoryHash(directoryHashName);
 
         Set<UserFileDto> dtoSet = new TreeSet<>();
