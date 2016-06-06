@@ -79,6 +79,7 @@ $(document).ready(function() {
         clearModalWindow();
         $('#saveGroupButton').hide();
         $('#updateGroupButton').show();
+        $('.modal-title').text('Change group');
         var groupId = this.id;
         $.getJSON('/friends/get_group', {groupId: groupId}, function(group) {
             friendsGroupId = group.id;
@@ -98,6 +99,7 @@ $(document).ready(function() {
         clearModalWindow();
         $('#saveGroupButton').show();
         $('#updateGroupButton').hide();
+        $('.modal-title').text('Add new group');
     });
 
     $('.removeFriendButton').click(function() {
