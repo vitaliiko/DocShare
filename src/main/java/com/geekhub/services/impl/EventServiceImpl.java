@@ -8,6 +8,7 @@ import java.util.Collection;
 import java.util.List;
 
 import com.geekhub.services.EventService;
+import com.geekhub.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,6 +19,9 @@ public class EventServiceImpl implements EventService {
 
     @Autowired
     private EventDao eventDao;
+
+    @Autowired
+    private UserService userService;
 
     @Override
     public List<Event> getAll(String orderParameter) {
@@ -82,5 +86,12 @@ public class EventServiceImpl implements EventService {
     @Override
     public Event getByHashName(String eventHashName) {
         return eventDao.get("hashName", eventHashName);
+    }
+
+    @Override
+    public void clearEvents(Long userId) {
+        User user = userService.getById(userId);
+        user.getEvents().clear();
+        userService.update(user);
     }
 }

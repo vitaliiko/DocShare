@@ -18,4 +18,6 @@ public interface EventService extends EntityService<Event, Long> {
     List<Event> getAllByRecipient(User recipient);
 
     Event getByHashName(String eventHashName);
+
+    void clearEvents(Long userId);
 }

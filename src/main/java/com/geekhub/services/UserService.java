@@ -39,8 +39,6 @@ public interface UserService extends EntityService<User, Long> {
 
     Set<User> getSetByIds(Long[] usersIds);
 
-    void clearEvents(Long userId);
-
     Set<User> searchByName(String name);
 
     Set<User> search(String name, Map<String, String> searchingMap);

@@ -181,13 +181,6 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void clearEvents(Long userId) {
-        User user = getById(userId);
-        user.getEvents().clear();
-        update(user);
-    }
-
-    @Override
     public Set<User> searchByName(String name) {
         String[] names = name.split(" ");
         Set<User> users = new TreeSet<>();

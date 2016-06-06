@@ -44,7 +44,7 @@ public class EventController {
 
     @RequestMapping("/clear")
     public ModelAndView clearEventsHistory(HttpSession session) {
-        userService.clearEvents((Long) session.getAttribute("userId"));
+        eventService.clearEvents((Long) session.getAttribute("userId"));
         return new ModelAndView("events", "message" , "You have not events yet");
     }
 
