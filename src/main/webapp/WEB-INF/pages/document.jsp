@@ -25,6 +25,7 @@
                 Previous versions
             </a>
         </c:if>
+        <a href="#" class="btn btn-default custom-width">Upload new version</a>
     </h5>
     <c:if test="${doc.description != null}">
         Description: ${doc.description}
