@@ -3,8 +3,11 @@ package com.geekhub.security;
 import com.geekhub.dto.RegistrationInfo;
 import com.geekhub.dto.UserDto;
 import com.geekhub.entities.User;
+import com.geekhub.entities.UserDirectory;
+import com.geekhub.entities.UserDocument;
 import com.geekhub.exceptions.UserAuthenticationException;
 import com.geekhub.exceptions.UserProfileException;
+import com.geekhub.services.UserDirectoryService;
 import com.geekhub.services.UserDocumentService;
 import com.geekhub.services.UserService;
 import com.geekhub.dto.convertors.DtoToEntityConverter;
@@ -30,6 +33,9 @@ public class UserProfileManager {
 
     @Autowired
     private UserDocumentService userDocumentService;
+
+    @Autowired
+    private UserDirectoryService userDirectoryService;
 
     public void registerNewUser(RegistrationInfo regInfo) throws UserProfileException {
         if (regInfo != null) {
@@ -119,9 +125,23 @@ public class UserProfileManager {
                     throw new UserProfileException("City name contain forbidden characters");
                 }
             }
+            changeFilesParentDirectoryHash(user.getLogin(), userDto.getLogin());
             user = DtoToEntityConverter.merge(userDto, user);
             userService.update(user);
         }
+    }
+
+    private void changeFilesParentDirectoryHash(String currentParentDirHash, String newParentDirHash) {
+        List<UserDocument> documents = userDocumentService.getByParentDirectoryHash(currentParentDirHash);
+        documents.forEach(d -> {
+            d.setParentDirectoryHash(newParentDirHash);
+            userDocumentService.update(d);
+        });
+        List<UserDirectory> directories = userDirectoryService.getByParentDirectoryHash(currentParentDirHash);
+        directories.forEach(d -> {
+            d.setParentDirectoryHash(newParentDirHash);
+            userDirectoryService.update(d);
+        });
     }
 
     public void changePassword(String currentPassword, String newPassword, String confirmationNewPassword, User user)

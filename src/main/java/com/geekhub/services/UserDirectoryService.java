@@ -40,6 +40,8 @@ public interface UserDirectoryService extends EntityService<UserDirectory, Long>
 
     UserDirectory getByHashName(String hashName);
 
+    List<UserDirectory> getByParentDirectoryHash(String parentDirectoryHash);
+
     List<UserDirectory> getByParentDirectoryHashAndStatus(String parentDirectoryHash, DocumentStatus status);
 
     List<Object> getActualIdsByParentDirectoryHash(String parentDirectoryHash);

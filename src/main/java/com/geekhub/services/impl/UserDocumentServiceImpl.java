@@ -154,6 +154,11 @@ public class UserDocumentServiceImpl implements UserDocumentService {
     }
 
     @Override
+    public List<UserDocument> getByParentDirectoryHash(String parentDirectoryHash) {
+        return userDocumentDao.getList("parentDirectoryHash", parentDirectoryHash);
+    }
+
+    @Override
     public List<UserDocument> getByParentDirectoryHashAndStatus(String parentDirectoryHash, DocumentStatus status) {
         Map<String, Object> propertiesMap = new HashMap<>();
         propertiesMap.put("parentDirectoryHash", parentDirectoryHash);
