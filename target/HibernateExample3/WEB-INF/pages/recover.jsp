@@ -5,26 +5,46 @@
 <head>
     <title>Removed documents</title>
     <jsp:include page="../include/include.jsp"/>
+    <script src="${pageContext.request.contextPath}/resources/js/sidebar.js"></script>
 </head>
-<body>
 
-<jsp:include page="../include/header.jsp"/>
+<body style="padding-top: 65px;">
+
+<jsp:include page="../include/navbar.jsp"/>
 <jsp:include page="../include/sidebar.jsp"/>
 
-<div class="container" style="width: 900px;">
+<div class="container col-md-10" style="width: 900px;">
     <table class="table table-hover tbody tr:hover td" id="documentTable">
         <caption><h3>List of Removed Documents</h3></caption>
         <tr>
-            <th id="file-name">File Name</th>
+            <th id="file-name">Name</th>
             <th>Removed</th>
             <th width="100"></th>
         </tr>
-        <c:forEach items="${documents}" var="doc">
+        <c:forEach items="${directories}" var="dir">
             <tr>
-                <td>${doc.userDocument.name}</td>
-                <td><fmt:formatDate type="date" timeStyle="short" dateStyle="short" value="${doc.removalDate}"/></td>
-                <td><a href="<c:url value='/document/recover-${doc.id}' />"
-                       class="btn btn-primary custom-width">Recover</a></td>
+                <td>${dir.name}</td>
+                <td>
+                    <fmt:formatDate type="date" timeStyle="short" dateStyle="short" value="${dir.removalDate}"/>
+                    by ${dir.removerName}
+                </td>
+                <td><form action="/document/recover_directory" method="post">
+                    <input type="hidden" name="remDirId" value="${dir.id}">
+                    <input type="submit" class="btn btn-primary custom-width" value="Recover">
+                </form></td>
+            </tr>
+        </c:forEach>
+        <c:forEach items="${documents}" var="version">
+            <tr>
+                <td>${version.name}</td>
+                <td>
+                    <fmt:formatDate type="date" timeStyle="short" dateStyle="short" value="${version.removalDate}"/>
+                    by ${version.removerName}
+                </td>
+                <td><form action="/document/recover_document" method="post">
+                    <input type="hidden" name="remDocId" value="${version.id}">
+                    <input type="submit" class="btn btn-primary custom-width" value="Recover">
+                </form></td>
             </tr>
         </c:forEach>
     </table>

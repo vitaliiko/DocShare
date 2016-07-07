@@ -2,6 +2,8 @@
 $(document).ready(function() {
 
     var friendsGroupId;
+    var handlebarsPath = '/resources/js/templates/';
+    var removeButton;
 
     function clearModalWindow() {
         $('.check-box').each(function() {
@@ -9,6 +11,14 @@ $(document).ready(function() {
         });
         $('#groupName').val('');
     }
+
+    $.getJSON('/friends/friend_groups', function(groups) {
+        $.each(groups, function (k, group) {
+            loadTemplate(handlebarsPath + 'groupInfoRow.html', function (template) {
+                $('#groupTable').append(template(group));
+            });
+        });
+    });
 
     $('#saveGroupButton').click(function() {
         var groupName = $('#groupName').val();
@@ -20,18 +30,20 @@ $(document).ready(function() {
             url: '/friends/create_group',
             data: {groupName: groupName, friends: friends},
             success: function(groupId) {
-                $('#groupTable').append("<tr class='group" + groupId + "'>" +
-                    "<td><button type='button' name='groupInfoButton' class='btn btn-link group-info-btn'" +
-                    "data-toggle='modal' data-target='#groupInfo'> " + groupName + " </button></td>" +
-                    "<td><input type='button' class='btn btn-default removeGroupButton' id='" + groupId +
-                    "' value='Remove friends group'>" +
-                    "</td></tr>");
-                $.each(friends, function(k, v) {
-                    $('.td' + v).append("<button type='button' name='groupInfoButton' " +
-                        "data-toggle='modal' data-target='#groupInfo'" +
-                        "class='btn btn-link group-info-btn group" + groupId + "'>" + groupName + "</button>");
+                var group = {id: groupId, name: groupName};
+                loadTemplate(handlebarsPath + 'groupInfoRow.html', function(template) {
+                    $('.group-table').append(template(group));
+                });
+                $.each(friends, function (k, v) {
+                    loadTemplate(handlebarsPath + 'groupInfoButton.html', function (template) {
+                        $('.td-friend' +  v).append(template(group));
+                    });
                 });
                 clearModalWindow();
+            },
+            error: function() {
+                $('.alert-danger').show();
+                $('.alert-text').text('Friends group with such name already exist');
             }
         });
     });
@@ -42,22 +54,32 @@ $(document).ready(function() {
         $('.check-box:checked').each(function(k, v) {
             friends.push(v.value);
         });
-        $.ajax({
-            url: '/friends/update_group',
-            contentType: 'json',
-            data: {groupId: friendsGroupId, groupName: groupName, friends: friends},
-            success: function() {
-                $('.group' + friendsGroupId).html(groupName);
-                clearModalWindow();
-            }
-        });
+        if (groupName === undefined) {
+            $('.alert-danger').show();
+            $('.alert-text').text('You cannot create friends group without name');
+        } else {
+            $.ajax({
+                url: '/friends/update_group',
+                contentType: 'json',
+                data: {groupId: friendsGroupId, groupName: groupName, friends: friends},
+                success: function() {
+                    $('.info-table').find($('.group' + friendsGroupId)).html(groupName);
+                    clearModalWindow();
+                },
+                error: function() {
+                    $('.alert-danger').show();
+                    $('.alert-text').text('Friends group with such name already exist');
+                }
+            });
+        }
     });
 
-    $('.group-info-btn').click(function() {
+    $('.info-table').on('click', '.group-info-btn', function(event) {
         event.preventDefault();
         clearModalWindow();
         $('#saveGroupButton').hide();
         $('#updateGroupButton').show();
+        $('.modal-title').text('Change group');
         var groupId = this.id;
         $.getJSON('/friends/get_group', {groupId: groupId}, function(group) {
             friendsGroupId = group.id;
@@ -77,6 +99,7 @@ $(document).ready(function() {
         clearModalWindow();
         $('#saveGroupButton').show();
         $('#updateGroupButton').hide();
+        $('.modal-title').text('Add new group');
     });
 
     $('.removeFriendButton').click(function() {
@@ -90,14 +113,22 @@ $(document).ready(function() {
         })
     });
 
-    $('.removeGroupButton').click(function() {
-        var groupId = this.id;
+    $('#groupTable').on('click', '.removeGroupButton', function() {
+        friendsGroupId = this.id;
+        removeButton = $(this);
+        var message = 'Are you sure yo want to remove friends group?';
+        $('#deleteDialog').modal('show');
+        $('#delete-dialog-text').text(message);
+    });
+
+    $('#deleteGroup').click(function() {
         $.ajax({
             url: '/friends/delete_group',
-            data: {groupId: groupId},
+            data: {groupId: friendsGroupId},
             success: function() {
-                $('.group' + groupId).remove();
+                removeButton.parent().parent().remove();
+                $('.friend-table').find($('.group' + friendsGroupId)).remove();
             }
-        })
+        });
     });
 });

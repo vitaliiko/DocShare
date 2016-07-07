@@ -7,17 +7,26 @@
     <jsp:include page="../include/include.jsp"/>
     <link href="${pageContext.request.contextPath}/resources/bootstrap/css/comment-box.css" rel="stylesheet">
     <script src="${pageContext.request.contextPath}/resources/js/document.js"></script>
+    <script src="${pageContext.request.contextPath}/resources/js/templateHandler.js"></script>
 </head>
-<body>
-<jsp:include page="../include/header.jsp"/>
+
+<body style="padding-top: 65px;">
+<jsp:include page="../include/navbar.jsp"/>
 <jsp:include page="../include/sidebar.jsp"/>
 
-<div class="container" style="width: 900px;">
-    ${doc.name} <br>
-    ${doc.size} <br>
-    Changed: <fmt:formatDate type="both" timeStyle="short" dateStyle="long" value="${doc.lastModifyTime}"/>
-    <a href="<c:url value='/document/download-${doc.id}' />" class="btn btn-success custom-width">Download</a>
-    <br>
+<div class="container col-md-10" style="width: 900px;">
+    <input type="hidden" class="doc-id" value="${doc.id}">
+    <h4>${location}${doc.name}</h4>
+    <h5>
+        ${doc.size} &nbsp&nbsp Changed: ${doc.lastModifyTime}
+        <a href="<c:url value='/document/download/${doc.id}' />" class="btn btn-default custom-width">Download</a>
+        <c:if test="${historyLink != null}">
+            <a href="${historyLink}" class="btn btn-default custom-width">
+                Previous versions
+            </a>
+        </c:if>
+        <a href="#" class="btn btn-default custom-width">Upload new version</a>
+    </h5>
     <c:if test="${doc.description != null}">
         Description: ${doc.description}
     </c:if>
@@ -25,37 +34,25 @@
     <br>
     <br>
     <br>
-    <div class="detailBox">
-        <div class="titleBox">
-            <label>Comment Box</label>
-            <button type="button" class="close" aria-hidden="true">&times;</button>
-        </div>
-        <div class="actionBox">
-            <ul class="commentList">
-            <c:forEach items="${doc.comments}" var="comment">
-                <li>
-                    <%--<div class="commenterImage">--%>
-                        <%--<img src="http://lorempixel.com/50/50/people/6" />--%>
-                    <%--</div>--%>
-                    <div class="commentText">
-                        <p class=""><strong>${comment.owner}</strong></p>
-                        <p class="">${comment.text}</p> <span class="date sub-text">
-                        <fmt:formatDate type="both" dateStyle="long" timeStyle="short" value="${comment.date}"/></span>
+    <c:if test="${renderComments}">
+        <div class="detailBox commentBox">
+            <div class="titleBox">
+                <label>Comment Box</label>
+                <button type="button" class="close close-comments" aria-hidden="true">&times;</button>
+            </div>
+            <div class="actionBox">
+                <ul class="commentList"></ul>
+                <form class="form-inline" role="form">
+                    <div class="form-group">
+                        <input class="form-control comment-text" type="text" placeholder="Your comments" />
                     </div>
-                </li>
-            </c:forEach>
-            </ul>
-            <form class="form-inline" role="form">
-                <div class="form-group">
-                    <input class="form-control comment-text" type="text" placeholder="Your comments" />
-                </div>
-                <div class="form-group">
-                    <input type="hidden" class="doc-id" value="${doc.id}">
-                    <button type="button" class="btn btn-default add-comment">Add</button>
-                </div>
-            </form>
+                    <div class="form-group">
+                        <button type="button" class="btn btn-default add-comment">Add</button>
+                    </div>
+                </form>
+            </div>
         </div>
-    </div>
+    </c:if>
 </div>
 
 </body>

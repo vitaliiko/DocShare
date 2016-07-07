@@ -4,8 +4,6 @@
 <head>
     <title>Sign Up</title>
     <jsp:include page="../include/include.jsp"/>
-    <script src="${pageContext.request.contextPath}/view/bootstrap/js/jquery-1.12.2.min.js"></script>
-    <script src="${pageContext.request.contextPath}/view/bootstrap/js/bootstrap.min.js"></script>
 </head>
 <body>
     <div class="container" style="width: 600px;" align="center">
@@ -20,22 +18,25 @@
         </c:if>
     </div>
 
-    <div class="container" style="width: 500px;" align="center">
+    <div class="container" style="width: 400px;" align="left">
         <form class="form-signin" action="/main/sign_up" method="post">
-            <input type="text" name="login" id="login" value="${login}"
-                   class="form-control" placeholder="Email address" required="" autofocus="">
+            <label for="firstName">First name: </label>
+            <input type="text" name="firstName" id="firstName" value="${registrationInfo.firstName}"
+                   class="form-control" required="" autofocus="">
             <br>
-            <input type="text" name="firstName" id="firstName" value="${firstName}"
-                   class="form-control" placeholder="First Name" required="" autofocus="">
+            <label for="lastName">Last name: </label>
+            <input type="text" name="lastName" id="lastName" value="${registrationInfo.lastName}"
+                   class="form-control" required="" autofocus="">
             <br>
-            <input type="text" name="lastName" id="lastName" value="${lastName}"
-                   class="form-control" placeholder="Last Name" required="" autofocus="">
+            <label for="login">Login: </label>
+            <input type="text" name="login" id="login" value="${registrationInfo.login}"
+                   class="form-control" required="" autofocus="">
             <br>
-            <input type="password" name="password" id="inputPassword"
-                   class="form-control" placeholder="Password" required="">
+            <label for="inputPassword">Password: </label>
+            <input type="password" name="password" id="inputPassword" class="form-control" required="">
             <br>
-            <input type="password" name="confirmPassword" id="confirmPassword"
-                   class="form-control" placeholder="Confirm Password" required="">
+            <label for="confirmPassword">Confirm password: </label>
+            <input type="password" name="confirmationPassword" id="confirmPassword" class="form-control" required="">
             <br>
             <button class="btn btn-lg btn-primary btn-block" type="submit">Register</button>
         </form>
