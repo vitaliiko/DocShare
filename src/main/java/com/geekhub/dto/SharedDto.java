@@ -1,13 +1,15 @@
 package com.geekhub.dto;
 
+import java.util.List;
+
 public class SharedDto {
 
     private long docId;
     private String access;
-    private long[] readers;
-    private long[] readersGroups;
-    private long[] editors;
-    private long[] editorsGroups;
+    private List<Long> readers;
+    private List<Long> readersGroups;
+    private List<Long> editors;
+    private List<Long> editorsGroups;
 
     public long getDocId() {
         return docId;
@@ -25,35 +27,35 @@ public class SharedDto {
         this.access = access;
     }
 
-    public long[] getReaders() {
+    public List<Long> getReaders() {
         return readers;
     }
 
-    public void setReaders(long[] readers) {
+    public void setReaders(List<Long> readers) {
         this.readers = readers;
     }
 
-    public long[] getReadersGroups() {
+    public List<Long> getReadersGroups() {
         return readersGroups;
     }
 
-    public void setReadersGroups(long[] readersGroups) {
+    public void setReadersGroups(List<Long> readersGroups) {
         this.readersGroups = readersGroups;
     }
 
-    public long[] getEditors() {
+    public List<Long> getEditors() {
         return editors;
     }
 
-    public void setEditors(long[] editors) {
+    public void setEditors(List<Long> editors) {
         this.editors = editors;
     }
 
-    public long[] getEditorsGroups() {
+    public List<Long> getEditorsGroups() {
         return editorsGroups;
     }
 
-    public void setEditorsGroups(long[] editorsGroups) {
+    public void setEditorsGroups(List<Long> editorsGroups) {
         this.editorsGroups = editorsGroups;
     }
 
