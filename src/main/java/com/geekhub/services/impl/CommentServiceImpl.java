@@ -5,7 +5,7 @@ import com.geekhub.entities.Comment;
 import java.util.List;
 
 import com.geekhub.services.CommentService;
-import org.springframework.beans.factory.annotation.Autowired;
+import javax.inject.Inject;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -13,7 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class CommentServiceImpl implements CommentService {
 
-    @Autowired
+    @Inject
     private CommentDao commentDao;
 
     @Override

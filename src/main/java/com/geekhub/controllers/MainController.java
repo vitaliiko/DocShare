@@ -17,7 +17,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.TreeSet;
-import org.springframework.beans.factory.annotation.Autowired;
+import javax.inject.Inject;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -35,13 +35,13 @@ import java.util.stream.Collectors;
 @RequestMapping("/main")
 public class MainController {
 
-    @Autowired
+    @Inject
     private UserService userService;
 
-    @Autowired
+    @Inject
     private UserProfileManager userProfileManager;
 
-    @Autowired
+    @Inject
     private UserDocumentService userDocumentService;
 
     @RequestMapping(value = "/home", method = RequestMethod.GET)

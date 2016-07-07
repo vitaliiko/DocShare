@@ -16,25 +16,25 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 import org.apache.commons.codec.digest.DigestUtils;
-import org.springframework.beans.factory.annotation.Autowired;
+import javax.inject.Inject;
 import org.springframework.stereotype.Service;
 
 @Service
 public class UserProfileManager {
 
-    public static final Pattern LOGIN_PATTERN = Pattern.compile("^[\\.a-zA-Z0-9_-]{6,20}$");
-    public static final Pattern FIRST_NAME_PATTERN = Pattern.compile("[A-Z][a-zA-Z ']{2,25}$");
-    public static final Pattern LAST_NAME_PATTERN = Pattern.compile("[A-Z][a-zA-Z ']{2,25}$");
-    public static final Pattern EMAIL_PATTERN = Pattern.compile("^[a-zA-Z0-9\\._%+-]+@[a-zA-Z0-9.-]+\\.[a-z]{2,4}$");
-    public static final Pattern LOCATION_PATTERN = Pattern.compile("^[A-Z][a-zA-Z-]{2,30}$");
+    private static final Pattern LOGIN_PATTERN = Pattern.compile("^[\\.a-zA-Z0-9_-]{6,20}$");
+    private static final Pattern FIRST_NAME_PATTERN = Pattern.compile("[A-Z][a-zA-Z ']{2,25}$");
+    private static final Pattern LAST_NAME_PATTERN = Pattern.compile("[A-Z][a-zA-Z ']{2,25}$");
+    private static final Pattern EMAIL_PATTERN = Pattern.compile("^[a-zA-Z0-9\\._%+-]+@[a-zA-Z0-9.-]+\\.[a-z]{2,4}$");
+    private static final Pattern LOCATION_PATTERN = Pattern.compile("^[A-Z][a-zA-Z-]{2,30}$");
 
-    @Autowired
+    @Inject
     private UserService userService;
 
-    @Autowired
+    @Inject
     private UserDocumentService userDocumentService;
 
-    @Autowired
+    @Inject
     private UserDirectoryService userDirectoryService;
 
     public void registerNewUser(RegistrationInfo regInfo) throws UserProfileException {

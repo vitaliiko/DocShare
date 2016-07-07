@@ -8,7 +8,7 @@ import com.geekhub.services.UserService;
 import com.geekhub.dto.convertors.EntityToDtoConverter;
 import java.io.IOException;
 import javax.servlet.http.HttpServletResponse;
-import org.springframework.beans.factory.annotation.Autowired;
+import javax.inject.Inject;
 import org.springframework.util.FileCopyUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -23,10 +23,10 @@ import javax.servlet.http.HttpSession;
 @SuppressWarnings("unchecked")
 public class ProfileController {
 
-    @Autowired
+    @Inject
     private UserService userService;
 
-    @Autowired
+    @Inject
     private UserProfileManager userProfileManager;
 
     @RequestMapping(value = "/", method = RequestMethod.GET)

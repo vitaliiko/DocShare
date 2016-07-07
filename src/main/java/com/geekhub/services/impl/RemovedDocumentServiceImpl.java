@@ -10,7 +10,7 @@ import java.util.Set;
 
 import com.geekhub.services.RemovedDocumentService;
 import com.geekhub.services.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
+import javax.inject.Inject;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,10 +18,10 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class RemovedDocumentServiceImpl implements RemovedDocumentService {
 
-    @Autowired
+    @Inject
     private RemovedDocumentDao removedDocumentDao;
 
-    @Autowired
+    @Inject
     private UserService userService;
 
     @Override

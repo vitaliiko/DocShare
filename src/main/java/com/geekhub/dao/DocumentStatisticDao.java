@@ -4,7 +4,7 @@ import com.geekhub.entities.DocumentStatistic;
 import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
-import org.springframework.beans.factory.annotation.Autowired;
+import javax.inject.Inject;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -13,7 +13,7 @@ import java.util.List;
 @SuppressWarnings("unchecked")
 public class DocumentStatisticDao implements EntityDao<DocumentStatistic, Long> {
 
-    @Autowired
+    @Inject
     private SessionFactory sessionFactory;
 
     private Class<DocumentStatistic> clazz = DocumentStatistic.class;

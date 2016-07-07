@@ -17,7 +17,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 import org.hibernate.Hibernate;
-import org.springframework.beans.factory.annotation.Autowired;
+import javax.inject.Inject;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,19 +28,19 @@ import java.util.List;
 @Transactional
 public class UserDocumentServiceImpl implements UserDocumentService {
 
-    @Autowired
+    @Inject
     private UserDocumentDao userDocumentDao;
 
-    @Autowired
+    @Inject
     private UserService userService;
 
-    @Autowired
+    @Inject
     private RemovedDocumentService removedDocumentService;
 
-    @Autowired
+    @Inject
     private FriendsGroupService friendsGroupService;
 
-    @Autowired
+    @Inject
     private UserDirectoryService userDirectoryService;
 
     @Override

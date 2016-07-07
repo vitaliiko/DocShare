@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
-import org.springframework.beans.factory.annotation.Autowired;
+import javax.inject.Inject;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,19 +24,19 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class UserDirectoryServiceImpl implements UserDirectoryService {
 
-    @Autowired
+    @Inject
     private UserDirectoryDao userDirectoryDao;
 
-    @Autowired
+    @Inject
     private UserService userService;
 
-    @Autowired
+    @Inject
     private RemovedDirectoryService removedDirectoryService;
 
-    @Autowired
+    @Inject
     private RemovedDocumentService removedDocumentService;
 
-    @Autowired
+    @Inject
     private UserDocumentService userDocumentService;
 
     @Override

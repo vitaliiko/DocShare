@@ -15,19 +15,19 @@ import com.geekhub.services.EventService;
 import com.geekhub.services.UserDirectoryService;
 import com.geekhub.services.UserDocumentService;
 import org.apache.commons.codec.digest.DigestUtils;
-import org.springframework.beans.factory.annotation.Autowired;
+import javax.inject.Inject;
 import org.springframework.stereotype.Service;
 
 @Service
 public class EventSendingService {
 
-    @Autowired
+    @Inject
     private EventService eventService;
 
-    @Autowired
+    @Inject
     private UserDocumentService userDocumentService;
 
-    @Autowired
+    @Inject
     private UserDirectoryService userDirectoryService;
 
     public void sendUpdateEvent(UserDocument document, User user) {

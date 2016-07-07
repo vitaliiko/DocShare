@@ -11,7 +11,7 @@ import com.geekhub.services.FriendsGroupService;
 import com.geekhub.services.UserService;
 import org.hibernate.Hibernate;
 import org.hibernate.HibernateException;
-import org.springframework.beans.factory.annotation.Autowired;
+import javax.inject.Inject;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,14 +21,16 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import javax.inject.Inject;
+
 @Service
 @Transactional
 public class UserServiceImpl implements UserService {
 
-    @Autowired
+    @Inject
     private UserDao userDao;
 
-    @Autowired
+    @Inject
     private FriendsGroupService friendsGroupService;
 
     @Override

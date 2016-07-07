@@ -10,7 +10,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.TreeSet;
 import javax.servlet.http.HttpSession;
-import org.springframework.beans.factory.annotation.Autowired;
+import javax.inject.Inject;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
@@ -20,10 +20,10 @@ import org.springframework.web.servlet.ModelAndView;
 @RequestMapping("/event")
 public class EventController {
 
-    @Autowired
+    @Inject
     private EventService eventService;
 
-    @Autowired
+    @Inject
     private UserService userService;
 
     @RequestMapping("/browse")

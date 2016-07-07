@@ -6,13 +6,13 @@ import java.util.List;
 import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
-import org.springframework.beans.factory.annotation.Autowired;
+import javax.inject.Inject;
 import org.springframework.stereotype.Repository;
 
 @Repository
 public class OrganizationDao implements EntityDao<Organization, Long> {
     
-    @Autowired
+    @Inject
     private SessionFactory sessionFactory;
     
     private Class<Organization> clazz = Organization.class;

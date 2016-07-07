@@ -12,19 +12,19 @@ import com.geekhub.services.UserService;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
-import org.springframework.beans.factory.annotation.Autowired;
+import javax.inject.Inject;
 import org.springframework.stereotype.Service;
 
 @Service
 public class UserDocumentAccessService implements UserFileAccessService<UserDocument, RemovedDocument> {
 
-    @Autowired
+    @Inject
     private UserService userService;
 
-    @Autowired
+    @Inject
     private UserDocumentService userDocumentService;
 
-    @Autowired
+    @Inject
     private RemovedDocumentService removedDocumentService;
 
     private UserDocument document;

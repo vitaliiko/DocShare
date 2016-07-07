@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
-import org.springframework.beans.factory.annotation.Autowired;
+import javax.inject.Inject;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -33,16 +33,16 @@ import java.util.Set;
 @SuppressWarnings("unchecked")
 public class FriendsController {
 
-    @Autowired
+    @Inject
     private UserService userService;
 
-    @Autowired
+    @Inject
     private FriendsGroupService friendsGroupService;
 
-    @Autowired
+    @Inject
     private EventService eventService;
 
-    @Autowired
+    @Inject
     private EventSendingService eventSendingService;
 
     private User getUserFromSession(HttpSession session) {

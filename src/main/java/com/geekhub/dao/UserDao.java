@@ -7,7 +7,7 @@ import org.hibernate.SessionFactory;
 import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
-import org.springframework.beans.factory.annotation.Autowired;
+import javax.inject.Inject;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -16,7 +16,7 @@ import java.util.List;
 @SuppressWarnings("unchecked")
 public class UserDao implements EntityDao<User, Long> {
 
-    @Autowired
+    @Inject
     private SessionFactory sessionFactory;
 
     private Class<User> clazz = User.class;

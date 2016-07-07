@@ -11,14 +11,14 @@ import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
-import org.springframework.beans.factory.annotation.Autowired;
+import javax.inject.Inject;
 import org.springframework.stereotype.Repository;
 
 @Repository
 @SuppressWarnings("unchecked")
 public class UserDirectoryDao implements EntityDao<UserDirectory, Long> {
 
-    @Autowired
+    @Inject
     private SessionFactory sessionFactory;
 
     private Class<UserDirectory> clazz = UserDirectory.class;

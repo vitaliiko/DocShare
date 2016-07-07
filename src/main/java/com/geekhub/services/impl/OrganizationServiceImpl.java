@@ -6,13 +6,13 @@ import com.geekhub.entities.User;
 import java.util.List;
 
 import com.geekhub.services.OrganizationService;
-import org.springframework.beans.factory.annotation.Autowired;
+import javax.inject.Inject;
 import org.springframework.stereotype.Service;
 
 @Service
 public class OrganizationServiceImpl implements OrganizationService {
 
-    @Autowired
+    @Inject
     private OrganizationDao organizationDao;
 
     @Override

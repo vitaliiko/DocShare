@@ -12,19 +12,19 @@ import com.geekhub.services.UserService;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
-import org.springframework.beans.factory.annotation.Autowired;
+import javax.inject.Inject;
 import org.springframework.stereotype.Service;
 
 @Service
 public class UserDirectoryAccessService implements UserFileAccessService<UserDirectory, RemovedDirectory> {
 
-    @Autowired
+    @Inject
     private UserService userService;
 
-    @Autowired
+    @Inject
     private UserDirectoryService userDirectoryService;
 
-    @Autowired
+    @Inject
     private RemovedDirectoryService removedDirectoryService;
 
     private UserDirectory directory;

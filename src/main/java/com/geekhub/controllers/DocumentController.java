@@ -38,7 +38,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.TreeSet;
-import org.springframework.beans.factory.annotation.Autowired;
+import javax.inject.Inject;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.FileCopyUtils;
@@ -62,37 +62,37 @@ import java.util.List;
 @RequestMapping("/document")
 public class DocumentController {
 
-    @Autowired
+    @Inject
     private UserService userService;
 
-    @Autowired
+    @Inject
     private UserDocumentService userDocumentService;
 
-    @Autowired
+    @Inject
     private UserDirectoryService userDirectoryService;
 
-    @Autowired
+    @Inject
     private FileValidator fileValidator;
 
-    @Autowired
+    @Inject
     private RemovedDocumentService removedDocumentService;
 
-    @Autowired
+    @Inject
     private RemovedDirectoryService removedDirectoryService;
 
-    @Autowired
+    @Inject
     private FriendsGroupService friendsGroupService;
 
-    @Autowired
+    @Inject
     private DocumentOldVersionService documentOldVersionService;
 
-    @Autowired
+    @Inject
     private UserDirectoryAccessService directoryAccessService;
 
-    @Autowired
+    @Inject
     private UserDocumentAccessService documentAccessService;
 
-    @Autowired
+    @Inject
     private EventSendingService eventSendingService;
 
     private User getUserFromSession(HttpSession session) {

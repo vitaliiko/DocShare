@@ -6,7 +6,7 @@ import com.geekhub.entities.User;
 import com.geekhub.services.FriendsGroupService;
 import com.geekhub.services.UserService;
 import org.hibernate.Hibernate;
-import org.springframework.beans.factory.annotation.Autowired;
+import javax.inject.Inject;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,10 +17,10 @@ import java.util.Set;
 @Transactional
 public class FriendsGroupServiceImpl implements FriendsGroupService {
 
-    @Autowired
+    @Inject
     private FriendsGroupDao friendsGroupDao;
 
-    @Autowired
+    @Inject
     private UserService userService;
 
     @Override

@@ -15,7 +15,7 @@ import com.geekhub.utils.CommentUtil;
 import java.util.Set;
 import java.util.TreeSet;
 import javax.servlet.http.HttpSession;
-import org.springframework.beans.factory.annotation.Autowired;
+import javax.inject.Inject;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -26,16 +26,16 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/comments")
 public class CommentController {
 
-    @Autowired
+    @Inject
     private UserDocumentService userDocumentService;
 
-    @Autowired
+    @Inject
     private CommentService commentService;
 
-    @Autowired
+    @Inject
     private UserDocumentAccessService documentAccessService;
 
-    @Autowired
+    @Inject
     private UserService userService;
 
     private User getUserFromSession(HttpSession session) {
