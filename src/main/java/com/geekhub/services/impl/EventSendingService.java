@@ -51,7 +51,7 @@ public class EventSendingService {
     }
 
     public <T, S extends EntityService<T, Long>> void sendRecoverEvent(S service, String fileType, String fileName,
-                                                                        long fileId, User user) {
+                                                                       long fileId, User user) {
 
         String eventText = fileType + " " + fileName + " has been recovered by " + user.getFullName();
         String eventLinkText = null;

@@ -24,10 +24,30 @@ import java.text.DecimalFormat;
 
 public class UserFileUtil {
 
-    public static final String ROOT_LOCATION = "C:\\spring_docs\\";
-    public static final String SYSTEM_EXTENSION = ".ud";
-    public static final Pattern DIRECTORY_NAME_PATTERN = Pattern.compile("^[а-яА-Я\\w,\\s,\\.\\-/)/(]+$");
-    public static final Pattern DOCUMENT_NAME_PATTERN = Pattern.compile("^[а-яА-Я\\w,\\s,\\.\\-/)/(]+\\.[A-Za-z0-9]{1,5}");
+    private static final String ROOT_LOCATION = "C:\\spring_docs\\";
+    private static final String SYSTEM_EXTENSION = ".ud";
+    private static final Pattern DIRECTORY_NAME_PATTERN = Pattern.compile("^[\\w,\\s,\\.\\-/)/(]+$");
+    private static final Pattern DOCUMENT_NAME_PATTERN = Pattern.compile("^[\\w,\\s,\\.\\-/)/(]+\\.[A-Za-z0-9]{1,5}");
+
+    private final static List<String> IMAGE_TYPES = Arrays.asList(
+            "image/bmp", "image/png", "image/jpeg", "image/gif"
+    );
+
+    private final static List<String> FORBIDDEN_FILE_TYPES = Arrays.asList(
+            "application/octet-stream", "application/x-msdownload"
+    );
+
+    private static final List<String> SIZE_UNITS = Arrays.asList(
+            "B", "kB", "MB", "GB", "TB"
+    );
+
+    public static boolean isValidFileUploading(MultipartFile... files) {
+        return files.length > 0
+                && files.length <= 10
+                && Arrays.stream(files).noneMatch(MultipartFile::isEmpty)
+                && Arrays.stream(files).map(MultipartFile::getContentType).noneMatch(FORBIDDEN_FILE_TYPES::contains)
+                && Arrays.stream(files).map(MultipartFile::getOriginalFilename).allMatch(UserFileUtil::validateDocumentName);
+    }
 
     public static UserDocument createUserDocument(MultipartFile multipartFile,
                                                   UserDirectory directory,
@@ -40,7 +60,7 @@ public class UserFileUtil {
         document.setDescription(description);
         document.setLastModifyTime(Calendar.getInstance().getTime());
         document.setType(multipartFile.getContentType());
-        document.setSize(convertSize(multipartFile.getSize()));
+        document.setSize(convertDocumentSize(multipartFile.getSize()));
         document.setOwner(user);
         document.setModifiedBy(user.getFullName());
         document.setHashName(createHashName());
@@ -66,19 +86,27 @@ public class UserFileUtil {
         String hashName = UserFileUtil.createHashName();
         document.setLastModifyTime(Calendar.getInstance().getTime());
         document.setModifiedBy(user.getFullName());
-        document.setSize(convertSize(multipartFile.getSize()));
+        document.setSize(convertDocumentSize(multipartFile.getSize()));
         document.setHashName(hashName);
         multipartFile.transferTo(UserFileUtil.createFile(hashName));
         return document;
     }
 
-    private static String convertSize(long size) {
+    private static String convertDocumentSize(long size) {
         if (size <= 0) {
             return "0 B";
         }
-        final String[] units = new String[] {"B", "kB", "MB", "GB", "TB"};
-        int digitGroups = (int) (Math.log10(size)/Math.log10(1024));
-        return new DecimalFormat("#,##0.#").format(size/Math.pow(1024, digitGroups)) + " " + units[digitGroups];
+        int digitGroup = getDigitGroup(size);
+        DecimalFormat decimalFormat = new DecimalFormat("#,##0.#");
+        return decimalFormat.format(getSize(size, digitGroup)) + " " + SIZE_UNITS.get(digitGroup);
+    }
+
+    private static int getDigitGroup(long size) {
+        return (int) (Math.log10(size) / Math.log10(1024));
+    }
+
+    private static double getSize(long size, int digitGroup) {
+        return size / Math.pow(1024, digitGroup);
     }
 
     public static RemovedDocument wrapUserDocumentInRemoved(UserDocument document, Long removerId) {

@@ -1,35 +1,23 @@
 package com.geekhub.controllers;
 
 import com.geekhub.controllers.utils.FileControllersUtil;
-import com.geekhub.dto.DocumentOldVersionDto;
-import com.geekhub.dto.FriendsGroupDto;
-import com.geekhub.dto.SharedDto;
-import com.geekhub.dto.UserDto;
-import com.geekhub.dto.UserFileDto;
+import com.geekhub.dto.*;
 import com.geekhub.dto.convertors.EntityToDtoConverter;
-import com.geekhub.entities.DocumentOldVersion;
-import com.geekhub.entities.RemovedDocument;
-import com.geekhub.entities.User;
-import com.geekhub.entities.UserDirectory;
-import com.geekhub.entities.UserDocument;
+import com.geekhub.entities.*;
 import com.geekhub.entities.enums.AbilityToCommentDocument;
-import com.geekhub.entities.enums.DocumentAttribute;
 import com.geekhub.entities.enums.DocumentStatus;
 import com.geekhub.exceptions.ResourceNotFoundException;
 import com.geekhub.security.UserDirectoryAccessService;
 import com.geekhub.security.UserDocumentAccessService;
 import com.geekhub.services.DocumentOldVersionService;
-import com.geekhub.services.FriendsGroupService;
-import com.geekhub.services.RemovedDocumentService;
 import com.geekhub.services.UserDirectoryService;
 import com.geekhub.services.UserDocumentService;
 import com.geekhub.services.UserService;
-import com.geekhub.services.impl.EventSendingService;
-import com.geekhub.utils.DocumentVersionUtil;
 import com.geekhub.utils.UserFileUtil;
 import com.geekhub.validators.FileValidator;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.FileCopyUtils;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -44,8 +32,11 @@ import org.springframework.web.servlet.ModelAndView;
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/document")
@@ -64,12 +55,6 @@ public class UserDocumentController {
     private FileValidator fileValidator;
 
     @Inject
-    private RemovedDocumentService removedDocumentService;
-
-    @Inject
-    private FriendsGroupService friendsGroupService;
-
-    @Inject
     private DocumentOldVersionService documentOldVersionService;
 
     @Inject
@@ -77,9 +62,6 @@ public class UserDocumentController {
 
     @Inject
     private UserDocumentAccessService documentAccessService;
-
-    @Inject
-    private EventSendingService eventSendingService;
 
     private User getUserFromSession(HttpSession session) {
         return userService.getById((Long) session.getAttribute("userId"));
@@ -91,19 +73,23 @@ public class UserDocumentController {
     }
 
     @RequestMapping(value = "/upload", method = RequestMethod.GET)
-    public ModelAndView uploadDocument(HttpSession session) {
+    public ModelAndView createUploadDocumentPageModel(HttpSession session) {
         ModelAndView model = new ModelAndView("home");
         User user = getUserFromSession(session);
 
-        Set<FriendsGroupDto> friendsGroups = new TreeSet<>();
-        userService.getAllFriendsGroups(user.getId()).forEach(g -> friendsGroups.add(EntityToDtoConverter.convert(g)));
+        List<FriendsGroup> friendsGroups = userService.getAllFriendsGroups(user.getId());
+        Set<FriendsGroupDto> friendsGroupDtoSet = friendsGroups.stream()
+                .map(EntityToDtoConverter::convert)
+                .collect(Collectors.toSet());
 
-        Set<UserDto> friends = new HashSet<>();
-        userService.getAllFriends(user.getId()).forEach(f -> friends.add(EntityToDtoConverter.convert(f)));
+        List<User> friends = userService.getAllFriends(user.getId());
+        Set<UserDto> friendsDtoSet = friends.stream()
+                .map(EntityToDtoConverter::convert)
+                .collect(Collectors.toSet());
 
-        model.addObject("tableNames", new String[] {"ALL", "PRIVATE", "PUBLIC", "FOR_FRIENDS"});
-        model.addObject("friendsGroups", friendsGroups);
-        model.addObject("friends", friends);
+        model.addObject("tableNames", FileControllersUtil.ACCESS_ATTRIBUTES);
+        model.addObject("friendsGroups", friendsGroupDtoSet);
+        model.addObject("friends", friendsDtoSet);
         model.addObject("userLogin", user.getLogin());
         return model;
     }
@@ -123,43 +109,39 @@ public class UserDocumentController {
             }
         }
 
-        if (files != null && files.length > 0) {
+        if (UserFileUtil.isValidFileUploading(files)) {
             for (MultipartFile file : files) {
-                if (!file.isEmpty() && UserFileUtil.validateDocumentName(file.getOriginalFilename())) {
-                    saveOrUpdateDocument(file, directory, description, user);
-                }
+                userDocumentService.saveOrUpdateDocument(file, directory, description, user);
             }
         }
+
         return new ModelAndView("redirect:/document/upload");
     }
 
     @RequestMapping(value = {"/download/{docId}", "/download-{docId}"}, method = RequestMethod.GET)
-    public void downloadDocument(@PathVariable long docId, HttpSession session, HttpServletResponse response)
-            throws IOException {
+    public ResponseEntity downloadDocument(@PathVariable long docId,
+                                           HttpSession session, HttpServletResponse response) throws IOException {
 
         User user = getUserFromSession(session);
         UserDocument document = userDocumentService.getById(docId);
 
         if (documentAccessService.canRead(document, user)) {
-            FileControllersUtil.openOutputStream(document.getHashName(), document.getType(), document.getName(), response);
+            openOutputStream(document, response);
+            return ResponseEntity.ok().build();
         }
         throw new ResourceNotFoundException();
     }
 
-    @RequestMapping("/set_comment_ability")
-    public void setCommentAbility(long docId, HttpSession session) {
+    @RequestMapping(value = "/set_comment_ability", method = RequestMethod.PUT)
+    public ResponseEntity setCommentAbility(long docId, boolean abilityToComment, HttpSession session) {
         User user = getUserFromSession(session);
         UserDocument document = userDocumentService.getById(docId);
 
-        if (documentAccessService.isOwner(document, user)) {
-            boolean abilityToComment = document.getAbilityToComment() == AbilityToCommentDocument.ENABLE;
-            document.setAbilityToComment(abilityToComment
-                    ? AbilityToCommentDocument.DISABLE
-                    : AbilityToCommentDocument.ENABLE);
-            userDocumentService.update(document);
-        } else {
+        if (!documentAccessService.isOwner(document, user)) {
             throw new ResourceNotFoundException();
         }
+        userDocumentService.changeAbilityToComment(document, abilityToComment);
+        return ResponseEntity.ok().build();
     }
 
     @RequestMapping(value = {"/browse/{docId}", "/browse-{docId}"}, method = RequestMethod.GET)
@@ -167,88 +149,68 @@ public class UserDocumentController {
         ModelAndView model = new ModelAndView();
         User user = getUserFromSession(session);
         UserDocument document = userDocumentService.getById(docId);
-        if (documentAccessService.canRead(document, user)) {
-            boolean abilityToComment = document.getAbilityToComment() == AbilityToCommentDocument.ENABLE;
-            model.setViewName("document");
-            model.addObject("doc", EntityToDtoConverter.convert(document));
-            model.addObject("location", userDocumentService.getLocation(document));
-            model.addObject("renderSettings", documentAccessService.isOwner(document, user) || abilityToComment);
-            model.addObject("renderComments", abilityToComment);
-            if (documentAccessService.isOwner(document, user)) {
-                model.addObject("historyLink", "/document/history/" + document.getId());
-                String action = abilityToComment
-                        ? "Disable comments for this file"
-                        : "Enable comments for this file";
-                model.addObject("changeAbilityToComment", action);
-            }
-            return model;
+
+        if (!documentAccessService.canRead(document, user)) {
+            throw new ResourceNotFoundException();
         }
-        throw new ResourceNotFoundException();
+
+        boolean abilityToComment = AbilityToCommentDocument.getBoolean(document.getAbilityToComment());
+        model.setViewName("document");
+        model.addObject("doc", EntityToDtoConverter.convert(document));
+        model.addObject("location", userDocumentService.getLocation(document));
+        model.addObject("renderSettings", documentAccessService.isOwner(document, user) || abilityToComment);
+        model.addObject("renderComments", abilityToComment);
+        if (documentAccessService.isOwner(document, user)) {
+            model.addObject("historyLink", "/document/history/" + document.getId());
+            model.addObject("abilityToComment", abilityToComment);
+        }
+        return model;
     }
 
     @RequestMapping(value = "/get_document", method = RequestMethod.GET)
-    public UserFileDto getUserDocument(long docId, HttpSession session) {
+    public ResponseEntity<UserFileDto> getUserDocument(long docId, HttpSession session) {
         User user = getUserFromSession(session);
         UserDocument document = userDocumentService.getById(docId);
         if (documentAccessService.isOwner(document, user) && document.getDocumentStatus() == DocumentStatus.ACTUAL) {
-            return EntityToDtoConverter.convert(document);
+            UserFileDto fileDto = EntityToDtoConverter.convert(document);
+            return ResponseEntity.ok().body(fileDto);
         }
-        return null;
+        return ResponseEntity.badRequest().body(null);
     }
 
     @RequestMapping(value = "/rename_document", method = RequestMethod.POST)
     public ResponseEntity<UserFileDto> renameDocument(Long docId, String newDocName, HttpSession session) {
-        UserDocument document = userDocumentService.getById(docId);
         User user = getUserFromSession(session);
+        UserDocument document = userDocumentService.getById(docId);
         newDocName = newDocName + document.getExtension();
 
         if (document.getName().equals(newDocName)) {
-            return null;
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
         }
 
-        if (documentAccessService.isOwner(document, user)) {
-            UserDocument documentWithNewName =
-                    userDocumentService.getByFullNameAndOwner(user, document.getParentDirectoryHash(), newDocName);
-            if (documentWithNewName == null && UserFileUtil.validateDocumentNameWithoutExtension(newDocName)) {
-                String oldDocName = document.getName();
-                document.setName(newDocName);
-                userDocumentService.update(document);
-
-                eventSendingService.sendRenameEvent(userDocumentService
-                        .getAllReadersAndEditors(docId), "document", oldDocName, newDocName, document.getId(), user);
-
-                return new ResponseEntity<>(EntityToDtoConverter.convert(document), HttpStatus.OK);
-            }
+        if (!documentAccessService.isOwner(document, user)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
         }
-        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+
+        UserDocument existingDocument =
+                userDocumentService.getByFullNameAndOwner(user, document.getParentDirectoryHash(), newDocName);
+        if (existingDocument == null && UserFileUtil.validateDocumentNameWithoutExtension(newDocName)) {
+            UserDocument documentWithNewName = userDocumentService.renameDocument(document, newDocName, user);
+            return ResponseEntity.ok(EntityToDtoConverter.convert(documentWithNewName));
+        }
+        return ResponseEntity.badRequest().body(null);
     }
 
     @RequestMapping(value = "/share_document", method = RequestMethod.POST)
     public ResponseEntity<UserFileDto> shareUserDocument(@RequestBody SharedDto shared, HttpSession session) {
         User user = getUserFromSession(session);
         UserDocument document = userDocumentService.getById(shared.getDocId());
-        Set<User> currentReadersAndEditors = userDocumentService.getAllReadersAndEditors(document.getId());
 
         if (documentAccessService.isOwner(document, user) && document.getDocumentStatus() == DocumentStatus.ACTUAL) {
-            document.setDocumentAttribute(DocumentAttribute.valueOf(shared.getAccess()));
-            document.setReaders(FileControllersUtil.createEntitySet(shared.getReaders(), userService));
-            document.setEditors(FileControllersUtil.createEntitySet(shared.getEditors(), userService));
-            document.setReadersGroups(FileControllersUtil.createEntitySet(shared.getReadersGroups(), friendsGroupService));
-            document.setEditorsGroups(FileControllersUtil.createEntitySet(shared.getEditorsGroups(), friendsGroupService));
-            userDocumentService.update(document);
-
-            Set<User> newReadersAndEditorsSet = userDocumentService.getAllReadersAndEditors(document.getId());
-            newReadersAndEditorsSet.removeAll(currentReadersAndEditors);
-            eventSendingService
-                    .sendShareEvent(newReadersAndEditorsSet, "document", document.getName(), document.getId(), user);
-
-            newReadersAndEditorsSet = userDocumentService.getAllReadersAndEditors(document.getId());
-            currentReadersAndEditors.removeAll(newReadersAndEditorsSet);
-            eventSendingService.sendProhibitAccessEvent(currentReadersAndEditors, "document", document.getName(), user);
-
-            return new ResponseEntity<>(EntityToDtoConverter.convert(document), HttpStatus.OK);
+            UserDocument sharedDocument = userDocumentService.shareDocument(document, shared, user);
+            return ResponseEntity.ok(EntityToDtoConverter.convert(sharedDocument));
         }
-        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        return ResponseEntity.badRequest().body(null);
     }
 
     @RequestMapping("/history/{docId}")
@@ -257,8 +219,9 @@ public class UserDocumentController {
         User user = getUserFromSession(session);
         UserDocument document = userDocumentService.getWithOldVersions(docId);
         if (documentAccessService.isOwner(document, user) && document.getDocumentStatus() == DocumentStatus.ACTUAL) {
-            List<DocumentOldVersionDto> versions = new ArrayList<>();
-            document.getDocumentOldVersions().forEach(v -> versions.add(EntityToDtoConverter.convert(v)));
+            List<DocumentOldVersionDto> versions = document.getDocumentOldVersions().stream()
+                    .map(EntityToDtoConverter::convert)
+                    .collect(Collectors.toList());
             model.addObject("versions", versions);
             return model;
         }
@@ -272,18 +235,14 @@ public class UserDocumentController {
         UserDocument document = oldVersion.getUserDocument();
 
         if (documentAccessService.isOwner(document, user)) {
-            DocumentOldVersion currentVersion = DocumentVersionUtil.createOldVersion(document);
-            document.getDocumentOldVersions().add(currentVersion);
-            document = DocumentVersionUtil.recoverOldVersion(oldVersion);
-            userDocumentService.update(document);
-            documentOldVersionService.delete(oldVersion);
+            userDocumentService.recoverOldVersion(oldVersion);
             return new ModelAndView("redirect:/document/upload");
         }
         throw new ResourceNotFoundException();
     }
 
     @RequestMapping(value = "/download_old_version/{versionId}", method = RequestMethod.GET)
-    public void downloadDocumentOldVersion(@PathVariable long versionId,
+    public ResponseEntity downloadDocumentOldVersion(@PathVariable long versionId,
                                            HttpSession session,
                                            HttpServletResponse response) throws IOException {
 
@@ -292,52 +251,35 @@ public class UserDocumentController {
         UserDocument document = oldVersion.getUserDocument();
 
         if (documentAccessService.canRead(document, user)) {
-            FileControllersUtil
-                    .openOutputStream(oldVersion.getHashName(), document.getType(), oldVersion.getName(), response);
+            openOutputStream(oldVersion.getHashName(), document.getType(), oldVersion.getName(), response);
+            return ResponseEntity.ok().build();
         }
-        throw new ResourceNotFoundException();
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
     }
 
     @RequestMapping("/accessible")
     public ModelAndView getAccessibleDocuments(HttpSession session) {
         User user = getUserFromSession(session);
-        Set<UserFileDto> documentDtos = new TreeSet<>();
-        userDocumentService.getAllCanRead(user).forEach(d -> documentDtos.add(EntityToDtoConverter.convert(d)));
+        Set<UserFileDto> documentDtos = userDocumentService.getAllCanRead(user).stream()
+                .map(EntityToDtoConverter::convert)
+                .collect(Collectors.toCollection(TreeSet::new));
         ModelAndView model = new ModelAndView("accessibleDocuments");
         model.addObject("documents", documentDtos);
         return model;
     }
 
-    private void saveOrUpdateDocument(MultipartFile multipartFile,
-                                      UserDirectory directory,
-                                      String description,
-                                      User user) throws IOException {
-
-        String docName = multipartFile.getOriginalFilename();
-        String parentDirectoryHash = directory == null ? user.getLogin() : directory.getHashName();
-        UserDocument document = userDocumentService.getByFullNameAndOwner(user, parentDirectoryHash, docName);
-
-        if (document == null) {
-            document = UserFileUtil.createUserDocument(multipartFile, directory, description, user);
-            multipartFile.transferTo(UserFileUtil.createFile(document.getHashName()));
-            userDocumentService.save(document);
-        } else if (document.getDocumentStatus() == DocumentStatus.REMOVED) {
-            RemovedDocument removedDocument = removedDocumentService.getByUserDocument(document);
-            Long docId = userDocumentService.recover(removedDocument.getId());
-            document = userDocumentService.getDocumentWithOldVersions(docId);
-            updateDocument(document, user, description, multipartFile);
-        } else if (documentAccessService.canEdit(document, user)) {
-            document = userDocumentService.getDocumentWithOldVersions(document.getId());
-            updateDocument(document, user, description, multipartFile);
-        }
+    private static void openOutputStream(UserDocument document, HttpServletResponse response) throws IOException {
+        openOutputStream(document.getHashName(), document.getType(), document.getName(), response);
     }
 
-    private void updateDocument(UserDocument document, User user, String description, MultipartFile multipartFile)
+    private static void openOutputStream(String docHashName, String docType, String docName, HttpServletResponse response)
             throws IOException {
 
-        DocumentOldVersion oldVersion = DocumentVersionUtil.createOldVersion(document);
-        document.getDocumentOldVersions().add(oldVersion);
-        userDocumentService.update(UserFileUtil.updateUserDocument(document, multipartFile, description, user));
-        eventSendingService.sendUpdateEvent(document, user);
+        File file = UserFileUtil.createFile(docHashName);
+        response.setContentType(docType);
+        response.setContentLength((int) file.length());
+        response.setHeader("Content-Disposition", "attachment; filename=\"" + docName + "\"");
+
+        FileCopyUtils.copy(Files.newInputStream(file.toPath()), response.getOutputStream());
     }
 }

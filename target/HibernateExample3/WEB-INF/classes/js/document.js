@@ -44,11 +44,25 @@ $(document).ready(function() {
         }
     });
 
-    $('.on-off-comments').click(function() {
-        $.post('/document/set_comment_ability', {'docId': docId}, function() {
-            location.reload();
-        });
+    $('.off-comments').click(function() {
+        setCommentAbility(false);
     });
+
+    $('.on-comments').click(function() {
+        setCommentAbility(true);
+    });
+    
+    function setCommentAbility(ability) {
+        $.ajax({
+            url: '/document/set_comment_ability',
+            type: 'PUT',
+            dataType: 'json',
+            data: {'docId': docId, 'abilityToComment': ability},
+            success: function() {
+                location.reload();
+            }
+        });
+    }
 
     $('.clear-comments').click(function() {
         $.post('/comments/clear', {'docId': docId}, function() {

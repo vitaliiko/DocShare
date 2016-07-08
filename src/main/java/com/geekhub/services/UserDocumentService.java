@@ -1,14 +1,15 @@
 package com.geekhub.services;
 
-import com.geekhub.entities.DocumentOldVersion;
-import com.geekhub.entities.FriendsGroup;
-import com.geekhub.entities.User;
-import com.geekhub.entities.UserDocument;
+import com.geekhub.dto.SharedDto;
+import com.geekhub.entities.*;
 import com.geekhub.entities.enums.DocumentAttribute;
+
+import java.io.IOException;
 import java.util.Set;
 
 import com.geekhub.entities.enums.DocumentStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -66,4 +67,18 @@ public interface UserDocumentService extends EntityService<UserDocument, Long> {
     List<UserDocument> getAllByOwner(User owner);
 
     Set<UserDocument> searchByName(User owner, String name);
+
+    UserDocument saveOrUpdateDocument(MultipartFile multipartFile, UserDirectory directory,
+                                      String description, User user) throws IOException;
+
+    void updateDocument(UserDocument document, User user, String description, MultipartFile multipartFile)
+            throws IOException;
+
+    void changeAbilityToComment(UserDocument document, boolean abilityToComment);
+
+    UserDocument renameDocument(UserDocument document, String newDocName, User user);
+
+    UserDocument shareDocument(UserDocument document, SharedDto shared, User user);
+
+    UserDocument recoverOldVersion(DocumentOldVersion oldVersion);
 }

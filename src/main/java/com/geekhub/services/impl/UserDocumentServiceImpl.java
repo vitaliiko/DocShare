@@ -1,16 +1,23 @@
 package com.geekhub.services.impl;
 
+import com.geekhub.controllers.utils.FileControllersUtil;
 import com.geekhub.dao.UserDocumentDao;
+import com.geekhub.dto.SharedDto;
 import com.geekhub.entities.DocumentOldVersion;
 import com.geekhub.entities.FriendsGroup;
 import com.geekhub.entities.RemovedDocument;
 import com.geekhub.entities.User;
 import com.geekhub.entities.UserDirectory;
 import com.geekhub.entities.UserDocument;
+import com.geekhub.entities.enums.AbilityToCommentDocument;
 import com.geekhub.entities.enums.DocumentAttribute;
 import com.geekhub.entities.enums.DocumentStatus;
+import com.geekhub.security.UserDocumentAccessService;
 import com.geekhub.services.*;
+import com.geekhub.utils.DocumentVersionUtil;
 import com.geekhub.utils.UserFileUtil;
+
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -20,6 +27,7 @@ import org.hibernate.Hibernate;
 import javax.inject.Inject;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Arrays;
 import java.util.List;
@@ -42,6 +50,15 @@ public class UserDocumentServiceImpl implements UserDocumentService {
 
     @Inject
     private UserDirectoryService userDirectoryService;
+
+    @Inject
+    private UserDocumentAccessService userDocumentAccessService;
+
+    @Inject
+    private EventSendingService eventSendingService;
+
+    @Inject
+    private DocumentOldVersionService documentOldVersionService;
 
     @Override
     public List<UserDocument> getAll(String orderParameter) {
@@ -315,6 +332,91 @@ public class UserDocumentServiceImpl implements UserDocumentService {
         Set<UserDocument> documents = new TreeSet<>();
         Arrays.stream(names).forEach(n -> documents.addAll(userDocumentDao.search(owner, "name", n)));
         return documents;
+    }
+
+    @Override
+    public UserDocument saveOrUpdateDocument(MultipartFile multipartFile, UserDirectory directory,
+                                             String description, User user) throws IOException {
+
+        String docName = multipartFile.getOriginalFilename();
+        String parentDirectoryHash = directory == null ? user.getLogin() : directory.getHashName();
+        UserDocument document = getByFullNameAndOwner(user, parentDirectoryHash, docName);
+
+        if (document == null) {
+            document = UserFileUtil.createUserDocument(multipartFile, directory, description, user);
+            multipartFile.transferTo(UserFileUtil.createFile(document.getHashName()));
+            save(document);
+        } else if (document.getDocumentStatus() == DocumentStatus.REMOVED) {
+            RemovedDocument removedDocument = removedDocumentService.getByUserDocument(document);
+            Long docId = recover(removedDocument.getId());
+            document = getDocumentWithOldVersions(docId);
+            updateDocument(document, user, description, multipartFile);
+        } else if (userDocumentAccessService.canEdit(document, user)) {
+            document = getDocumentWithOldVersions(document.getId());
+            updateDocument(document, user, description, multipartFile);
+        }
+
+        return document;
+    }
+
+    @Override
+    public void updateDocument(UserDocument document, User user, String description, MultipartFile multipartFile)
+            throws IOException {
+
+        DocumentOldVersion oldVersion = DocumentVersionUtil.createOldVersion(document);
+        document.getDocumentOldVersions().add(oldVersion);
+        update(UserFileUtil.updateUserDocument(document, multipartFile, description, user));
+        eventSendingService.sendUpdateEvent(document, user);
+    }
+
+    @Override
+    public void changeAbilityToComment(UserDocument document, boolean abilityToComment) {
+        AbilityToCommentDocument ability = AbilityToCommentDocument.getAttribute(abilityToComment);
+        document.setAbilityToComment(ability);
+        update(document);
+    }
+
+    @Override
+    public UserDocument renameDocument(UserDocument document, String newDocName, User user) {
+        String oldDocName = document.getName();
+        document.setName(newDocName);
+        update(document);
+        eventSendingService.sendRenameEvent(getAllReadersAndEditors(document.getId()), "document",
+                oldDocName, newDocName, document.getId(), user);
+        return document;
+    }
+
+    @Override
+    public UserDocument shareDocument(UserDocument document, SharedDto shared, User user) {
+        Set<User> currentReadersAndEditors = getAllReadersAndEditors(document.getId());
+        document.setDocumentAttribute(DocumentAttribute.valueOf(shared.getAccess()));
+        document.setReaders(FileControllersUtil.createEntitySet(shared.getReaders(), userService));
+        document.setEditors(FileControllersUtil.createEntitySet(shared.getEditors(), userService));
+        document.setReadersGroups(FileControllersUtil.createEntitySet(shared.getReadersGroups(), friendsGroupService));
+        document.setEditorsGroups(FileControllersUtil.createEntitySet(shared.getEditorsGroups(), friendsGroupService));
+        update(document);
+
+        Set<User> newReadersAndEditorsSet = getAllReadersAndEditors(document.getId());
+        newReadersAndEditorsSet.removeAll(currentReadersAndEditors);
+        eventSendingService
+                .sendShareEvent(newReadersAndEditorsSet, "document", document.getName(), document.getId(), user);
+
+        newReadersAndEditorsSet = getAllReadersAndEditors(document.getId());
+        currentReadersAndEditors.removeAll(newReadersAndEditorsSet);
+        eventSendingService.sendProhibitAccessEvent(currentReadersAndEditors, "document", document.getName(), user);
+
+        return document;
+    }
+
+    @Override
+    public UserDocument recoverOldVersion(DocumentOldVersion oldVersion) {
+        UserDocument oldVersionDocument = oldVersion.getUserDocument();
+        DocumentOldVersion currentVersion = DocumentVersionUtil.createOldVersion(oldVersionDocument);
+        oldVersionDocument.getDocumentOldVersions().add(currentVersion);
+        UserDocument recoveredDocument = DocumentVersionUtil.recoverOldVersion(oldVersion);
+        update(recoveredDocument);
+        documentOldVersionService.delete(oldVersion);
+        return recoveredDocument;
     }
 
     @Override

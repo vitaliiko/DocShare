@@ -20,9 +20,20 @@
                                 <a href="#" class="comment-box-visible">Hide comment box</a>
                             </li>
                         </c:if>
-                        <c:if test="${changeAbilityToComment != null}">
-                            <li><a href="#" class="on-off-comments">${changeAbilityToComment}</a></li>
-                            <li><a href="#" class="clear-comments">Delete all comments</a></li>
+                        <c:if test="${abilityToComment != null}">
+                            <c:if test="${abilityToComment}">
+                                <li>
+                                    <a href="#" class="off-comments">Disable comments for this file</a>
+                                </li>
+                            </c:if>
+                            <c:if test="${!abilityToComment}">
+                                <li>
+                                    <a href="#" class="on-comments">Enable comments for this file</a>
+                                </li>
+                            </c:if>
+                            <li>
+                                <a href="#" class="clear-comments">Delete all comments</a>
+                            </li>
                         </c:if>
                     </ul>
                 </li>
