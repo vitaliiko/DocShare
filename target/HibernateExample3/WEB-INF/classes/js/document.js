@@ -8,7 +8,7 @@ $(document).ready(function() {
         e.preventDefault()
     });
 
-    $.getJSON('/comments/get', {docId: docId}, function(comments) {
+    $.getJSON('/api/documents/' + docId + '/comments', function(comments) {
         $.each(comments, function(k, v) {
             loadTemplate(handlebarsPath, function (template) {
                 $('.commentList').prepend(template(v));
@@ -19,7 +19,7 @@ $(document).ready(function() {
     $('.add-comment').click(function() {
         var text = $('.comment-text').val();
         if (text != '') {
-            $.post('/comments/add', {text: text, docId: docId}, function(comment) {
+            $.post('/api/documents/' + docId + '/comments', {text: text}, function(comment) {
                 loadTemplate(handlebarsPath, function (template) {
                     $('.commentList').prepend(template(comment));
                 });
@@ -65,8 +65,12 @@ $(document).ready(function() {
     }
 
     $('.clear-comments').click(function() {
-        $.post('/comments/clear', {'docId': docId}, function() {
-            $('.commentBox').find($('.commentText')).remove();
+        $.ajax({
+            url: '/api/documents/' + docId + '/comments',
+            type: 'DELETE',
+            success: function() {
+                $('.commentBox').find($('.commentText')).remove();
+            }
         });
     });
 });

@@ -18,12 +18,10 @@ import javax.servlet.http.HttpSession;
 import javax.inject.Inject;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/comments")
+@RequestMapping("/api")
 public class CommentController {
 
     @Inject
@@ -42,8 +40,8 @@ public class CommentController {
         return userService.getById((Long) session.getAttribute("userId"));
     }
 
-    @RequestMapping(value = "/get", method = RequestMethod.GET)
-    public ResponseEntity<Set<CommentDto>> getComments(long docId, HttpSession session) {
+    @RequestMapping(value = "/documents/{docId}/comments", method = RequestMethod.GET)
+    public ResponseEntity<Set<CommentDto>> getComments(@PathVariable long docId, HttpSession session) {
         User user = getUserFromSession(session);
         UserDocument document = userDocumentService.getDocumentWithComments(docId);
         if (documentAccessService.canRead(document, user)
@@ -55,8 +53,8 @@ public class CommentController {
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
-    @RequestMapping(value = "/add", method = RequestMethod.POST)
-    public CommentDto addComment(String text, long docId, HttpSession session) {
+    @RequestMapping(value = "/documents/{docId}/comments", method = RequestMethod.POST)
+    public CommentDto addComment(@PathVariable long docId, @RequestParam String text, HttpSession session) {
         User user = getUserFromSession(session);
         UserDocument document = userDocumentService.getById(docId);
         if (documentAccessService.canRead(document, user)
@@ -69,8 +67,8 @@ public class CommentController {
         throw new ResourceNotFoundException();
     }
 
-    @RequestMapping("/clear")
-    public void clearComments(long docId, HttpSession session) {
+    @RequestMapping(value = "/documents/{docId}/comments", method = RequestMethod.DELETE)
+    public void clearComments(@PathVariable long docId, HttpSession session) {
         User user = getUserFromSession(session);
         UserDocument document = userDocumentService.getDocumentWithComments(docId);
         if (documentAccessService.isOwner(document, user)) {
