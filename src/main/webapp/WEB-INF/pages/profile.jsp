@@ -39,7 +39,7 @@
 
         <h5>Avatar</h5>
         <img src="/profile/imageDisplay?id=${user.id}"/>
-        <form action="/profile/upload_avatar" method="post" enctype="multipart/form-data">
+        <form action="/api/profile/avatar" method="post" enctype="multipart/form-data">
             <label class="col-md-3 control-lable" for="avatar">Upload an avatar</label>
             <input type="file" name="avatar" id="avatar" class="form-control input-sm"/>
             <br>
@@ -48,7 +48,7 @@
             </div>
         </form>
 
-        <form action="/profile/change_profile" method="post">
+        <form action="/api/profile" method="post">
             <label for="firstName">First name: </label>
             <input type="text" name="firstName" value="${user.firstName}" id="firstName"
                    class="form-control" required="" autofocus="">
@@ -81,7 +81,7 @@
         </form>
         <hr/>
 
-        <form class="form-signin" action="/profile/change_password" method="post">
+        <form class="form-signin" action="/api/profile/password" method="post">
             <h4>To change password enter your current password</h4>
 
             <label for="currentPassword">Your current password: </label>
@@ -121,7 +121,7 @@
                 <h4>Your files will be removed irretrievably.</h4>
             </div>
             <div class="modal-footer">
-                <form action="/profile/remove_account">
+                <form action="/api/profile/remove" method="post">
                     <input type="submit" id="deleteDocument" class="btn btn-success" value="YES">
                     <button type="button" class="btn btn-danger" data-dismiss="modal">NO</button>
                 </form>
