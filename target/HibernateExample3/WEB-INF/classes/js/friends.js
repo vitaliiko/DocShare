@@ -1,7 +1,7 @@
 
 $(document).ready(function() {
 
-    var friendsGroupId;
+    var friendGroupId;
     var handlebarsPath = '/resources/js/templates/';
     var removeButton;
 
@@ -12,7 +12,7 @@ $(document).ready(function() {
         $('#groupName').val('');
     }
 
-    $.getJSON('/friends/friend_groups', function(groups) {
+    $.getJSON('/api/friend-groups', function(groups) {
         $.each(groups, function (k, group) {
             loadTemplate(handlebarsPath + 'groupInfoRow.html', function (template) {
                 $('#groupTable').append(template(group));
@@ -27,7 +27,8 @@ $(document).ready(function() {
            friends.push($(this).val());
         });
         $.ajax({
-            url: '/friends/create_group',
+            url: '/api/friend-groups',
+            type: 'POST',
             data: {groupName: groupName, friends: friends},
             success: function(groupId) {
                 var group = {id: groupId, name: groupName};
@@ -59,11 +60,12 @@ $(document).ready(function() {
             $('.alert-text').text('You cannot create friends group without name');
         } else {
             $.ajax({
-                url: '/friends/update_group',
-                contentType: 'json',
-                data: {groupId: friendsGroupId, groupName: groupName, friends: friends},
+                url: '/api/friend-groups/' + friendGroupId,
+                type: 'PUT',
+                //contentType: 'json',
+                data: {groupName: groupName, friendIds: friends},
                 success: function() {
-                    $('.info-table').find($('.group' + friendsGroupId)).html(groupName);
+                    $('.info-table').find($('.group' + friendGroupId)).html(groupName);
                     clearModalWindow();
                 },
                 error: function() {
@@ -81,8 +83,8 @@ $(document).ready(function() {
         $('#updateGroupButton').show();
         $('.modal-title').text('Change group');
         var groupId = this.id;
-        $.getJSON('/friends/get_group', {groupId: groupId}, function(group) {
-            friendsGroupId = group.id;
+        $.getJSON('/api/friend-groups/' + groupId, function(group) {
+            friendGroupId = group.id;
             var memberIds = [];
             $.each(group.friends, function (k, v) {
                 memberIds.push(v.id);
@@ -105,8 +107,8 @@ $(document).ready(function() {
     $('.removeFriendButton').click(function() {
         var friendId = this.id;
         $.ajax({
-            url: '/friends/delete_friend',
-            data: {friendId: friendId},
+            url: '/api/friends/' + friendId,
+            type: 'DELETE',
             success: function() {
                 $('.friend' + friendId).remove();
             }
@@ -114,7 +116,7 @@ $(document).ready(function() {
     });
 
     $('#groupTable').on('click', '.removeGroupButton', function() {
-        friendsGroupId = this.id;
+        friendGroupId = this.id;
         removeButton = $(this);
         var message = 'Are you sure yo want to remove friends group?';
         $('#deleteDialog').modal('show');
@@ -123,11 +125,11 @@ $(document).ready(function() {
 
     $('#deleteGroup').click(function() {
         $.ajax({
-            url: '/friends/delete_group',
-            data: {groupId: friendsGroupId},
+            url: '/api/friend-groups/' + friendGroupId,
+            type: 'DELETE',
             success: function() {
                 removeButton.parent().parent().remove();
-                $('.friend-table').find($('.group' + friendsGroupId)).remove();
+                $('.friend-table').find($('.group' + friendGroupId)).remove();
             }
         });
     });

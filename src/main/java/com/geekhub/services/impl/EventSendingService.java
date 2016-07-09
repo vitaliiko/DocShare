@@ -102,7 +102,7 @@ public class EventSendingService {
         String eventHashName = createHashName();
         String eventText = "User " + user.getFullName() + " wants to add you as a friend.";
         String eventLinkText = "Confirm";
-        String eventLinkUrl = "/friends/add_friend/" + user.getId() + "/" + eventHashName;
+        String eventLinkUrl = "/api/friends/" + user.getId() + "/add/" + eventHashName;
 
         eventService.save(createEvent(eventHashName, friend, eventText, eventLinkText, eventLinkUrl, user));
     }
@@ -110,7 +110,7 @@ public class EventSendingService {
     public void sendAddToFriendEvent(User user, User friend) {
         String eventText = "User " + user.getFullName() + " confirm your request.";
         String eventLinkText = "Friends";
-        String eventLinkUrl = "/friends/";
+        String eventLinkUrl = "/api/friends/";
 
         eventService.save(createEvent(friend, eventText, eventLinkText, eventLinkUrl, user));
     }

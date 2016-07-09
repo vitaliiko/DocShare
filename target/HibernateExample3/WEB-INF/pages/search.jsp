@@ -48,12 +48,13 @@
                     <c:url var="userPage" value="/main/userpage/${userEntry.key.id}"/>
                     <a href="${userPage}" class="btn btn-link">${userEntry.key}</a>
                 </td>
-                <td><form action="/friends/send_to_friend_event">
+                <td>
                     <c:if test="${userEntry.value}">
-                        <input type="hidden" name="friendId" value="${userEntry.key.id}">
-                        <input type="submit" class="btn btn-default" value="Add to friend"/>
+                        <form action="/api/friends/${userEntry.key.id}/request-to-friend" method="post">
+                            <input type="submit" class="btn btn-default" value="Add to friend"/>
+                        </form>
                     </c:if>
-                </form></td>
+                </td>
             </tr>
         </c:forEach>
         </table>

@@ -7,7 +7,7 @@
             <a href="/document/accessible">Accessible files</a>
         </li>
         <li id="friends">
-            <a href="/friends/">Friends</a>
+            <a href="/api/friends/">Friends</a>
         </li>
         <li id="events">
             <a href="/api/events">Events   <label id="unreadEventsCount"></label></a>
