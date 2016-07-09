@@ -34,14 +34,14 @@
                 </form></td>
             </tr>
         </c:forEach>
-        <c:forEach items="${documents}" var="doc">
+        <c:forEach items="${documents}" var="version">
             <tr>
-                <td>${doc.name}</td>
+                <td>${version.name}</td>
                 <td>
-                    <fmt:formatDate type="date" timeStyle="short" dateStyle="short" value="${doc.removalDate}"/>
-                    by ${doc.removerName}
+                    <fmt:formatDate type="date" timeStyle="short" dateStyle="short" value="${version.removalDate}"/>
+                    by ${version.removerName}
                 </td>
-                <td><form action="/document/${doc.id}/recover" method="post">
+                <td><form action="/api/documents/${version.id}/recover" method="post">
                     <input type="submit" class="btn btn-primary custom-width" value="Recover">
                 </form></td>
             </tr>

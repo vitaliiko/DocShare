@@ -68,7 +68,7 @@ public class UserDirectoryController {
 
             String dirName = userDirectoryService.getById(dirId).getName();
             eventSendingService.sendRecoverEvent(userDirectoryService, "Directory", dirName, dirId, user);
-            return new ModelAndView("redirect:/document/upload");
+            return new ModelAndView("redirect:/api/documents");
         }
         throw new ResourceNotFoundException();
     }
@@ -103,7 +103,7 @@ public class UserDirectoryController {
         return null;
     }
 
-    @RequestMapping(value = "/directories/{dirId}", method = RequestMethod.PUT)
+    @RequestMapping(value = "/directories/{dirId}/rename", method = RequestMethod.POST)
     public ResponseEntity<UserFileDto> renameDirectory(@PathVariable Long dirId,
                                                        @RequestParam String newDirName,
                                                        HttpSession session) {

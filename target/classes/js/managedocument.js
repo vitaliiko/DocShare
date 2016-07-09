@@ -185,10 +185,10 @@ $(document).ready(function() {
         clearModalWindow();
         makeBoxesUnchecked();
         $('.group-check-box').show();
-        shareUrl = '/document/share_document';
+        shareUrl = '/api/documents/share';
 
         var docId = $(this).val();
-        $.getJSON('/document/get_document', {docId: docId}, function(document) {
+        $.getJSON('/api/documents/' + docId, function(document) {
             fileId = document.id;
             fileAccess = document.access;
             makeBoxesChecked(document.readers, $('.reader-check-box'));
@@ -459,7 +459,7 @@ $(document).ready(function() {
         var docCheckBox = $('.select-doc:visible:checked');
         var dirCheckBox = $('.select-dir:visible:checked');
         if (docCheckBox.length == 1) {
-            $.getJSON('/document/get_document', {docId: docCheckBox.val()}, function(document) {
+            $.getJSON('/api/documents/' + docCheckBox.val(), function(document) {
                 var docName = document.name;
                 $('#newFileName').val(docName.substring(0, docName.lastIndexOf('.')));
             });
@@ -476,15 +476,15 @@ $(document).ready(function() {
         var dirCheckBox = $('.select-dir:visible:checked');
         if (docCheckBox.length == 1) {
             $.ajax({
-                url: '/document/rename_document',
+                url: '/api/documents/' + docCheckBox.val() + '/rename',
                 type: 'POST',
-                data: {docId: docCheckBox.val(), newDocName: newName},
+                data: {newDocName: newName},
                 success: function(document) {
                     if (document !== undefined) {
                         $('.doc-table')
                             .find($('.tr-doc' + document.id))
                             .find('.document-name')
-                            .html("<a href='/document/browse-'" + document.id + ">" + document.name + "</a>")
+                            .html("<a href='/api/documents/'" + document.id + "'/browse'>" + document.name + "</a>")
                     }
                     dangerAlert.hide(true);
                 },
@@ -495,8 +495,8 @@ $(document).ready(function() {
             });
         } else if (dirCheckBox.length == 1) {
             $.ajax({
-                url: '/api/directories/' + dirCheckBox.val(),
-                type: 'PUT',
+                url: '/api/directories/' + dirCheckBox.val() + '/rename',
+                type: 'POST',
                 data: {newDirName: newName},
                 success: function(directory) {
                     if (directory !== undefined) {

@@ -33,7 +33,7 @@ public class EventSendingService {
     public void sendUpdateEvent(UserDocument document, User user) {
         String eventText = "Document " + document.getName() + " has been updated by " + user.getFullName();
         String eventLinkText = "Browse";
-        String eventLinkUrl = "/document/browse/" + document.getId();
+        String eventLinkUrl = buildBrowseDocumentURL(document.getId());
 
         Set<User> readers = userDocumentService.getAllReadersAndEditors(document.getId());
         eventService.save(createEvent(readers, eventText, eventLinkText, eventLinkUrl, user));
@@ -58,7 +58,7 @@ public class EventSendingService {
         String eventLinkUrl = null;
         if (fileType.toLowerCase().equals("Document")) {
             eventLinkText = "Browse";
-            eventLinkUrl = "/document/browse/" + fileId;
+            eventLinkUrl = buildBrowseDocumentURL(fileId);
         }
 
         Set<User> readers = service instanceof UserDirectoryService
@@ -77,7 +77,7 @@ public class EventSendingService {
         String eventLinkUrl = null;
         if (fileType.toLowerCase().equals("document")) {
             eventLinkText = "Browse";
-            eventLinkUrl = "/document/browse/" + fileId;
+            eventLinkUrl = buildBrowseDocumentURL(fileId);
         }
         eventService.save(createEvent(readers, eventText, eventLinkText, eventLinkUrl, user));
     }
@@ -88,7 +88,7 @@ public class EventSendingService {
         String eventLinkUrl = null;
         if (fileType.toLowerCase().equals("document")) {
             eventLinkText = "Browse";
-            eventLinkUrl = "/document/browse/" + fileId;
+            eventLinkUrl = buildBrowseDocumentURL(fileId);
         }
         eventService.save(createEvent(readers, eventText, eventLinkText, eventLinkUrl, user));
     }
@@ -181,5 +181,9 @@ public class EventSendingService {
 
     private String createHashName() {
         return DigestUtils.md5Hex("" + new Date().getTime());
+    }
+
+    private String buildBrowseDocumentURL(long documentId) {
+        return "/api/documents/" + documentId + "/browse";
     }
 }

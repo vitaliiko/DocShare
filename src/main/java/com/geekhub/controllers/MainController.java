@@ -46,7 +46,7 @@ public class MainController {
 
     @RequestMapping(value = "/home", method = RequestMethod.GET)
     public ModelAndView home() {
-        return new ModelAndView("redirect:/document/upload");
+        return new ModelAndView("redirect:/api/documents");
     }
 
     @RequestMapping(value = "/sign_in", method = RequestMethod.GET)
@@ -65,7 +65,7 @@ public class MainController {
         session.setAttribute("userId", user.getId());
         session.setAttribute("parentDirectoryHash", user.getLogin());
         session.setAttribute("currentLocation", user.getLogin());
-        model.setViewName("redirect:/document/upload");
+        model.setViewName("redirect:/api/documents");
         return model;
     }
 

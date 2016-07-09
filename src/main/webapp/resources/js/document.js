@@ -45,22 +45,16 @@ $(document).ready(function() {
     });
 
     $('.off-comments').click(function() {
-        setCommentAbility(false);
+        setCommentAbility('false');
     });
 
     $('.on-comments').click(function() {
-        setCommentAbility(true);
+        setCommentAbility('true');
     });
     
     function setCommentAbility(ability) {
-        $.ajax({
-            url: '/document/set_comment_ability',
-            type: 'PUT',
-            dataType: 'json',
-            data: {'docId': docId, 'abilityToComment': ability},
-            success: function() {
-                location.reload();
-            }
+        $.post('/api/documents/' + docId + '/comment-ability', {'abilityToComment': ability}, function() {
+            location.reload();
         });
     }
 

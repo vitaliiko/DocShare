@@ -10,6 +10,6 @@ public class IndexController {
 
     @RequestMapping("/")
     public ModelAndView index() {
-        return new ModelAndView("redirect:/document/upload");
+        return new ModelAndView("redirect:/api/documents");
     }
 }

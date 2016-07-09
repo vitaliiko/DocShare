@@ -4,7 +4,7 @@
 <div class="col-md-2 sidebar-offcanvas" id="sidebar" role="navigation">
     <ul class="nav">
         <li id="accessibleFiles">
-            <a href="/document/accessible">Accessible files</a>
+            <a href="/api/documents/accessible">Accessible files</a>
         </li>
         <li id="friends">
             <a href="/api/friends/">Friends</a>

@@ -389,7 +389,7 @@ public class UserDocumentServiceImpl implements UserDocumentService {
     @Override
     public UserDocument shareDocument(UserDocument document, SharedDto shared, User user) {
         Set<User> currentReadersAndEditors = getAllReadersAndEditors(document.getId());
-        document.setDocumentAttribute(DocumentAttribute.valueOf(shared.getAccess()));
+        document.setDocumentAttribute(DocumentAttribute.valueOf(shared.getAccess().toUpperCase()));
         document.setReaders(FileControllersUtil.createEntitySet(shared.getReaders(), userService));
         document.setEditors(FileControllersUtil.createEntitySet(shared.getEditors(), userService));
         document.setReadersGroups(FileControllersUtil.createEntitySet(shared.getReadersGroups(), friendsGroupService));

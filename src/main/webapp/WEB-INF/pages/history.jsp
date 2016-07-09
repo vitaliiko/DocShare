@@ -22,18 +22,24 @@
             <th width="15"></th>
             <th width="15"></th>
         </tr>
-        <c:forEach items="${versions}" var="doc">
+        <c:forEach items="${versions}" var="version">
             <tr>
-                <td>${doc.name}</td>
-                <td>${doc.size}</td>
+                <td>${version.name}</td>
+                <td>${version.size}</td>
                 <td>
-                    <fmt:formatDate type="date" timeStyle="short" dateStyle="short" value="${doc.lastModifyTime}"/>
-                     by ${doc.changedBy}
+                    <fmt:formatDate type="date" timeStyle="short" dateStyle="short" value="${version.lastModifyTime}"/>
+                     by ${version.changedBy}
                 </td>
-                <td><a href="<c:url value='/document/version_recover/${doc.id}' />"
-                       class="btn btn-primary custom-width">Recover</a></td>
-                <td><a href="<c:url value='/document/download_old_version/${doc.id}' />"
-                       class="btn btn-primary custom-width">Download</a></td>
+                <td>
+                    <form action="/api/documents/versions/${version.id}/recover" method="post">
+                        <input type="submit" class="btn btn-default custom-width" value="Recover">
+                    </form>
+                </td>
+                <td>
+                    <form action="/api/documents/versions/${version.id}/download" method="get">
+                        <input type="submit" class="btn btn-default custom-width" value="Download">
+                    </form>
+                </td>
             </tr>
         </c:forEach>
     </table>

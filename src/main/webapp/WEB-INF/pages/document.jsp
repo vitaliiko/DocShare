@@ -19,7 +19,7 @@
     <h4>${location}${doc.name}</h4>
     <h5>
         ${doc.size} &nbsp&nbsp Changed: ${doc.lastModifyTime}
-        <a href="<c:url value='/document/download/${doc.id}' />" class="btn btn-default custom-width">Download</a>
+        <a href="<c:url value='/api/documents/${doc.id}/download' />" class="btn btn-default custom-width">Download</a>
         <c:if test="${historyLink != null}">
             <a href="${historyLink}" class="btn btn-default custom-width">
                 Previous versions

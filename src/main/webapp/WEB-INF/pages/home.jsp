@@ -40,7 +40,7 @@
         <p class="alert-text"></p>
     </div>
 
-    <form action="/document/upload" method="post" enctype="multipart/form-data">
+    <form action="/api/documents/upload" method="post" enctype="multipart/form-data">
         <label class="col-md-3 control-lable" for="files">Upload a document</label>
         <input type="file" multiple name="files[]" id="files" class="form-control input-sm"/>
         <br>

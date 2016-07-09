@@ -1,7 +1,7 @@
 $(document).ready(function() {
-    var accessibleFilesUrl = '/document/accessible';
-    var friendsUrl = '/friends/';
-    var eventsUrl = '/event/browse';
+    var accessibleFilesUrl = '/api/documents/accessible';
+    var friendsUrl = '/api/friends';
+    var eventsUrl = '/api/events';
     var recoverUrl = '/api/files/removed';
     var currentUrl = window.location.href;
 

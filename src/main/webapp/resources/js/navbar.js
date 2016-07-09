@@ -1,5 +1,5 @@
 $(document).ready(function() {
-    var documentUploadUrl = '/document/upload';
+    var documentUploadUrl = '/api/documents';
     var searchUrl = '/main/search';
     var profileUrl = '/profile';
     var currentUrl = window.location.href;
