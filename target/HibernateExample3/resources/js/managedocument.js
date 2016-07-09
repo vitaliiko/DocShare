@@ -54,7 +54,7 @@ $(document).ready(function() {
     setSelectionStyle($('.all-href'));
     backLink.hide();
     $('.add-action-btn').hide();
-    $.getJSON('/document/get-directory-content-root', function(files) {
+    $.getJSON('/api/directories/root/content', function(files) {
         renderDirectories(files);
         renderDocuments(files);
     });
@@ -204,10 +204,10 @@ $(document).ready(function() {
         clearModalWindow();
         makeBoxesUnchecked();
         $('.group-check-box').hide();
-        shareUrl = '/document/share_directory';
+        shareUrl = '/api/directories/share';
 
         var dirId = $(this).val();
-        $.getJSON('/document/get_directory', {dirId: dirId}, function(directory) {
+        $.getJSON('/api/directories/' + dirId, function(directory) {
             fileId = directory.id;
             fileAccess = directory.access;
             makeBoxesChecked(directory.readers, $('.reader-check-box'));
@@ -289,8 +289,9 @@ $(document).ready(function() {
     $('#makeDir').click(function() {
         var dirName = $('#directoryName').val();
         $.ajax({
-            url: '/document/make-directory',
-            data: {dirName: dirName, dirHashName: dirHashName},
+            url: '/api/directories',
+            type: 'POST',
+            data: {dirName: dirName, parentDirHash: dirHashName},
             success: function (directory) {
                 loadTemplate(handlebarsPath + 'directoryRow.html', function(template) {
                     var html = template(directory);
@@ -310,14 +311,14 @@ $(document).ready(function() {
         event.preventDefault();
         var dirName = $(this).text();
         dirHashName = this.id;
-        var url = '/document/get-directory-content-' + dirHashName;
+        var url = '/api/directories/' + dirHashName + '/content';
 
         $.getJSON(url, function(files) {
             var locationElement = $('#location');
             var location = locationElement.text();
             locationElement.text(location + '/' + dirName);
 
-            $('.back-link').prop('href', '/document/get-parent-directory-content-' + dirHashName);
+            $('.back-link').prop('href', '/api/directories/' + dirHashName + '/parent/content');
             $('.doc-table tr').not('.table-head').remove();
             $('#dirHashNameHidden').val(dirHashName);
 
@@ -340,7 +341,7 @@ $(document).ready(function() {
             locationElement.text(location.substring(0, location.lastIndexOf('/')));
 
             dirHashName = files[0].parentDirectoryHash;
-            $('.back-link').prop('href', 'get-parent-directory-content-' + dirHashName);
+            $('.back-link').prop('href', '/api/directories/' + dirHashName + '/parent/content');
             $('.doc-table tr').not('.table-head').remove();
 
             renderDirectories(files);
@@ -360,7 +361,7 @@ $(document).ready(function() {
             locationElement.text(location.substring(0, location.indexOf('/')));
 
             dirHashName = files[0].parentDirectoryHash;
-            $('.back-link').prop('href', 'get-parent-directory-content-' + dirHashName);
+            $('.back-link').prop('href', '/api/directories/' + dirHashName + '/parent/content');
             $('.doc-table tr').not('.table-head').remove();
 
             renderDirectories(files);
@@ -463,7 +464,7 @@ $(document).ready(function() {
                 $('#newFileName').val(docName.substring(0, docName.lastIndexOf('.')));
             });
         } else if (dirCheckBox.length == 1) {
-            $.getJSON('/document/get_directory', {dirId: dirCheckBox.val()}, function(directory) {
+            $.getJSON('/api/directories/' + dirCheckBox.val(), function(directory) {
                 $('#newFileName').val(directory.name);
             });
         }
@@ -494,9 +495,9 @@ $(document).ready(function() {
             });
         } else if (dirCheckBox.length == 1) {
             $.ajax({
-                url: '/document/rename_directory',
-                type: 'POST',
-                data: {dirId: dirCheckBox.val(), newDirName: newName},
+                url: '/api/directories/' + dirCheckBox.val(),
+                type: 'PUT',
+                data: {newDirName: newName},
                 success: function(directory) {
                     if (directory !== undefined) {
                         $('.doc-table')

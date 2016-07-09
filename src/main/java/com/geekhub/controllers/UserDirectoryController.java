@@ -35,7 +35,7 @@ import java.util.Set;
 import java.util.TreeSet;
 
 @RestController
-@RequestMapping("/document")
+@RequestMapping("/api")
 public class UserDirectoryController {
 
     @Inject
@@ -60,11 +60,11 @@ public class UserDirectoryController {
         return userService.getById((Long) session.getAttribute("userId"));
     }
 
-    @RequestMapping(value = "/recover_directory", method = RequestMethod.POST)
-    public ModelAndView recoverDirectory(long remDirId, HttpSession session) {
+    @RequestMapping(value = "/directories/{removedDirId}/recover", method = RequestMethod.POST)
+    public ModelAndView recoverDirectory(@PathVariable long removedDirId, HttpSession session) {
         User user = getUserFromSession(session);
-        if (directoryAccessService.canRecover(remDirId, user)) {
-            Long dirId = userDirectoryService.recover(remDirId);
+        if (directoryAccessService.canRecover(removedDirId, user)) {
+            Long dirId = userDirectoryService.recover(removedDirId);
 
             String dirName = userDirectoryService.getById(dirId).getName();
             eventSendingService.sendRecoverEvent(userDirectoryService, "Directory", dirName, dirId, user);
@@ -73,9 +73,9 @@ public class UserDirectoryController {
         throw new ResourceNotFoundException();
     }
 
-    @RequestMapping(value = "/make-directory", method = RequestMethod.GET)
-    public ResponseEntity<UserFileDto> makeDir(String dirName,
-                                               @RequestParam(required = false, name = "dirHashName") String parentDirHash,
+    @RequestMapping(value = "/directories", method = RequestMethod.POST)
+    public ResponseEntity<UserFileDto> makeDir(@RequestParam String dirName,
+                                               @RequestParam(required = false) String parentDirHash,
                                                HttpSession session) {
 
         User owner = getUserFromSession(session);
@@ -92,8 +92,8 @@ public class UserDirectoryController {
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
-    @RequestMapping("/get_directory")
-    public UserFileDto getUserDirectory(Long dirId, HttpSession session) {
+    @RequestMapping(value = "/directories/{dirId}", method = RequestMethod.GET)
+    public UserFileDto getUserDirectory(@PathVariable Long dirId, HttpSession session) {
         User user = getUserFromSession(session);
         UserDirectory directory = userDirectoryService.getById(dirId);
         if (directoryAccessService.isOwner(directory, user)
@@ -103,8 +103,11 @@ public class UserDirectoryController {
         return null;
     }
 
-    @RequestMapping(value = "/rename_directory", method = RequestMethod.POST)
-    public ResponseEntity<UserFileDto> renameDirectory(Long dirId, String newDirName, HttpSession session) {
+    @RequestMapping(value = "/directories/{dirId}", method = RequestMethod.PUT)
+    public ResponseEntity<UserFileDto> renameDirectory(@PathVariable Long dirId,
+                                                       @RequestParam String newDirName,
+                                                       HttpSession session) {
+
         UserDirectory directory = userDirectoryService.getById(dirId);
         User user = getUserFromSession(session);
 
@@ -129,7 +132,7 @@ public class UserDirectoryController {
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
-    @RequestMapping(value = "/share_directory", method = RequestMethod.POST)
+    @RequestMapping(value = "/directories/share", method = RequestMethod.POST)
     public ResponseEntity<UserFileDto> shareUserDirectory(@RequestBody SharedDto shared, HttpSession session) {
         User user = getUserFromSession(session);
         UserDirectory directory = userDirectoryService.getById(shared.getDocId());
@@ -170,7 +173,7 @@ public class UserDirectoryController {
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
-    @RequestMapping("/get-directory-content-{dirHashName}")
+    @RequestMapping(value = "/directories/{dirHashName}/content", method = RequestMethod.GET)
     public ResponseEntity<Set<UserFileDto>> getDirectoryContent(@PathVariable String dirHashName, HttpSession session) {
         User user = getUserFromSession(session);
         if (dirHashName.equals("root")) {
@@ -185,7 +188,7 @@ public class UserDirectoryController {
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
-    @RequestMapping("get-parent-directory-content-{dirHashName}")
+    @RequestMapping(value = "/directories/{dirHashName}/parent/content", method = RequestMethod.GET)
     public ResponseEntity<Set<UserFileDto>> getParentDirectoryContent(@PathVariable String dirHashName,
                                                                       HttpSession session) {
 

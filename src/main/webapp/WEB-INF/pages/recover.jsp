@@ -28,8 +28,8 @@
                     <fmt:formatDate type="date" timeStyle="short" dateStyle="short" value="${dir.removalDate}"/>
                     by ${dir.removerName}
                 </td>
-                <td><form action="/document/recover_directory" method="post">
-                    <input type="hidden" name="remDirId" value="${dir.id}">
+                <td><form action="/api/directory/${dir.id}/recover" method="post">
+                    <input type="hidden" name="remDirId" value="">
                     <input type="submit" class="btn btn-primary custom-width" value="Recover">
                 </form></td>
             </tr>
