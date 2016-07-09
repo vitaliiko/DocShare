@@ -10,7 +10,7 @@
             <a href="/friends/">Friends</a>
         </li>
         <li id="events">
-            <a href="/event/browse">Events   <label id="unreadEventsCount"></label></a>
+            <a href="/api/events">Events   <label id="unreadEventsCount"></label></a>
         </li>
         <li id="recover">
             <a href="/document/recover">Removed Files</a>

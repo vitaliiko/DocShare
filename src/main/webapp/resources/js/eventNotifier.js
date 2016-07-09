@@ -9,7 +9,7 @@ $(document).ready(function() {
 
     function checkUnreadEvents() {
         $.ajax({
-            url: '/event/get_unread_events_count',
+            url: '/api/events/unread-count',
             type: 'GET',
             success: function(count) {
                 if (count > 0) {

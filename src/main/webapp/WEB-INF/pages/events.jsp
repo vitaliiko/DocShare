@@ -16,7 +16,7 @@
 
 <div id="wrapper" class="container col-md-10" style="width: 900px;">
     <c:if test="${events.size() > 0}">
-        <form action="/event/clear">
+        <form action="/api/events/clear" method="post">
             <input type="submit" class="btn btn-default" value="Clear events history">
         </form>
     </c:if>

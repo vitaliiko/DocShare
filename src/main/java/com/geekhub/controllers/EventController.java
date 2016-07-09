@@ -11,13 +11,15 @@ import java.util.Set;
 import java.util.TreeSet;
 import javax.servlet.http.HttpSession;
 import javax.inject.Inject;
+
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.ModelAndView;
 
 @RestController
-@RequestMapping("/event")
+@RequestMapping("/api")
 public class EventController {
 
     @Inject
@@ -26,7 +28,7 @@ public class EventController {
     @Inject
     private UserService userService;
 
-    @RequestMapping("/browse")
+    @RequestMapping(value = "/events", method = RequestMethod.GET)
     public ModelAndView browseEvents(HttpSession session) {
         User user = userService.getById((Long) session.getAttribute("userId"));
         Set<Event> events = new HashSet<>(eventService.getAllByRecipient(user));
@@ -42,14 +44,15 @@ public class EventController {
         return model;
     }
 
-    @RequestMapping("/clear")
+    @RequestMapping(value = "/events/clear", method = RequestMethod.POST)
     public ModelAndView clearEventsHistory(HttpSession session) {
         eventService.clearEvents((Long) session.getAttribute("userId"));
         return new ModelAndView("events", "message" , "You have not events yet");
     }
 
-    @RequestMapping(value = "/get_unread_events_count", method = RequestMethod.GET)
-    public long getUnreadEventsCount(HttpSession session) {
-        return eventService.getUnreadCount((Long) session.getAttribute("userId"));
+    @RequestMapping(value = "/events/unread-count", method = RequestMethod.GET)
+    public ResponseEntity<Long> getUnreadEventsCount(HttpSession session) {
+        long unreadCount = eventService.getUnreadCount((Long) session.getAttribute("userId"));
+        return ResponseEntity.ok(unreadCount);
     }
 }
