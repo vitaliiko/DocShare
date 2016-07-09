@@ -13,7 +13,7 @@
             <a href="/api/events">Events   <label id="unreadEventsCount"></label></a>
         </li>
         <li id="recover">
-            <a href="/document/recover">Removed Files</a>
+            <a href="/api/files/removed">Removed Files</a>
         </li>
     </ul>
 </div>

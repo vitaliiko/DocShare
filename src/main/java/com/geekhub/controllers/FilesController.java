@@ -1,27 +1,14 @@
 package com.geekhub.controllers;
 
-import com.geekhub.dto.FriendsGroupDto;
 import com.geekhub.dto.RemovedFileDto;
-import com.geekhub.dto.UserDto;
-import com.geekhub.entities.DocumentOldVersion;
-import com.geekhub.entities.FriendsGroup;
-import com.geekhub.entities.RemovedDocument;
 import com.geekhub.entities.User;
 import com.geekhub.entities.UserDirectory;
 import com.geekhub.entities.UserDocument;
-import com.geekhub.entities.enums.AbilityToCommentDocument;
-import com.geekhub.entities.enums.DocumentAttribute;
 import com.geekhub.dto.UserFileDto;
-import com.geekhub.dto.DocumentOldVersionDto;
-import com.geekhub.dto.SharedDto;
-import com.geekhub.entities.enums.DocumentStatus;
 import com.geekhub.exceptions.ResourceNotFoundException;
 import com.geekhub.security.UserDirectoryAccessService;
 import com.geekhub.security.UserDocumentAccessService;
-import com.geekhub.services.DocumentOldVersionService;
-import com.geekhub.services.EntityService;
 import com.geekhub.services.impl.EventSendingService;
-import com.geekhub.services.FriendsGroupService;
 import com.geekhub.services.RemovedDirectoryService;
 import com.geekhub.services.RemovedDocumentService;
 import com.geekhub.services.UserDirectoryService;
@@ -46,7 +33,7 @@ import org.springframework.web.servlet.ModelAndView;
 import javax.servlet.http.HttpSession;
 
 @RestController
-@RequestMapping("/document")
+@RequestMapping("/api")
 public class FilesController {
 
     @Inject
@@ -85,8 +72,8 @@ public class FilesController {
         binder.setValidator(fileValidator);
     }
 
-    @RequestMapping("/search_files")
-    public Set<UserFileDto> searchFiles(String searchName, HttpSession session) {
+    @RequestMapping(value = "/files/search", method = RequestMethod.GET)
+    public ResponseEntity<Set<UserFileDto>> searchFiles(@RequestParam String searchName, HttpSession session) {
         User user = getUserFromSession(session);
         Set<UserDocument> documents = null;
         Set<UserDirectory> directories = null;
@@ -103,13 +90,13 @@ public class FilesController {
         if (directories != null) {
             directories.forEach(d -> dtoSet.add(EntityToDtoConverter.convert(d)));
         }
-        return dtoSet;
+        return ResponseEntity.ok(dtoSet);
     }
 
-    @RequestMapping(value = "/replace_files", method = RequestMethod.POST)
+    @RequestMapping(value = "/files/replace", method = RequestMethod.POST)
     public ResponseEntity<Void> replaceFiles(@RequestParam(value = "docIds[]", required = false) Long[] docIds,
                                              @RequestParam(value = "dirIds[]", required = false) Long[] dirIds,
-                                             String destinationDirHash,
+                                             @RequestParam String destinationDirHash,
                                              HttpSession session) {
 
         User user = getUserFromSession(session);
@@ -118,7 +105,7 @@ public class FilesController {
             if (documentAccessService.isOwner(documents, user)) {
                 userDocumentService.replace(docIds, destinationDirHash);
             } else {
-                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+                return ResponseEntity.badRequest().build();
             }
         }
         if (dirIds != null && destinationDirHash != null) {
@@ -126,21 +113,21 @@ public class FilesController {
             if (directoryAccessService.isOwner(directories, user)) {
                 userDirectoryService.replace(dirIds, destinationDirHash);
             } else {
-                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+                return ResponseEntity.badRequest().build();
             }
         }
-        return new ResponseEntity<>(HttpStatus.OK);
+        return ResponseEntity.ok().build();
     }
 
-    @RequestMapping(value = "/copy_files", method = RequestMethod.POST)
+    @RequestMapping(value = "/files/copy", method = RequestMethod.POST)
     public ResponseEntity<Void> copyFiles(@RequestParam(value = "docIds[]", required = false) Long[] docIds,
                                           @RequestParam(value = "dirIds[]", required = false) Long[] dirIds,
-                                          String destinationDirHash,
+                                          @RequestParam String destinationDirHash,
                                           HttpSession session) {
 
         User user = getUserFromSession(session);
         if (destinationDirHash == null) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            return ResponseEntity.badRequest().build();
         }
 
         if (destinationDirHash.equals("root")) {
@@ -151,7 +138,7 @@ public class FilesController {
             if (dirIds != null) {
                 userDirectoryService.copy(dirIds, destinationDirHash);
             }
-            return new ResponseEntity<>(HttpStatus.OK);
+            return ResponseEntity.ok().build();
         }
 
         if (docIds != null) {
@@ -159,7 +146,7 @@ public class FilesController {
             if (documentAccessService.isOwner(documents, user)) {
                 userDocumentService.copy(docIds, destinationDirHash);
             } else {
-                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+                return ResponseEntity.badRequest().build();
             }
         }
 
@@ -168,16 +155,16 @@ public class FilesController {
             if (directoryAccessService.isOwner(directories, user)) {
                 userDirectoryService.copy(dirIds, destinationDirHash);
             } else {
-                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+                return ResponseEntity.badRequest().build();
             }
         }
-        return new ResponseEntity<>(HttpStatus.OK);
+        return ResponseEntity.ok().build();
     }
 
-    @RequestMapping(value = "/move_to_trash", method = RequestMethod.POST)
-    public void moveDocumentToTrash(@RequestParam(value = "docIds[]", required = false) Long[] docIds,
-                                    @RequestParam(value = "dirIds[]", required = false) Long[] dirIds,
-                                    HttpSession session) {
+    @RequestMapping(value = "/files/move-to-trash", method = RequestMethod.POST)
+    public ResponseEntity moveDocumentToTrash(@RequestParam(value = "docIds[]", required = false) Long[] docIds,
+                                              @RequestParam(value = "dirIds[]", required = false) Long[] dirIds,
+                                              HttpSession session) {
 
         Long userId = (Long) session.getAttribute("userId");
         User user = getUserFromSession(session);
@@ -197,9 +184,11 @@ public class FilesController {
                         .sendRemoveEvent(userDirectoryService, "Directory", dir.getName(), dir.getId(), user));
             }
         }
+
+        return ResponseEntity.ok().build();
     }
 
-    @RequestMapping(value = "/recover", method = RequestMethod.GET)
+    @RequestMapping(value = "/files/removed", method = RequestMethod.GET)
     public ModelAndView recoverDocument(HttpSession session) {
         ModelAndView model = new ModelAndView("recover");
 
@@ -220,18 +209,4 @@ public class FilesController {
         model.addObject("directories", directories);
         return model;
     }
-
-    @RequestMapping(value = "/recover_document", method = RequestMethod.POST)
-    public ModelAndView recoverDocument(long remDocId, HttpSession session) {
-        User user = getUserFromSession(session);
-        if (documentAccessService.canRecover(remDocId, user)) {
-            Long docId = userDocumentService.recover(remDocId);
-
-            String docName = userDocumentService.getById(docId).getName();
-            eventSendingService.sendRecoverEvent(userDocumentService, "Document", docName, docId, user);
-            return new ModelAndView("redirect:/document/upload");
-        }
-        throw new ResourceNotFoundException();
-    }
-
 }

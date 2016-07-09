@@ -81,4 +81,6 @@ public interface UserDocumentService extends EntityService<UserDocument, Long> {
     UserDocument shareDocument(UserDocument document, SharedDto shared, User user);
 
     UserDocument recoverOldVersion(DocumentOldVersion oldVersion);
+
+    void recoverRemovedDocument(Long removedDocId, User user);
 }

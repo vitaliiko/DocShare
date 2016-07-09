@@ -2,7 +2,7 @@ $(document).ready(function() {
     var accessibleFilesUrl = '/document/accessible';
     var friendsUrl = '/friends/';
     var eventsUrl = '/event/browse';
-    var recoverUrl = '/document/recover';
+    var recoverUrl = '/api/files/removed';
     var currentUrl = window.location.href;
 
     if (currentUrl.indexOf(accessibleFilesUrl) > 0) {

@@ -420,6 +420,13 @@ public class UserDocumentServiceImpl implements UserDocumentService {
     }
 
     @Override
+    public void recoverRemovedDocument(Long removedDocId, User user) {
+        Long docId = recover(removedDocId);
+        String docName = getById(docId).getName();
+        eventSendingService.sendRecoverEvent(this, "Document", docName, docId, user);
+    }
+
+    @Override
     public List<Object> getActualIdsByParentDirectoryHash(String parentDirectoryHash) {
         return userDocumentDao.getPropertiesList("id", "parentDirectoryHash", parentDirectoryHash);
     }

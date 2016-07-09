@@ -268,6 +268,16 @@ public class UserDocumentController {
         return model;
     }
 
+    @RequestMapping(value = "/{removedDocId}/recover", method = RequestMethod.POST)
+    public ModelAndView recoverDocument(@PathVariable long removedDocId, HttpSession session) {
+        User user = getUserFromSession(session);
+        if (documentAccessService.canRecover(removedDocId, user)) {
+            userDocumentService.recoverRemovedDocument(removedDocId, user);
+            return new ModelAndView("redirect:/document/upload");
+        }
+        throw new ResourceNotFoundException();
+    }
+
     private static void openOutputStream(UserDocument document, HttpServletResponse response) throws IOException {
         openOutputStream(document.getHashName(), document.getType(), document.getName(), response);
     }

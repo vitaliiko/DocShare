@@ -170,7 +170,7 @@ $(document).ready(function() {
 
     $('#deleteDocument').click(function() {
         $.ajax({
-            url: '/document/move_to_trash',
+            url: '/api/files/move-to-trash',
             type: 'POST',
             data: {'docIds[]': docIds, 'dirIds[]': dirIds},
             success: function() {
@@ -354,7 +354,7 @@ $(document).ready(function() {
 
     $('#searchButton').click(function() {
         var searchName = $('#filesSearch').val();
-        $.getJSON('/document/search_files', {searchName: searchName}, function(files) {
+        $.getJSON('/api/files/search', {searchName: searchName}, function(files) {
             var locationElement = $('#location');
             var location = locationElement.text();
             locationElement.text(location.substring(0, location.indexOf('/')));
@@ -418,7 +418,7 @@ $(document).ready(function() {
 
     $('.move-here-btn').click(function() {
         $.ajax({
-            url: '/document/replace_files',
+            url: '/api/files/replace',
             type: 'POST',
             data: {'docIds[]': docIds, 'dirIds[]': dirIds, "destinationDirHash": dirHashName},
             success: function() {
@@ -429,7 +429,7 @@ $(document).ready(function() {
 
     $('.copy-here-btn').click(function() {
         $.ajax({
-            url: '/document/copy_files',
+            url: '/api/files/copy',
             type: 'POST',
             data: {'docIds[]': docIds, 'dirIds[]': dirIds, "destinationDirHash": dirHashName},
             success: function() {

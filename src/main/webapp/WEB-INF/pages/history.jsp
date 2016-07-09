@@ -22,17 +22,17 @@
             <th width="15"></th>
             <th width="15"></th>
         </tr>
-        <c:forEach items="${versions}" var="version">
+        <c:forEach items="${versions}" var="doc">
             <tr>
-                <td>${version.name}</td>
-                <td>${version.size}</td>
+                <td>${doc.name}</td>
+                <td>${doc.size}</td>
                 <td>
-                    <fmt:formatDate type="date" timeStyle="short" dateStyle="short" value="${version.lastModifyTime}"/>
-                     by ${version.changedBy}
+                    <fmt:formatDate type="date" timeStyle="short" dateStyle="short" value="${doc.lastModifyTime}"/>
+                     by ${doc.changedBy}
                 </td>
-                <td><a href="<c:url value='/document/version_recover/${version.id}' />"
+                <td><a href="<c:url value='/document/version_recover/${doc.id}' />"
                        class="btn btn-primary custom-width">Recover</a></td>
-                <td><a href="<c:url value='/document/download_old_version/${version.id}' />"
+                <td><a href="<c:url value='/document/download_old_version/${doc.id}' />"
                        class="btn btn-primary custom-width">Download</a></td>
             </tr>
         </c:forEach>
