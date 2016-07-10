@@ -6,9 +6,9 @@ import com.geekhub.entities.Event;
 import com.geekhub.entities.User;
 import com.geekhub.services.EventService;
 import com.geekhub.services.UserService;
-import java.util.HashSet;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.stream.Collectors;
 import javax.servlet.http.HttpSession;
 import javax.inject.Inject;
 
@@ -31,9 +31,10 @@ public class EventController {
     @RequestMapping(value = "/events", method = RequestMethod.GET)
     public ModelAndView browseEvents(HttpSession session) {
         User user = userService.getById((Long) session.getAttribute("userId"));
-        Set<Event> events = new HashSet<>(eventService.getAllByRecipient(user));
-        Set<EventDto> eventDtoSet = new TreeSet<>();
-        events.forEach(e -> eventDtoSet.add(EntityToDtoConverter.convert(e)));
+        Set<Event> events = eventService.getAllByRecipient(user).stream().collect(Collectors.toSet());
+        Set<EventDto> eventDtoSet = events.stream()
+                .map(EntityToDtoConverter::convert)
+                .collect(Collectors.toCollection(TreeSet::new));
         eventService.setReadStatus(events);
 
         ModelAndView model = new ModelAndView("events");
