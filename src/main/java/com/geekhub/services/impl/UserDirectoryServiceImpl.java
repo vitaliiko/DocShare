@@ -7,6 +7,7 @@ import com.geekhub.entities.User;
 import com.geekhub.entities.UserDirectory;
 import com.geekhub.entities.UserDocument;
 import com.geekhub.entities.enums.DocumentStatus;
+import com.geekhub.security.UserDirectoryAccessService;
 import com.geekhub.services.*;
 import com.geekhub.utils.UserFileUtil;
 import java.util.Arrays;
@@ -38,6 +39,9 @@ public class UserDirectoryServiceImpl implements UserDirectoryService {
 
     @Inject
     private UserDocumentService userDocumentService;
+
+    @Inject
+    private UserDirectoryAccessService userDirectoryAccessService;
 
     @Override
     public List<UserDirectory> getAll(String orderParameter) {
@@ -225,8 +229,13 @@ public class UserDirectoryServiceImpl implements UserDirectoryService {
     }
 
     @Override
-    public void replace(Long[] dirIds, String destinationDirectoryHash) {
-        Arrays.stream(dirIds).forEach(id -> replace(id, destinationDirectoryHash));
+    public boolean replace(Long[] dirIds, String destinationDirectoryHash, User user) {
+        Set<UserDirectory> directories = getByIds(Arrays.asList(dirIds));
+        if (userDirectoryAccessService.isOwner(directories, user)) {
+            Arrays.stream(dirIds).forEach(id -> replace(id, destinationDirectoryHash));
+            return true;
+        }
+        return false;
     }
 
     @Override
@@ -264,8 +273,13 @@ public class UserDirectoryServiceImpl implements UserDirectoryService {
     }
 
     @Override
-    public void copy(Long[] dirIds, String destinationDirectoryHash) {
-        Arrays.stream(dirIds).forEach(id -> copy(id, destinationDirectoryHash));
+    public boolean copy(Long[] dirIds, String destinationDirectoryHash, User user) {
+        Set<UserDirectory> directories = getByIds(Arrays.asList(dirIds));
+        if (userDirectoryAccessService.isOwner(directories, user)) {
+            Arrays.stream(dirIds).forEach(id -> copy(id, destinationDirectoryHash));
+            return true;
+        }
+        return false;
     }
 
     @Override

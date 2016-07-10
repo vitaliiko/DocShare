@@ -5,17 +5,13 @@ import com.geekhub.entities.User;
 import com.geekhub.entities.UserDirectory;
 import com.geekhub.entities.UserDocument;
 import com.geekhub.dto.UserFileDto;
-import com.geekhub.exceptions.ResourceNotFoundException;
 import com.geekhub.security.UserDirectoryAccessService;
 import com.geekhub.security.UserDocumentAccessService;
+import com.geekhub.services.*;
 import com.geekhub.services.impl.EventSendingService;
-import com.geekhub.services.RemovedDirectoryService;
-import com.geekhub.services.RemovedDocumentService;
-import com.geekhub.services.UserDirectoryService;
-import com.geekhub.services.UserDocumentService;
-import com.geekhub.services.UserService;
 import com.geekhub.dto.convertors.EntityToDtoConverter;
 import com.geekhub.validators.FileValidator;
+
 import java.util.Arrays;
 import java.util.Set;
 import java.util.TreeSet;
@@ -61,6 +57,9 @@ public class FilesController {
     private UserDocumentAccessService documentAccessService;
 
     @Inject
+    private UserDirectoryAccessService userDirectoryAccessService;
+
+    @Inject
     private EventSendingService eventSendingService;
 
     private User getUserFromSession(HttpSession session) {
@@ -100,21 +99,12 @@ public class FilesController {
                                              HttpSession session) {
 
         User user = getUserFromSession(session);
-        if (docIds != null && destinationDirHash != null) {
-            Set<UserDocument> documents = userDocumentService.getByIds(Arrays.asList(docIds));
-            if (documentAccessService.isOwner(documents, user)) {
-                userDocumentService.replace(docIds, destinationDirHash);
-            } else {
-                return ResponseEntity.badRequest().build();
-            }
+
+        if (docIds != null && !userDocumentService.replace(docIds, destinationDirHash, user)) {
+            return ResponseEntity.badRequest().build();
         }
-        if (dirIds != null && destinationDirHash != null) {
-            Set<UserDirectory> directories = userDirectoryService.getByIds(Arrays.asList(dirIds));
-            if (directoryAccessService.isOwner(directories, user)) {
-                userDirectoryService.replace(dirIds, destinationDirHash);
-            } else {
-                return ResponseEntity.badRequest().build();
-            }
+        if (dirIds != null && !userDirectoryService.replace(dirIds, destinationDirHash, user)) {
+            return ResponseEntity.badRequest().build();
         }
         return ResponseEntity.ok().build();
     }
@@ -126,37 +116,18 @@ public class FilesController {
                                           HttpSession session) {
 
         User user = getUserFromSession(session);
-        if (destinationDirHash == null) {
-            return ResponseEntity.badRequest().build();
-        }
 
         if (destinationDirHash.equals("root")) {
             destinationDirHash = user.getLogin();
-            if (docIds != null) {
-                userDocumentService.copy(docIds, user.getLogin());
-            }
-            if (dirIds != null) {
-                userDirectoryService.copy(dirIds, destinationDirHash);
-            }
-            return ResponseEntity.ok().build();
         }
-
-        if (docIds != null) {
-            Set<UserDocument> documents = userDocumentService.getByIds(Arrays.asList(docIds));
-            if (documentAccessService.isOwner(documents, user)) {
-                userDocumentService.copy(docIds, destinationDirHash);
-            } else {
-                return ResponseEntity.badRequest().build();
-            }
+        if (!userDirectoryAccessService.isOwner(destinationDirHash, user)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
-
-        if (dirIds != null) {
-            Set<UserDirectory> directories = userDirectoryService.getByIds(Arrays.asList(dirIds));
-            if (directoryAccessService.isOwner(directories, user)) {
-                userDirectoryService.copy(dirIds, destinationDirHash);
-            } else {
-                return ResponseEntity.badRequest().build();
-            }
+        if (docIds != null && !userDocumentService.copy(docIds, destinationDirHash, user)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+        if (dirIds != null && !userDirectoryService.copy(dirIds, destinationDirHash, user)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
         return ResponseEntity.ok().build();
     }

@@ -108,6 +108,13 @@ public class UserDocumentAccessService implements UserFileAccessService<UserDocu
     }
 
     @Override
+    public boolean isOwner(String fileHashName, User user) {
+        this.user = user;
+        document = userDocumentService.getByHashName(fileHashName);
+        return isOwner();
+    }
+
+    @Override
     public boolean canRead(UserDocument file, User user) {
         this.user = user;
         document = file;

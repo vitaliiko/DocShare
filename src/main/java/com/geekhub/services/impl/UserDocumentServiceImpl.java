@@ -131,6 +131,11 @@ public class UserDocumentServiceImpl implements UserDocumentService {
     }
 
     @Override
+    public UserDocument getByHashName(String hashName) {
+        return userDocumentDao.get("hashName", hashName);
+    }
+
+    @Override
     public UserDocument getByNameAndOwnerId(Long ownerId, String name) {
         User owner = userService.getById(ownerId);
         return userDocumentDao.get(owner, "name", name);
@@ -282,8 +287,13 @@ public class UserDocumentServiceImpl implements UserDocumentService {
     }
 
     @Override
-    public void replace(Long[] docIds, String destinationDirectoryHash) {
-        Arrays.stream(docIds).forEach(id -> replace(id, destinationDirectoryHash));
+    public boolean replace(Long[] docIds, String destinationDirectoryHash, User user) {
+        Set<UserDocument> documents = getByIds(Arrays.asList(docIds));
+        if (userDocumentAccessService.isOwner(documents, user)) {
+            Arrays.stream(docIds).forEach(id -> replace(id, destinationDirectoryHash));
+            return true;
+        }
+        return false;
     }
 
     @Override
@@ -322,8 +332,13 @@ public class UserDocumentServiceImpl implements UserDocumentService {
     }
 
     @Override
-    public void copy(Long[] docIds, String destinationDirectoryHash) {
-        Arrays.stream(docIds).forEach(id -> copy(id, destinationDirectoryHash));
+    public boolean copy(Long[] docIds, String destinationDirectoryHash, User user) {
+        Set<UserDocument> documents = getByIds(Arrays.asList(docIds));
+        if (userDocumentAccessService.isOwner(documents, user)) {
+            Arrays.stream(docIds).forEach(id -> copy(id, destinationDirectoryHash));
+            return true;
+        }
+        return false;
     }
 
     @Override

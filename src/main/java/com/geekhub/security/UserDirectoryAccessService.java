@@ -43,7 +43,7 @@ public class UserDirectoryAccessService implements UserFileAccessService<UserDir
     private boolean isOwner() {
         return directory != null
                 && user != null
-                && directory.getOwner().equals(user);
+                && (directory.getHashName().equals(user.getLogin()) || directory.getOwner().equals(user));
     }
 
     private boolean isReader() {
@@ -88,6 +88,13 @@ public class UserDirectoryAccessService implements UserFileAccessService<UserDir
             return true;
         }
         return false;
+    }
+
+    @Override
+    public boolean isOwner(String fileHashName, User user) {
+        this.user = user;
+        directory = userDirectoryService.getByHashName(fileHashName);
+        return isOwner();
     }
 
     @Override

@@ -24,13 +24,13 @@ public interface UserDirectoryService extends EntityService<UserDirectory, Long>
 
     void replace(Long dirId, String destinationDirectoryHash);
 
-    void replace(Long[] dirIds, String destinationDirectoryHash);
+    boolean replace(Long[] dirIds, String destinationDirectoryHash, User user);
 
     Long recover(Long removedDirId);
 
     void copy(Long dirId, String destinationDirectoryHash);
 
-    void copy(Long[] dirIds, String destinationDirectoryHash);
+    boolean copy(Long[] dirIds, String destinationDirectoryHash, User user);
 
     void recover(Long[] removedDirIds);
 

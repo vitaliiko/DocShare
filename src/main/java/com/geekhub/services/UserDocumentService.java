@@ -26,15 +26,17 @@ public interface UserDocumentService extends EntityService<UserDocument, Long> {
 
     void replace(Long docId, String destinationDirectoryHash);
 
-    void replace(Long[] docIds, String destinationDirectoryHash);
+    boolean replace(Long[] docIds, String destinationDirectoryHash, User user);
 
     void copy(Long docId, String destinationDirectoryHash);
 
-    void copy(Long[] docIds, String destinationDirectoryHash);
+    boolean copy(Long[] docIds, String destinationDirectoryHash, User user);
 
     Long recover(Long removedDocId);
 
     void recover(Long[] removedDocIds);
+
+    UserDocument getByHashName(String hashName);
 
     UserDocument getByNameAndOwnerId(Long ownerId, String name);
 
