@@ -1,5 +1,6 @@
 package com.geekhub.entities;
 
+import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 import javax.persistence.CascadeType;
@@ -16,7 +17,7 @@ import javax.persistence.Table;
 
 @Entity
 @Table(name = "friends_group")
-public class FriendsGroup {
+public class FriendsGroup implements Serializable {
 
     @Id
     @GeneratedValue

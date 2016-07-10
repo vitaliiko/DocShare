@@ -1,6 +1,8 @@
 package com.geekhub.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import java.io.Serializable;
 import java.util.Date;
 import java.util.TreeSet;
 import javax.persistence.Basic;
@@ -20,7 +22,7 @@ import java.util.Set;
 
 @Entity
 @Table
-public class User implements Comparable<User> {
+public class User implements Serializable, Comparable<User> {
 
     @Id
     @GeneratedValue

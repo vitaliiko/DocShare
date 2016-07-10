@@ -6,14 +6,13 @@ import com.geekhub.entities.Comment;
 import com.geekhub.entities.User;
 import com.geekhub.entities.UserDocument;
 import com.geekhub.entities.enums.AbilityToCommentDocument;
-import com.geekhub.exceptions.ResourceNotFoundException;
 import com.geekhub.security.UserDocumentAccessService;
 import com.geekhub.services.CommentService;
 import com.geekhub.services.UserDocumentService;
 import com.geekhub.services.UserService;
-import com.geekhub.utils.CommentUtil;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.stream.Collectors;
 import javax.servlet.http.HttpSession;
 import javax.inject.Inject;
 import org.springframework.http.HttpStatus;
@@ -44,38 +43,38 @@ public class CommentController {
     public ResponseEntity<Set<CommentDto>> getComments(@PathVariable long docId, HttpSession session) {
         User user = getUserFromSession(session);
         UserDocument document = userDocumentService.getDocumentWithComments(docId);
-        if (documentAccessService.canRead(document, user)
-                && document.getAbilityToComment() == AbilityToCommentDocument.ENABLE) {
-            Set<CommentDto> comments = new TreeSet<>();
-            document.getComments().forEach(c -> comments.add(EntityToDtoConverter.convert(c)));
-            return new ResponseEntity<>(comments, HttpStatus.OK);
+        if (!documentAccessService.canRead(document, user)
+                || document.getAbilityToComment() == AbilityToCommentDocument.DISABLE) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
         }
-        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        Set<Comment> commentSet = document.getComments();
+        Set<CommentDto> commentDtos = commentSet.stream()
+                .map(EntityToDtoConverter::convert)
+                .collect(Collectors.toCollection(TreeSet::new));
+        return ResponseEntity.ok(commentDtos);
     }
 
     @RequestMapping(value = "/documents/{docId}/comments", method = RequestMethod.POST)
-    public CommentDto addComment(@PathVariable long docId, @RequestParam String text, HttpSession session) {
+    public ResponseEntity<CommentDto> addComment(@PathVariable long docId, @RequestParam String text, HttpSession session) {
         User user = getUserFromSession(session);
         UserDocument document = userDocumentService.getById(docId);
         if (documentAccessService.canRead(document, user)
                 && document.getAbilityToComment() == AbilityToCommentDocument.ENABLE
                 && !text.isEmpty()) {
-            Comment comment = CommentUtil.createComment(text, user, document);
-            commentService.save(comment);
-            return EntityToDtoConverter.convert(comment);
+            Comment comment = commentService.create(text, user, document);
+            return ResponseEntity.ok(EntityToDtoConverter.convert(comment));
         }
-        throw new ResourceNotFoundException();
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
     }
 
     @RequestMapping(value = "/documents/{docId}/comments", method = RequestMethod.DELETE)
-    public void clearComments(@PathVariable long docId, HttpSession session) {
+    public ResponseEntity clearComments(@PathVariable long docId, HttpSession session) {
         User user = getUserFromSession(session);
         UserDocument document = userDocumentService.getDocumentWithComments(docId);
-        if (documentAccessService.isOwner(document, user)) {
-            document.getComments().clear();
-            userDocumentService.update(document);
-        } else {
-            throw new ResourceNotFoundException();
+        if (!documentAccessService.isOwner(document, user)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
+        commentService.deleteCommentsFoDocument(document);
+        return ResponseEntity.ok().build();
     }
 }

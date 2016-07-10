@@ -2,6 +2,7 @@ package com.geekhub.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import java.io.Serializable;
 import java.util.Date;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -13,7 +14,7 @@ import javax.persistence.Table;
 
 @Entity
 @Table
-public class Comment {
+public class Comment implements Serializable {
 
     @Id
     @GeneratedValue

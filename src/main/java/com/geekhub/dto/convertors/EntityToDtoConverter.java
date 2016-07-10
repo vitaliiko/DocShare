@@ -1,15 +1,9 @@
 package com.geekhub.dto.convertors;
 
-import com.geekhub.dto.CommentDto;
-import com.geekhub.dto.EventDto;
-import com.geekhub.dto.FriendsGroupDto;
+import com.geekhub.dto.*;
 
-import com.geekhub.dto.RemovedFileDto;
-import com.geekhub.dto.UserFileDto;
-import com.geekhub.dto.UserDto;
 import com.geekhub.entities.Comment;
 import com.geekhub.entities.DocumentOldVersion;
-import com.geekhub.dto.DocumentOldVersionDto;
 import com.geekhub.entities.Event;
 import com.geekhub.entities.FriendsGroup;
 import com.geekhub.entities.RemovedDirectory;

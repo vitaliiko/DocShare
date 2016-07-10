@@ -1,5 +1,6 @@
 package com.geekhub.entities;
 
+import java.io.Serializable;
 import java.util.Date;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -11,7 +12,7 @@ import javax.persistence.Table;
 
 @Entity
 @Table(name = "document_old_version")
-public class DocumentOldVersion {
+public class DocumentOldVersion implements Serializable {
 
     @Id
     @GeneratedValue
