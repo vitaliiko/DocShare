@@ -98,6 +98,13 @@ public class UserDirectoryAccessService implements UserFileAccessService<UserDir
     }
 
     @Override
+    public boolean isOwnerOfActual(UserDirectory file, User user) {
+        this.user = user;
+        this.directory = file;
+        return isOwner() && file.getDocumentStatus() == DocumentStatus.ACTUAL;
+    }
+
+    @Override
     public boolean canRead(UserDirectory file, User user) {
         this.user = user;
         directory = file;

@@ -1,5 +1,7 @@
 package com.geekhub.services;
 
+import com.geekhub.dto.SharedDto;
+import com.geekhub.dto.UserFileDto;
 import com.geekhub.entities.FriendsGroup;
 import com.geekhub.entities.RemovedDirectory;
 import com.geekhub.entities.User;
@@ -13,6 +15,8 @@ import org.springframework.stereotype.Service;
 
 @Service
 public interface UserDirectoryService extends EntityService<UserDirectory, Long> {
+
+    UserDirectory createDirectory(User owner, String parentDirHash, String dirName);
 
     Set<UserDirectory> getByIds(List<Long> dirIds);
 
@@ -55,4 +59,10 @@ public interface UserDirectoryService extends EntityService<UserDirectory, Long>
     Long getCountByFriendsGroup(FriendsGroup friendsGroup);
 
     Set<UserDirectory> searchByName(User owner, String name);
+
+    UserDirectory renameDirectory(UserDirectory directory, String newName, User owner);
+
+    UserDirectory shareDirectory(UserDirectory directory, SharedDto sharedDto, User user);
+
+    Set<UserFileDto> getDirectoryContent(String dirHashName);
 }

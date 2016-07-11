@@ -8,6 +8,7 @@ import com.geekhub.dto.UserFileDto;
 import com.geekhub.security.UserDirectoryAccessService;
 import com.geekhub.security.UserDocumentAccessService;
 import com.geekhub.services.*;
+import com.geekhub.services.enams.FileType;
 import com.geekhub.services.impl.EventSendingService;
 import com.geekhub.dto.convertors.EntityToDtoConverter;
 import com.geekhub.validators.FileValidator;
@@ -144,7 +145,7 @@ public class FilesController {
             if (documentAccessService.canRemove(documents, user)) {
                 userDocumentService.moveToTrash(docIds, userId);
                 documents.forEach(doc -> eventSendingService
-                        .sendRemoveEvent(userDocumentService, "Document", doc.getName(), doc.getId(), user));
+                        .sendRemoveEvent(userDocumentService, FileType.DOCUMENT, doc.getName(), doc.getId(), user));
             }
         }
         if (dirIds != null) {
@@ -152,7 +153,7 @@ public class FilesController {
             if (directoryAccessService.canRemove(directories, user)) {
                 userDirectoryService.moveToTrash(dirIds, userId);
                 directories.forEach(dir -> eventSendingService
-                        .sendRemoveEvent(userDirectoryService, "Directory", dir.getName(), dir.getId(), user));
+                        .sendRemoveEvent(userDirectoryService, FileType.DIRECTORY, dir.getName(), dir.getId(), user));
             }
         }
 

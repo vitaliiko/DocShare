@@ -15,6 +15,8 @@ public interface UserFileAccessService<T, R> {
 
     boolean isOwner(String fileHashName, User user);
 
+    boolean isOwnerOfActual(T file, User user);
+
     boolean canRead(T file, User user);
 
     boolean canRead(List<T> files, User user);

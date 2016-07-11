@@ -115,6 +115,13 @@ public class UserDocumentAccessService implements UserFileAccessService<UserDocu
     }
 
     @Override
+    public boolean isOwnerOfActual(UserDocument file, User user) {
+        this.user = user;
+        this.document = file;
+        return isOwner() && file.getDocumentStatus() == DocumentStatus.ACTUAL;
+    }
+
+    @Override
     public boolean canRead(UserDocument file, User user) {
         this.user = user;
         document = file;

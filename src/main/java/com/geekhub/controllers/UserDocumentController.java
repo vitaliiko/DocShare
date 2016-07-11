@@ -5,7 +5,6 @@ import com.geekhub.dto.*;
 import com.geekhub.dto.convertors.EntityToDtoConverter;
 import com.geekhub.entities.*;
 import com.geekhub.entities.enums.AbilityToCommentDocument;
-import com.geekhub.entities.enums.DocumentStatus;
 import com.geekhub.exceptions.ResourceNotFoundException;
 import com.geekhub.security.UserDirectoryAccessService;
 import com.geekhub.security.UserDocumentAccessService;
@@ -104,7 +103,7 @@ public class UserDocumentController {
         UserDirectory directory = null;
         if (parentDirectoryHash != null && !parentDirectoryHash.isEmpty()) {
             directory = userDirectoryService.getByHashName(parentDirectoryHash);
-            if (!directoryAccessService.isOwner(directory, user)) {
+            if (!directoryAccessService.isOwnerOfActual(directory, user)) {
                 throw new ResourceNotFoundException();
             }
         }
@@ -174,9 +173,8 @@ public class UserDocumentController {
     public ResponseEntity<UserFileDto> getUserDocument(@PathVariable long docId, HttpSession session) {
         User user = getUserFromSession(session);
         UserDocument document = userDocumentService.getById(docId);
-        if (documentAccessService.isOwner(document, user) && document.getDocumentStatus() == DocumentStatus.ACTUAL) {
-            UserFileDto fileDto = EntityToDtoConverter.convert(document);
-            return ResponseEntity.ok().body(fileDto);
+        if (documentAccessService.isOwnerOfActual(document, user)) {
+            return ResponseEntity.ok().body(EntityToDtoConverter.convert(document));
         }
         return ResponseEntity.badRequest().body(null);
     }
@@ -190,12 +188,11 @@ public class UserDocumentController {
         UserDocument document = userDocumentService.getById(docId);
         newDocName = newDocName + document.getExtension();
 
-        if (document.getName().equals(newDocName)) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
-        }
-
-        if (!documentAccessService.isOwner(document, user)) {
+        if (!documentAccessService.isOwnerOfActual(document, user)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+        }
+        if (document.getName().equals(newDocName)) {
+            return ResponseEntity.badRequest().body(null);
         }
 
         UserDocument existingDocument =
@@ -212,7 +209,7 @@ public class UserDocumentController {
         User user = getUserFromSession(session);
         UserDocument document = userDocumentService.getById(shared.getDocId());
 
-        if (documentAccessService.isOwner(document, user) && document.getDocumentStatus() == DocumentStatus.ACTUAL) {
+        if (documentAccessService.isOwnerOfActual(document, user)) {
             UserDocument sharedDocument = userDocumentService.shareDocument(document, shared, user);
             return ResponseEntity.ok(EntityToDtoConverter.convert(sharedDocument));
         }
@@ -224,7 +221,7 @@ public class UserDocumentController {
         ModelAndView model = new ModelAndView("history");
         User user = getUserFromSession(session);
         UserDocument document = userDocumentService.getWithOldVersions(docId);
-        if (documentAccessService.isOwner(document, user) && document.getDocumentStatus() == DocumentStatus.ACTUAL) {
+        if (documentAccessService.isOwnerOfActual(document, user)) {
             List<DocumentOldVersionDto> versions = document.getDocumentOldVersions().stream()
                     .map(EntityToDtoConverter::convert)
                     .collect(Collectors.toList());
@@ -240,7 +237,7 @@ public class UserDocumentController {
         DocumentOldVersion oldVersion = documentOldVersionService.getById(oldVersionId);
         UserDocument document = oldVersion.getUserDocument();
 
-        if (documentAccessService.isOwner(document, user)) {
+        if (documentAccessService.isOwnerOfActual(document, user)) {
             userDocumentService.recoverOldVersion(oldVersion);
             return new ModelAndView("redirect:/api/documents");
         }

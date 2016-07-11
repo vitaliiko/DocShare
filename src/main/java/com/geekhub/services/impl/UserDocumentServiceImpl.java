@@ -14,6 +14,7 @@ import com.geekhub.entities.enums.DocumentAttribute;
 import com.geekhub.entities.enums.DocumentStatus;
 import com.geekhub.security.UserDocumentAccessService;
 import com.geekhub.services.*;
+import com.geekhub.services.enams.FileType;
 import com.geekhub.utils.DocumentVersionUtil;
 import com.geekhub.utils.UserFileUtil;
 
@@ -396,7 +397,7 @@ public class UserDocumentServiceImpl implements UserDocumentService {
         String oldDocName = document.getName();
         document.setName(newDocName);
         update(document);
-        eventSendingService.sendRenameEvent(getAllReadersAndEditors(document.getId()), "document",
+        eventSendingService.sendRenameEvent(getAllReadersAndEditors(document.getId()), FileType.DOCUMENT,
                 oldDocName, newDocName, document.getId(), user);
         return document;
     }
@@ -414,11 +415,11 @@ public class UserDocumentServiceImpl implements UserDocumentService {
         Set<User> newReadersAndEditorsSet = getAllReadersAndEditors(document.getId());
         newReadersAndEditorsSet.removeAll(currentReadersAndEditors);
         eventSendingService
-                .sendShareEvent(newReadersAndEditorsSet, "document", document.getName(), document.getId(), user);
+                .sendShareEvent(newReadersAndEditorsSet, FileType.DOCUMENT, document.getName(), document.getId(), user);
 
         newReadersAndEditorsSet = getAllReadersAndEditors(document.getId());
         currentReadersAndEditors.removeAll(newReadersAndEditorsSet);
-        eventSendingService.sendProhibitAccessEvent(currentReadersAndEditors, "document", document.getName(), user);
+        eventSendingService.sendProhibitAccessEvent(currentReadersAndEditors, FileType.DOCUMENT, document.getName(), user);
 
         return document;
     }
@@ -438,7 +439,7 @@ public class UserDocumentServiceImpl implements UserDocumentService {
     public void recoverRemovedDocument(Long removedDocId, User user) {
         Long docId = recover(removedDocId);
         String docName = getById(docId).getName();
-        eventSendingService.sendRecoverEvent(this, "Document", docName, docId, user);
+        eventSendingService.sendRecoverEvent(this, FileType.DOCUMENT, docName, docId, user);
     }
 
     @Override

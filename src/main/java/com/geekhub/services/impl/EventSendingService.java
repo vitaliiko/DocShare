@@ -14,6 +14,7 @@ import com.geekhub.services.EntityService;
 import com.geekhub.services.EventService;
 import com.geekhub.services.UserDirectoryService;
 import com.geekhub.services.UserDocumentService;
+import com.geekhub.services.enams.FileType;
 import org.apache.commons.codec.digest.DigestUtils;
 import javax.inject.Inject;
 import org.springframework.stereotype.Service;
@@ -39,10 +40,10 @@ public class EventSendingService {
         eventService.save(createEvent(readers, eventText, eventLinkText, eventLinkUrl, user));
     }
 
-    public <T, S extends EntityService<T, Long>> void sendRemoveEvent(S service, String fileType, String fileName,
+    public <T, S extends EntityService<T, Long>> void sendRemoveEvent(S service, FileType fileType, String fileName,
                                                                       long fileId, User user) {
 
-        String eventText = fileType + " " + fileName + " has been removed by " + user.getFullName();
+        String eventText = fileType.name() + " " + fileName + " has been removed by " + user.getFullName();
 
         Set<User> readers = service instanceof UserDirectoryService
                 ? ((UserDirectoryService) service).getAllReaders(fileId)
@@ -50,13 +51,13 @@ public class EventSendingService {
         eventService.save(createEvent(readers, eventText, user));
     }
 
-    public <T, S extends EntityService<T, Long>> void sendRecoverEvent(S service, String fileType, String fileName,
+    public <T, S extends EntityService<T, Long>> void sendRecoverEvent(S service, FileType fileType, String fileName,
                                                                        long fileId, User user) {
 
-        String eventText = fileType + " " + fileName + " has been recovered by " + user.getFullName();
+        String eventText = fileType.name() + " " + fileName + " has been recovered by " + user.getFullName();
         String eventLinkText = null;
         String eventLinkUrl = null;
-        if (fileType.toLowerCase().equals("Document")) {
+        if (fileType == FileType.DOCUMENT) {
             eventLinkText = "Browse";
             eventLinkUrl = buildBrowseDocumentURL(fileId);
         }
@@ -68,33 +69,33 @@ public class EventSendingService {
         eventService.save(createEvent(readers, eventText, eventLinkText, eventLinkUrl, user));
     }
 
-    public void sendRenameEvent(Set<User> readers, String fileType, String fileOldName,
+    public void sendRenameEvent(Set<User> readers, FileType fileType, String fileOldName,
                                  String fileName, long fileId, User user) {
 
         String eventText = "User " + user.getFullName() + " has renamed "
-                + fileType + " " + fileOldName + " to " + fileName;
+                + fileType.name() + " " + fileOldName + " to " + fileName;
         String eventLinkText = null;
         String eventLinkUrl = null;
-        if (fileType.toLowerCase().equals("document")) {
+        if (fileType == FileType.DOCUMENT) {
             eventLinkText = "Browse";
             eventLinkUrl = buildBrowseDocumentURL(fileId);
         }
         eventService.save(createEvent(readers, eventText, eventLinkText, eventLinkUrl, user));
     }
 
-    public void sendShareEvent(Set<User> readers, String fileType, String fileName, long fileId, User user) {
-        String eventText = "User " + user.getFullName() + " has shared " + fileType + " " + fileName;
+    public void sendShareEvent(Set<User> readers, FileType fileType, String fileName, long fileId, User user) {
+        String eventText = "User " + user.getFullName() + " has shared " + fileType.name() + " " + fileName;
         String eventLinkText = null;
         String eventLinkUrl = null;
-        if (fileType.toLowerCase().equals("document")) {
+        if (fileType == FileType.DOCUMENT) {
             eventLinkText = "Browse";
             eventLinkUrl = buildBrowseDocumentURL(fileId);
         }
         eventService.save(createEvent(readers, eventText, eventLinkText, eventLinkUrl, user));
     }
 
-    public void sendProhibitAccessEvent(Set<User> readers, String fileType, String fileName, User user) {
-        String eventText = "User " + user.getFullName() + " has prohibited access to " + fileType + " " + fileName;
+    public void sendProhibitAccessEvent(Set<User> readers, FileType fileType, String fileName, User user) {
+        String eventText = "User " + user.getFullName() + " has prohibited access to " + fileType.name() + " " + fileName;
         eventService.save(createEvent(readers, eventText, user));
     }
 
