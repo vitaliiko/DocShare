@@ -9,7 +9,7 @@ import com.geekhub.entities.User;
 import com.geekhub.entities.UserDocument;
 import com.geekhub.entities.enums.DocumentAttribute;
 import com.geekhub.exceptions.UserAuthenticationException;
-import com.geekhub.exceptions.UserProfileException;
+import com.geekhub.exceptions.ValidateUserInformationException;
 import com.geekhub.security.UserProfileManager;
 import com.geekhub.services.UserDocumentService;
 import com.geekhub.services.UserService;
@@ -21,7 +21,6 @@ import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -79,7 +78,7 @@ public class MainController {
     }
 
     @RequestMapping(value = "/sign_up", method = RequestMethod.POST)
-    public ModelAndView signUp(RegistrationInfoDto registrationInfo) throws UserProfileException {
+    public ModelAndView signUp(RegistrationInfoDto registrationInfo) throws ValidateUserInformationException {
         userProfileManager.registerNewUser(registrationInfo);
         return new ModelAndView("signIn", "message", "Your account created successfully");
     }
@@ -147,12 +146,14 @@ public class MainController {
     }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    @ExceptionHandler(UserProfileException.class)
-    public ModelAndView handleUserProfileException(UserProfileException e) {
+    @ExceptionHandler(ValidateUserInformationException.class)
+    public ModelAndView handleUserProfileException(ValidateUserInformationException e) {
         ModelAndView model = new ModelAndView();
-        model.addObject("registrationInfo", e.getRegistrationInfoDto())
-                .addObject("errorMessage", e.getMessage())
+        model.addObject("errorMessage", e.getMessage())
                 .setViewName("signUp");
+        if (e.getRegistrationInfoDto() != null) {
+            model.addObject("registrationInfo", e.getRegistrationInfoDto());
+        }
         return model;
     }
 }

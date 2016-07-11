@@ -37,17 +37,6 @@
     <div class="container" style="width: 450px;" align="left">
         <h4>Set your account</h4>
 
-        <h5>Avatar</h5>
-        <img src="/profile/imageDisplay?id=${user.id}"/>
-        <form action="/api/profile/avatar" method="post" enctype="multipart/form-data">
-            <label class="col-md-3 control-lable" for="avatar">Upload an avatar</label>
-            <input type="file" name="avatar" id="avatar" class="form-control input-sm"/>
-            <br>
-            <div class="form-actions floatRight">
-                <input type="submit" value="Upload" class="btn btn-primary btn-sm">
-            </div>
-        </form>
-
         <form action="/api/profile" method="post">
             <label for="firstName">First name: </label>
             <input type="text" name="firstName" value="${user.firstName}" id="firstName"

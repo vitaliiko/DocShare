@@ -8,8 +8,11 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.TreeSet;
 
+import com.geekhub.entities.UserDocument;
 import com.geekhub.services.FriendGroupService;
+import com.geekhub.services.UserDocumentService;
 import com.geekhub.services.UserService;
+import com.geekhub.utils.UserFileUtil;
 import org.hibernate.Hibernate;
 import org.hibernate.HibernateException;
 import javax.inject.Inject;
@@ -34,6 +37,9 @@ public class UserServiceImpl implements UserService {
 
     @Inject
     private EventSendingService eventSendingService;
+
+    @Inject
+    private UserDocumentService userDocumentService;
 
     @Override
     public List<User> getAll(String orderParameter) {
@@ -65,7 +71,11 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void delete(User entity) {
+        removeFromFriends(entity);
+        List<String> filesHashNames =
+                userDocumentService.getAllByOwner(entity).stream().map(UserDocument::getName).collect(Collectors.toList());
         userDao.delete(entity);
+        UserFileUtil.removeUserFiles(filesHashNames);
     }
 
     @Override
