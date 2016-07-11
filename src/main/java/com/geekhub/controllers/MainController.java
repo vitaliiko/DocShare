@@ -1,6 +1,7 @@
 package com.geekhub.controllers;
 
-import com.geekhub.dto.RegistrationInfo;
+import com.geekhub.dto.RegistrationInfoDto;
+import com.geekhub.dto.SearchDto;
 import com.geekhub.dto.UserDto;
 import com.geekhub.dto.UserFileDto;
 import com.geekhub.dto.convertors.EntityToDtoConverter;
@@ -13,17 +14,15 @@ import com.geekhub.security.UserProfileManager;
 import com.geekhub.services.UserDocumentService;
 import com.geekhub.services.UserService;
 import com.geekhub.utils.UserFileUtil;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.TreeSet;
+import javax.annotation.PostConstruct;
 import javax.inject.Inject;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpSession;
@@ -31,8 +30,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-@Controller
-@RequestMapping("/main")
+@RestController
+@RequestMapping("/api")
 public class MainController {
 
     @Inject
@@ -44,6 +43,11 @@ public class MainController {
     @Inject
     private UserDocumentService userDocumentService;
 
+    @PostConstruct
+    public void init() {
+        UserFileUtil.createRootDir();
+    }
+
     @RequestMapping(value = "/home", method = RequestMethod.GET)
     public ModelAndView home() {
         return new ModelAndView("redirect:/api/documents");
@@ -51,13 +55,13 @@ public class MainController {
 
     @RequestMapping(value = "/sign_in", method = RequestMethod.GET)
     public ModelAndView signIn() {
-        UserFileUtil.createRootDir();
         return new ModelAndView("signIn");
     }
 
     @RequestMapping(value = "/sign_in", method = RequestMethod.POST)
-    public ModelAndView signIn(String j_username, String j_password, HttpSession session)
-            throws UserAuthenticationException {
+    public ModelAndView signIn(@RequestParam String j_username,
+                               @RequestParam String j_password,
+                               HttpSession session) throws UserAuthenticationException {
 
         ModelAndView model = new ModelAndView();
         User user;
@@ -69,39 +73,24 @@ public class MainController {
         return model;
     }
 
-    @ExceptionHandler(UserAuthenticationException.class)
-    public ModelAndView handleUserValidateException(UserAuthenticationException e) {
-        return new ModelAndView("signIn", "errorMessage", e.getMessage());
-    }
-
     @RequestMapping(value = "/sign_up", method = RequestMethod.GET)
-    public String signUp() {
-        return "signUp";
+    public ModelAndView signUp() {
+        return new ModelAndView("signUp");
     }
 
     @RequestMapping(value = "/sign_up", method = RequestMethod.POST)
-    public ModelAndView signUp(RegistrationInfo registrationInfo) {
-
-        ModelAndView model = new ModelAndView();
-        try {
-            userProfileManager.registerNewUser(registrationInfo);
-            model.setViewName("signIn");
-            model.addObject("message", "Your account created successfully");
-        } catch (UserProfileException e) {
-            model.addObject("registrationInfo", registrationInfo)
-                    .addObject("errorMessage", e.getMessage())
-                    .setViewName("signUp");
-        }
-        return model;
+    public ModelAndView signUp(RegistrationInfoDto registrationInfo) throws UserProfileException {
+        userProfileManager.registerNewUser(registrationInfo);
+        return new ModelAndView("signIn", "message", "Your account created successfully");
     }
 
-    @RequestMapping("/sign_out")
-    public String signOut(HttpSession session) {
+    @RequestMapping(value = "/sign_out", method = RequestMethod.GET)
+    public ModelAndView signOut(HttpSession session) {
         session.invalidate();
-        return "signIn";
+        return new ModelAndView("signIn");
     }
 
-    @RequestMapping(value = "/search", method = RequestMethod.GET)
+    @RequestMapping(value = "/search/page", method = RequestMethod.GET)
     public ModelAndView search(HttpSession session) {
         User user = userService.getById((Long) session.getAttribute("userId"));
 
@@ -115,51 +104,24 @@ public class MainController {
         return model;
     }
 
-    @RequestMapping(value = "/search", method = RequestMethod.POST)
-    public ModelAndView search(@RequestParam(required = false) String name,
-                               @RequestParam(required = false) String country,
-                               @RequestParam(required = false) String region,
-                               @RequestParam(required = false) String city,
-                               HttpSession session) {
-
+    @RequestMapping(value = "/search", method = RequestMethod.GET)
+    public ModelAndView search(SearchDto searchDto, HttpSession session) {
         User user = userService.getById((Long) session.getAttribute("userId"));
-
-        Map<String, String> searchingParametersMap = new HashMap<>();
-        if (!country.isEmpty()) {
-            searchingParametersMap.put("country", country);
-        }
-        if (!region.isEmpty()) {
-            searchingParametersMap.put("state", region);
-        }
-        if (!city.isEmpty()) {
-            searchingParametersMap.put("city", city);
-        }
+        Set<User> users = userService.search(searchDto);
 
         ModelAndView model = new ModelAndView();
-        Set<User> users;
-        if (searchingParametersMap.size() > 0) {
-            users = userService.search(name, searchingParametersMap);
-            users.remove(user);
-        } else if (!name.isEmpty()) {
-            users = userService.searchByName(name);
-            users.remove(user);
-        } else {
-            model.setViewName("redirect:/main/search");
-            return model;
-        }
 
         Map<UserDto, Boolean> usersMap = users.stream()
                 .collect(Collectors.toMap(EntityToDtoConverter::convert, u -> !userService.areFriends(user.getId(), u)));
-
         model.setViewName("search");
         model.addObject("usersMap", usersMap);
-        model.addObject("countOrResults", usersMap.size());
-        model.addObject("name", name);
-        searchingParametersMap.forEach(model::addObject);
+        model.addObject("countOfResults", usersMap.size());
+        model.addObject("name", searchDto.getName());
+        searchDto.toMap().forEach(model::addObject);
         return model;
     }
 
-    @RequestMapping("/userpage/{ownerId}")
+    @RequestMapping(value = "/userpage/{ownerId}", method = RequestMethod.GET)
     public ModelAndView userPage(@PathVariable Long ownerId, HttpSession session) {
         User user = userService.getById((Long) session.getAttribute("userId"));
         User owner = userService.getById(ownerId);
@@ -175,6 +137,22 @@ public class MainController {
         ModelAndView model = new ModelAndView("userPage");
         model.addObject("pageOwner", EntityToDtoConverter.convert(owner));
         model.addObject("documents", fileDtoSet);
+        return model;
+    }
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(UserAuthenticationException.class)
+    public ModelAndView handleUserValidateException(UserAuthenticationException e) {
+        return new ModelAndView("signIn", "errorMessage", e.getMessage());
+    }
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(UserProfileException.class)
+    public ModelAndView handleUserProfileException(UserProfileException e) {
+        ModelAndView model = new ModelAndView();
+        model.addObject("registrationInfo", e.getRegistrationInfoDto())
+                .addObject("errorMessage", e.getMessage())
+                .setViewName("signUp");
         return model;
     }
 }

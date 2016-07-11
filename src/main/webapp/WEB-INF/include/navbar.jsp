@@ -7,8 +7,8 @@
         </div>
         <ul class="nav navbar-nav">
             <li id="documentUpload"><a href="/api/documents">Home</a></li>
-            <li id="search"><a href="/main/search">Search Friends</a></li>
-            <li id="profile"><a href="/profile/">Profile</a></li>
+            <li id="search"><a href="/api/search/page">Search Friends</a></li>
+            <li id="profile"><a href="/api/profile/">Profile</a></li>
 
             <c:if test="${renderSettings}">
                 <li class="dropdown">
@@ -46,7 +46,7 @@
             <button type="button" id="searchButton" class="btn btn-default">Submit</button>
         </form>
         <ul class="nav navbar-nav navbar-right">
-            <li><a href="/main/sign_out">Sign Out</a></li>
+            <li><a href="/api/sign_out">Sign Out</a></li>
         </ul>
     </div>
 </nav>

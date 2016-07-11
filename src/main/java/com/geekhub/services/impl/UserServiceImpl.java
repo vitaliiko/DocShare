@@ -1,6 +1,7 @@
 package com.geekhub.services.impl;
 
 import com.geekhub.dao.UserDao;
+import com.geekhub.dto.SearchDto;
 import com.geekhub.entities.FriendsGroup;
 import com.geekhub.entities.User;
 import java.util.Arrays;
@@ -201,8 +202,9 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Set<User> search(String name, Map<String, String> searchingMap) {
-        String[] names = name.split(" ");
+    public Set<User> search(SearchDto searchDto) {
+        Map<String, String> searchingMap = searchDto.toMap();
+        String[] names = searchDto.getName().split(" ");
         Set<User> users = new TreeSet<>();
         Arrays.stream(names)
                 .filter(n -> !n.isEmpty())

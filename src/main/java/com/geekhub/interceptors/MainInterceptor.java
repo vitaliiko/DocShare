@@ -22,7 +22,7 @@ public class MainInterceptor extends HandlerInterceptorAdapter {
         if (exclusion || req.getSession().getAttribute("userId") != null) {
             return true;
         } else {
-            resp.sendRedirect("/main/sign_in");
+            resp.sendRedirect("/api/sign_in");
         }
         return false;
     }

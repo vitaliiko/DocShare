@@ -21,7 +21,6 @@ import javax.servlet.http.HttpSession;
 
 @RestController
 @RequestMapping("/api")
-@SuppressWarnings("unchecked")
 public class ProfileController {
 
     @Inject

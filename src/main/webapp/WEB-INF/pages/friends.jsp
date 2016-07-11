@@ -40,11 +40,11 @@
 
         <table id="friendsTable" class="table table-hover tbody tr:hover td info-table friend-table">
             <caption>
-                Friends <a href="/main/search" class="btn btn-primary btn-sm">Add friends</a>
+                Friends <a href="/api/search/page" class="btn btn-primary btn-sm">Add friends</a>
             </caption>
 
             <c:forEach var="friendEntry" items="${friends}">
-                <c:url var="friendPage" value="/main/userpage/${friendEntry.key.id}"/>
+                <c:url var="friendPage" value="/api/userpage/${friendEntry.key.id}"/>
                 <tr class="friend${friendEntry.key.id}">
                     <td>
                         <a href="${friendPage}" class="btn btn-link"> ${friendEntry.key} </a>

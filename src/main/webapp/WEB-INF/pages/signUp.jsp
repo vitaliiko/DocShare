@@ -19,7 +19,7 @@
     </div>
 
     <div class="container" style="width: 400px;" align="left">
-        <form class="form-signin" action="/main/sign_up" method="post">
+        <form class="form-signin" action="/api/sign_up" method="post">
             <label for="firstName">First name: </label>
             <input type="text" name="firstName" id="firstName" value="${registrationInfo.firstName}"
                    class="form-control" required="" autofocus="">

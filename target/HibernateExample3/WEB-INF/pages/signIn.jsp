@@ -28,7 +28,7 @@
 </div>
 
 <c:url value="/j_spring_security_check" var="loginUrl" />
-<c:url value="/main/sign_in" var="signInURL"/>
+<c:url value="/api/sign_in" var="signInURL"/>
 <div class="container" style="width: 300px;" align="center">
     <form class="form-signin" action="${signInURL}" method="post">
         <input type="text" name="j_username" class="form-control" placeholder="Email address" required="" autofocus="">
@@ -38,7 +38,7 @@
         <button class="btn btn-lg btn-primary btn-block signin-btn" type="submit">Sign in</button>
     </form>
 
-    <form action="/main/sign_up">
+    <form action="/api/sign_up">
         <input type="submit" class="btn btn-link" value="Sign Up">
     </form>
 </div>

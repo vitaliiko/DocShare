@@ -25,7 +25,7 @@
         <br>
     </c:if>
 
-    <form action="/main/search" method="post">
+    <form action="/api/search" method="get">
         <input type="text" name="name" value="${name}" placeholder="Search by name" class="form-control">
         <br>
         <input type="text" name="country" value="${country}" placeholder="Search by country" class="form-control">
@@ -40,12 +40,12 @@
     <br><br>
 
     <div>
-        <h5><strong>Count of results: ${countOrResults}</strong></h5>
+        <h5><strong>Count of results: ${countOfResults}</strong></h5>
         <table class="table table-hover tbody tr:hover td doc-table">
         <c:forEach var="userEntry" items="${usersMap}">
             <tr>
                 <td>
-                    <c:url var="userPage" value="/main/userpage/${userEntry.key.id}"/>
+                    <c:url var="userPage" value="/api/userpage/${userEntry.key.id}"/>
                     <a href="${userPage}" class="btn btn-link">${userEntry.key}</a>
                 </td>
                 <td>

@@ -1,5 +1,6 @@
 package com.geekhub.services;
 
+import com.geekhub.dto.SearchDto;
 import com.geekhub.entities.FriendsGroup;
 import com.geekhub.entities.User;
 import org.springframework.stereotype.Service;
@@ -41,5 +42,5 @@ public interface UserService extends EntityService<User, Long> {
 
     Set<User> searchByName(String name);
 
-    Set<User> search(String name, Map<String, String> searchingMap);
+    Set<User> search(SearchDto searchDto);
 }

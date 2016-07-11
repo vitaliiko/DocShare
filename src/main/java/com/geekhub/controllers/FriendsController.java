@@ -60,7 +60,7 @@ public class FriendsController {
     }
 
     @RequestMapping(value = "/friend-groups", method = RequestMethod.POST)
-    public ResponseEntity<FriendGroupDto> createGroup(@RequestParam CreateFriendGroupDto groupDto,
+    public ResponseEntity<FriendGroupDto> createGroup(@RequestBody CreateFriendGroupDto groupDto,
                                                       HttpSession session) {
 
         User user = getUserFromSession(session);
@@ -73,7 +73,7 @@ public class FriendsController {
     }
 
     @RequestMapping(value = "/friend-groups", method = RequestMethod.PUT)
-    public ResponseEntity<FriendGroupDto> updateGroup(@RequestParam CreateFriendGroupDto groupDto,
+    public ResponseEntity<FriendGroupDto> updateGroup(@RequestBody CreateFriendGroupDto groupDto,
                                                       HttpSession session) {
 
         User user = getUserFromSession(session);
@@ -124,7 +124,7 @@ public class FriendsController {
         if (!userService.areFriends(user.getId(), friend)) {
             eventSendingService.sendToFriendRequestEvent(user, friend);
         }
-        return new ModelAndView("redirect:/main/search");
+        return new ModelAndView("redirect:/api/search");
     }
 
     @RequestMapping(value = "/friends/{friendId}", method = RequestMethod.DELETE)

@@ -1,6 +1,6 @@
 package com.geekhub.security;
 
-import com.geekhub.dto.RegistrationInfo;
+import com.geekhub.dto.RegistrationInfoDto;
 import com.geekhub.dto.UserDto;
 import com.geekhub.entities.User;
 import com.geekhub.entities.UserDirectory;
@@ -37,12 +37,17 @@ public class UserProfileManager {
     @Inject
     private UserDirectoryService userDirectoryService;
 
-    public void registerNewUser(RegistrationInfo regInfo) throws UserProfileException {
-        if (regInfo != null) {
-            validateNames(regInfo.getFirstName(), regInfo.getLastName(), regInfo.getLogin());
-            validatePassword(regInfo.getPassword(), regInfo.getConfirmationPassword());
-            checkExistingUserWithSuchLogin(regInfo.getLogin());
-            createNewUser(regInfo);
+    public void registerNewUser(RegistrationInfoDto regInfo) throws UserProfileException {
+        try {
+            if (regInfo != null) {
+                validateNames(regInfo.getFirstName(), regInfo.getLastName(), regInfo.getLogin());
+                validatePassword(regInfo.getPassword(), regInfo.getConfirmationPassword());
+                checkExistingUserWithSuchLogin(regInfo.getLogin());
+                createNewUser(regInfo);
+            }
+        } catch (UserProfileException e) {
+            e.setRegistrationInfoDto(regInfo);
+            throw e;
         }
     }
 
@@ -82,7 +87,7 @@ public class UserProfileManager {
         }
     }
 
-    private void createNewUser(RegistrationInfo regInfo) {
+    private void createNewUser(RegistrationInfoDto regInfo) {
         User user = new User();
         user.setFirstName(regInfo.getFirstName());
         user.setLastName(regInfo.getLastName());
