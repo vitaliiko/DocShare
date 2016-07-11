@@ -7,7 +7,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.TreeSet;
 
-import com.geekhub.services.FriendsGroupService;
+import com.geekhub.services.FriendGroupService;
 import com.geekhub.services.UserService;
 import org.hibernate.Hibernate;
 import org.hibernate.HibernateException;
@@ -21,8 +21,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import javax.inject.Inject;
-
 @Service
 @Transactional
 public class UserServiceImpl implements UserService {
@@ -31,7 +29,10 @@ public class UserServiceImpl implements UserService {
     private UserDao userDao;
 
     @Inject
-    private FriendsGroupService friendsGroupService;
+    private FriendGroupService friendGroupService;
+
+    @Inject
+    private EventSendingService eventSendingService;
 
     @Override
     public List<User> getAll(String orderParameter) {
@@ -86,7 +87,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public FriendsGroup getFriendsGroupByName(Long ownerId, String groupName) {
         User owner = userDao.getById(ownerId);
-        return friendsGroupService.getFriendsGroups(owner, "name", groupName).get(0);
+        return friendGroupService.getFriendsGroups(owner, "name", groupName).get(0);
     }
 
     @Override
@@ -104,7 +105,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public List<FriendsGroup> getGroupsByOwnerAndFriend(Long ownerId, User friend) {
         User owner = userDao.getById(ownerId);
-        return friendsGroupService.getByOwnerAndFriend(owner, friend);
+        return friendGroupService.getByOwnerAndFriend(owner, friend);
     }
 
     @Override
@@ -123,7 +124,10 @@ public class UserServiceImpl implements UserService {
         User user = userDao.getById(userId);
         User friend = userDao.getById(friendId);
         user.getFriends().add(friend);
+        friend.getFriends().add(user);
         userDao.update(user);
+        userDao.update(friend);
+        eventSendingService.sendAddToFriendEvent(user, friend);
     }
 
     @Override
@@ -133,15 +137,16 @@ public class UserServiceImpl implements UserService {
 
         deleteFriend(user, friend);
         deleteFriend(friend, user);
+        eventSendingService.sendDeleteFromFriendEvent(user, friend);
     }
 
     private void deleteFriend(User user, User friend) {
         user.getFriends().remove(friend);
         userDao.update(user);
-        List<FriendsGroup> groups = friendsGroupService.getByOwnerAndFriend(user, friend);
+        List<FriendsGroup> groups = friendGroupService.getByOwnerAndFriend(user, friend);
         groups.forEach(g -> {
             g.getFriends().remove(friend);
-            friendsGroupService.update(g);
+            friendGroupService.update(g);
         });
     }
 
@@ -165,9 +170,9 @@ public class UserServiceImpl implements UserService {
         users.forEach(u -> u.getFriends().remove(friend));
         update(users);
 
-        List<FriendsGroup> groups = friendsGroupService.getByFriend(friend);
+        List<FriendsGroup> groups = friendGroupService.getByFriend(friend);
         groups.forEach(g -> g.getFriends().remove(friend));
-        friendsGroupService.update(groups);
+        friendGroupService.update(groups);
     }
 
     @Override

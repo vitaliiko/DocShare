@@ -78,7 +78,7 @@ public class UserDocumentController {
         User user = getUserFromSession(session);
 
         List<FriendsGroup> friendsGroups = userService.getAllFriendsGroups(user.getId());
-        Set<FriendsGroupDto> friendsGroupDtoSet = friendsGroups.stream()
+        Set<FriendGroupDto> friendGroupDtoSet = friendsGroups.stream()
                 .map(EntityToDtoConverter::convert)
                 .collect(Collectors.toSet());
 
@@ -88,7 +88,7 @@ public class UserDocumentController {
                 .collect(Collectors.toSet());
 
         model.addObject("tableNames", FileControllersUtil.ACCESS_ATTRIBUTES);
-        model.addObject("friendsGroups", friendsGroupDtoSet);
+        model.addObject("friendsGroups", friendGroupDtoSet);
         model.addObject("friends", friendsDtoSet);
         model.addObject("userLogin", user.getLogin());
         return model;

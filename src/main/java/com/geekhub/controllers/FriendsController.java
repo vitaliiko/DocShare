@@ -1,17 +1,19 @@
 package com.geekhub.controllers;
 
+import com.geekhub.dto.CreateFriendGroupDto;
 import com.geekhub.dto.UserDto;
 import com.geekhub.entities.Event;
 import com.geekhub.entities.FriendsGroup;
 import com.geekhub.entities.User;
-import com.geekhub.dto.FriendsGroupDto;
+import com.geekhub.dto.FriendGroupDto;
 import com.geekhub.services.impl.EventSendingService;
 import com.geekhub.services.EventService;
-import com.geekhub.services.FriendsGroupService;
+import com.geekhub.services.FriendGroupService;
 import com.geekhub.services.UserService;
 import com.geekhub.dto.convertors.EntityToDtoConverter;
 
 import java.util.*;
+import java.util.stream.Collectors;
 import javax.inject.Inject;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,14 +24,13 @@ import javax.servlet.http.HttpSession;
 
 @RestController
 @RequestMapping("/api")
-@SuppressWarnings("unchecked")
 public class FriendsController {
 
     @Inject
     private UserService userService;
 
     @Inject
-    private FriendsGroupService friendsGroupService;
+    private FriendGroupService friendGroupService;
 
     @Inject
     private EventService eventService;
@@ -45,16 +46,12 @@ public class FriendsController {
     public ModelAndView getFriendsWithGroups(HttpSession session) {
         Long userId = (Long) session.getAttribute("userId");
 
-        List<FriendsGroupDto> groupDtoList = new ArrayList<>();
-        userService.getAllFriendsGroups(userId).forEach(g -> groupDtoList.add(EntityToDtoConverter.convert(g)));
+        List<FriendsGroup> friendsGroups = userService.getAllFriendsGroups(userId);
+        List<FriendGroupDto> groupDtoList =
+                friendsGroups.stream().map(EntityToDtoConverter::convert).collect(Collectors.toList());
 
         Map<User, List<FriendsGroup>> friendsMap = userService.getFriendsGroupsMap(userId);
-        Map<UserDto, List<FriendsGroupDto>> friendsDtoMap = new TreeMap<>();
-        for (User user : friendsMap.keySet()) {
-            List<FriendsGroupDto> userGroupDtoList = new ArrayList<>();
-            friendsMap.get(user).forEach(g -> userGroupDtoList.add(EntityToDtoConverter.convert(g)));
-            friendsDtoMap.put(EntityToDtoConverter.convert(user), userGroupDtoList);
-        }
+        Map<UserDto, List<FriendGroupDto>> friendsDtoMap = EntityToDtoConverter.convertMap(friendsMap);
 
         ModelAndView model = new ModelAndView("friends");
         model.addObject("friends", friendsDtoMap);
@@ -63,69 +60,43 @@ public class FriendsController {
     }
 
     @RequestMapping(value = "/friend-groups", method = RequestMethod.POST)
-    public ResponseEntity<Long> createGroup(@RequestParam(value = "friends[]", required = false) Long[] friends,
-                                            @RequestParam String groupName,
-                                            HttpSession session) {
+    public ResponseEntity<FriendGroupDto> createGroup(@RequestParam CreateFriendGroupDto groupDto,
+                                                      HttpSession session) {
 
-        long groupId = 0;
         User user = getUserFromSession(session);
-        if (groupName == null || groupName.isEmpty()) {
-            return new ResponseEntity<>(groupId, HttpStatus.BAD_REQUEST);
+        FriendsGroup group = friendGroupService.getByOwnerAndName(user, groupDto.getGroupName());
+        if (group != null) {
+            return ResponseEntity.badRequest().body(null);
         }
-        FriendsGroup group = friendsGroupService.getByOwnerAndName(user, groupName);
-        if (group == null) {
-            group = new FriendsGroup();
-            group.setOwner(user);
-            group.setName(groupName);
-            if (friends != null) {
-                group.setFriends(userService.getSetByIds(friends));
-            }
-            groupId = friendsGroupService.save(group);
-            return new ResponseEntity<>(groupId, HttpStatus.OK);
-        }
-        return new ResponseEntity<>(groupId, HttpStatus.BAD_REQUEST);
+        FriendsGroup newGroup = friendGroupService.create(user, groupDto);
+        return ResponseEntity.ok(EntityToDtoConverter.convert(newGroup));
     }
 
-    @RequestMapping(value = "/friend-groups/{groupId}", method = RequestMethod.PUT)
-    public ResponseEntity<Void> updateGroup(@PathVariable Long groupId,
-                                            @RequestParam(value = "friends[]", required = false) Long[] friendIds,
-                                            @RequestParam String groupName,
-                                            HttpSession session) {
+    @RequestMapping(value = "/friend-groups", method = RequestMethod.PUT)
+    public ResponseEntity<FriendGroupDto> updateGroup(@RequestParam CreateFriendGroupDto groupDto,
+                                                      HttpSession session) {
 
         User user = getUserFromSession(session);
-        FriendsGroup group = friendsGroupService.getById(groupId);
+        FriendsGroup group = friendGroupService.getById(groupDto.getId());
 
-        if (group == null) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        String groupName = groupDto.getGroupName();
+        if (group == null
+                || !group.getOwner().equals(user)
+                || (!group.getName().equals(groupName) && friendGroupService.getByOwnerAndName(user, groupName) != null)) {
+            return ResponseEntity.badRequest().body(null);
         }
-        if (!group.getName().equals(groupName) && friendsGroupService.getByOwnerAndName(user, groupName) != null) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-        if (group.getOwner().equals(user)) {
-            Set<User> membersSet = new HashSet<>(group.getFriends());
-            Set<User> newMembersSet = null;
-            group.setName(groupName);
-            if (friendIds != null) {
-                newMembersSet = userService.getSetByIds(friendIds);
-                group.setFriends(newMembersSet);
-            } else {
-                group.getFriends().clear();
-            }
-            friendsGroupService.update(group);
-
-            eventSendingService.sendShareEvent(user, group, membersSet, newMembersSet);
-        }
-        return null;
+        FriendsGroup updatedGroup = friendGroupService.update(user, groupDto);
+        return ResponseEntity.ok(EntityToDtoConverter.convert(updatedGroup));
     }
 
     @RequestMapping(value = "/friend-groups/{groupId}", method = RequestMethod.GET)
-    public ResponseEntity<FriendsGroupDto> getGroup(@PathVariable Long groupId, HttpSession session) {
+    public ResponseEntity<FriendGroupDto> getGroup(@PathVariable Long groupId, HttpSession session) {
         User user = getUserFromSession(session);
-        FriendsGroup group = friendsGroupService.getById(groupId);
+        FriendsGroup group = friendGroupService.getById(groupId);
         if (group != null && group.getOwner().equals(user)) {
-            return new ResponseEntity<>(EntityToDtoConverter.convert(group), HttpStatus.OK);
+            return ResponseEntity.ok(EntityToDtoConverter.convert(group));
         }
-        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
     }
 
     @RequestMapping(value = "/friends/{friendId}/add/{eventHash}", method = RequestMethod.POST)
@@ -139,12 +110,8 @@ public class FriendsController {
         Event event = eventService.getByHashName(eventHash);
         if (event.getSenderId() == friendId
                 && Objects.equals(event.getRecipient().getId(), user.getId())
-                && !userService.getFriends(user.getId()).contains(friend)) {
-            Long userId = (Long) session.getAttribute("userId");
-            userService.addFriend(userId, friendId);
-            userService.addFriend(friendId, userId);
-
-            eventSendingService.sendAddToFriendEvent(user, friend);
+                && !userService.areFriends(user.getId(), friend)) {
+            userService.addFriend(user.getId(), friendId);
         }
         return new ModelAndView("redirect:/api/friends/");
     }
@@ -161,29 +128,27 @@ public class FriendsController {
     }
 
     @RequestMapping(value = "/friends/{friendId}", method = RequestMethod.DELETE)
-    public void deleteFriend(@PathVariable Long friendId, HttpSession session) {
+    public ResponseEntity deleteFriend(@PathVariable Long friendId, HttpSession session) {
         User user = userService.getById((Long) session.getAttribute("userId"));
-        User friend = userService.getById(friendId);
-        userService.deleteFriend(user.getId(), friend.getId());
-
-        eventSendingService.sendDeleteFromFriendEvent(user, friend);
+        userService.deleteFriend(user.getId(), friendId);
+        return ResponseEntity.ok().build();
     }
 
     @RequestMapping(value = "/friend-groups/{groupId}", method = RequestMethod.DELETE)
-    public void deleteGroup(@PathVariable Long groupId, HttpSession session) {
+    public ResponseEntity deleteGroup(@PathVariable Long groupId, HttpSession session) {
         User user = getUserFromSession(session);
-        FriendsGroup group = friendsGroupService.getById(groupId);
+        FriendsGroup group = friendGroupService.getById(groupId);
         if (group != null && group.getOwner().equals(user)) {
-            friendsGroupService.delete(group);
+            friendGroupService.delete(group);
         }
+        return ResponseEntity.ok().build();
     }
 
     @RequestMapping(value = "/friend-groups", method = RequestMethod.GET)
-    public Set<FriendsGroupDto> getFriendsGroups(HttpSession session) {
+    public ResponseEntity<Set<FriendGroupDto>> getFriendsGroups(HttpSession session) {
         User user = getUserFromSession(session);
-        List<FriendsGroup> groups = friendsGroupService.getListByOwner(user);
-        Set<FriendsGroupDto> groupDtos = new TreeSet<>();
-        groups.forEach(g -> groupDtos.add(EntityToDtoConverter.convert(g)));
-        return groupDtos;
+        List<FriendsGroup> groups = friendGroupService.getListByOwner(user);
+        Set<FriendGroupDto> groupDtos = groups.stream().map(EntityToDtoConverter::convert).collect(Collectors.toSet());
+        return ResponseEntity.ok(groupDtos);
     }
 }

@@ -12,7 +12,7 @@ import com.geekhub.entities.enums.DocumentAttribute;
 import com.geekhub.entities.enums.DocumentStatus;
 import com.geekhub.exceptions.ResourceNotFoundException;
 import com.geekhub.security.UserDirectoryAccessService;
-import com.geekhub.services.FriendsGroupService;
+import com.geekhub.services.FriendGroupService;
 import com.geekhub.services.UserDirectoryService;
 import com.geekhub.services.UserDocumentService;
 import com.geekhub.services.UserService;
@@ -48,7 +48,7 @@ public class UserDirectoryController {
     private UserDirectoryService userDirectoryService;
 
     @Inject
-    private FriendsGroupService friendsGroupService;
+    private FriendGroupService friendGroupService;
 
     @Inject
     private UserDirectoryAccessService directoryAccessService;
@@ -145,7 +145,7 @@ public class UserDirectoryController {
             Set<User> readers =
                     FileControllersUtil.createEntitySet(shared.getReaders(), userService);
             Set<FriendsGroup> readerGroups =
-                    FileControllersUtil.createEntitySet(shared.getReadersGroups(), friendsGroupService);
+                    FileControllersUtil.createEntitySet(shared.getReadersGroups(), friendGroupService);
 
             directory.setReaders(readers);
             directory.setReadersGroups(readerGroups);

@@ -14,8 +14,8 @@ import com.geekhub.entities.UserDocument;
 import com.geekhub.entities.enums.EventStatus;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class EntityToDtoConverter {
 
@@ -74,8 +74,8 @@ public class EntityToDtoConverter {
         return userDto;
     }
 
-    public static FriendsGroupDto convert(FriendsGroup group) {
-        FriendsGroupDto groupDto = new FriendsGroupDto();
+    public static FriendGroupDto convert(FriendsGroup group) {
+        FriendGroupDto groupDto = new FriendGroupDto();
         groupDto.setId(group.getId());
         groupDto.setName(group.getName());
 
@@ -122,5 +122,15 @@ public class EntityToDtoConverter {
         removedFileDto.setRemoverName(removerName);
         removedFileDto.setType("dir");
         return removedFileDto;
+    }
+
+    public static Map<UserDto, List<FriendGroupDto>> convertMap(Map<User, List<FriendsGroup>> friendsMap) {
+        Map<UserDto, List<FriendGroupDto>> friendsDtoMap = new TreeMap<>();
+        for (User user : friendsMap.keySet()) {
+            List<FriendGroupDto> userGroupDtoList =
+                    friendsMap.get(user).stream().map(EntityToDtoConverter::convert).collect(Collectors.toList());
+            friendsDtoMap.put(EntityToDtoConverter.convert(user), userGroupDtoList);
+        }
+        return friendsDtoMap;
     }
 }

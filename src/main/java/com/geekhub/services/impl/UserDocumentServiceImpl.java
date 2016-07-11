@@ -46,7 +46,7 @@ public class UserDocumentServiceImpl implements UserDocumentService {
     private RemovedDocumentService removedDocumentService;
 
     @Inject
-    private FriendsGroupService friendsGroupService;
+    private FriendGroupService friendGroupService;
 
     @Inject
     private UserDirectoryService userDirectoryService;
@@ -210,7 +210,7 @@ public class UserDocumentServiceImpl implements UserDocumentService {
         documents.addAll(userDocumentDao.getByReader(reader));
         documents.addAll(userDocumentDao.getByEditor(reader));
 
-        List<FriendsGroup> groups = friendsGroupService.getByFriend(reader);
+        List<FriendsGroup> groups = friendGroupService.getByFriend(reader);
         groups.forEach(g -> {
             documents.addAll(userDocumentDao.getByReadersGroup(g));
             documents.addAll(userDocumentDao.getByEditorsGroup(g));
@@ -407,8 +407,8 @@ public class UserDocumentServiceImpl implements UserDocumentService {
         document.setDocumentAttribute(DocumentAttribute.valueOf(shared.getAccess().toUpperCase()));
         document.setReaders(FileControllersUtil.createEntitySet(shared.getReaders(), userService));
         document.setEditors(FileControllersUtil.createEntitySet(shared.getEditors(), userService));
-        document.setReadersGroups(FileControllersUtil.createEntitySet(shared.getReadersGroups(), friendsGroupService));
-        document.setEditorsGroups(FileControllersUtil.createEntitySet(shared.getEditorsGroups(), friendsGroupService));
+        document.setReadersGroups(FileControllersUtil.createEntitySet(shared.getReadersGroups(), friendGroupService));
+        document.setEditorsGroups(FileControllersUtil.createEntitySet(shared.getEditorsGroups(), friendGroupService));
         update(document);
 
         Set<User> newReadersAndEditorsSet = getAllReadersAndEditors(document.getId());
