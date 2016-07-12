@@ -4,6 +4,7 @@ import com.geekhub.dao.FriendsGroupDao;
 import com.geekhub.dto.CreateFriendGroupDto;
 import com.geekhub.entities.FriendsGroup;
 import com.geekhub.entities.User;
+import com.geekhub.services.EventSendingService;
 import com.geekhub.services.FriendGroupService;
 import com.geekhub.services.UserService;
 import org.hibernate.Hibernate;

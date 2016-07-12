@@ -9,7 +9,7 @@ import com.geekhub.security.UserDirectoryAccessService;
 import com.geekhub.security.UserDocumentAccessService;
 import com.geekhub.services.*;
 import com.geekhub.services.enams.FileType;
-import com.geekhub.services.impl.EventSendingService;
+import com.geekhub.services.EventSendingService;
 import com.geekhub.dto.convertors.EntityToDtoConverter;
 import com.geekhub.validators.FileValidator;
 

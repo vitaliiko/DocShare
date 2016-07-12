@@ -9,6 +9,7 @@ import java.util.HashSet;
 import java.util.TreeSet;
 
 import com.geekhub.entities.UserDocument;
+import com.geekhub.services.EventSendingService;
 import com.geekhub.services.FriendGroupService;
 import com.geekhub.services.UserDocumentService;
 import com.geekhub.services.UserService;

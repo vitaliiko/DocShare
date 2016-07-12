@@ -2,7 +2,6 @@ package com.geekhub.services.impl;
 
 import com.geekhub.dao.DocumentStatisticDao;
 import com.geekhub.entities.DocumentStatistic;
-import com.geekhub.entities.DocumentStatistic;
 import com.geekhub.services.DocumentStatisticService;
 import javax.inject.Inject;
 import org.springframework.stereotype.Service;

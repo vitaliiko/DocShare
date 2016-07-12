@@ -10,17 +10,16 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
-import com.geekhub.services.EntityService;
-import com.geekhub.services.EventService;
-import com.geekhub.services.UserDirectoryService;
-import com.geekhub.services.UserDocumentService;
+import com.geekhub.services.*;
 import com.geekhub.services.enams.FileType;
 import org.apache.commons.codec.digest.DigestUtils;
 import javax.inject.Inject;
+import javax.persistence.OneToOne;
+
 import org.springframework.stereotype.Service;
 
 @Service
-public class EventSendingService {
+public class EventSendingServiceImpl implements EventSendingService {
 
     @Inject
     private EventService eventService;
@@ -31,6 +30,7 @@ public class EventSendingService {
     @Inject
     private UserDirectoryService userDirectoryService;
 
+    @OneToOne
     public void sendUpdateEvent(UserDocument document, User user) {
         String eventText = "Document " + document.getName() + " has been updated by " + user.getFullName();
         String eventLinkText = "Browse";
@@ -40,6 +40,7 @@ public class EventSendingService {
         eventService.save(createEvent(readers, eventText, eventLinkText, eventLinkUrl, user));
     }
 
+    @OneToOne
     public <T, S extends EntityService<T, Long>> void sendRemoveEvent(S service, FileType fileType, String fileName,
                                                                       long fileId, User user) {
 
@@ -51,6 +52,7 @@ public class EventSendingService {
         eventService.save(createEvent(readers, eventText, user));
     }
 
+    @OneToOne
     public <T, S extends EntityService<T, Long>> void sendRecoverEvent(S service, FileType fileType, String fileName,
                                                                        long fileId, User user) {
 
@@ -69,6 +71,7 @@ public class EventSendingService {
         eventService.save(createEvent(readers, eventText, eventLinkText, eventLinkUrl, user));
     }
 
+    @OneToOne
     public void sendRenameEvent(Set<User> readers, FileType fileType, String fileOldName,
                                  String fileName, long fileId, User user) {
 
@@ -83,6 +86,7 @@ public class EventSendingService {
         eventService.save(createEvent(readers, eventText, eventLinkText, eventLinkUrl, user));
     }
 
+    @OneToOne
     public void sendShareEvent(Set<User> readers, FileType fileType, String fileName, long fileId, User user) {
         String eventText = "User " + user.getFullName() + " has shared " + fileType.name() + " " + fileName;
         String eventLinkText = null;
@@ -94,11 +98,13 @@ public class EventSendingService {
         eventService.save(createEvent(readers, eventText, eventLinkText, eventLinkUrl, user));
     }
 
+    @OneToOne
     public void sendProhibitAccessEvent(Set<User> readers, FileType fileType, String fileName, User user) {
         String eventText = "User " + user.getFullName() + " has prohibited access to " + fileType.name() + " " + fileName;
         eventService.save(createEvent(readers, eventText, user));
     }
 
+    @OneToOne
     public void sendToFriendRequestEvent(User user, User friend) {
         String eventHashName = createHashName();
         String eventText = "User " + user.getFullName() + " wants to add you as a friend.";
@@ -108,6 +114,7 @@ public class EventSendingService {
         eventService.save(createEvent(eventHashName, friend, eventText, eventLinkText, eventLinkUrl, user));
     }
 
+    @OneToOne
     public void sendAddToFriendEvent(User user, User friend) {
         String eventText = "User " + user.getFullName() + " confirm your request.";
         String eventLinkText = "Friends";
@@ -116,11 +123,13 @@ public class EventSendingService {
         eventService.save(createEvent(friend, eventText, eventLinkText, eventLinkUrl, user));
     }
 
+    @OneToOne
     public void sendDeleteFromFriendEvent(User user, User friend) {
         String eventText = "User " + user.getFullName() + " removed you from friends.";
         eventService.save(createEvent(friend, eventText, user));
     }
 
+    @OneToOne
     public void sendShareEvent(User user, FriendsGroup group, Set<User> membersSet, Set<User> newMembersSet) {
         long documentsCount = Long.valueOf(userDocumentService.getCountByFriendsGroup(group));
         long directoriesCount = userDirectoryService.getCountByFriendsGroup(group);

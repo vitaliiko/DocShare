@@ -6,7 +6,7 @@ import com.geekhub.entities.Event;
 import com.geekhub.entities.FriendsGroup;
 import com.geekhub.entities.User;
 import com.geekhub.dto.FriendGroupDto;
-import com.geekhub.services.impl.EventSendingService;
+import com.geekhub.services.EventSendingService;
 import com.geekhub.services.EventService;
 import com.geekhub.services.FriendGroupService;
 import com.geekhub.services.UserService;

@@ -2,6 +2,8 @@ package com.geekhub.services.impl;
 
 import com.geekhub.dao.CommentDao;
 import com.geekhub.entities.Comment;
+
+import java.util.Calendar;
 import java.util.List;
 
 import com.geekhub.entities.User;
@@ -10,7 +12,6 @@ import com.geekhub.services.CommentService;
 import javax.inject.Inject;
 
 import com.geekhub.services.UserDocumentService;
-import com.geekhub.utils.CommentUtil;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -61,7 +62,11 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     public Comment create(String text, User user, UserDocument document) {
-        Comment comment = CommentUtil.createComment(text, user, document);
+        Comment comment = new Comment();
+        comment.setText(text);
+        comment.setOwner(user);
+        comment.setUserDocument(document);
+        comment.setDate(Calendar.getInstance().getTime());
         save(comment);
         return comment;
     }
