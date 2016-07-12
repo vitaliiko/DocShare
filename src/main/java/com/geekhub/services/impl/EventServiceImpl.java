@@ -1,6 +1,6 @@
 package com.geekhub.services.impl;
 
-import com.geekhub.dao.EventDao;
+import com.geekhub.repositories.EventRepository;
 import com.geekhub.entities.Event;
 import com.geekhub.entities.User;
 import com.geekhub.entities.enums.EventStatus;
@@ -18,7 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class EventServiceImpl implements EventService {
 
     @Inject
-    private EventDao eventDao;
+    private EventRepository eventDao;
 
     @Inject
     private UserService userService;

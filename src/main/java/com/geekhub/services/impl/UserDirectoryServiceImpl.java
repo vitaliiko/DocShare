@@ -1,7 +1,7 @@
 package com.geekhub.services.impl;
 
 import com.geekhub.controllers.utils.FileControllersUtil;
-import com.geekhub.dao.UserDirectoryDao;
+import com.geekhub.repositories.UserDirectoryRepository;
 import com.geekhub.dto.SharedDto;
 import com.geekhub.dto.UserFileDto;
 import com.geekhub.dto.convertors.EntityToDtoConverter;
@@ -32,7 +32,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class UserDirectoryServiceImpl implements UserDirectoryService {
 
     @Inject
-    private UserDirectoryDao userDirectoryDao;
+    private UserDirectoryRepository userDirectoryDao;
 
     @Inject
     private UserService userService;

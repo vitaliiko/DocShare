@@ -1,6 +1,6 @@
 package com.geekhub.services.impl;
 
-import com.geekhub.dao.DocumentStatisticDao;
+import com.geekhub.repositories.DocumentStatisticRepository;
 import com.geekhub.entities.DocumentStatistic;
 import com.geekhub.services.DocumentStatisticService;
 import javax.inject.Inject;
@@ -14,7 +14,7 @@ import java.util.List;
 public class DocumentStatisticServiceImpl implements DocumentStatisticService {
     
     @Inject
-    private DocumentStatisticDao documentStatisticDao;
+    private DocumentStatisticRepository documentStatisticDao;
     
     @Override
     public DocumentStatistic getByUserDocumentId(Long documentId) {

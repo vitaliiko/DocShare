@@ -1,4 +1,4 @@
-package com.geekhub.dao;
+package com.geekhub.repositories;
 
 import com.geekhub.entities.Event;
 import com.geekhub.entities.User;
@@ -11,7 +11,7 @@ import javax.inject.Inject;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class EventDao implements EntityDao<Event, Long> {
+public class EventRepository implements EntityRepository<Event, Long> {
 
     @Inject
     private SessionFactory sessionFactory;

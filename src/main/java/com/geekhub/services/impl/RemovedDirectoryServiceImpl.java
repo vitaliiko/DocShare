@@ -1,6 +1,6 @@
 package com.geekhub.services.impl;
 
-import com.geekhub.dao.RemovedDirectoryDao;
+import com.geekhub.repositories.RemovedDirectoryRepository;
 import com.geekhub.entities.RemovedDirectory;
 import com.geekhub.entities.User;
 import com.geekhub.entities.UserDirectory;
@@ -19,7 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class RemovedDirectoryServiceImpl implements RemovedDirectoryService {
 
     @Inject
-    private RemovedDirectoryDao removedDirectoryDao;
+    private RemovedDirectoryRepository removedDirectoryDao;
 
     @Inject
     private UserService userService;

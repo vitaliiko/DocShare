@@ -1,4 +1,4 @@
-package com.geekhub.dao;
+package com.geekhub.repositories;
 
 import com.geekhub.entities.FriendsGroup;
 import com.geekhub.entities.User;
@@ -16,7 +16,7 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 @SuppressWarnings("unchecked")
-public class UserDirectoryDao implements EntityDao<UserDirectory, Long> {
+public class UserDirectoryRepository implements EntityRepository<UserDirectory, Long> {
 
     @Inject
     private SessionFactory sessionFactory;

@@ -1,4 +1,4 @@
-package com.geekhub.dao;
+package com.geekhub.repositories;
 
 import com.geekhub.entities.Comment;
 import java.util.List;
@@ -10,7 +10,7 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 @SuppressWarnings("unchecked")
-public class CommentDao implements EntityDao<Comment, Long> {
+public class CommentRepository implements EntityRepository<Comment, Long> {
 
     @Inject
     private SessionFactory sessionFactory;

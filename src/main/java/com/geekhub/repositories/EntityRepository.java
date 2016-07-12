@@ -1,9 +1,9 @@
-package com.geekhub.dao;
+package com.geekhub.repositories;
 
 import java.io.Serializable;
 import java.util.List;
 
-public interface EntityDao<T, PK extends Serializable> {
+public interface EntityRepository<T, PK extends Serializable> {
 
     List<T> getAll(String orderParameter);
 

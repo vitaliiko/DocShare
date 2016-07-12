@@ -1,6 +1,6 @@
 package com.geekhub.services.impl;
 
-import com.geekhub.dao.CommentDao;
+import com.geekhub.repositories.CommentRepository;
 import com.geekhub.entities.Comment;
 
 import java.util.Calendar;
@@ -20,7 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class CommentServiceImpl implements CommentService {
 
     @Inject
-    private CommentDao commentDao;
+    private CommentRepository commentDao;
 
     @Inject
     private UserDocumentService userDocumentService;

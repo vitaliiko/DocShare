@@ -1,6 +1,6 @@
 package com.geekhub.services.impl;
 
-import com.geekhub.dao.UserDao;
+import com.geekhub.repositories.UserRepository;
 import com.geekhub.dto.SearchDto;
 import com.geekhub.entities.FriendsGroup;
 import com.geekhub.entities.User;
@@ -31,7 +31,7 @@ import java.util.stream.Collectors;
 public class UserServiceImpl implements UserService {
 
     @Inject
-    private UserDao userDao;
+    private UserRepository userDao;
 
     @Inject
     private FriendGroupService friendGroupService;

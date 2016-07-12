@@ -1,6 +1,6 @@
-package com.geekhub.dao;
+package com.geekhub.repositories;
 
-import com.geekhub.entities.UserToDocumentRelation;
+import com.geekhub.entities.FriendGroupToDirectoryRelation;
 import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
@@ -11,15 +11,15 @@ import java.util.List;
 
 @Repository
 @SuppressWarnings("unchecked")
-public class UserToDocumentRelationDao implements EntityDao<UserToDocumentRelation, Long> {
+public class FriendGroupToDirectoryRelationRepository implements EntityRepository<FriendGroupToDirectoryRelation, Long> {
 
     @Inject
     private SessionFactory sessionFactory;
 
-    private Class<UserToDocumentRelation> clazz = UserToDocumentRelation.class;
+    private Class<FriendGroupToDirectoryRelation> clazz = FriendGroupToDirectoryRelation.class;
 
     @Override
-    public List<UserToDocumentRelation> getAll(String orderParameter) {
+    public List<FriendGroupToDirectoryRelation> getAll(String orderParameter) {
         return sessionFactory.getCurrentSession()
                 .createCriteria(clazz)
                 .addOrder(Order.asc(orderParameter))
@@ -27,46 +27,46 @@ public class UserToDocumentRelationDao implements EntityDao<UserToDocumentRelati
     }
 
     @Override
-    public UserToDocumentRelation getById(Long id) {
-        return (UserToDocumentRelation) sessionFactory.getCurrentSession().get(clazz, id);
+    public FriendGroupToDirectoryRelation getById(Long id) {
+        return (FriendGroupToDirectoryRelation) sessionFactory.getCurrentSession().get(clazz, id);
     }
 
     @Override
-    public UserToDocumentRelation get(String propertyName, Object value) {
-        return (UserToDocumentRelation) sessionFactory.getCurrentSession()
+    public FriendGroupToDirectoryRelation get(String propertyName, Object value) {
+        return (FriendGroupToDirectoryRelation) sessionFactory.getCurrentSession()
                 .createCriteria(clazz)
                 .add(Restrictions.eq(propertyName, value))
                 .uniqueResult();
     }
 
     @Override
-    public Long save(UserToDocumentRelation entity) {
+    public Long save(FriendGroupToDirectoryRelation entity) {
         return (Long) sessionFactory.getCurrentSession().save(entity);
     }
 
     @Override
-    public void update(UserToDocumentRelation entity) {
+    public void update(FriendGroupToDirectoryRelation entity) {
         sessionFactory.getCurrentSession().update(entity);
     }
 
     @Override
-    public void saveOrUpdate(UserToDocumentRelation entity) {
+    public void saveOrUpdate(FriendGroupToDirectoryRelation entity) {
         sessionFactory.getCurrentSession().saveOrUpdate(entity);
     }
 
     @Override
-    public void delete(UserToDocumentRelation entity) {
+    public void delete(FriendGroupToDirectoryRelation entity) {
         sessionFactory.getCurrentSession().delete(entity);
     }
 
     @Override
     public void deleteById(Long entityId) {
-        UserToDocumentRelation userDocument = getById(entityId);
+        FriendGroupToDirectoryRelation userDocument = getById(entityId);
         sessionFactory.getCurrentSession().delete(userDocument);
     }
 
     @Override
-    public List<UserToDocumentRelation> getList(String propertyName, Object value) {
+    public List<FriendGroupToDirectoryRelation> getList(String propertyName, Object value) {
         return sessionFactory.getCurrentSession()
                 .createCriteria(clazz)
                 .add(Restrictions.eq(propertyName, value))

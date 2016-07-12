@@ -1,4 +1,4 @@
-package com.geekhub.dao;
+package com.geekhub.repositories;
 
 import com.geekhub.entities.DocumentOldVersion;
 import java.util.List;
@@ -10,7 +10,7 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 @SuppressWarnings("unchecked")
-public class DocumentOldVersionDao implements EntityDao<DocumentOldVersion, Long> {
+public class DocumentOldVersionRepository implements EntityRepository<DocumentOldVersion, Long> {
 
     @Inject
     private SessionFactory sessionFactory;

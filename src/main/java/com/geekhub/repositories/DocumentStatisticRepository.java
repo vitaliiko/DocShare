@@ -1,4 +1,4 @@
-package com.geekhub.dao;
+package com.geekhub.repositories;
 
 import com.geekhub.entities.DocumentStatistic;
 import org.hibernate.SessionFactory;
@@ -11,7 +11,7 @@ import java.util.List;
 
 @Repository
 @SuppressWarnings("unchecked")
-public class DocumentStatisticDao implements EntityDao<DocumentStatistic, Long> {
+public class DocumentStatisticRepository implements EntityRepository<DocumentStatistic, Long> {
 
     @Inject
     private SessionFactory sessionFactory;

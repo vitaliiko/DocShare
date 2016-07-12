@@ -1,4 +1,4 @@
-package com.geekhub.dao;
+package com.geekhub.repositories;
 
 import com.geekhub.entities.RemovedDirectory;
 import java.util.List;
@@ -10,7 +10,7 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 @SuppressWarnings("unchecked")
-public class RemovedDirectoryDao implements EntityDao<RemovedDirectory, Long> {
+public class RemovedDirectoryRepository implements EntityRepository<RemovedDirectory, Long> {
 
     @Inject
     private SessionFactory sessionFactory;

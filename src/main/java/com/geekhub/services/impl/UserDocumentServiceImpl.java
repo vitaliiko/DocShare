@@ -1,7 +1,7 @@
 package com.geekhub.services.impl;
 
 import com.geekhub.controllers.utils.FileControllersUtil;
-import com.geekhub.dao.UserDocumentDao;
+import com.geekhub.repositories.UserDocumentRepository;
 import com.geekhub.dto.SharedDto;
 import com.geekhub.entities.DocumentOldVersion;
 import com.geekhub.entities.FriendsGroup;
@@ -38,7 +38,7 @@ import java.util.List;
 public class UserDocumentServiceImpl implements UserDocumentService {
 
     @Inject
-    private UserDocumentDao userDocumentDao;
+    private UserDocumentRepository userDocumentDao;
 
     @Inject
     private UserService userService;

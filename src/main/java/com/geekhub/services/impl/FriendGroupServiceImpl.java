@@ -1,6 +1,6 @@
 package com.geekhub.services.impl;
 
-import com.geekhub.dao.FriendsGroupDao;
+import com.geekhub.repositories.FriendsGroupRepository;
 import com.geekhub.dto.CreateFriendGroupDto;
 import com.geekhub.entities.FriendsGroup;
 import com.geekhub.entities.User;
@@ -21,7 +21,7 @@ import java.util.Set;
 public class FriendGroupServiceImpl implements FriendGroupService {
 
     @Inject
-    private FriendsGroupDao friendsGroupDao;
+    private FriendsGroupRepository friendsGroupDao;
 
     @Inject
     private UserService userService;

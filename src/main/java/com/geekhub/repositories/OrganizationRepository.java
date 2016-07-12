@@ -1,4 +1,4 @@
-package com.geekhub.dao;
+package com.geekhub.repositories;
 
 import com.geekhub.entities.Organization;
 import com.geekhub.entities.User;
@@ -10,7 +10,7 @@ import javax.inject.Inject;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class OrganizationDao implements EntityDao<Organization, Long> {
+public class OrganizationRepository implements EntityRepository<Organization, Long> {
     
     @Inject
     private SessionFactory sessionFactory;

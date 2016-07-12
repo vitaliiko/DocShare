@@ -1,4 +1,4 @@
-package com.geekhub.dao;
+package com.geekhub.repositories;
 
 import com.geekhub.entities.User;
 import java.util.Map;
@@ -14,7 +14,7 @@ import java.util.List;
 
 @Repository
 @SuppressWarnings("unchecked")
-public class UserDao implements EntityDao<User, Long> {
+public class UserRepository implements EntityRepository<User, Long> {
 
     @Inject
     private SessionFactory sessionFactory;

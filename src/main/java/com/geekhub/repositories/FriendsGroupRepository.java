@@ -1,4 +1,4 @@
-package com.geekhub.dao;
+package com.geekhub.repositories;
 
 import com.geekhub.entities.FriendsGroup;
 import com.geekhub.entities.User;
@@ -12,7 +12,7 @@ import java.util.List;
 
 @Repository
 @SuppressWarnings("unchecked")
-public class FriendsGroupDao implements EntityDao<FriendsGroup, Long> {
+public class FriendsGroupRepository implements EntityRepository<FriendsGroup, Long> {
 
     @Inject
     private SessionFactory sessionFactory;

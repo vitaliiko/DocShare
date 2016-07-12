@@ -1,4 +1,4 @@
-package com.geekhub.dao;
+package com.geekhub.repositories;
 
 import com.geekhub.entities.UserToDirectoryRelation;
 import org.hibernate.SessionFactory;
@@ -11,7 +11,7 @@ import java.util.List;
 
 @Repository
 @SuppressWarnings("unchecked")
-public class UserToDirectoryRelationDao implements EntityDao<UserToDirectoryRelation, Long> {
+public class UserToDirectoryRelationRepository implements EntityRepository<UserToDirectoryRelation, Long> {
 
     @Inject
     private SessionFactory sessionFactory;

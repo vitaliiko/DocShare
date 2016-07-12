@@ -1,11 +1,11 @@
-package com.geekhub.dao;
+package com.geekhub.repositories;
 
 import com.geekhub.entities.FriendsGroup;
 import com.geekhub.entities.User;
 import com.geekhub.entities.UserDocument;
 import com.geekhub.entities.enums.DocumentStatus;
 import java.util.Map;
-import org.hibernate.Hibernate;
+
 import org.hibernate.SessionFactory;
 import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Order;
@@ -18,7 +18,7 @@ import java.util.List;
 
 @Repository
 @SuppressWarnings("unchecked")
-public class UserDocumentDao implements EntityDao<UserDocument, Long> {
+public class UserDocumentRepository implements EntityRepository<UserDocument, Long> {
 
     @Inject
     private SessionFactory sessionFactory;

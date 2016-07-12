@@ -1,4 +1,4 @@
-package com.geekhub.dao;
+package com.geekhub.repositories;
 
 import com.geekhub.entities.RemovedDocument;
 import com.geekhub.entities.User;
@@ -11,7 +11,7 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 @SuppressWarnings("unchecked")
-public class RemovedDocumentDao implements EntityDao<RemovedDocument, Long> {
+public class RemovedDocumentRepository implements EntityRepository<RemovedDocument, Long> {
 
     @Inject
     private SessionFactory sessionFactory;

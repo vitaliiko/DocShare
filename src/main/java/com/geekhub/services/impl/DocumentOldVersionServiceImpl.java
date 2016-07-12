@@ -1,6 +1,6 @@
 package com.geekhub.services.impl;
 
-import com.geekhub.dao.DocumentOldVersionDao;
+import com.geekhub.repositories.DocumentOldVersionRepository;
 import com.geekhub.entities.DocumentOldVersion;
 import com.geekhub.entities.UserDocument;
 import java.util.List;
@@ -16,7 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class DocumentOldVersionServiceImpl implements DocumentOldVersionService {
 
     @Inject
-    private DocumentOldVersionDao documentOldVersionDao;
+    private DocumentOldVersionRepository documentOldVersionDao;
 
     @Override
     public List<DocumentOldVersion> getAll(String orderParameter) {

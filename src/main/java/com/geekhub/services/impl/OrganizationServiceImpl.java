@@ -1,6 +1,6 @@
 package com.geekhub.services.impl;
 
-import com.geekhub.dao.OrganizationDao;
+import com.geekhub.repositories.OrganizationRepository;
 import com.geekhub.entities.Organization;
 import com.geekhub.entities.User;
 import java.util.List;
@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service;
 public class OrganizationServiceImpl implements OrganizationService {
 
     @Inject
-    private OrganizationDao organizationDao;
+    private OrganizationRepository organizationDao;
 
     @Override
     public List<Organization> getAll(String orderParameter) {

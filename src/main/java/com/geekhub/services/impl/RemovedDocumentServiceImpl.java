@@ -1,6 +1,6 @@
 package com.geekhub.services.impl;
 
-import com.geekhub.dao.RemovedDocumentDao;
+import com.geekhub.repositories.RemovedDocumentRepository;
 import com.geekhub.entities.RemovedDocument;
 import com.geekhub.entities.User;
 import com.geekhub.entities.UserDocument;
@@ -19,7 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class RemovedDocumentServiceImpl implements RemovedDocumentService {
 
     @Inject
-    private RemovedDocumentDao removedDocumentDao;
+    private RemovedDocumentRepository removedDocumentDao;
 
     @Inject
     private UserService userService;
