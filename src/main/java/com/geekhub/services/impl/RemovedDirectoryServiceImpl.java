@@ -19,54 +19,54 @@ import org.springframework.transaction.annotation.Transactional;
 public class RemovedDirectoryServiceImpl implements RemovedDirectoryService {
 
     @Inject
-    private RemovedDirectoryRepository removedDirectoryDao;
+    private RemovedDirectoryRepository removedDirectoryRepository;
 
     @Inject
     private UserService userService;
 
     @Override
     public List<RemovedDirectory> getAll(String orderParameter) {
-        return removedDirectoryDao.getAll(orderParameter);
+        return removedDirectoryRepository.getAll(orderParameter);
     }
 
     @Override
     public RemovedDirectory getById(Long id) {
-        return removedDirectoryDao.getById(id);
+        return removedDirectoryRepository.getById(id);
     }
 
     @Override
     public RemovedDirectory get(String propertyName, Object value) {
-        return removedDirectoryDao.get(propertyName, value);
+        return removedDirectoryRepository.get(propertyName, value);
     }
 
     @Override
     public Long save(RemovedDirectory entity) {
-        return removedDirectoryDao.save(entity);
+        return removedDirectoryRepository.save(entity);
     }
 
     @Override
     public void update(RemovedDirectory entity) {
-        removedDirectoryDao.update(entity);
+        removedDirectoryRepository.update(entity);
     }
 
     @Override
     public void delete(RemovedDirectory entity) {
-        removedDirectoryDao.delete(entity);
+        removedDirectoryRepository.delete(entity);
     }
 
     @Override
     public void deleteById(Long entityId) {
-        removedDirectoryDao.deleteById(entityId);
+        removedDirectoryRepository.deleteById(entityId);
     }
 
     @Override
     public Set<RemovedDirectory> getAllByOwnerId(Long ownerId) {
         User owner = userService.getById(ownerId);
-        return new HashSet<>(removedDirectoryDao.getList("owner", owner));
+        return new HashSet<>(removedDirectoryRepository.getList("owner", owner));
     }
 
     @Override
     public RemovedDirectory getByUserDirectory(UserDirectory directory) {
-        return removedDirectoryDao.get("userDirectory", directory);
+        return removedDirectoryRepository.get("userDirectory", directory);
     }
 }

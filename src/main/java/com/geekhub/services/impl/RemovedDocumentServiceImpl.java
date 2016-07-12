@@ -19,59 +19,59 @@ import org.springframework.transaction.annotation.Transactional;
 public class RemovedDocumentServiceImpl implements RemovedDocumentService {
 
     @Inject
-    private RemovedDocumentRepository removedDocumentDao;
+    private RemovedDocumentRepository removedDocumentRepository;
 
     @Inject
     private UserService userService;
 
     @Override
     public List<RemovedDocument> getAll(String orderParameter) {
-        return removedDocumentDao.getAll(orderParameter);
+        return removedDocumentRepository.getAll(orderParameter);
     }
 
     @Override
     public RemovedDocument getById(Long id) {
-        return removedDocumentDao.getById(id);
+        return removedDocumentRepository.getById(id);
     }
 
     @Override
     public RemovedDocument get(String propertyName, Object value) {
-        return removedDocumentDao.get(propertyName, value);
+        return removedDocumentRepository.get(propertyName, value);
     }
 
     @Override
     public Long save(RemovedDocument entity) {
-        return removedDocumentDao.save(entity);
+        return removedDocumentRepository.save(entity);
     }
 
     @Override
     public void update(RemovedDocument entity) {
-        removedDocumentDao.update(entity);
+        removedDocumentRepository.update(entity);
     }
 
     @Override
     public void delete(RemovedDocument entity) {
-        removedDocumentDao.delete(entity);
+        removedDocumentRepository.delete(entity);
     }
 
     @Override
     public void deleteById(Long entityId) {
-        removedDocumentDao.deleteById(entityId);
+        removedDocumentRepository.deleteById(entityId);
     }
 
     @Override
     public Set<RemovedDocument> getAllByOwnerId(Long ownerId) {
         User owner = userService.getById(ownerId);
-        return new HashSet<>(removedDocumentDao.getList("owner", owner));
+        return new HashSet<>(removedDocumentRepository.getList("owner", owner));
     }
 
     @Override
     public RemovedDocument getByUserDocument(UserDocument document) {
-        return removedDocumentDao.get(document.getOwner(), "userDocument", document);
+        return removedDocumentRepository.get(document.getOwner(), "userDocument", document);
     }
 
     @Override
     public RemovedDocument getByUserDocumentHashName(String userDocumentHashName) {
-        return removedDocumentDao.getByUserDocumentHashName(userDocumentHashName);
+        return removedDocumentRepository.getByUserDocumentHashName(userDocumentHashName);
     }
 }

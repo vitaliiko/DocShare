@@ -13,55 +13,55 @@ import org.springframework.stereotype.Service;
 public class OrganizationServiceImpl implements OrganizationService {
 
     @Inject
-    private OrganizationRepository organizationDao;
+    private OrganizationRepository organizationRepository;
 
     @Override
     public List<Organization> getAll(String orderParameter) {
-        return organizationDao.getAll(orderParameter);
+        return organizationRepository.getAll(orderParameter);
     }
 
     @Override
     public Organization getById(Long id) {
-        return organizationDao.getById(id);
+        return organizationRepository.getById(id);
     }
 
     @Override
     public Organization get(String propertyName, Object value) {
-        return organizationDao.get(propertyName, value);
+        return organizationRepository.get(propertyName, value);
     }
 
     @Override
     public Long save(Organization entity) {
-        return organizationDao.save(entity);
+        return organizationRepository.save(entity);
     }
 
     @Override
     public void update(Organization entity) {
-        organizationDao.update(entity);
+        organizationRepository.update(entity);
     }
 
     @Override
     public void delete(Organization entity) {
-        organizationDao.delete(entity);
+        organizationRepository.delete(entity);
     }
 
     @Override
     public void deleteById(Long entityId) {
-        organizationDao.deleteById(entityId);
+        organizationRepository.deleteById(entityId);
     }
 
     @Override
     public Organization getByCreatorAndName(User creator, String organizationName) {
-        return organizationDao.get(creator, "name", organizationName);
+        return organizationRepository.get(creator, "name", organizationName);
     }
 
     @Override
     public List<Organization> getByCreator(User creator) {
-        return organizationDao.getList("creator", creator);
+        return organizationRepository.getList("creator", creator);
     }
 
     @Override
     public List<Organization> getByMember(User member) {
-        return organizationDao.getByMember(member);
+        return organizationRepository.getByMember(member);
     }
 }
