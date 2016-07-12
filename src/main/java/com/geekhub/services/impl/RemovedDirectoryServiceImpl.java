@@ -19,54 +19,54 @@ import org.springframework.transaction.annotation.Transactional;
 public class RemovedDirectoryServiceImpl implements RemovedDirectoryService {
 
     @Inject
-    private RemovedDirectoryRepository removedDirectoryRepository;
+    private RemovedDirectoryRepository repository;
 
     @Inject
     private UserService userService;
 
     @Override
     public List<RemovedDirectory> getAll(String orderParameter) {
-        return removedDirectoryRepository.getAll(orderParameter);
+        return repository.getAll(orderParameter);
     }
 
     @Override
     public RemovedDirectory getById(Long id) {
-        return removedDirectoryRepository.getById(id);
+        return repository.getById(id);
     }
 
     @Override
     public RemovedDirectory get(String propertyName, Object value) {
-        return removedDirectoryRepository.get(propertyName, value);
+        return repository.get(propertyName, value);
     }
 
     @Override
     public Long save(RemovedDirectory entity) {
-        return removedDirectoryRepository.save(entity);
+        return repository.save(entity);
     }
 
     @Override
     public void update(RemovedDirectory entity) {
-        removedDirectoryRepository.update(entity);
+        repository.update(entity);
     }
 
     @Override
     public void delete(RemovedDirectory entity) {
-        removedDirectoryRepository.delete(entity);
+        repository.delete(entity);
     }
 
     @Override
     public void deleteById(Long entityId) {
-        removedDirectoryRepository.deleteById(entityId);
+        repository.deleteById(entityId);
     }
 
     @Override
     public Set<RemovedDirectory> getAllByOwnerId(Long ownerId) {
         User owner = userService.getById(ownerId);
-        return new HashSet<>(removedDirectoryRepository.getList("owner", owner));
+        return new HashSet<>(repository.getList("owner", owner));
     }
 
     @Override
     public RemovedDirectory getByUserDirectory(UserDirectory directory) {
-        return removedDirectoryRepository.get("userDirectory", directory);
+        return repository.get("userDirectory", directory);
     }
 }

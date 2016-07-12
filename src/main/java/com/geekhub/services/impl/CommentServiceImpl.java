@@ -20,44 +20,44 @@ import org.springframework.transaction.annotation.Transactional;
 public class CommentServiceImpl implements CommentService {
 
     @Inject
-    private CommentRepository commentRepository;
+    private CommentRepository repository;
 
     @Inject
     private UserDocumentService userDocumentService;
 
     @Override
     public List<Comment> getAll(String orderParameter) {
-        return commentRepository.getAll(orderParameter);
+        return repository.getAll(orderParameter);
     }
 
     @Override
     public Comment getById(Long id) {
-        return commentRepository.getById(id);
+        return repository.getById(id);
     }
 
     @Override
     public Comment get(String propertyName, Object value) {
-        return commentRepository.get(propertyName, value);
+        return repository.get(propertyName, value);
     }
 
     @Override
     public Long save(Comment entity) {
-        return commentRepository.save(entity);
+        return repository.save(entity);
     }
 
     @Override
     public void update(Comment entity) {
-        commentRepository.update(entity);
+        repository.update(entity);
     }
 
     @Override
     public void delete(Comment entity) {
-        commentRepository.delete(entity);
+        repository.delete(entity);
     }
 
     @Override
     public void deleteById(Long entityId) {
-        commentRepository.deleteById(entityId);
+        repository.deleteById(entityId);
     }
 
     @Override

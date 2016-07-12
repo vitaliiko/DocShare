@@ -13,55 +13,55 @@ import org.springframework.stereotype.Service;
 public class OrganizationServiceImpl implements OrganizationService {
 
     @Inject
-    private OrganizationRepository organizationRepository;
+    private OrganizationRepository repository;
 
     @Override
     public List<Organization> getAll(String orderParameter) {
-        return organizationRepository.getAll(orderParameter);
+        return repository.getAll(orderParameter);
     }
 
     @Override
     public Organization getById(Long id) {
-        return organizationRepository.getById(id);
+        return repository.getById(id);
     }
 
     @Override
     public Organization get(String propertyName, Object value) {
-        return organizationRepository.get(propertyName, value);
+        return repository.get(propertyName, value);
     }
 
     @Override
     public Long save(Organization entity) {
-        return organizationRepository.save(entity);
+        return repository.save(entity);
     }
 
     @Override
     public void update(Organization entity) {
-        organizationRepository.update(entity);
+        repository.update(entity);
     }
 
     @Override
     public void delete(Organization entity) {
-        organizationRepository.delete(entity);
+        repository.delete(entity);
     }
 
     @Override
     public void deleteById(Long entityId) {
-        organizationRepository.deleteById(entityId);
+        repository.deleteById(entityId);
     }
 
     @Override
     public Organization getByCreatorAndName(User creator, String organizationName) {
-        return organizationRepository.get(creator, "name", organizationName);
+        return repository.get(creator, "name", organizationName);
     }
 
     @Override
     public List<Organization> getByCreator(User creator) {
-        return organizationRepository.getList("creator", creator);
+        return repository.getList("creator", creator);
     }
 
     @Override
     public List<Organization> getByMember(User member) {
-        return organizationRepository.getByMember(member);
+        return repository.getByMember(member);
     }
 }

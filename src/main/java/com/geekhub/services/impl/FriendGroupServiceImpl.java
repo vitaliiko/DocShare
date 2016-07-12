@@ -21,7 +21,7 @@ import java.util.Set;
 public class FriendGroupServiceImpl implements FriendGroupService {
 
     @Inject
-    private FriendsGroupRepository friendsGroupRepository;
+    private FriendsGroupRepository repository;
 
     @Inject
     private UserService userService;
@@ -31,37 +31,37 @@ public class FriendGroupServiceImpl implements FriendGroupService {
 
     @Override
     public List<FriendsGroup> getAll(String orderParameter) {
-        return friendsGroupRepository.getAll(orderParameter);
+        return repository.getAll(orderParameter);
     }
 
     @Override
     public FriendsGroup getById(Long id) {
-        return friendsGroupRepository.getById(id);
+        return repository.getById(id);
     }
 
     @Override
     public FriendsGroup get(String propertyName, Object value) {
-        return friendsGroupRepository.get(propertyName, value);
+        return repository.get(propertyName, value);
     }
 
     @Override
     public Long save(FriendsGroup entity) {
-        return friendsGroupRepository.save(entity);
+        return repository.save(entity);
     }
 
     @Override
     public void update(FriendsGroup entity) {
-        friendsGroupRepository.update(entity);
+        repository.update(entity);
     }
 
     @Override
     public void delete(FriendsGroup entity) {
-        friendsGroupRepository.delete(entity);
+        repository.delete(entity);
     }
 
     @Override
     public void deleteById(Long entityId) {
-        friendsGroupRepository.deleteById(entityId);
+        repository.deleteById(entityId);
     }
 
     @Override
@@ -96,10 +96,10 @@ public class FriendGroupServiceImpl implements FriendGroupService {
 
     @Override
     public boolean addFriend(Long groupId, Long friendId) {
-        FriendsGroup group = friendsGroupRepository.getById(friendId);
+        FriendsGroup group = repository.getById(friendId);
         User user = userService.getById(friendId);
         if (group.getFriends().add(user)) {
-            friendsGroupRepository.update(group);
+            repository.update(group);
             return true;
         }
         return false;
@@ -107,7 +107,7 @@ public class FriendGroupServiceImpl implements FriendGroupService {
 
     @Override
     public FriendsGroup getByName(String groupName) {
-        return friendsGroupRepository.get("name", groupName);
+        return repository.get("name", groupName);
     }
 
     @Override
@@ -118,17 +118,17 @@ public class FriendGroupServiceImpl implements FriendGroupService {
 
     @Override
     public List<FriendsGroup> getFriendsGroups(User owner, String propertyName, Object value) {
-        return friendsGroupRepository.getFriendsGroups(owner, propertyName, value);
+        return repository.getFriendsGroups(owner, propertyName, value);
     }
 
     @Override
     public List<FriendsGroup> getByOwnerAndFriend(User owner, User friend) {
-        return friendsGroupRepository.getByOwnerAndFriend(owner, friend);
+        return repository.getByOwnerAndFriend(owner, friend);
     }
 
     @Override
     public List<FriendsGroup> getByFriend(User friend) {
-        return friendsGroupRepository.getByFriend(friend);
+        return repository.getByFriend(friend);
     }
 
     @Override
@@ -138,11 +138,11 @@ public class FriendGroupServiceImpl implements FriendGroupService {
 
     @Override
     public FriendsGroup getByOwnerAndName(User owner, String name) {
-        return friendsGroupRepository.get(owner, "name", name);
+        return repository.get(owner, "name", name);
     }
 
     @Override
     public List<FriendsGroup> getListByOwner(User owner) {
-        return friendsGroupRepository.getList("owner", owner);
+        return repository.getList("owner", owner);
     }
 }

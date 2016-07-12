@@ -32,7 +32,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class UserDirectoryServiceImpl implements UserDirectoryService {
 
     @Inject
-    private UserDirectoryRepository userDirectoryRepository;
+    private UserDirectoryRepository repository;
 
     @Inject
     private UserService userService;
@@ -57,53 +57,53 @@ public class UserDirectoryServiceImpl implements UserDirectoryService {
 
     @Override
     public List<UserDirectory> getAll(String orderParameter) {
-        return userDirectoryRepository.getAll(orderParameter);
+        return repository.getAll(orderParameter);
     }
 
     @Override
     public UserDirectory getById(Long id) {
-        return userDirectoryRepository.getById(id);
+        return repository.getById(id);
     }
 
     @Override
     public UserDirectory get(String propertyName, Object value) {
-        return userDirectoryRepository.get(propertyName, value);
+        return repository.get(propertyName, value);
     }
 
     @Override
     public Long save(UserDirectory entity) {
-        return userDirectoryRepository.save(entity);
+        return repository.save(entity);
     }
 
     @Override
     public void update(UserDirectory entity) {
-        userDirectoryRepository.update(entity);
+        repository.update(entity);
     }
 
     @Override
     public void delete(UserDirectory entity) {
-        userDirectoryRepository.delete(entity);
+        repository.delete(entity);
     }
 
     @Override
     public void deleteById(Long entityId) {
-        userDirectoryRepository.deleteById(entityId);
+        repository.deleteById(entityId);
     }
 
     @Override
     public List<UserDirectory> getAllByOwnerId(Long ownerId) {
         User owner = userService.getById(ownerId);
-        return userDirectoryRepository.getList("owner", owner);
+        return repository.getList("owner", owner);
     }
 
     @Override
     public void moveToTrash(Long docId, Long removerId) {
-        UserDirectory directory = userDirectoryRepository.getById(docId);
+        UserDirectory directory = repository.getById(docId);
         RemovedDirectory removedDirectory = UserFileUtil.wrapUserDirectoryInRemoved(directory, removerId);
         removedDirectoryService.save(removedDirectory);
 
         setRemovedStatus(directory);
-        userDirectoryRepository.update(directory);
+        repository.update(directory);
     }
 
     private void setRemovedStatus(UserDirectory directory) {
@@ -130,7 +130,7 @@ public class UserDirectoryServiceImpl implements UserDirectoryService {
         removedDirectoryService.delete(removedDocument);
 
         setActualStatus(directory);
-        userDirectoryRepository.update(directory);
+        repository.update(directory);
 
         eventSendingService.sendRecoverEvent(this, FileType.DIRECTORY, directory.getName(), directory.getId(), directory.getOwner());
         return directory.getId();
@@ -160,18 +160,18 @@ public class UserDirectoryServiceImpl implements UserDirectoryService {
     @Override
     public UserDirectory getByNameAndOwnerId(Long ownerId, String name) {
         User owner = userService.getById(ownerId);
-        return userDirectoryRepository.get(owner, "name", name);
+        return repository.get(owner, "name", name);
     }
 
     @Override
     public UserDirectory getByFullNameAndOwner(User owner, String parentDirectoryHash, String name) {
         Map<String, Object> propertiesMap = UserFileUtil.createPropertiesMap(owner, parentDirectoryHash, name);
-        return userDirectoryRepository.get(propertiesMap);
+        return repository.get(propertiesMap);
     }
 
     @Override
     public List<UserDirectory> getByParentDirectoryHash(String parentDirectoryHash) {
-        return userDirectoryRepository.getList("parentDirectoryHash", parentDirectoryHash);
+        return repository.getList("parentDirectoryHash", parentDirectoryHash);
     }
 
     @Override
@@ -179,12 +179,12 @@ public class UserDirectoryServiceImpl implements UserDirectoryService {
         Map<String, Object> propertiesMap = new HashMap<>();
         propertiesMap.put("parentDirectoryHash", parentDirectoryHash);
         propertiesMap.put("documentStatus", status);
-        return userDirectoryRepository.getList(propertiesMap);
+        return repository.getList(propertiesMap);
     }
 
     @Override
     public UserDirectory getByHashName(String hashName) {
-        return userDirectoryRepository.get("hashName", hashName);
+        return repository.get("hashName", hashName);
     }
 
     @Override
@@ -202,7 +202,7 @@ public class UserDirectoryServiceImpl implements UserDirectoryService {
 
     @Override
     public Set<UserDirectory> getByIds(List<Long> dirIds) {
-        return new HashSet<>(userDirectoryRepository.getAll("id", dirIds));
+        return new HashSet<>(repository.getAll("id", dirIds));
     }
 
     @Override
@@ -230,28 +230,28 @@ public class UserDirectoryServiceImpl implements UserDirectoryService {
 
     @Override
     public Set<UserDirectory> getActualByOwner(User owner) {
-        return new HashSet<>(userDirectoryRepository.getList(owner, "documentAttribute", DocumentStatus.ACTUAL));
+        return new HashSet<>(repository.getList(owner, "documentAttribute", DocumentStatus.ACTUAL));
     }
 
     @Override
     public Long getCountByFriendsGroup(FriendsGroup friendsGroup) {
-        return userDirectoryRepository.getCountByReadersGroup(friendsGroup);
+        return repository.getCountByReadersGroup(friendsGroup);
     }
 
     @Override
     public void replace(Long dirId, String destinationDirectoryHash) {
-        UserDirectory directory = userDirectoryRepository.getById(dirId);
+        UserDirectory directory = repository.getById(dirId);
         String dirName = directory.getName();
         String dirLocation = getLocation(directory) + dirName;
         String destinationDirLocation = getDestinationDirectoryLocation(directory, destinationDirectoryHash);
 
         if (!destinationDirLocation.startsWith(dirLocation)) {
             if (getByFullNameAndOwner(directory.getOwner(), destinationDirectoryHash, dirName) != null) {
-                int matchesCount = userDirectoryRepository.getLike(destinationDirectoryHash, dirName).size();
+                int matchesCount = repository.getLike(destinationDirectoryHash, dirName).size();
                 directory.setName(dirName + " (" + (matchesCount + 1) + ")");
             }
             directory.setParentDirectoryHash(destinationDirectoryHash);
-            userDirectoryRepository.update(directory);
+            repository.update(directory);
         }
     }
 
@@ -269,7 +269,7 @@ public class UserDirectoryServiceImpl implements UserDirectoryService {
     public Set<UserDirectory> searchByName(User owner, String name) {
         String[] names = name.split(" ");
         Set<UserDirectory> directories = new TreeSet<>();
-        Arrays.stream(names).forEach(n -> directories.addAll(userDirectoryRepository.search(owner, "name", n)));
+        Arrays.stream(names).forEach(n -> directories.addAll(repository.search(owner, "name", n)));
         return directories;
     }
 
@@ -338,7 +338,7 @@ public class UserDirectoryServiceImpl implements UserDirectoryService {
 
     @Override
     public void copy(Long dirId, String destinationDirectoryHash) {
-        UserDirectory directory = userDirectoryRepository.getById(dirId);
+        UserDirectory directory = repository.getById(dirId);
         UserDirectory copy = UserFileUtil.copyDirectory(directory);
         String copyName = directory.getName();
         String copyLocation = getLocation(directory) + copyName;
@@ -346,13 +346,13 @@ public class UserDirectoryServiceImpl implements UserDirectoryService {
 
         if (!destinationDirLocation.startsWith(copyLocation)) {
             if (getByFullNameAndOwner(directory.getOwner(), destinationDirectoryHash, copyName) != null) {
-                int matchesCount = userDirectoryRepository.getLike(destinationDirectoryHash, copyName).size();
+                int matchesCount = repository.getLike(destinationDirectoryHash, copyName).size();
                 copy.setName(copyName + " (" + (matchesCount + 1) + ")");
             }
 
             copy.setParentDirectoryHash(destinationDirectoryHash);
             copy.setHashName(UserFileUtil.createHashName());
-            userDirectoryRepository.save(copy);
+            repository.save(copy);
 
             List<Object> docIds = userDocumentService.getActualIdsByParentDirectoryHash(directory.getHashName());
             docIds.forEach(id -> userDocumentService.copy((Long) id, copy.getHashName()));
@@ -374,7 +374,7 @@ public class UserDirectoryServiceImpl implements UserDirectoryService {
 
     @Override
     public List<Object> getActualIdsByParentDirectoryHash(String parentDirectoryHash) {
-        return userDirectoryRepository.getPropertiesList("id", "parentDirectoryHash", parentDirectoryHash);
+        return repository.getPropertiesList("id", "parentDirectoryHash", parentDirectoryHash);
     }
 
     private String getDestinationDirectoryLocation(UserDirectory directory, String destinationDirHash) {

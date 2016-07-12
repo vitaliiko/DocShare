@@ -14,45 +14,45 @@ import java.util.List;
 public class DocumentStatisticServiceImpl implements DocumentStatisticService {
     
     @Inject
-    private DocumentStatisticRepository documentStatisticRepository;
+    private DocumentStatisticRepository repository;
     
     @Override
     public DocumentStatistic getByUserDocumentId(Long documentId) {
-        return documentStatisticRepository.getByUserDocumentId(documentId);
+        return repository.getByUserDocumentId(documentId);
     }
 
     @Override
     public List<DocumentStatistic> getAll(String orderParameter) {
-        return documentStatisticRepository.getAll(orderParameter);
+        return repository.getAll(orderParameter);
     }
 
     @Override
     public DocumentStatistic getById(Long id) {
-        return documentStatisticRepository.getById(id);
+        return repository.getById(id);
     }
 
     @Override
     public DocumentStatistic get(String propertyName, Object value) {
-        return documentStatisticRepository.get(propertyName, value);
+        return repository.get(propertyName, value);
     }
 
     @Override
     public Long save(DocumentStatistic entity) {
-        return documentStatisticRepository.save(entity);
+        return repository.save(entity);
     }
 
     @Override
     public void update(DocumentStatistic entity) {
-        documentStatisticRepository.update(entity);
+        repository.update(entity);
     }
 
     @Override
     public void delete(DocumentStatistic entity) {
-        documentStatisticRepository.delete(entity);
+        repository.delete(entity);
     }
 
     @Override
     public void deleteById(Long entityId) {
-        documentStatisticRepository.deleteById(entityId);
+        repository.deleteById(entityId);
     }
 }

@@ -38,7 +38,7 @@ import java.util.List;
 public class UserDocumentServiceImpl implements UserDocumentService {
 
     @Inject
-    private UserDocumentRepository userDocumentRepository;
+    private UserDocumentRepository repository;
 
     @Inject
     private UserService userService;
@@ -63,52 +63,52 @@ public class UserDocumentServiceImpl implements UserDocumentService {
 
     @Override
     public List<UserDocument> getAll(String orderParameter) {
-        return userDocumentRepository.getAll(orderParameter);
+        return repository.getAll(orderParameter);
     }
 
     @Override
     public UserDocument getById(Long id) {
-        return userDocumentRepository.getById(id);
+        return repository.getById(id);
     }
 
     @Override
     public UserDocument get(String propertyName, Object value) {
-        return userDocumentRepository.get(propertyName, value);
+        return repository.get(propertyName, value);
     }
 
     @Override
     public Long save(UserDocument entity) {
-        return userDocumentRepository.save(entity);
+        return repository.save(entity);
     }
 
     @Override
     public void update(UserDocument entity) {
-        userDocumentRepository.update(entity);
+        repository.update(entity);
     }
 
     @Override
     public void delete(UserDocument entity) {
-        userDocumentRepository.delete(entity);
+        repository.delete(entity);
     }
 
     @Override
     public void deleteById(Long entityId) {
-        userDocumentRepository.deleteById(entityId);
+        repository.deleteById(entityId);
     }
 
     @Override
     public List<UserDocument> getAllByOwnerId(Long ownerId) {
         User owner = userService.getById(ownerId);
-        return userDocumentRepository.getList("owner", owner);
+        return repository.getList("owner", owner);
     }
 
     @Override
     public void moveToTrash(Long docId, Long removerId) {
-        UserDocument document = userDocumentRepository.getById(docId);
+        UserDocument document = repository.getById(docId);
         RemovedDocument removedDocument = UserFileUtil.wrapUserDocumentInRemoved(document, removerId);
         removedDocumentService.save(removedDocument);
         document.setDocumentStatus(DocumentStatus.REMOVED);
-        userDocumentRepository.update(document);
+        repository.update(document);
     }
 
     @Override
@@ -122,7 +122,7 @@ public class UserDocumentServiceImpl implements UserDocumentService {
         UserDocument document = removedDocument.getUserDocument();
         document.setDocumentStatus(DocumentStatus.ACTUAL);
         removedDocumentService.delete(removedDocument);
-        userDocumentRepository.update(document);
+        repository.update(document);
         return document.getId();
     }
 
@@ -133,31 +133,31 @@ public class UserDocumentServiceImpl implements UserDocumentService {
 
     @Override
     public UserDocument getByHashName(String hashName) {
-        return userDocumentRepository.get("hashName", hashName);
+        return repository.get("hashName", hashName);
     }
 
     @Override
     public UserDocument getByNameAndOwnerId(Long ownerId, String name) {
         User owner = userService.getById(ownerId);
-        return userDocumentRepository.get(owner, "name", name);
+        return repository.get(owner, "name", name);
     }
 
     @Override
     public UserDocument getByFullNameAndOwner(User owner, String parentDirectoryHash, String name) {
         Map<String, Object> propertiesMap = UserFileUtil.createPropertiesMap(owner, parentDirectoryHash, name);
-        return userDocumentRepository.get(propertiesMap);
+        return repository.get(propertiesMap);
     }
 
     @Override
     public UserDocument getDocumentWithComments(Long docId) {
-        UserDocument document = userDocumentRepository.getById(docId);
+        UserDocument document = repository.getById(docId);
         Hibernate.initialize(document.getComments());
         return document;
     }
 
     @Override
     public UserDocument getDocumentWithOldVersions(Long docId) {
-        UserDocument document = userDocumentRepository.getById(docId);
+        UserDocument document = repository.getById(docId);
         Hibernate.initialize(document.getDocumentOldVersions());
         return document;
     }
@@ -171,14 +171,14 @@ public class UserDocumentServiceImpl implements UserDocumentService {
 
     @Override
     public UserDocument getWithOldVersions(Long docId) {
-        UserDocument document = userDocumentRepository.getById(docId);
+        UserDocument document = repository.getById(docId);
         Hibernate.initialize(document.getDocumentOldVersions());
         return document;
     }
 
     @Override
     public List<UserDocument> getByParentDirectoryHash(String parentDirectoryHash) {
-        return userDocumentRepository.getList("parentDirectoryHash", parentDirectoryHash);
+        return repository.getList("parentDirectoryHash", parentDirectoryHash);
     }
 
     @Override
@@ -186,12 +186,12 @@ public class UserDocumentServiceImpl implements UserDocumentService {
         Map<String, Object> propertiesMap = new HashMap<>();
         propertiesMap.put("parentDirectoryHash", parentDirectoryHash);
         propertiesMap.put("documentStatus", status);
-        return userDocumentRepository.getList(propertiesMap);
+        return repository.getList(propertiesMap);
     }
 
     @Override
     public Set<UserDocument> getByIds(List<Long> docIds) {
-        return new HashSet<>(userDocumentRepository.getAll("id", docIds));
+        return new HashSet<>(repository.getAll("id", docIds));
     }
 
     @Override
@@ -208,13 +208,13 @@ public class UserDocumentServiceImpl implements UserDocumentService {
     @Override
     public Set<UserDocument> getAllCanRead(User reader) {
         Set<UserDocument> documents = new HashSet<>();
-        documents.addAll(userDocumentRepository.getByReader(reader));
-        documents.addAll(userDocumentRepository.getByEditor(reader));
+        documents.addAll(repository.getByReader(reader));
+        documents.addAll(repository.getByEditor(reader));
 
         List<FriendsGroup> groups = friendGroupService.getByFriend(reader);
         groups.forEach(g -> {
-            documents.addAll(userDocumentRepository.getByReadersGroup(g));
-            documents.addAll(userDocumentRepository.getByEditorsGroup(g));
+            documents.addAll(repository.getByReadersGroup(g));
+            documents.addAll(repository.getByEditorsGroup(g));
         });
 
         return documents;
@@ -236,25 +236,25 @@ public class UserDocumentServiceImpl implements UserDocumentService {
 
     @Override
     public Set<UserDocument> getAllByOwnerAndAttribute(User owner, DocumentAttribute attribute) {
-        return new HashSet<>(userDocumentRepository.getList(owner, "documentAttribute", attribute));
+        return new HashSet<>(repository.getList(owner, "documentAttribute", attribute));
     }
 
     @Override
     public Integer getCountByFriendsGroup(FriendsGroup friendsGroup) {
         Set<UserDocument> documents = new HashSet<>();
-        documents.addAll(userDocumentRepository.getByEditorsGroup(friendsGroup));
-        documents.addAll(userDocumentRepository.getByReadersGroup(friendsGroup));
+        documents.addAll(repository.getByEditorsGroup(friendsGroup));
+        documents.addAll(repository.getByReadersGroup(friendsGroup));
         return documents.size();
     }
 
     @Override
     public List<UserDocument> getAllByOwner(User owner) {
-        return userDocumentRepository.getList("owner", owner);
+        return repository.getList("owner", owner);
     }
 
     @Override
     public void replace(Long docId, String destinationDirectoryHash) {
-        UserDocument document = userDocumentRepository.getById(docId);
+        UserDocument document = repository.getById(docId);
         UserDirectory destinationDir = null;
         if (!document.getOwner().getLogin().equals(destinationDirectoryHash)) {
             destinationDir = userDirectoryService.getByHashName(destinationDirectoryHash);
@@ -267,7 +267,7 @@ public class UserDocumentServiceImpl implements UserDocumentService {
         if (!document.getParentDirectoryHash().equals(destinationDirectoryHash)) {
             if (getByFullNameAndOwner(document.getOwner(), destinationDirectoryHash, docName) != null) {
                 String docNameWithoutExtension = docName.substring(0, docName.lastIndexOf("."));
-                int matchesCount = userDocumentRepository.getLike(destinationDirectoryHash, docNameWithoutExtension).size();
+                int matchesCount = repository.getLike(destinationDirectoryHash, docNameWithoutExtension).size();
                 document.setName(docNameWithoutExtension + " (" + (matchesCount + 1) + ")" + document.getExtension());
             }
             document.setParentDirectoryHash(destinationDirectoryHash);
@@ -283,7 +283,7 @@ public class UserDocumentServiceImpl implements UserDocumentService {
                 document.setDocumentAttribute(DocumentAttribute.PRIVATE);
             }
 
-            userDocumentRepository.update(document);
+            repository.update(document);
         }
     }
 
@@ -299,7 +299,7 @@ public class UserDocumentServiceImpl implements UserDocumentService {
 
     @Override
     public void copy(Long docId, String destinationDirectoryHash) {
-        UserDocument document = userDocumentRepository.getById(docId);
+        UserDocument document = repository.getById(docId);
         UserDocument copy = UserFileUtil.copyDocument(document);
         UserDirectory destinationDir = null;
 
@@ -313,7 +313,7 @@ public class UserDocumentServiceImpl implements UserDocumentService {
 
         if (getByFullNameAndOwner(document.getOwner(), destinationDirectoryHash, copyName) != null) {
             String copyNameWithoutExtension = copyName.substring(0, copyName.lastIndexOf("."));
-            int matchesCount = userDocumentRepository.getLike(destinationDirectoryHash, copyNameWithoutExtension).size();
+            int matchesCount = repository.getLike(destinationDirectoryHash, copyNameWithoutExtension).size();
             copy.setName(copyNameWithoutExtension + " (" + (matchesCount + 1) + ")" + document.getExtension());
         }
         copy.setParentDirectoryHash(destinationDirectoryHash);
@@ -329,7 +329,7 @@ public class UserDocumentServiceImpl implements UserDocumentService {
         }
 
         UserFileUtil.copyFile(document.getHashName(), copy.getHashName());
-        userDocumentRepository.save(copy);
+        repository.save(copy);
     }
 
     @Override
@@ -346,7 +346,7 @@ public class UserDocumentServiceImpl implements UserDocumentService {
     public Set<UserDocument> searchByName(User owner, String name) {
         String[] names = name.split(" ");
         Set<UserDocument> documents = new TreeSet<>();
-        Arrays.stream(names).forEach(n -> documents.addAll(userDocumentRepository.search(owner, "name", n)));
+        Arrays.stream(names).forEach(n -> documents.addAll(repository.search(owner, "name", n)));
         return documents;
     }
 
@@ -444,6 +444,6 @@ public class UserDocumentServiceImpl implements UserDocumentService {
 
     @Override
     public List<Object> getActualIdsByParentDirectoryHash(String parentDirectoryHash) {
-        return userDocumentRepository.getPropertiesList("id", "parentDirectoryHash", parentDirectoryHash);
+        return repository.getPropertiesList("id", "parentDirectoryHash", parentDirectoryHash);
     }
 }

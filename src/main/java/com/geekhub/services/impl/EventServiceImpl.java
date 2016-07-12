@@ -18,54 +18,54 @@ import org.springframework.transaction.annotation.Transactional;
 public class EventServiceImpl implements EventService {
 
     @Inject
-    private EventRepository eventRepository;
+    private EventRepository repository;
 
     @Inject
     private UserService userService;
 
     @Override
     public List<Event> getAll(String orderParameter) {
-        return eventRepository.getAll(orderParameter);
+        return repository.getAll(orderParameter);
     }
 
     @Override
     public List<Event> getAllByRecipient(User recipient) {
-        return eventRepository.getList("recipient", recipient);
+        return repository.getList("recipient", recipient);
     }
 
     @Override
     public Event getById(Long id) {
-        return eventRepository.getById(id);
+        return repository.getById(id);
     }
 
     @Override
     public Event get(String propertyName, Object value) {
-        return eventRepository.get(propertyName, value);
+        return repository.get(propertyName, value);
     }
 
     @Override
     public Long save(Event entity) {
-        return eventRepository.save(entity);
+        return repository.save(entity);
     }
 
     @Override
     public void update(Event entity) {
-        eventRepository.update(entity);
+        repository.update(entity);
     }
 
     @Override
     public void delete(Event entity) {
-        eventRepository.delete(entity);
+        repository.delete(entity);
     }
 
     @Override
     public void deleteById(Long entityId) {
-        eventRepository.deleteById(entityId);
+        repository.deleteById(entityId);
     }
 
     @Override
     public Long getUnreadCount(Long recipientId) {
-        return eventRepository.getCount(recipientId, "eventStatus", EventStatus.UNREAD);
+        return repository.getCount(recipientId, "eventStatus", EventStatus.UNREAD);
     }
 
     @Override
@@ -85,7 +85,7 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public Event getByHashName(String eventHashName) {
-        return eventRepository.get("hashName", eventHashName);
+        return repository.get("hashName", eventHashName);
     }
 
     @Override

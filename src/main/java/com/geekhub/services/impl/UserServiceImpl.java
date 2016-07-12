@@ -31,7 +31,7 @@ import java.util.stream.Collectors;
 public class UserServiceImpl implements UserService {
 
     @Inject
-    private UserRepository userRepository;
+    private UserRepository repository;
 
     @Inject
     private FriendGroupService friendGroupService;
@@ -44,30 +44,27 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<User> getAll(String orderParameter) {
-        return userRepository.getAll(orderParameter);
+        return repository.getAll(orderParameter);
     }
 
     @Override
     public User getById(Long id) {
-        return userRepository.getById(id);
+        return repository.getById(id);
     }
 
     @Override
     public User get(String propertyName, Object value) {
-        return userRepository.get(propertyName, value);
+        return repository.get(propertyName, value);
     }
 
     @Override
     public Long save(User entity) {
-        if (userRepository.get("login", entity.getLogin()) == null) {
-            return userRepository.save(entity);
-        }
-        return null;
+        return repository.save(entity);
     }
 
     @Override
     public void update(User entity) {
-        userRepository.update(entity);
+        repository.update(entity);
     }
 
     @Override
@@ -75,77 +72,77 @@ public class UserServiceImpl implements UserService {
         removeFromFriends(entity);
         List<String> filesHashNames =
                 userDocumentService.getAllByOwner(entity).stream().map(UserDocument::getName).collect(Collectors.toList());
-        userRepository.delete(entity);
+        repository.delete(entity);
         UserFileUtil.removeUserFiles(filesHashNames);
     }
 
     @Override
     public void deleteById(Long entityId) {
-        userRepository.deleteById(entityId);
+        repository.deleteById(entityId);
     }
 
     @Override
     public User getByLogin(String login) {
-        return userRepository.get("login", login);
+        return repository.get("login", login);
     }
 
     @Override
     public Set<User> getFriends(Long userId) {
-        User user = userRepository.getById(userId);
+        User user = repository.getById(userId);
         Hibernate.initialize(user.getFriends());
         return user.getFriends();
     }
 
     @Override
     public FriendsGroup getFriendsGroupByName(Long ownerId, String groupName) {
-        User owner = userRepository.getById(ownerId);
+        User owner = repository.getById(ownerId);
         return friendGroupService.getFriendsGroups(owner, "name", groupName).get(0);
     }
 
     @Override
     public List<FriendsGroup> getAllFriendsGroups(Long ownerId) {
-        User owner = userRepository.getById(ownerId);
+        User owner = repository.getById(ownerId);
         return owner.getFriendsGroups().stream().collect(Collectors.toList());
     }
 
     @Override
     public List<User> getAllFriends(Long userId) {
-        User owner = userRepository.getById(userId);
+        User owner = repository.getById(userId);
         return owner.getFriends().stream().collect(Collectors.toList());
     }
 
     @Override
     public List<FriendsGroup> getGroupsByOwnerAndFriend(Long ownerId, User friend) {
-        User owner = userRepository.getById(ownerId);
+        User owner = repository.getById(ownerId);
         return friendGroupService.getByOwnerAndFriend(owner, friend);
     }
 
     @Override
     public void addFriendsGroup(Long ownerId, FriendsGroup group) {
-        User user = userRepository.getById(ownerId);
+        User user = repository.getById(ownerId);
         if (user.getFriendsGroups().stream().noneMatch(fg -> fg.getName().equals(group.getName()))) {
             user.getFriendsGroups().add(group);
         } else {
             throw new HibernateException("Friends Group with such name already exist");
         }
-        userRepository.update(user);
+        repository.update(user);
     }
 
     @Override
     public void addFriend(Long userId, Long friendId) {
-        User user = userRepository.getById(userId);
-        User friend = userRepository.getById(friendId);
+        User user = repository.getById(userId);
+        User friend = repository.getById(friendId);
         user.getFriends().add(friend);
         friend.getFriends().add(user);
-        userRepository.update(user);
-        userRepository.update(friend);
+        repository.update(user);
+        repository.update(friend);
         eventSendingService.sendAddToFriendEvent(user, friend);
     }
 
     @Override
     public void deleteFriend(Long userId, Long friendId) {
-        User user = userRepository.getById(userId);
-        User friend = userRepository.getById(friendId);
+        User user = repository.getById(userId);
+        User friend = repository.getById(friendId);
 
         deleteFriend(user, friend);
         deleteFriend(friend, user);
@@ -154,7 +151,7 @@ public class UserServiceImpl implements UserService {
 
     private void deleteFriend(User user, User friend) {
         user.getFriends().remove(friend);
-        userRepository.update(user);
+        repository.update(user);
         List<FriendsGroup> groups = friendGroupService.getByOwnerAndFriend(user, friend);
         groups.forEach(g -> {
             g.getFriends().remove(friend);
@@ -164,13 +161,13 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public boolean areFriends(Long userId, User friend) {
-        Set<User> friends = userRepository.getById(userId).getFriends();
+        Set<User> friends = repository.getById(userId).getFriends();
         return friends.contains(friend);
     }
 
     @Override
     public Map<User, List<FriendsGroup>> getFriendsGroupsMap(Long ownerId) {
-        Set<User> friends = userRepository.getById(ownerId).getFriends();
+        Set<User> friends = repository.getById(ownerId).getFriends();
         Map<User, List<FriendsGroup>> friendsGroupsMap = new HashMap<>();
         friends.forEach(friend -> friendsGroupsMap.put(friend, getGroupsByOwnerAndFriend(ownerId, friend)));
         return friendsGroupsMap;
@@ -178,7 +175,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void removeFromFriends(User friend) {
-        List<User> users = userRepository.getByFriend(friend);
+        List<User> users = repository.getByFriend(friend);
         users.forEach(u -> u.getFriends().remove(friend));
         update(users);
 
@@ -205,10 +202,10 @@ public class UserServiceImpl implements UserService {
         Set<User> users = new TreeSet<>();
         Arrays.stream(names)
                 .filter(n -> !n.isEmpty())
-                .forEach(n -> users.addAll(userRepository.search("firstName", n)));
+                .forEach(n -> users.addAll(repository.search("firstName", n)));
         Arrays.stream(names)
                 .filter(n -> !n.isEmpty())
-                .forEach(n -> users.addAll(userRepository.search("lastName", n)));
+                .forEach(n -> users.addAll(repository.search("lastName", n)));
         return users;
     }
 
@@ -219,10 +216,10 @@ public class UserServiceImpl implements UserService {
         Set<User> users = new TreeSet<>();
         Arrays.stream(names)
                 .filter(n -> !n.isEmpty())
-                .forEach(n -> users.addAll(userRepository.search("firstName", n, searchingMap)));
+                .forEach(n -> users.addAll(repository.search("firstName", n, searchingMap)));
         Arrays.stream(names)
                 .filter(n -> !n.isEmpty())
-                .forEach(n -> users.addAll(userRepository.search("lastName", n, searchingMap)));
+                .forEach(n -> users.addAll(repository.search("lastName", n, searchingMap)));
         return users;
     }
 }
