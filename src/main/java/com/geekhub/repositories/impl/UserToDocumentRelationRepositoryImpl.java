@@ -1,6 +1,8 @@
 package com.geekhub.repositories.impl;
 
+import com.geekhub.entities.UserDocument;
 import com.geekhub.entities.UserToDocumentRelation;
+import com.geekhub.entities.enums.FileRelationType;
 import com.geekhub.repositories.UserToDocumentRelationRepository;
 import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Order;
@@ -72,5 +74,14 @@ public class UserToDocumentRelationRepositoryImpl implements UserToDocumentRelat
                 .createCriteria(clazz)
                 .add(Restrictions.eq(propertyName, value))
                 .list();
+    }
+
+    @Override
+    public void deleteByDocumentBesidesOwner(UserDocument document) {
+        sessionFactory.getCurrentSession()
+                .createQuery("DELETE UserToDocumentRelation r WHERE r.document = :document AND r.fileRelationType != :relation")
+                .setParameter("document", document)
+                .setParameter("relation", FileRelationType.OWNER)
+                .executeUpdate();
     }
 }

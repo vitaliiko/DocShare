@@ -1,6 +1,8 @@
 package com.geekhub.repositories.impl;
 
+import com.geekhub.entities.UserDirectory;
 import com.geekhub.entities.UserToDirectoryRelation;
+import com.geekhub.entities.enums.FileRelationType;
 import com.geekhub.repositories.UserToDirectoryRelationRepository;
 import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Order;
@@ -72,5 +74,14 @@ public class UserToDirectoryRelationRepositoryImpl implements UserToDirectoryRel
                 .createCriteria(clazz)
                 .add(Restrictions.eq(propertyName, value))
                 .list();
+    }
+
+    @Override
+    public void deleteByDirectoryBesidesOwner(UserDirectory directory) {
+        sessionFactory.getCurrentSession()
+                .createQuery("DELETE UserToDirectoryRelation r WHERE r.directory = :directory AND r.fileRelationType != :relation")
+                .setParameter("directory", directory)
+                .setParameter("relation", FileRelationType.OWNER)
+                .executeUpdate();
     }
 }

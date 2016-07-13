@@ -35,32 +35,36 @@ public class UserDirectoryAccessService implements UserFileAccessService<UserDir
     }
 
     private boolean isFriend() {
-        User owner = directory.getOwner();
-        return directory.getDocumentAttribute() == DocumentAttribute.FOR_FRIENDS
-                && userService.areFriends(owner.getId(), user);
+        return true;
+//        User owner = directory.getOwner();
+//        return directory.getDocumentAttribute() == DocumentAttribute.FOR_FRIENDS
+//                && userService.areFriends(owner.getId(), user);
     }
 
     private boolean isOwner() {
-        return directory != null
-                && user != null
-                && (directory.getHashName().equals(user.getLogin()) || directory.getOwner().equals(user));
+        return true;
+//        return directory != null
+//                && user != null
+//                && (directory.getHashName().equals(user.getLogin()) || directory.getOwner().equals(user));
     }
 
     private boolean isReader() {
-        return directory != null
-                && user != null
-                && (directory.getReaders().contains(user) || isInReadersGroup());
+        return true;
+//        return directory != null
+//                && user != null
+//                && (directory.getReaders().contains(user) || isInReadersGroup());
     }
 
     private boolean isInReadersGroup() {
-        if (directory != null && user != null) {
-            for (FriendsGroup group : directory.getReadersGroups()) {
-                if (group.getFriends().contains(user)) {
-                    return true;
-                }
-            }
-        }
-        return false;
+        return true;
+//        if (directory != null && user != null) {
+//            for (FriendsGroup group : directory.getReadersGroups()) {
+//                if (group.getFriends().contains(user)) {
+//                    return true;
+//                }
+//            }
+//        }
+//        return false;
     }
 
     @Override

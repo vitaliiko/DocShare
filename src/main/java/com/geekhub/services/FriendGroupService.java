@@ -11,6 +11,8 @@ import java.util.Set;
 @Service
 public interface FriendGroupService extends EntityService<FriendsGroup, Long> {
 
+    List<FriendsGroup> getByIds(List<Long> groupIds);
+
     FriendsGroup create(User owner, CreateFriendGroupDto groupDto);
 
     FriendsGroup update(User user, CreateFriendGroupDto groupDto);

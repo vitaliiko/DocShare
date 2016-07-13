@@ -66,8 +66,8 @@ public class RemovedDocumentServiceImpl implements RemovedDocumentService {
     }
 
     @Override
-    public RemovedDocument getByUserDocument(UserDocument document) {
-        return repository.get(document.getOwner(), "userDocument", document);
+    public RemovedDocument getByOwnerAndDocument(User owner, UserDocument document) {
+        return repository.get(owner, "userDocument", document);
     }
 
     @Override

@@ -3,10 +3,12 @@ package com.geekhub.repositories.impl;
 import com.geekhub.entities.FriendsGroup;
 import com.geekhub.entities.User;
 import com.geekhub.entities.UserDirectory;
+import com.geekhub.entities.enums.DocumentAttribute;
 import com.geekhub.entities.enums.DocumentStatus;
 import java.util.List;
 import java.util.Map;
 
+import com.geekhub.entities.enums.FileRelationType;
 import com.geekhub.repositories.UserDirectoryRepository;
 import org.hibernate.SessionFactory;
 import org.hibernate.criterion.MatchMode;
@@ -133,20 +135,15 @@ public class UserDirectoryRepositoryImpl implements UserDirectoryRepository {
     }
 
     @Override
-    public UserDirectory get(Map<String, Object> propertiesMap) {
+    public UserDirectory getByFullNameAndOwner(Map<String, Object> propertiesMap) {
         return (UserDirectory) sessionFactory.getCurrentSession()
-                .createCriteria(clazz)
-                .add(Restrictions.allEq(propertiesMap))
-                .uniqueResult();
-    }
-
-    @Override
-    public Long getCountByReadersGroup(FriendsGroup readersGroup) {
-        return (Long) sessionFactory.getCurrentSession()
-                .createQuery("select count(*) from UserDirectory dir " +
-                        "where dir.documentStatus = :status and :readersGroup in elements(dir.readersGroups)")
-                .setParameter("readersGroup", readersGroup)
-                .setParameter("status", DocumentStatus.ACTUAL)
+                .createQuery("SELECT dir FROM UserToDirectoryRelation rel JOIN rel.directory dir " +
+                        "WHERE dir.parentDirectoryHash = :parentDirHash AND dir.name = :name AND rel.user = :owner " +
+                        "AND rel.fileRelationType = :relation")
+                .setParameter("parentDirHash", propertiesMap.get("parentDirectoryHash"))
+                .setParameter("name", propertiesMap.get("name"))
+                .setParameter("owner", propertiesMap.get("owner"))
+                .setParameter("relation", FileRelationType.OWNER)
                 .uniqueResult();
     }
 
@@ -157,5 +154,14 @@ public class UserDirectoryRepositoryImpl implements UserDirectoryRepository {
                 .add(Restrictions.eq("owner", owner))
                 .add(Restrictions.like(propertyName, "%" + value + "%"))
                 .list();
+    }
+
+    @Override
+    public void updateDocumentAttribute(DocumentAttribute attribute, List<Long> directoryIds) {
+        sessionFactory.getCurrentSession()
+                .createQuery("UPDATE UserDirectory d SET d.documentAttribute = :attribute WHERE d.id in :ids")
+                .setParameter("attribute", attribute)
+                .setParameter("ids", directoryIds)
+                .executeUpdate();
     }
 }

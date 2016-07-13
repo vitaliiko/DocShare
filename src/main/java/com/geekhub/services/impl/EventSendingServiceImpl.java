@@ -1,9 +1,7 @@
 package com.geekhub.services.impl;
 
-import com.geekhub.entities.Event;
-import com.geekhub.entities.FriendsGroup;
-import com.geekhub.entities.User;
-import com.geekhub.entities.UserDocument;
+import com.geekhub.entities.*;
+
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -30,6 +28,12 @@ public class EventSendingServiceImpl implements EventSendingService {
     @Inject
     private UserDirectoryService userDirectoryService;
 
+    @Inject
+    private FriendGroupToDirectoryRelationService friendGroupToDirectoryRelationService;
+
+    @Inject
+    private FriendGroupToDocumentRelationService friendGroupToDocumentRelationService;
+
     @OneToOne
     public void sendUpdateEvent(UserDocument document, User user) {
         String eventText = "Document " + document.getName() + " has been updated by " + user.getFullName();
@@ -47,7 +51,7 @@ public class EventSendingServiceImpl implements EventSendingService {
         String eventText = fileType.name() + " " + fileName + " has been removed by " + user.getFullName();
 
         Set<User> readers = service instanceof UserDirectoryService
-                ? ((UserDirectoryService) service).getAllReaders(fileId)
+                ? ((UserDirectoryService) service).getAllReadersAndEditors(fileId)
                 : ((UserDocumentService) service).getAllReadersAndEditors(fileId);
         eventService.save(createEvent(readers, eventText, user));
     }
@@ -65,7 +69,7 @@ public class EventSendingServiceImpl implements EventSendingService {
         }
 
         Set<User> readers = service instanceof UserDirectoryService
-                ? ((UserDirectoryService) service).getAllReaders(fileId)
+                ? ((UserDirectoryService) service).getAllReadersAndEditors(fileId)
                 : ((UserDocumentService) service).getAllReadersAndEditors(fileId);
 
         eventService.save(createEvent(readers, eventText, eventLinkText, eventLinkUrl, user));
@@ -131,8 +135,8 @@ public class EventSendingServiceImpl implements EventSendingService {
 
     @OneToOne
     public void sendShareEvent(User user, FriendsGroup group, Set<User> membersSet, Set<User> newMembersSet) {
-        long documentsCount = Long.valueOf(userDocumentService.getCountByFriendsGroup(group));
-        long directoriesCount = userDirectoryService.getCountByFriendsGroup(group);
+        long documentsCount = friendGroupToDocumentRelationService.getCountByFriendGroup(group);
+        long directoriesCount = friendGroupToDirectoryRelationService.getCountByFriendGroup(group);
         if (documentsCount != 0 || directoriesCount != 0) {
             String filesCount = "";
             if (documentsCount != 0) {

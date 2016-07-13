@@ -88,26 +88,6 @@ public class User implements Serializable, Comparable<User> {
     @JoinColumn(name = "creator_id")
     private Set<Organization> organizations = new HashSet<>();
 
-    @JsonIgnore
-    @OneToMany(cascade = CascadeType.ALL)
-    @JoinColumn(name = "owner_id")
-    private Set<UserDocument> userDocuments = new HashSet<>();
-
-    @JsonIgnore
-    @OneToMany(cascade = CascadeType.ALL)
-    @JoinColumn(name = "owner_id")
-    private Set<UserDirectory> userDirectories = new HashSet<>();
-
-    @JsonIgnore
-    @OneToMany(cascade = CascadeType.ALL)
-    @JoinColumn(name = "owner_id")
-    private Set<RemovedDocument> removedDocuments = new HashSet<>();
-
-    @JsonIgnore
-    @OneToMany(cascade = CascadeType.ALL)
-    @JoinColumn(name = "owner_id")
-    private Set<RemovedDirectory> removedDirectories = new HashSet<>();
-
     public User() {}
 
     public User(String firstName, String lastName, String password, String login) {
@@ -187,38 +167,6 @@ public class User implements Serializable, Comparable<User> {
 
     public void setFriends(Set<User> friends) {
         this.friends = friends;
-    }
-
-    public Set<UserDocument> getUserDocuments() {
-        return userDocuments;
-    }
-
-    public void setUserDocuments(Set<UserDocument> userDocuments) {
-        this.userDocuments = userDocuments;
-    }
-
-    public Set<RemovedDocument> getRemovedDocuments() {
-        return removedDocuments;
-    }
-
-    public Set<UserDirectory> getUserDirectories() {
-        return userDirectories;
-    }
-
-    public void setUserDirectories(Set<UserDirectory> userDirectories) {
-        this.userDirectories = userDirectories;
-    }
-
-    public void setRemovedDocuments(Set<RemovedDocument> removedDocuments) {
-        this.removedDocuments = removedDocuments;
-    }
-
-    public Set<RemovedDirectory> getRemovedDirectories() {
-        return removedDirectories;
-    }
-
-    public void setRemovedDirectories(Set<RemovedDirectory> removedDirectories) {
-        this.removedDirectories = removedDirectories;
     }
 
     public String getEmail() {

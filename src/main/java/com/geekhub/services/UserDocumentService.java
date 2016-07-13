@@ -11,6 +11,7 @@ import com.geekhub.entities.enums.DocumentStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.print.Doc;
 import java.util.List;
 
 @Service
@@ -52,9 +53,11 @@ public interface UserDocumentService extends EntityService<UserDocument, Long> {
 
     UserDocument getWithOldVersions(Long docId);
 
-    List<UserDocument> getByParentDirectoryHash(String parentDirectoryHash);
+    List<UserDocument> getAllByParentDirectoryHash(String parentDirectoryHash);
 
-    List<UserDocument> getByParentDirectoryHashAndStatus(String parentDirectoryHash, DocumentStatus status);
+    List<UserDocument> getAllByParentDirectoryHashes(List<String> parentDirectoryHashList);
+
+    List<UserDocument> getAllByParentDirectoryHashAndStatus(String parentDirectoryHash, DocumentStatus status);
 
     List<Object> getActualIdsByParentDirectoryHash(String parentDirectoryHash);
 
@@ -63,8 +66,6 @@ public interface UserDocumentService extends EntityService<UserDocument, Long> {
     String getLocation(UserDocument document);
 
     Set<UserDocument> getAllByOwnerAndAttribute(User owner, DocumentAttribute attribute);
-
-    Integer getCountByFriendsGroup(FriendsGroup friendsGroup);
 
     List<UserDocument> getAllByOwner(User owner);
 
@@ -82,7 +83,11 @@ public interface UserDocumentService extends EntityService<UserDocument, Long> {
 
     UserDocument shareDocument(UserDocument document, SharedDto shared, User user);
 
+    void shareDocuments(List<UserDocument> documents, SharedDto sharedDto);
+
     UserDocument recoverOldVersion(DocumentOldVersion oldVersion);
 
     void recoverRemovedDocument(Long removedDocId, User user);
+
+    void updateDocumentAttribute(DocumentAttribute attribute, List<Long> documentIds);
 }

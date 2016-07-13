@@ -1,12 +1,20 @@
 package com.geekhub.services.impl;
 
 import com.geekhub.entities.FriendGroupToDocumentRelation;
+import com.geekhub.entities.FriendsGroup;
+import com.geekhub.entities.UserDocument;
+import com.geekhub.entities.enums.FileRelationType;
 import com.geekhub.repositories.FriendGroupToDocumentRelationRepository;
 import com.geekhub.services.FriendGroupToDocumentRelationService;
+import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
+import javax.transaction.Transactional;
 import java.util.List;
+import java.util.stream.Collectors;
 
+@Service
+@Transactional
 public class FriendGroupToDocumentRelationServiceImpl implements FriendGroupToDocumentRelationService {
 
     @Inject
@@ -45,5 +53,37 @@ public class FriendGroupToDocumentRelationServiceImpl implements FriendGroupToDo
     @Override
     public void deleteById(Long entityId) {
         repository.deleteById(entityId);
+    }
+
+    @Override
+    public List<FriendGroupToDocumentRelation> create(UserDocument document, List<FriendsGroup> groups,
+                                                      FileRelationType relationType) {
+
+        return groups.stream().map(g -> create(document, g, relationType)).collect(Collectors.toList());
+    }
+
+    @Override
+    public FriendGroupToDocumentRelation create(UserDocument document, FriendsGroup group, FileRelationType relationType) {
+        FriendGroupToDocumentRelation relation = new FriendGroupToDocumentRelation();
+        relation.setDocument(document);
+        relation.setFriendsGroup(group);
+        relation.setFileRelationType(relationType);
+        save(relation);
+        return relation;
+    }
+
+    @Override
+    public void deleteByDocumentBesidesOwner(UserDocument document) {
+        repository.deleteByDocumentBesidesOwner(document);
+    }
+
+    @Override
+    public List<FriendGroupToDocumentRelation> getAllByDocument(UserDocument document) {
+        return repository.getList("document", document);
+    }
+
+    @Override
+    public Long getCountByFriendGroup(FriendsGroup group) {
+        return repository.getCountByFriendGroup(group);
     }
 }

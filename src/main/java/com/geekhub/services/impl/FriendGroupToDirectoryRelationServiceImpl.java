@@ -1,12 +1,20 @@
 package com.geekhub.services.impl;
 
 import com.geekhub.entities.FriendGroupToDirectoryRelation;
+import com.geekhub.entities.FriendsGroup;
+import com.geekhub.entities.UserDirectory;
+import com.geekhub.entities.enums.FileRelationType;
 import com.geekhub.repositories.FriendGroupToDirectoryRelationRepository;
 import com.geekhub.services.FriendGroupToDirectoryRelationService;
+import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
+import javax.transaction.Transactional;
 import java.util.List;
+import java.util.stream.Collectors;
 
+@Service
+@Transactional
 public class FriendGroupToDirectoryRelationServiceImpl implements FriendGroupToDirectoryRelationService {
     
     @Inject
@@ -45,5 +53,39 @@ public class FriendGroupToDirectoryRelationServiceImpl implements FriendGroupToD
     @Override
     public void deleteById(Long entityId) {
         repository.deleteById(entityId);
+    }
+
+    @Override
+    public List<FriendGroupToDirectoryRelation> create(UserDirectory directory, List<FriendsGroup> groups,
+                                                       FileRelationType relationType) {
+
+        return groups.stream().map(g -> create(directory, g, relationType)).collect(Collectors.toList());
+    }
+
+    @Override
+    public FriendGroupToDirectoryRelation create(UserDirectory directory, FriendsGroup group,
+                                                 FileRelationType relationType) {
+
+        FriendGroupToDirectoryRelation relation = new FriendGroupToDirectoryRelation();
+        relation.setDirectory(directory);
+        relation.setFriendsGroup(group);
+        relation.setFileRelationType(relationType);
+        save(relation);
+        return relation;
+    }
+
+    @Override
+    public void deleteByDirectoryBesidesOwner(UserDirectory directory) {
+        repository.deleteByDirectoryBesidesOwner(directory);
+    }
+
+    @Override
+    public List<FriendGroupToDirectoryRelation> getAllByDirectory(UserDirectory directory) {
+        return repository.getList("directory", directory);
+    }
+
+    @Override
+    public Long getCountByFriendGroup(FriendsGroup group) {
+        return repository.getCountByFriendGroup(group);
     }
 }

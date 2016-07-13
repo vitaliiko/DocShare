@@ -1,14 +1,9 @@
 package com.geekhub.services.impl;
 
-import com.geekhub.controllers.utils.FileControllersUtil;
+import com.geekhub.entities.*;
+import com.geekhub.entities.enums.FileRelationType;
 import com.geekhub.repositories.UserDocumentRepository;
 import com.geekhub.dto.SharedDto;
-import com.geekhub.entities.DocumentOldVersion;
-import com.geekhub.entities.FriendsGroup;
-import com.geekhub.entities.RemovedDocument;
-import com.geekhub.entities.User;
-import com.geekhub.entities.UserDirectory;
-import com.geekhub.entities.UserDocument;
 import com.geekhub.entities.enums.AbilityToCommentDocument;
 import com.geekhub.entities.enums.DocumentAttribute;
 import com.geekhub.entities.enums.DocumentStatus;
@@ -28,6 +23,7 @@ import org.hibernate.Hibernate;
 import javax.inject.Inject;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Arrays;
@@ -60,6 +56,18 @@ public class UserDocumentServiceImpl implements UserDocumentService {
 
     @Inject
     private DocumentOldVersionService documentOldVersionService;
+
+    @Inject
+    private UserToDocumentRelationService userToDocumentRelationService;
+
+    @Inject
+    private UserToDirectoryRelationService userToDirectoryRelationService;
+
+    @Inject
+    private FriendGroupToDocumentRelationService friendGroupToDocumentRelationService;
+
+    @Inject
+    private FriendGroupToDirectoryRelationService friendGroupToDirectoryRelationService;
 
     @Override
     public List<UserDocument> getAll(String orderParameter) {
@@ -119,6 +127,10 @@ public class UserDocumentServiceImpl implements UserDocumentService {
     @Override
     public Long recover(Long removedDocId) {
         RemovedDocument removedDocument = removedDocumentService.getById(removedDocId);
+        return recover(removedDocument);
+    }
+
+    private Long recover(RemovedDocument removedDocument) {
         UserDocument document = removedDocument.getUserDocument();
         document.setDocumentStatus(DocumentStatus.ACTUAL);
         removedDocumentService.delete(removedDocument);
@@ -145,7 +157,7 @@ public class UserDocumentServiceImpl implements UserDocumentService {
     @Override
     public UserDocument getByFullNameAndOwner(User owner, String parentDirectoryHash, String name) {
         Map<String, Object> propertiesMap = UserFileUtil.createPropertiesMap(owner, parentDirectoryHash, name);
-        return repository.get(propertiesMap);
+        return repository.getByFullNameAndOwner(propertiesMap);
     }
 
     @Override
@@ -177,12 +189,17 @@ public class UserDocumentServiceImpl implements UserDocumentService {
     }
 
     @Override
-    public List<UserDocument> getByParentDirectoryHash(String parentDirectoryHash) {
+    public List<UserDocument> getAllByParentDirectoryHash(String parentDirectoryHash) {
         return repository.getList("parentDirectoryHash", parentDirectoryHash);
     }
 
     @Override
-    public List<UserDocument> getByParentDirectoryHashAndStatus(String parentDirectoryHash, DocumentStatus status) {
+    public List<UserDocument> getAllByParentDirectoryHashes(List<String> parentDirectoryHashList) {
+        return null;
+    }
+
+    @Override
+    public List<UserDocument> getAllByParentDirectoryHashAndStatus(String parentDirectoryHash, DocumentStatus status) {
         Map<String, Object> propertiesMap = new HashMap<>();
         propertiesMap.put("parentDirectoryHash", parentDirectoryHash);
         propertiesMap.put("documentStatus", status);
@@ -197,25 +214,25 @@ public class UserDocumentServiceImpl implements UserDocumentService {
     @Override
     public Set<User> getAllReadersAndEditors(Long docId) {
         Set<User> users = new HashSet<>();
-        UserDocument document = getById(docId);
-        users.addAll(document.getReaders());
-        users.addAll(document.getEditors());
-        document.getReadersGroups().forEach(g -> users.addAll(g.getFriends()));
-        document.getEditorsGroups().forEach(g -> users.addAll(g.getFriends()));
+//        UserDocument document = getById(docId);
+//        users.addAll(document.getReaders());
+//        users.addAll(document.getEditors());
+//        document.getReadersGroups().forEach(g -> users.addAll(g.getFriends()));
+//        document.getEditorsGroups().forEach(g -> users.addAll(g.getFriends()));
         return users;
     }
 
     @Override
     public Set<UserDocument> getAllCanRead(User reader) {
         Set<UserDocument> documents = new HashSet<>();
-        documents.addAll(repository.getByReader(reader));
-        documents.addAll(repository.getByEditor(reader));
-
-        List<FriendsGroup> groups = friendGroupService.getByFriend(reader);
-        groups.forEach(g -> {
-            documents.addAll(repository.getByReadersGroup(g));
-            documents.addAll(repository.getByEditorsGroup(g));
-        });
+//        documents.addAll(repository.getByReader(reader));
+//        documents.addAll(repository.getByEditor(reader));
+//
+//        List<FriendsGroup> groups = friendGroupService.getByFriend(reader);
+//        groups.forEach(g -> {
+//            documents.addAll(repository.getByReadersGroup(g));
+//            documents.addAll(repository.getByEditorsGroup(g));
+//        });
 
         return documents;
     }
@@ -225,11 +242,11 @@ public class UserDocumentServiceImpl implements UserDocumentService {
         String location = "";
         String patentDirectoryHash = document.getParentDirectoryHash();
 
-        while(!patentDirectoryHash.equals(document.getOwner().getLogin())) {
-            UserDirectory directory = userDirectoryService.getByHashName(patentDirectoryHash);
-            location = directory.getName() + "/" + location;
-            patentDirectoryHash = directory.getParentDirectoryHash();
-        }
+//        while(!patentDirectoryHash.equals(document.getOwner().getLogin())) {
+//            UserDirectory directory = userDirectoryService.getByHashName(patentDirectoryHash);
+//            location = directory.getName() + "/" + location;
+//            patentDirectoryHash = directory.getParentDirectoryHash();
+//        }
 
         return location;
     }
@@ -237,14 +254,6 @@ public class UserDocumentServiceImpl implements UserDocumentService {
     @Override
     public Set<UserDocument> getAllByOwnerAndAttribute(User owner, DocumentAttribute attribute) {
         return new HashSet<>(repository.getList(owner, "documentAttribute", attribute));
-    }
-
-    @Override
-    public Integer getCountByFriendsGroup(FriendsGroup friendsGroup) {
-        Set<UserDocument> documents = new HashSet<>();
-        documents.addAll(repository.getByEditorsGroup(friendsGroup));
-        documents.addAll(repository.getByReadersGroup(friendsGroup));
-        return documents.size();
     }
 
     @Override
@@ -256,29 +265,29 @@ public class UserDocumentServiceImpl implements UserDocumentService {
     public void replace(Long docId, String destinationDirectoryHash) {
         UserDocument document = repository.getById(docId);
         UserDirectory destinationDir = null;
-        if (!document.getOwner().getLogin().equals(destinationDirectoryHash)) {
-            destinationDir = userDirectoryService.getByHashName(destinationDirectoryHash);
-            if (destinationDir == null) {
-                return;
-            }
-        }
+//        if (!document.getOwner().getLogin().equals(destinationDirectoryHash)) {
+//            destinationDir = userDirectoryService.getByHashName(destinationDirectoryHash);
+//            if (destinationDir == null) {
+//                return;
+//            }
+//        }
         String docName = document.getName();
 
         if (!document.getParentDirectoryHash().equals(destinationDirectoryHash)) {
-            if (getByFullNameAndOwner(document.getOwner(), destinationDirectoryHash, docName) != null) {
-                String docNameWithoutExtension = docName.substring(0, docName.lastIndexOf("."));
-                int matchesCount = repository.getLike(destinationDirectoryHash, docNameWithoutExtension).size();
-                document.setName(docNameWithoutExtension + " (" + (matchesCount + 1) + ")" + document.getExtension());
-            }
+//            if (getByFullNameAndOwner(document.getOwner(), destinationDirectoryHash, docName) != null) {
+//                String docNameWithoutExtension = docName.substring(0, docName.lastIndexOf("."));
+//                int matchesCount = repository.getLike(destinationDirectoryHash, docNameWithoutExtension).size();
+//                document.setName(docNameWithoutExtension + " (" + (matchesCount + 1) + ")" + document.getExtension());
+//            }
             document.setParentDirectoryHash(destinationDirectoryHash);
             if (destinationDir != null) {
                 document.setDocumentAttribute(destinationDir.getDocumentAttribute());
 
-                document.getReaders().clear();
-                document.getReadersGroups().clear();
-
-                destinationDir.getReaders().forEach(document.getReaders()::add);
-                destinationDir.getReadersGroups().forEach(document.getReadersGroups()::add);
+//                document.getReaders().clear();
+//                document.getReadersGroups().clear();
+//
+//                destinationDir.getReaders().forEach(document.getReaders()::add);
+//                destinationDir.getReadersGroups().forEach(document.getReadersGroups()::add);
             } else {
                 document.setDocumentAttribute(DocumentAttribute.PRIVATE);
             }
@@ -303,27 +312,27 @@ public class UserDocumentServiceImpl implements UserDocumentService {
         UserDocument copy = UserFileUtil.copyDocument(document);
         UserDirectory destinationDir = null;
 
-        if (!document.getOwner().getLogin().equals(destinationDirectoryHash)) {
-            destinationDir = userDirectoryService.getByHashName(destinationDirectoryHash);
-            if (destinationDir == null) {
-                return;
-            }
-        }
+//        if (!document.getOwner().getLogin().equals(destinationDirectoryHash)) {
+//            destinationDir = userDirectoryService.getByHashName(destinationDirectoryHash);
+//            if (destinationDir == null) {
+//                return;
+//            }
+//        }
         String copyName = document.getName();
 
-        if (getByFullNameAndOwner(document.getOwner(), destinationDirectoryHash, copyName) != null) {
-            String copyNameWithoutExtension = copyName.substring(0, copyName.lastIndexOf("."));
-            int matchesCount = repository.getLike(destinationDirectoryHash, copyNameWithoutExtension).size();
-            copy.setName(copyNameWithoutExtension + " (" + (matchesCount + 1) + ")" + document.getExtension());
-        }
+//        if (getByFullNameAndOwner(document.getOwner(), destinationDirectoryHash, copyName) != null) {
+//            String copyNameWithoutExtension = copyName.substring(0, copyName.lastIndexOf("."));
+//            int matchesCount = repository.getLike(destinationDirectoryHash, copyNameWithoutExtension).size();
+//            copy.setName(copyNameWithoutExtension + " (" + (matchesCount + 1) + ")" + document.getExtension());
+//        }
         copy.setParentDirectoryHash(destinationDirectoryHash);
         copy.setHashName(UserFileUtil.createHashName());
 
         if (destinationDir != null) {
             copy.setDocumentAttribute(destinationDir.getDocumentAttribute());
 
-            destinationDir.getReaders().forEach(copy.getReaders()::add);
-            destinationDir.getReadersGroups().forEach(copy.getReadersGroups()::add);
+//            destinationDir.getReaders().forEach(copy.getReaders()::add);
+//            destinationDir.getReadersGroups().forEach(copy.getReadersGroups()::add);
         } else {
             copy.setDocumentAttribute(DocumentAttribute.PRIVATE);
         }
@@ -351,27 +360,60 @@ public class UserDocumentServiceImpl implements UserDocumentService {
     }
 
     @Override
-    public UserDocument saveOrUpdateDocument(MultipartFile multipartFile, UserDirectory directory,
+    public UserDocument saveOrUpdateDocument(MultipartFile multipartFile, UserDirectory parentDirectory,
                                              String description, User user) throws IOException {
 
         String docName = multipartFile.getOriginalFilename();
-        String parentDirectoryHash = directory == null ? user.getLogin() : directory.getHashName();
+        String parentDirectoryHash = parentDirectory == null ? user.getLogin() : parentDirectory.getHashName();
         UserDocument document = getByFullNameAndOwner(user, parentDirectoryHash, docName);
 
         if (document == null) {
-            document = UserFileUtil.createUserDocument(multipartFile, directory, description, user);
-            multipartFile.transferTo(UserFileUtil.createFile(document.getHashName()));
-            save(document);
+            document = createDocument(multipartFile, parentDirectory, description, user);
         } else if (document.getDocumentStatus() == DocumentStatus.REMOVED) {
-            RemovedDocument removedDocument = removedDocumentService.getByUserDocument(document);
-            Long docId = recover(removedDocument.getId());
-            document = getDocumentWithOldVersions(docId);
-            updateDocument(document, user, description, multipartFile);
+            document = recoverAndUpdate(multipartFile, description, user, document);
         } else if (userDocumentAccessService.canEdit(document, user)) {
             document = getDocumentWithOldVersions(document.getId());
             updateDocument(document, user, description, multipartFile);
         }
 
+        return document;
+    }
+
+    private UserDocument createDocument(MultipartFile multipartFile, UserDirectory parentDirectory, String description, User user)
+            throws IOException {
+
+        UserDocument document = UserFileUtil.createUserDocument(multipartFile, parentDirectory, description, user);
+        multipartFile.transferTo(UserFileUtil.createFile(document.getHashName()));
+        Long docId = save(document);
+        document.setId(docId);
+        createRelations(document, parentDirectory, user);
+        return document;
+    }
+
+    private void createRelations(UserDocument document, UserDirectory parentDirectory, User owner) {
+        if (parentDirectory != null) {
+            List<UserToDirectoryRelation> userRelations =
+                    userToDirectoryRelationService.getAllByDirectory(parentDirectory);
+            List<FriendGroupToDirectoryRelation> friendGroupRelations =
+                    friendGroupToDirectoryRelationService.getAllByDirectory(parentDirectory);
+
+            userRelations.forEach(r -> userToDocumentRelationService
+                    .create(document, r.getUser(), r.getFileRelationType()));
+
+            friendGroupRelations.forEach(r -> friendGroupToDocumentRelationService
+                    .create(document, r.getFriendsGroup(), r.getFileRelationType()));
+        } else {
+            userToDocumentRelationService.create(document, owner, FileRelationType.OWNER);
+        }
+    }
+
+    private UserDocument recoverAndUpdate(MultipartFile multipartFile, String description, User user, UserDocument document)
+            throws IOException {
+
+        RemovedDocument removedDocument = removedDocumentService.getByOwnerAndDocument(user, document);
+        Long recoveredDocId = recover(removedDocument);
+        document = getDocumentWithOldVersions(recoveredDocId);
+        updateDocument(document, user, description, multipartFile);
         return document;
     }
 
@@ -381,8 +423,9 @@ public class UserDocumentServiceImpl implements UserDocumentService {
 
         DocumentOldVersion oldVersion = DocumentVersionUtil.createOldVersion(document);
         document.getDocumentOldVersions().add(oldVersion);
-        update(UserFileUtil.updateUserDocument(document, multipartFile, description, user));
-        eventSendingService.sendUpdateEvent(document, user);
+        UserDocument updatedDocument = UserFileUtil.updateUserDocument(document, multipartFile, description, user);
+        update(updatedDocument);
+        eventSendingService.sendUpdateEvent(updatedDocument, user);
     }
 
     @Override
@@ -405,13 +448,43 @@ public class UserDocumentServiceImpl implements UserDocumentService {
     @Override
     public UserDocument shareDocument(UserDocument document, SharedDto shared, User user) {
         Set<User> currentReadersAndEditors = getAllReadersAndEditors(document.getId());
-        document.setDocumentAttribute(DocumentAttribute.valueOf(shared.getAccess().toUpperCase()));
-        document.setReaders(FileControllersUtil.createEntitySet(shared.getReaders(), userService));
-        document.setEditors(FileControllersUtil.createEntitySet(shared.getEditors(), userService));
-        document.setReadersGroups(FileControllersUtil.createEntitySet(shared.getReadersGroups(), friendGroupService));
-        document.setEditorsGroups(FileControllersUtil.createEntitySet(shared.getEditorsGroups(), friendGroupService));
+
+        document.setDocumentAttribute(DocumentAttribute.getValue(shared.getAccess()));
+        createRelations(document, shared);
         update(document);
 
+        sendEvents(document, user, currentReadersAndEditors);
+        return document;
+    }
+
+    @Override
+    public void shareDocuments(List<UserDocument> documents, SharedDto shared) {
+        documents.forEach(d -> createRelations(d, shared));
+    }
+
+    private void createRelations(UserDocument document, SharedDto shared) {
+        userToDocumentRelationService.deleteByDocumentBesidesOwner(document);
+        if (!CollectionUtils.isEmpty(shared.getEditors())) {
+            List<User> editors = userService.getByIds(shared.getEditors());
+            userToDocumentRelationService.create(document, editors, FileRelationType.EDITOR);
+        }
+        if (!CollectionUtils.isEmpty(shared.getReaders())) {
+            List<User> readers = userService.getByIds(shared.getReaders());
+            userToDocumentRelationService.create(document, readers, FileRelationType.READER);
+        }
+
+        friendGroupToDocumentRelationService.deleteByDocumentBesidesOwner(document);
+        if (!CollectionUtils.isEmpty(shared.getEditorsGroups())) {
+            List<FriendsGroup> editorGroups = friendGroupService.getByIds(shared.getEditorsGroups());
+            friendGroupToDocumentRelationService.create(document, editorGroups, FileRelationType.EDITOR);
+        }
+        if (!CollectionUtils.isEmpty(shared.getReadersGroups())) {
+            List<FriendsGroup> readerGroups = friendGroupService.getByIds(shared.getReadersGroups());
+            friendGroupToDocumentRelationService.create(document, readerGroups, FileRelationType.READER);
+        }
+    }
+
+    private void sendEvents(UserDocument document, User user, Set<User> currentReadersAndEditors) {
         Set<User> newReadersAndEditorsSet = getAllReadersAndEditors(document.getId());
         newReadersAndEditorsSet.removeAll(currentReadersAndEditors);
         eventSendingService
@@ -420,8 +493,6 @@ public class UserDocumentServiceImpl implements UserDocumentService {
         newReadersAndEditorsSet = getAllReadersAndEditors(document.getId());
         currentReadersAndEditors.removeAll(newReadersAndEditorsSet);
         eventSendingService.sendProhibitAccessEvent(currentReadersAndEditors, FileType.DOCUMENT, document.getName(), user);
-
-        return document;
     }
 
     @Override
@@ -440,6 +511,11 @@ public class UserDocumentServiceImpl implements UserDocumentService {
         Long docId = recover(removedDocId);
         String docName = getById(docId).getName();
         eventSendingService.sendRecoverEvent(this, FileType.DOCUMENT, docName, docId, user);
+    }
+
+    @Override
+    public void updateDocumentAttribute(DocumentAttribute attribute, List<Long> documentIds) {
+        repository.updateDocumentAttribute(attribute, documentIds);
     }
 
     @Override

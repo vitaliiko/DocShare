@@ -3,6 +3,8 @@ package com.geekhub.repositories;
 import com.geekhub.entities.FriendsGroup;
 import com.geekhub.entities.User;
 import com.geekhub.entities.UserDocument;
+import com.geekhub.entities.enums.DocumentAttribute;
+import com.geekhub.entities.enums.FileRelationType;
 
 import java.util.List;
 import java.util.Map;
@@ -23,13 +25,13 @@ public interface UserDocumentRepository extends EntityRepository<UserDocument, L
 
     UserDocument get(Map<String, Object> propertiesMap);
 
-    List<UserDocument> getByReader(User reader);
+    UserDocument getByFullNameAndOwner(Map<String, Object> propertiesMap);
 
-    List<UserDocument> getByEditor(User editor);
+    List<UserDocument> getByUserAndRelationType(User user, FileRelationType relation);
 
-    List<UserDocument> getByReadersGroup(FriendsGroup readersGroup);
-
-    List<UserDocument> getByEditorsGroup(FriendsGroup editorsGroup);
+    List<UserDocument> getByFriendGroupAndRelationType(FriendsGroup friendsGroup, FileRelationType relation);
 
     List<UserDocument> search(User owner, String propertyName, String value);
+
+    void updateDocumentAttribute(DocumentAttribute attribute, List<Long> documentIds);
 }

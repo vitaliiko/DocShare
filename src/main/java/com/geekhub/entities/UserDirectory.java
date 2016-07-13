@@ -3,20 +3,12 @@ package com.geekhub.entities;
 import com.geekhub.entities.enums.DocumentAttribute;
 import com.geekhub.entities.enums.DocumentStatus;
 import java.io.Serializable;
-import java.util.HashSet;
-import java.util.Set;
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
-import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 @Entity
@@ -26,14 +18,6 @@ public class UserDirectory implements Comparable<UserDirectory>, Serializable {
     @Id
     @GeneratedValue
     private Long id;
-
-    @ManyToOne
-    @JoinColumn(name = "owner_id")
-    private User owner;
-
-    @ManyToOne
-    @JoinColumn(name = "organization_id")
-    private Organization organization;
 
     @Column
     private String name;
@@ -52,60 +36,12 @@ public class UserDirectory implements Comparable<UserDirectory>, Serializable {
     @Enumerated(EnumType.STRING)
     private DocumentStatus documentStatus = DocumentStatus.ACTUAL;
 
-    @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH},
-            fetch = FetchType.EAGER)
-    @JoinTable(name = "reader_to_directory_relation",
-            joinColumns = {
-                    @JoinColumn(name = "userdirectory_id")
-            },
-            inverseJoinColumns = {
-                    @JoinColumn(name = "reader_id")
-            }
-    )
-    private Set<User> readers = new HashSet<>();
-
-    @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH},
-            fetch = FetchType.EAGER)
-    @JoinTable(name = "readers_group_to_directory_relation",
-            joinColumns = {
-                    @JoinColumn(name = "userdirectory_id")
-            },
-            inverseJoinColumns = {
-                    @JoinColumn(name = "readersgroup_id")
-            }
-    )
-    private Set<FriendsGroup> readersGroups = new HashSet<>();
-
     public Long getId() {
         return id;
     }
 
     public void setId(Long id) {
         this.id = id;
-    }
-
-    public User getOwner() {
-        return owner;
-    }
-
-    public void setOwner(User owner) {
-        this.owner = owner;
-    }
-
-    public Set<User> getReaders() {
-        return readers;
-    }
-
-    public void setReaders(Set<User> readers) {
-        this.readers = readers;
-    }
-
-    public Set<FriendsGroup> getReadersGroups() {
-        return readersGroups;
-    }
-
-    public void setReadersGroups(Set<FriendsGroup> readersGroups) {
-        this.readersGroups = readersGroups;
     }
 
     public String getName() {
@@ -146,14 +82,6 @@ public class UserDirectory implements Comparable<UserDirectory>, Serializable {
 
     public void setDocumentStatus(DocumentStatus documentStatus) {
         this.documentStatus = documentStatus;
-    }
-
-    public Organization getOrganization() {
-        return organization;
-    }
-
-    public void setOrganization(Organization organization) {
-        this.organization = organization;
     }
 
     @Override

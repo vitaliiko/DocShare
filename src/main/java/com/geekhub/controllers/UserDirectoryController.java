@@ -5,6 +5,7 @@ import com.geekhub.dto.UserFileDto;
 import com.geekhub.dto.convertors.EntityToDtoConverter;
 import com.geekhub.entities.User;
 import com.geekhub.entities.UserDirectory;
+import com.geekhub.entities.UserDocument;
 import com.geekhub.exceptions.ResourceNotFoundException;
 import com.geekhub.security.UserDirectoryAccessService;
 import com.geekhub.services.UserDirectoryService;
@@ -57,11 +58,18 @@ public class UserDirectoryController {
                                                HttpSession session) {
 
         User owner = getUserFromSession(session);
-        UserDirectory directory = userDirectoryService.getByFullNameAndOwner(owner, parentDirHash, dirName);
-        if (directory != null || !UserFileUtil.validateDirectoryName(dirName)) {
+        UserDirectory parentDirectory = null;
+        if (parentDirHash != null && !parentDirHash.isEmpty() && !parentDirHash.equals("root")) {
+            parentDirectory = userDirectoryService.getByHashName(parentDirHash);
+            if (!directoryAccessService.isOwnerOfActual(parentDirectory, owner)) {
+                throw new ResourceNotFoundException();
+            }
+        }
+        UserDirectory existingDirectory = userDirectoryService.getByFullNameAndOwner(owner, parentDirHash, dirName);
+        if (existingDirectory != null || !UserFileUtil.validateDirectoryName(dirName)) {
             return ResponseEntity.badRequest().body(null);
         }
-        UserDirectory newDirectory = userDirectoryService.createDirectory(owner, parentDirHash, dirName);
+        UserDirectory newDirectory = userDirectoryService.createDirectory(owner, parentDirectory, dirName);
         return ResponseEntity.ok(EntityToDtoConverter.convert(newDirectory));
     }
 

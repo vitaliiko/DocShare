@@ -61,17 +61,9 @@ public class UserFileUtil {
         document.setLastModifyTime(Calendar.getInstance().getTime());
         document.setType(multipartFile.getContentType());
         document.setSize(convertDocumentSize(multipartFile.getSize()));
-        document.setOwner(user);
         document.setModifiedBy(user.getFullName());
         document.setHashName(createHashName());
-        if (directory == null) {
-            document.setDocumentAttribute(DocumentAttribute.PRIVATE);
-        } else {
-            document.setDocumentAttribute(directory.getDocumentAttribute());
-            directory.getReaders().forEach(document.getReaders()::add);
-            directory.getReadersGroups().forEach(document.getReadersGroups()::add);
-        }
-
+        document.setDocumentAttribute(directory == null ? DocumentAttribute.PRIVATE : directory.getDocumentAttribute());
         return document;
     }
 
@@ -111,7 +103,7 @@ public class UserFileUtil {
 
     public static RemovedDocument wrapUserDocumentInRemoved(UserDocument document, Long removerId) {
         RemovedDocument removedDocument = new RemovedDocument();
-        removedDocument.setOwner(document.getOwner());
+//        removedDocument.setOwner(document.getOwner());
         removedDocument.setRemoverId(removerId);
         removedDocument.setRemovalDate(Calendar.getInstance().getTime());
         removedDocument.setUserDocument(document);
@@ -120,7 +112,7 @@ public class UserFileUtil {
 
     public static RemovedDirectory wrapUserDirectoryInRemoved(UserDirectory directory, Long removerId) {
         RemovedDirectory removedDirectory = new RemovedDirectory();
-        removedDirectory.setOwner(directory.getOwner());
+//        removedDirectory.setOwner(directory.getOwner());
         removedDirectory.setRemoverId(removerId);
         removedDirectory.setRemovalDate(Calendar.getInstance().getTime());
         removedDirectory.setUserDirectory(directory);
@@ -146,7 +138,6 @@ public class UserFileUtil {
 
     public static UserDirectory createUserDirectory(User owner, String parentDirHash, String dirName) {
         UserDirectory directory = new UserDirectory();
-        directory.setOwner(owner);
         directory.setName(dirName);
         directory.setParentDirectoryHash(parentDirHash.equals("root") ? owner.getLogin() : parentDirHash);
         directory.setHashName(createHashName());
@@ -156,7 +147,7 @@ public class UserFileUtil {
 
     public static Map<String, Object> createPropertiesMap(User owner, String parentDirectoryHash, String name) {
         Map<String, Object> propertiesMap = new HashMap<>();
-        propertiesMap.put("owner", owner);
+        propertiesMap.put("user", owner);
         propertiesMap.put("parentDirectoryHash", parentDirectoryHash);
         propertiesMap.put("name", name);
         return propertiesMap;

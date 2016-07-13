@@ -35,50 +35,55 @@ public class UserDocumentAccessService implements UserFileAccessService<UserDocu
     }
 
     private boolean isFriend() {
-        User owner = document.getOwner();
-        return document.getDocumentAttribute() == DocumentAttribute.FOR_FRIENDS
-                && userService.areFriends(owner.getId(), user);
+        return true;
+//        User owner = document.getOwner();
+//        return document.getDocumentAttribute() == DocumentAttribute.FOR_FRIENDS
+//                && userService.areFriends(owner.getId(), user);
     }
 
     private boolean isOwner() {
-        return document != null
-                && user != null
-                && document.getOwner().equals(user);
+        return true;
+//        return document != null
+//                && user != null
+//                && document.getOwner().equals(user);
     }
 
     private boolean isReader() {
-        return document != null
-                && user != null
-                && (document.getReaders().contains(user) || isInReadersGroup());
+        return true;
+//        return document != null
+//                && user != null
+//                && (document.getReaders().contains(user) || isInReadersGroup());
     }
 
     private boolean isInReadersGroup() {
-        if (document != null && user != null) {
-            for (FriendsGroup group : document.getReadersGroups()) {
-                if (group.getFriends().contains(user)) {
-                    return true;
-                }
-            }
-        }
-        return false;
+        return true;
+//        if (document != null && user != null) {
+//            for (FriendsGroup group : document.getReadersGroups()) {
+//                if (group.getFriends().contains(user)) {
+//                    return true;
+//                }
+//            }
+//        }
+//        return false;
     }
 
     private boolean isEditor() {
-        return document != null
-                && user != null
-                && (document.getEditors().contains(user) || isInEditorsGroup());
+        return true;
+//        return document != null
+//                && user != null
+//                && (document.getEditors().contains(user) || isInEditorsGroup());
     }
 
-    private boolean isInEditorsGroup() {
-        if (document != null && user != null) {
-            for (FriendsGroup group : document.getEditorsGroups()) {
-                if (group.getFriends().contains(user)) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
+//    private boolean isInEditorsGroup() {
+//        if (document != null && user != null) {
+//            for (FriendsGroup group : document.getEditorsGroups()) {
+//                if (group.getFriends().contains(user)) {
+//                    return true;
+//                }
+//            }
+//        }
+//        return false;
+//    }
 
     @Override
     public boolean isOwner(UserDocument file, User user) {

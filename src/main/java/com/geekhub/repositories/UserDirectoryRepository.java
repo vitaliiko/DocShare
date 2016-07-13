@@ -3,6 +3,7 @@ package com.geekhub.repositories;
 import com.geekhub.entities.FriendsGroup;
 import com.geekhub.entities.User;
 import com.geekhub.entities.UserDirectory;
+import com.geekhub.entities.enums.DocumentAttribute;
 
 import java.util.List;
 import java.util.Map;
@@ -21,9 +22,9 @@ public interface UserDirectoryRepository extends EntityRepository<UserDirectory,
 
     UserDirectory get(User owner, String propertyName, Object value);
 
-    UserDirectory get(Map<String, Object> propertiesMap);
-
-    Long getCountByReadersGroup(FriendsGroup readersGroup);
+    UserDirectory getByFullNameAndOwner(Map<String, Object> propertiesMap);
 
     List<UserDirectory> search(User owner, String propertyName, String value);
+
+    void updateDocumentAttribute(DocumentAttribute attribute, List<Long> directoryIds);
 }

@@ -19,6 +19,7 @@ import org.hibernate.HibernateException;
 import javax.inject.Inject;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
 import java.util.HashMap;
 import java.util.List;
@@ -79,6 +80,14 @@ public class UserServiceImpl implements UserService {
     @Override
     public void deleteById(Long entityId) {
         repository.deleteById(entityId);
+    }
+
+    @Override
+    public List<User> getByIds(List<Long> userIds) {
+        if (CollectionUtils.isEmpty(userIds)) {
+            return null;
+        }
+        return repository.getByIds(userIds);
     }
 
     @Override

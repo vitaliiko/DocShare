@@ -12,13 +12,9 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
-import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
@@ -69,62 +65,6 @@ public class UserDocument implements Comparable<UserDocument>, Serializable {
     @Enumerated(EnumType.STRING)
     private AbilityToCommentDocument abilityToComment = AbilityToCommentDocument.ENABLE;
 
-    @ManyToOne
-    @JoinColumn(name = "owner_id")
-    private User owner;
-
-    @ManyToOne
-    @JoinColumn(name = "organization_id")
-    private Organization organization;
-
-    @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH},
-            fetch = FetchType.EAGER)
-    @JoinTable(name = "reader_to_document_relation",
-            joinColumns = {
-                    @JoinColumn(name = "userdocument_id")
-            },
-            inverseJoinColumns = {
-                    @JoinColumn(name = "reader_id")
-            }
-    )
-    private Set<User> readers = new HashSet<>();
-
-    @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH},
-            fetch = FetchType.EAGER)
-    @JoinTable(name = "editor_to_document_relation",
-            joinColumns = {
-                    @JoinColumn(name = "userdocument_id")
-            },
-            inverseJoinColumns = {
-                    @JoinColumn(name = "editor_id")
-            }
-    )
-    private Set<User> editors = new HashSet<>();
-
-    @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH},
-            fetch = FetchType.EAGER)
-    @JoinTable(name = "readers_group_to_document_relation",
-            joinColumns = {
-                    @JoinColumn(name = "userdocument_id")
-            },
-            inverseJoinColumns = {
-                    @JoinColumn(name = "readersgroup_id")
-            }
-    )
-    private Set<FriendsGroup> readersGroups = new HashSet<>();
-
-    @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH},
-            fetch = FetchType.EAGER)
-    @JoinTable(name = "editors_group_to_document_relation",
-            joinColumns = {
-                    @JoinColumn(name = "userdocument_id")
-            },
-            inverseJoinColumns = {
-                    @JoinColumn(name = "editorsgroup_id")
-            }
-    )
-    private Set<FriendsGroup> editorsGroups = new HashSet<>();
-
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "doc_id")
     private Set<Comment> comments = new HashSet<>();
@@ -157,22 +97,6 @@ public class UserDocument implements Comparable<UserDocument>, Serializable {
         this.description = description;
     }
 
-    public User getOwner() {
-        return owner;
-    }
-
-    public void setOwner(User owner) {
-        this.owner = owner;
-    }
-
-    public Set<User> getReaders() {
-        return readers;
-    }
-
-    public void setReaders(Set<User> readers) {
-        this.readers = readers;
-    }
-
     public Date getLastModifyTime() {
         return lastModifyTime;
     }
@@ -197,36 +121,12 @@ public class UserDocument implements Comparable<UserDocument>, Serializable {
         this.comments = comments;
     }
 
-    public Set<FriendsGroup> getReadersGroups() {
-        return readersGroups;
-    }
-
-    public void setReadersGroups(Set<FriendsGroup> readersGroups) {
-        this.readersGroups = readersGroups;
-    }
-
     public Set<DocumentOldVersion> getDocumentOldVersions() {
         return documentOldVersions;
     }
 
     public void setDocumentOldVersions(Set<DocumentOldVersion> documentOldVersions) {
         this.documentOldVersions = documentOldVersions;
-    }
-
-    public Set<User> getEditors() {
-        return editors;
-    }
-
-    public void setEditors(Set<User> editors) {
-        this.editors = editors;
-    }
-
-    public Set<FriendsGroup> getEditorsGroups() {
-        return editorsGroups;
-    }
-
-    public void setEditorsGroups(Set<FriendsGroup> editorsGroups) {
-        this.editorsGroups = editorsGroups;
     }
 
     public String getName() {
@@ -291,14 +191,6 @@ public class UserDocument implements Comparable<UserDocument>, Serializable {
 
     public void setExtension(String extension) {
         this.extension = extension;
-    }
-
-    public Organization getOrganization() {
-        return organization;
-    }
-
-    public void setOrganization(Organization organization) {
-        this.organization = organization;
     }
 
     public void setNameWithExtension(String name) {

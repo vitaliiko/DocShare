@@ -96,21 +96,21 @@ public class UserDocumentController {
     @RequestMapping(value = "/documents/upload", method = RequestMethod.POST)
     public ModelAndView uploadDocument(@RequestParam("files[]") MultipartFile[] files,
                                        @RequestParam(required = false, name = "dirHashName") String parentDirectoryHash,
-                                       String description,
+                                       @RequestParam(required = false) String description,
                                        HttpSession session) throws IOException {
 
         User user = getUserFromSession(session);
-        UserDirectory directory = null;
+        UserDirectory parentDirectory = null;
         if (parentDirectoryHash != null && !parentDirectoryHash.isEmpty()) {
-            directory = userDirectoryService.getByHashName(parentDirectoryHash);
-            if (!directoryAccessService.isOwnerOfActual(directory, user)) {
+            parentDirectory = userDirectoryService.getByHashName(parentDirectoryHash);
+            if (!directoryAccessService.isOwnerOfActual(parentDirectory, user)) {
                 throw new ResourceNotFoundException();
             }
         }
 
         if (UserFileUtil.isValidFileUploading(files)) {
             for (MultipartFile file : files) {
-                userDocumentService.saveOrUpdateDocument(file, directory, description, user);
+                userDocumentService.saveOrUpdateDocument(file, parentDirectory, description, user);
             }
         }
 

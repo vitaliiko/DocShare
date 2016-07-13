@@ -12,6 +12,8 @@ import java.util.Set;
 @Service
 public interface UserService extends EntityService<User, Long> {
 
+    List<User> getByIds(List<Long> userIds);
+
     User getByLogin(String login);
 
     Set<User> getFriends(Long userId);

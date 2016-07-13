@@ -1,9 +1,14 @@
 package com.geekhub.repositories.impl;
 
 import com.geekhub.entities.FriendGroupToDocumentRelation;
+import com.geekhub.entities.FriendsGroup;
+import com.geekhub.entities.UserDirectory;
+import com.geekhub.entities.UserDocument;
+import com.geekhub.entities.enums.FileRelationType;
 import com.geekhub.repositories.FriendGroupToDocumentRelationRepository;
 import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Order;
+import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.stereotype.Repository;
 
@@ -72,5 +77,23 @@ public class FriendGroupToDocumentRelationRepositoryImpl implements FriendGroupT
                 .createCriteria(clazz)
                 .add(Restrictions.eq(propertyName, value))
                 .list();
+    }
+
+    @Override
+    public void deleteByDocumentBesidesOwner(UserDocument document) {
+        sessionFactory.getCurrentSession()
+                .createQuery("DELETE FriendGroupToDocumentRelation r WHERE r.document = :document AND r.fileRelationType != :relation")
+                .setParameter("document", document)
+                .setParameter("relation", FileRelationType.OWNER)
+                .executeUpdate();
+    }
+
+    @Override
+    public Long getCountByFriendGroup(FriendsGroup group) {
+        return (Long) sessionFactory.getCurrentSession()
+                .createCriteria(clazz)
+                .add(Restrictions.eq("friendsGroup", group))
+                .setProjection(Projections.rowCount())
+                .uniqueResult();
     }
 }

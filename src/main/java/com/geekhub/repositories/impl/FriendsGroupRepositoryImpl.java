@@ -49,6 +49,14 @@ public class FriendsGroupRepositoryImpl implements FriendsGroupRepository {
                 .list();
     }
 
+    @Override
+    public List<FriendsGroup> getByIds(List<Long> groupIds) {
+        return sessionFactory.getCurrentSession()
+                .createCriteria(clazz)
+                .add(Restrictions.in("id", groupIds))
+                .list();
+    }
+
     @Override public FriendsGroup get(User owner, String propertyName, Object value) {
         return (FriendsGroup) sessionFactory.getCurrentSession()
                 .createCriteria(clazz)

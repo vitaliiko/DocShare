@@ -79,6 +79,14 @@ public class UserRepositoryImpl implements UserRepository {
     }
 
     @Override
+    public List<User> getByIds(List<Long> userIds) {
+        return sessionFactory.getCurrentSession()
+                .createCriteria(clazz)
+                .add(Restrictions.in("id", userIds))
+                .list();
+    }
+
+    @Override
     public List<User> getByFriend(User friend) {
         return sessionFactory.getCurrentSession()
                 .createQuery("from User u where :friend in elements(u.friends)")

@@ -1,15 +1,11 @@
 package com.geekhub.services.impl;
 
-import com.geekhub.controllers.utils.FileControllersUtil;
+import com.geekhub.entities.*;
+import com.geekhub.entities.enums.FileRelationType;
 import com.geekhub.repositories.UserDirectoryRepository;
 import com.geekhub.dto.SharedDto;
 import com.geekhub.dto.UserFileDto;
 import com.geekhub.dto.convertors.EntityToDtoConverter;
-import com.geekhub.entities.FriendsGroup;
-import com.geekhub.entities.RemovedDirectory;
-import com.geekhub.entities.User;
-import com.geekhub.entities.UserDirectory;
-import com.geekhub.entities.UserDocument;
 import com.geekhub.entities.enums.DocumentAttribute;
 import com.geekhub.entities.enums.DocumentStatus;
 import com.geekhub.security.UserDirectoryAccessService;
@@ -23,9 +19,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.stream.Collectors;
 import javax.inject.Inject;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
 @Service
 @Transactional
@@ -54,6 +52,12 @@ public class UserDirectoryServiceImpl implements UserDirectoryService {
 
     @Inject
     private FriendGroupService friendGroupService;
+
+    @Inject
+    private UserToDirectoryRelationService userToDirectoryRelationService;
+
+    @Inject
+    private FriendGroupToDirectoryRelationService friendGroupToDirectoryRelationService;
 
     @Override
     public List<UserDirectory> getAll(String orderParameter) {
@@ -110,7 +114,7 @@ public class UserDirectoryServiceImpl implements UserDirectoryService {
         directory.setDocumentStatus(DocumentStatus.REMOVED);
 
         List<UserDocument> documents = userDocumentService
-                .getByParentDirectoryHashAndStatus(directory.getHashName(), DocumentStatus.ACTUAL);
+                .getAllByParentDirectoryHashAndStatus(directory.getHashName(), DocumentStatus.ACTUAL);
         documents.forEach(d -> d.setDocumentStatus(DocumentStatus.REMOVED));
 
         List<UserDirectory> directories =
@@ -132,7 +136,7 @@ public class UserDirectoryServiceImpl implements UserDirectoryService {
         setActualStatus(directory);
         repository.update(directory);
 
-        eventSendingService.sendRecoverEvent(this, FileType.DIRECTORY, directory.getName(), directory.getId(), directory.getOwner());
+//        eventSendingService.sendRecoverEvent(this, FileType.DIRECTORY, directory.getName(), directory.getId(), directory.getOwner());
         return directory.getId();
     }
 
@@ -140,10 +144,10 @@ public class UserDirectoryServiceImpl implements UserDirectoryService {
         directory.setDocumentStatus(DocumentStatus.ACTUAL);
 
         List<UserDocument> documents = userDocumentService
-                .getByParentDirectoryHashAndStatus(directory.getHashName(), DocumentStatus.REMOVED);
-        documents.stream()
-                .filter(d -> removedDocumentService.getByUserDocument(d) == null)
-                .forEach(d -> d.setDocumentStatus(DocumentStatus.ACTUAL));
+                .getAllByParentDirectoryHashAndStatus(directory.getHashName(), DocumentStatus.REMOVED);
+//        documents.stream()
+//                .filter(d -> removedDocumentService.getByOwnerAndDocument(d) == null)
+//                .forEach(d -> d.setDocumentStatus(DocumentStatus.ACTUAL));
 
         List<UserDirectory> directories =
                 getByParentDirectoryHashAndStatus(directory.getHashName(), DocumentStatus.REMOVED);
@@ -166,12 +170,17 @@ public class UserDirectoryServiceImpl implements UserDirectoryService {
     @Override
     public UserDirectory getByFullNameAndOwner(User owner, String parentDirectoryHash, String name) {
         Map<String, Object> propertiesMap = UserFileUtil.createPropertiesMap(owner, parentDirectoryHash, name);
-        return repository.get(propertiesMap);
+        return repository.getByFullNameAndOwner(propertiesMap);
     }
 
     @Override
-    public List<UserDirectory> getByParentDirectoryHash(String parentDirectoryHash) {
+    public List<UserDirectory> getAllByParentDirectoryHash(String parentDirectoryHash) {
         return repository.getList("parentDirectoryHash", parentDirectoryHash);
+    }
+
+    @Override
+    public List<UserDirectory> getTreeByParentDirectoryHash(String parentDirectoryHash) {
+        return null;
     }
 
     @Override
@@ -188,16 +197,34 @@ public class UserDirectoryServiceImpl implements UserDirectoryService {
     }
 
     @Override
-    public UserDirectory createDirectory(User owner, String parentDirHash, String dirName) {
+    public UserDirectory createDirectory(User owner, UserDirectory parentDirectory, String dirName) {
+        String parentDirHash = parentDirectory == null ? owner.getLogin() : parentDirectory.getHashName();
         UserDirectory directory = getByFullNameAndOwner(owner, parentDirHash, dirName);
 
-        if (directory == null && UserFileUtil.validateDirectoryName(dirName)) {
-            directory = UserFileUtil.createUserDirectory(owner, parentDirHash, dirName);
-            long dirId = save(directory);
-            directory.setId(dirId);
-            return directory;
+        if (directory != null && !UserFileUtil.validateDirectoryName(dirName)) {
+            return null;
         }
-        return null;
+        directory = UserFileUtil.createUserDirectory(owner, parentDirHash, dirName);
+        long dirId = save(directory);
+        directory.setId(dirId);
+        createRelations(owner, parentDirectory, directory);
+        return directory;
+    }
+
+    private void createRelations(User owner, UserDirectory parentDirectory, UserDirectory directory) {
+        if (parentDirectory != null) {
+            List<UserToDirectoryRelation> userRelations =
+                    userToDirectoryRelationService.getAllByDirectory(parentDirectory);
+            List<FriendGroupToDirectoryRelation> friendGroupRelations =
+                    friendGroupToDirectoryRelationService.getAllByDirectory(parentDirectory);
+
+            friendGroupRelations.forEach(r -> friendGroupToDirectoryRelationService
+                    .create(directory, r.getFriendsGroup(), r.getFileRelationType()));
+            userRelations.forEach(r -> userToDirectoryRelationService
+                    .create(directory, r.getUser(), r.getFileRelationType()));
+        } else {
+            userToDirectoryRelationService.create(directory, owner, FileRelationType.OWNER);
+        }
     }
 
     @Override
@@ -206,11 +233,11 @@ public class UserDirectoryServiceImpl implements UserDirectoryService {
     }
 
     @Override
-    public Set<User> getAllReaders(Long docId) {
+    public Set<User> getAllReadersAndEditors(Long docId) {
         Set<User> users = new HashSet<>();
-        UserDirectory document = getById(docId);
-        users.addAll(document.getReaders());
-        document.getReadersGroups().forEach(g -> users.addAll(g.getFriends()));
+//        UserDirectory document = getById(docId);
+//        users.addAll(document.getReaders());
+//        document.getReadersGroups().forEach(g -> users.addAll(g.getFriends()));
         return users;
     }
 
@@ -219,11 +246,11 @@ public class UserDirectoryServiceImpl implements UserDirectoryService {
         String location = "";
         String patentDirectoryHash = directory.getParentDirectoryHash();
 
-        while(!patentDirectoryHash.equals(directory.getOwner().getLogin())) {
-            UserDirectory dir = getByHashName(patentDirectoryHash);
-            location = dir.getName() + "/" + location;
-            patentDirectoryHash = dir.getParentDirectoryHash();
-        }
+//        while(!patentDirectoryHash.equals(directory.getOwner().getLogin())) {
+//            UserDirectory dir = getByHashName(patentDirectoryHash);
+//            location = dir.getName() + "/" + location;
+//            patentDirectoryHash = dir.getParentDirectoryHash();
+//        }
 
         return location;
     }
@@ -234,11 +261,6 @@ public class UserDirectoryServiceImpl implements UserDirectoryService {
     }
 
     @Override
-    public Long getCountByFriendsGroup(FriendsGroup friendsGroup) {
-        return repository.getCountByReadersGroup(friendsGroup);
-    }
-
-    @Override
     public void replace(Long dirId, String destinationDirectoryHash) {
         UserDirectory directory = repository.getById(dirId);
         String dirName = directory.getName();
@@ -246,10 +268,10 @@ public class UserDirectoryServiceImpl implements UserDirectoryService {
         String destinationDirLocation = getDestinationDirectoryLocation(directory, destinationDirectoryHash);
 
         if (!destinationDirLocation.startsWith(dirLocation)) {
-            if (getByFullNameAndOwner(directory.getOwner(), destinationDirectoryHash, dirName) != null) {
-                int matchesCount = repository.getLike(destinationDirectoryHash, dirName).size();
-                directory.setName(dirName + " (" + (matchesCount + 1) + ")");
-            }
+//            if (getByFullNameAndOwner(directory.getOwner(), destinationDirectoryHash, dirName) != null) {
+//                int matchesCount = repository.getLike(destinationDirectoryHash, dirName).size();
+//                directory.setName(dirName + " (" + (matchesCount + 1) + ")");
+//            }
             directory.setParentDirectoryHash(destinationDirectoryHash);
             repository.update(directory);
         }
@@ -279,7 +301,7 @@ public class UserDirectoryServiceImpl implements UserDirectoryService {
         directory.setName(newDirName);
         update(directory);
 
-        eventSendingService.sendRenameEvent(getAllReaders(directory.getId()), FileType.DIRECTORY, oldDirName,
+        eventSendingService.sendRenameEvent(getAllReadersAndEditors(directory.getId()), FileType.DIRECTORY, oldDirName,
                 newDirName, directory.getId(), owner);
 
         return directory;
@@ -287,43 +309,66 @@ public class UserDirectoryServiceImpl implements UserDirectoryService {
 
     @Override
     public UserDirectory shareDirectory(UserDirectory directory, SharedDto sharedDto, User user) {
+        Set<User> currentReadersAndEditors = getAllReadersAndEditors(directory.getId());
+
         directory.setDocumentAttribute(DocumentAttribute.valueOf(sharedDto.getAccess()));
-
-        Set<User> readers =
-                FileControllersUtil.createEntitySet(sharedDto.getReaders(), userService);
-        Set<FriendsGroup> readerGroups =
-                FileControllersUtil.createEntitySet(sharedDto.getReadersGroups(), friendGroupService);
-
-        directory.setReaders(readers);
-        directory.setReadersGroups(readerGroups);
-
-        userDocumentService
-                .getByParentDirectoryHashAndStatus(directory.getHashName(), DocumentStatus.ACTUAL).forEach(d -> {
-            d.setDocumentAttribute(DocumentAttribute.valueOf(sharedDto.getAccess()));
-            d.setReaders(readers);
-            d.setReadersGroups(readerGroups);
-            userDocumentService.update(d);
-        });
-
         update(directory);
+        createRelations(directory, sharedDto);
+        createRelationsForChilds(directory.getHashName(), sharedDto);
 
-        Set<User> currentReaders = getAllReaders(directory.getId());
-        Set<User> newReaderSet = getAllReaders(directory.getId());
-        newReaderSet.removeAll(currentReaders);
+        sendEvents(directory, user, currentReadersAndEditors);
+        return directory;
+    }
+
+    private void createRelationsForChilds(String dirHashName, SharedDto sharedDto) {
+        List<UserDirectory> childDirectories = getTreeByParentDirectoryHash(dirHashName);
+        if (!CollectionUtils.isEmpty(childDirectories)) {
+            childDirectories.forEach(d -> createRelations(d, sharedDto));
+
+            List<String> parentDirHashList = childDirectories.stream().map(UserDirectory::getHashName).collect(Collectors.toList());
+            parentDirHashList.add(dirHashName);
+            List<UserDocument> childDocuments = userDocumentService.getAllByParentDirectoryHashes(parentDirHashList);
+            userDocumentService.shareDocuments(childDocuments, sharedDto);
+        }
+    }
+
+    private void createRelations(UserDirectory directory, SharedDto sharedDto) {
+        userToDirectoryRelationService.deleteByDirectoryBesidesOwner(directory);
+        if (!CollectionUtils.isEmpty(sharedDto.getReaders())) {
+            List<User> readers = userService.getByIds(sharedDto.getReaders());
+            userToDirectoryRelationService.create(directory, readers, FileRelationType.READER);
+        }
+        if (!CollectionUtils.isEmpty(sharedDto.getEditors())) {
+            List<User> editors = userService.getByIds(sharedDto.getEditors());
+            userToDirectoryRelationService.create(directory, editors, FileRelationType.EDITOR);
+        }
+
+        friendGroupToDirectoryRelationService.deleteByDirectoryBesidesOwner(directory);
+        if (!CollectionUtils.isEmpty(sharedDto.getReadersGroups())) {
+            List<FriendsGroup> readerGroups = friendGroupService.getByIds(sharedDto.getReadersGroups());
+            friendGroupToDirectoryRelationService.create(directory, readerGroups, FileRelationType.READER);
+        }
+        if (!CollectionUtils.isEmpty(sharedDto.getEditorsGroups())) {
+            List<FriendsGroup> editorGroups = friendGroupService.getByIds(sharedDto.getReadersGroups());
+            friendGroupToDirectoryRelationService.create(directory, editorGroups, FileRelationType.EDITOR);
+        }
+    }
+
+    private void sendEvents(UserDirectory directory, User user, Set<User> currentReadersAndEditors) {
+        Set<User> newReaderSet = getAllReadersAndEditors(directory.getId());
+        newReaderSet.removeAll(currentReadersAndEditors);
         eventSendingService.sendShareEvent(newReaderSet, FileType.DIRECTORY, directory.getName(), directory.getId(), user);
 
-        newReaderSet = getAllReaders(directory.getId());
-        currentReaders.removeAll(newReaderSet);
-        eventSendingService.sendProhibitAccessEvent(currentReaders, FileType.DIRECTORY, directory.getName(), user);
-
-        return directory;
+        newReaderSet = getAllReadersAndEditors(directory.getId());
+        currentReadersAndEditors.removeAll(newReaderSet);
+        eventSendingService.sendProhibitAccessEvent(currentReadersAndEditors, FileType.DIRECTORY, directory.getName(), user);
     }
 
     @Override
     public Set<UserFileDto> getDirectoryContent(String dirHashName) {
         List<UserDocument> documents;
         List<UserDirectory> directories;
-        documents = userDocumentService.getByParentDirectoryHashAndStatus(dirHashName, DocumentStatus.ACTUAL);
+        documents = userDocumentService.getAllByParentDirectoryHashAndStatus(dirHashName, DocumentStatus.ACTUAL);
         directories = getByParentDirectoryHashAndStatus(dirHashName, DocumentStatus.ACTUAL);
 
         Set<UserFileDto> dtoSet = new TreeSet<>();
@@ -337,6 +382,11 @@ public class UserDirectoryServiceImpl implements UserDirectoryService {
     }
 
     @Override
+    public void updateDocumentAttribute(DocumentAttribute attribute, List<Long> directoryIds) {
+        repository.updateDocumentAttribute(attribute, directoryIds);
+    }
+
+    @Override
     public void copy(Long dirId, String destinationDirectoryHash) {
         UserDirectory directory = repository.getById(dirId);
         UserDirectory copy = UserFileUtil.copyDirectory(directory);
@@ -345,10 +395,10 @@ public class UserDirectoryServiceImpl implements UserDirectoryService {
         String destinationDirLocation = getDestinationDirectoryLocation(directory, destinationDirectoryHash);
 
         if (!destinationDirLocation.startsWith(copyLocation)) {
-            if (getByFullNameAndOwner(directory.getOwner(), destinationDirectoryHash, copyName) != null) {
-                int matchesCount = repository.getLike(destinationDirectoryHash, copyName).size();
-                copy.setName(copyName + " (" + (matchesCount + 1) + ")");
-            }
+//            if (getByFullNameAndOwner(directory.getOwner(), destinationDirectoryHash, copyName) != null) {
+//                int matchesCount = repository.getLike(destinationDirectoryHash, copyName).size();
+//                copy.setName(copyName + " (" + (matchesCount + 1) + ")");
+//            }
 
             copy.setParentDirectoryHash(destinationDirectoryHash);
             copy.setHashName(UserFileUtil.createHashName());
@@ -379,15 +429,15 @@ public class UserDirectoryServiceImpl implements UserDirectoryService {
 
     private String getDestinationDirectoryLocation(UserDirectory directory, String destinationDirHash) {
         UserDirectory destinationDir = null;
-        if (!directory.getOwner().getLogin().equals(destinationDirHash)) {
-            destinationDir = getByHashName(destinationDirHash);
-        }
+//        if (!directory.getOwner().getLogin().equals(destinationDirHash)) {
+//            destinationDir = getByHashName(destinationDirHash);
+//        }
 
-        String destinationDirLocation;
+        String destinationDirLocation = null;
         if (destinationDir != null) {
             destinationDirLocation = getLocation(destinationDir) + destinationDir.getName();
         } else {
-            destinationDirLocation = directory.getOwner().getLogin();
+//            destinationDirLocation = directory.getOwner().getLogin();
         }
         return destinationDirLocation;
     }

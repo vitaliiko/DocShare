@@ -3,9 +3,11 @@ package com.geekhub.repositories.impl;
 import com.geekhub.entities.FriendsGroup;
 import com.geekhub.entities.User;
 import com.geekhub.entities.UserDocument;
+import com.geekhub.entities.enums.DocumentAttribute;
 import com.geekhub.entities.enums.DocumentStatus;
 import java.util.Map;
 
+import com.geekhub.entities.enums.FileRelationType;
 import com.geekhub.repositories.UserDocumentRepository;
 import org.hibernate.SessionFactory;
 import org.hibernate.criterion.MatchMode;
@@ -142,42 +144,35 @@ public class UserDocumentRepositoryImpl implements UserDocumentRepository {
     }
 
     @Override
-    public List<UserDocument> getByReader(User reader) {
+    public UserDocument getByFullNameAndOwner(Map<String, Object> propertiesMap) {
+        return (UserDocument) sessionFactory.getCurrentSession()
+                .createQuery("SELECT doc FROM UserToDocumentRelation rel JOIN rel.document doc " +
+                        "WHERE doc.parentDirectoryHash = :parentDirHash AND doc.name = :name AND rel.user = :owner " +
+                        "AND rel.fileRelationType = :relation")
+                .setParameter("parentDirHash", propertiesMap.get("parentDirectoryHash"))
+                .setParameter("name", propertiesMap.get("name"))
+                .setParameter("owner", propertiesMap.get("owner"))
+                .setParameter("relation", FileRelationType.OWNER)
+                .uniqueResult();
+    }
+
+    @Override
+    public List<UserDocument> getByUserAndRelationType(User user, FileRelationType relation) {
         return sessionFactory.getCurrentSession()
-                .createQuery("from UserDocument doc " +
-                        "where doc.documentStatus = :status and :reader in elements(doc.readers)")
-                .setParameter("reader", reader)
-                .setParameter("status", DocumentStatus.ACTUAL)
+                .createQuery("SELECT doc FROM UserToDocumentRelation rel JOIN rel.document doc " +
+                        "WHERE rel.user = :user AND rel.fileRelationType = :relation")
+                .setParameter("user", user)
+                .setParameter("relation", relation)
                 .list();
     }
 
     @Override
-    public List<UserDocument> getByEditor(User editor) {
+    public List<UserDocument> getByFriendGroupAndRelationType(FriendsGroup group, FileRelationType relation) {
         return sessionFactory.getCurrentSession()
-                .createQuery("from UserDocument doc " +
-                        "where doc.documentStatus = :status and :editor in elements(doc.editors)")
-                .setParameter("editor", editor)
-                .setParameter("status", DocumentStatus.ACTUAL)
-                .list();
-    }
-
-    @Override
-    public List<UserDocument> getByReadersGroup(FriendsGroup readersGroup) {
-        return sessionFactory.getCurrentSession()
-                .createQuery("from UserDocument doc " +
-                        "where doc.documentStatus = :status and :readersGroup in elements(doc.readersGroups)")
-                .setParameter("readersGroup", readersGroup)
-                .setParameter("status", DocumentStatus.ACTUAL)
-                .list();
-    }
-
-    @Override
-    public List<UserDocument> getByEditorsGroup(FriendsGroup editorsGroup) {
-        return sessionFactory.getCurrentSession()
-                .createQuery("from UserDocument doc " +
-                        "where doc.documentStatus = :status and :editorsGroup in elements(doc.editorsGroups)")
-                .setParameter("editorsGroup", editorsGroup)
-                .setParameter("status", DocumentStatus.ACTUAL)
+                .createQuery("SELECT doc FROM FriendGroupToDocumentRelation rel JOIN rel.document doc " +
+                        "WHERE rel.friendsGroup = :group AND rel.fileRelationType = :relation")
+                .setParameter("group", group)
+                .setParameter("relation", relation)
                 .list();
     }
 
@@ -188,5 +183,14 @@ public class UserDocumentRepositoryImpl implements UserDocumentRepository {
                 .add(Restrictions.eq("owner", owner))
                 .add(Restrictions.like(propertyName, "%" + value + "%"))
                 .list();
+    }
+
+    @Override
+    public void updateDocumentAttribute(DocumentAttribute attribute, List<Long> documentIds) {
+        sessionFactory.getCurrentSession()
+                .createQuery("UPDATE UserDocument d SET d.documentAttribute = :attribute WHERE d.id in :ids")
+                .setParameter("attribute", attribute)
+                .setParameter("ids", documentIds)
+                .executeUpdate();
     }
 }

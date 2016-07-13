@@ -1,12 +1,20 @@
 package com.geekhub.services.impl;
 
+import com.geekhub.entities.User;
+import com.geekhub.entities.UserDirectory;
 import com.geekhub.entities.UserToDirectoryRelation;
+import com.geekhub.entities.enums.FileRelationType;
 import com.geekhub.repositories.UserToDirectoryRelationRepository;
 import com.geekhub.services.UserToDirectoryRelationService;
+import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
+import javax.transaction.Transactional;
 import java.util.List;
+import java.util.stream.Collectors;
 
+@Service
+@Transactional
 public class UserToDirectoryRelationServiceImpl implements UserToDirectoryRelationService {
 
     @Inject
@@ -45,5 +53,30 @@ public class UserToDirectoryRelationServiceImpl implements UserToDirectoryRelati
     @Override
     public void deleteById(Long entityId) {
         repository.deleteById(entityId);
+    }
+
+    @Override
+    public List<UserToDirectoryRelation> create(UserDirectory directory, List<User> users, FileRelationType relationType) {
+        return users.stream().map(u -> create(directory, u, relationType)).collect(Collectors.toList());
+    }
+
+    @Override
+    public UserToDirectoryRelation create(UserDirectory directory, User user, FileRelationType relationType) {
+        UserToDirectoryRelation relation = new UserToDirectoryRelation();
+        relation.setDirectory(directory);
+        relation.setUser(user);
+        relation.setFileRelationType(relationType);
+        save(relation);
+        return relation;
+    }
+
+    @Override
+    public void deleteByDirectoryBesidesOwner(UserDirectory directory) {
+        repository.deleteByDirectoryBesidesOwner(directory);
+    }
+
+    @Override
+    public List<UserToDirectoryRelation> getAllByDirectory(UserDirectory directory) {
+        return repository.getList("directory", directory);
     }
 }

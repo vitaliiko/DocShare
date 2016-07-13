@@ -16,7 +16,7 @@ import org.springframework.stereotype.Service;
 @Service
 public interface UserDirectoryService extends EntityService<UserDirectory, Long> {
 
-    UserDirectory createDirectory(User owner, String parentDirHash, String dirName);
+    UserDirectory createDirectory(User owner, UserDirectory parentDirectory, String dirName);
 
     Set<UserDirectory> getByIds(List<Long> dirIds);
 
@@ -44,19 +44,19 @@ public interface UserDirectoryService extends EntityService<UserDirectory, Long>
 
     UserDirectory getByHashName(String hashName);
 
-    List<UserDirectory> getByParentDirectoryHash(String parentDirectoryHash);
+    List<UserDirectory> getAllByParentDirectoryHash(String parentDirectoryHash);
+
+    List<UserDirectory> getTreeByParentDirectoryHash(String parentDirectoryHash);
 
     List<UserDirectory> getByParentDirectoryHashAndStatus(String parentDirectoryHash, DocumentStatus status);
 
     List<Object> getActualIdsByParentDirectoryHash(String parentDirectoryHash);
 
-    Set<User> getAllReaders(Long docId);
+    Set<User> getAllReadersAndEditors(Long docId);
 
     String getLocation(UserDirectory directory);
 
     Set<UserDirectory> getActualByOwner(User owner);
-
-    Long getCountByFriendsGroup(FriendsGroup friendsGroup);
 
     Set<UserDirectory> searchByName(User owner, String name);
 
@@ -65,4 +65,6 @@ public interface UserDirectoryService extends EntityService<UserDirectory, Long>
     UserDirectory shareDirectory(UserDirectory directory, SharedDto sharedDto, User user);
 
     Set<UserFileDto> getDirectoryContent(String dirHashName);
+
+    void updateDocumentAttribute(DocumentAttribute attribute, List<Long> directoryIds);
 }

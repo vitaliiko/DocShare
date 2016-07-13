@@ -11,11 +11,9 @@ import com.geekhub.services.UserDirectoryService;
 import com.geekhub.services.UserDocumentService;
 import com.geekhub.services.UserService;
 import com.geekhub.dto.convertors.DtoToEntityConverter;
-import com.geekhub.utils.UserFileUtil;
-import java.util.ArrayList;
+
 import java.util.List;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 import org.apache.commons.codec.digest.DigestUtils;
 import javax.inject.Inject;
@@ -150,12 +148,12 @@ public class UserProfileManager {
     }
 
     private void changeFilesParentDirectoryHash(String currentParentDirHash, String newParentDirHash) {
-        List<UserDocument> documents = userDocumentService.getByParentDirectoryHash(currentParentDirHash);
+        List<UserDocument> documents = userDocumentService.getAllByParentDirectoryHash(currentParentDirHash);
         documents.forEach(d -> {
             d.setParentDirectoryHash(newParentDirHash);
             userDocumentService.update(d);
         });
-        List<UserDirectory> directories = userDirectoryService.getByParentDirectoryHash(currentParentDirHash);
+        List<UserDirectory> directories = userDirectoryService.getAllByParentDirectoryHash(currentParentDirHash);
         directories.forEach(d -> {
             d.setParentDirectoryHash(newParentDirHash);
             userDirectoryService.update(d);

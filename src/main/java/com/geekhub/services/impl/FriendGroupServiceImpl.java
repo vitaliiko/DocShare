@@ -65,6 +65,11 @@ public class FriendGroupServiceImpl implements FriendGroupService {
     }
 
     @Override
+    public List<FriendsGroup> getByIds(List<Long> groupIds) {
+        return repository.getByIds(groupIds);
+    }
+
+    @Override
     public FriendsGroup create(User owner, CreateFriendGroupDto groupDto) {
         FriendsGroup group = new FriendsGroup();
         group.setOwner(owner);
