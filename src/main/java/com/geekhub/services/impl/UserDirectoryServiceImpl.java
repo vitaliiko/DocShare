@@ -343,7 +343,7 @@ public class UserDirectoryServiceImpl implements UserDirectoryService {
             userToDirectoryRelationService.create(directory, editors, FileRelationType.EDITOR);
         }
 
-        friendGroupToDirectoryRelationService.deleteByDirectoryBesidesOwner(directory);
+        friendGroupToDirectoryRelationService.deleteByDirectory(directory);
         if (!CollectionUtils.isEmpty(sharedDto.getReadersGroups())) {
             List<FriendsGroup> readerGroups = friendGroupService.getByIds(sharedDto.getReadersGroups());
             friendGroupToDirectoryRelationService.create(directory, readerGroups, FileRelationType.READER);

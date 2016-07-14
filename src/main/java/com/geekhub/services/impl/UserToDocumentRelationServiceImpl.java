@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import javax.inject.Inject;
 import javax.transaction.Transactional;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -81,7 +82,27 @@ public class UserToDocumentRelationServiceImpl implements UserToDocumentRelation
     }
 
     @Override
+    public List<User> getAllUsersByDocumentIdBesidesOwner(Long documentId) {
+        return repository.getAllUsersByDocumentIdBesidesOwner(documentId);
+    }
+
+    @Override
+    public User getDocumentOwner(UserDocument document) {
+        return repository.getDocumentOwner(document);
+    }
+
+    @Override
     public List<String> getAllDocumentHashNamesByOwner(User owner) {
         return repository.getAllDocumentHashNamesByOwner(owner);
+    }
+
+    @Override
+    public Set<UserDocument> getAllAccessibleDocuments(User user) {
+        return repository.getAllAccessibleDocuments(user).stream().collect(Collectors.toSet());
+    }
+
+    @Override
+    public Set<UserDocument> getAllAccessibleDocumentsInRoot(User user, List<String> directoryHashes) {
+        return repository.getAllAccessibleDocumentsInRoot(user, directoryHashes).stream().collect(Collectors.toSet());
     }
 }

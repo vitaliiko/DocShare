@@ -8,10 +8,7 @@ import com.geekhub.entities.enums.AbilityToCommentDocument;
 import com.geekhub.exceptions.ResourceNotFoundException;
 import com.geekhub.security.UserDirectoryAccessService;
 import com.geekhub.security.UserDocumentAccessService;
-import com.geekhub.services.DocumentOldVersionService;
-import com.geekhub.services.UserDirectoryService;
-import com.geekhub.services.UserDocumentService;
-import com.geekhub.services.UserService;
+import com.geekhub.services.*;
 import com.geekhub.utils.UserFileUtil;
 import com.geekhub.validators.FileValidator;
 import org.springframework.http.HttpStatus;
@@ -61,6 +58,12 @@ public class UserDocumentsResource {
 
     @Inject
     private UserDocumentAccessService documentAccessService;
+
+    @Inject
+    private UserToDirectoryRelationService userToDirectoryRelationService;
+
+    @Inject
+    private UserToDocumentRelationService userToDocumentRelationService;
 
     private User getUserFromSession(HttpSession session) {
         return userService.getById((Long) session.getAttribute("userId"));
@@ -263,11 +266,20 @@ public class UserDocumentsResource {
     @RequestMapping(value = "/documents/accessible", method = RequestMethod.GET)
     public ModelAndView getAccessibleDocuments(HttpSession session) {
         User user = getUserFromSession(session);
-        Set<UserFileDto> documentDtos = userDocumentService.getAllCanRead(user).stream()
-                .map(EntityToDtoConverter::convert)
-                .collect(Collectors.toCollection(TreeSet::new));
+
+        Set<UserDirectory> directories = userToDirectoryRelationService.getAllAccessibleDirectories(user);
+        List<String> directoryHashes = directories.stream().map(UserDirectory::getHashName).collect(Collectors.toList());
+        Set<UserDocument> documents = userToDocumentRelationService.getAllAccessibleDocumentsInRoot(user, directoryHashes);
+
+        Set<UserFileDto> documentDtos = documents.stream()
+                .map(EntityToDtoConverter::convert).collect(Collectors.toCollection(TreeSet::new));
+
+        Set<UserFileDto> directoryDtos = directories.stream()
+                .map(EntityToDtoConverter::convert).collect(Collectors.toCollection(TreeSet::new));
+
         ModelAndView model = new ModelAndView("accessibleDocuments");
         model.addObject("documents", documentDtos);
+        model.addObject("directories", directoryDtos);
         return model;
     }
 

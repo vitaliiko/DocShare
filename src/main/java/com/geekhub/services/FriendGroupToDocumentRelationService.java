@@ -2,6 +2,7 @@ package com.geekhub.services;
 
 import com.geekhub.entities.FriendGroupToDocumentRelation;
 import com.geekhub.entities.FriendsGroup;
+import com.geekhub.entities.User;
 import com.geekhub.entities.UserDocument;
 import com.geekhub.entities.enums.FileRelationType;
 import org.springframework.stereotype.Service;
@@ -16,7 +17,9 @@ public interface FriendGroupToDocumentRelationService extends EntityService<Frie
 
     FriendGroupToDocumentRelation create(UserDocument document, FriendsGroup group, FileRelationType relationType);
 
-    void deleteByDocumentBesidesOwner(UserDocument document);
+    void deleteByDocument(UserDocument document);
+
+    List<User> getAllGroupsMembersByDocumentId(Long documentId);
 
     List<FriendGroupToDocumentRelation> getAllByDocument(UserDocument document);
 

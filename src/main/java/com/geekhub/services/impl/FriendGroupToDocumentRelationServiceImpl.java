@@ -2,6 +2,7 @@ package com.geekhub.services.impl;
 
 import com.geekhub.entities.FriendGroupToDocumentRelation;
 import com.geekhub.entities.FriendsGroup;
+import com.geekhub.entities.User;
 import com.geekhub.entities.UserDocument;
 import com.geekhub.entities.enums.FileRelationType;
 import com.geekhub.repositories.FriendGroupToDocumentRelationRepository;
@@ -73,8 +74,13 @@ public class FriendGroupToDocumentRelationServiceImpl implements FriendGroupToDo
     }
 
     @Override
-    public void deleteByDocumentBesidesOwner(UserDocument document) {
-        repository.deleteByDocumentBesidesOwner(document);
+    public void deleteByDocument(UserDocument document) {
+        repository.deleteByDocument(document);
+    }
+
+    @Override
+    public List<User> getAllGroupsMembersByDocumentId(Long documentId) {
+        return repository.getAllGroupsMembersByDocument(documentId);
     }
 
     @Override

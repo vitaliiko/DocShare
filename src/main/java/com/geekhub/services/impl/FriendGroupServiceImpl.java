@@ -12,9 +12,11 @@ import javax.inject.Inject;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -75,7 +77,8 @@ public class FriendGroupServiceImpl implements FriendGroupService {
         group.setOwner(owner);
         group.setName(groupDto.getGroupName());
         if (groupDto.getFriends() != null) {
-            group.setFriends(userService.getSetByIds(groupDto.getFriends()));
+            List<User> userList = userService.getByIds(Arrays.asList(groupDto.getFriends()));
+            group.setFriends(userList.stream().collect(Collectors.toSet()));
         }
         save(group);
         return group;
@@ -88,7 +91,7 @@ public class FriendGroupServiceImpl implements FriendGroupService {
         Set<User> newMembersSet = null;
         group.setName(groupDto.getGroupName());
         if (groupDto.getFriends() != null) {
-            newMembersSet = userService.getSetByIds(groupDto.getFriends());
+            newMembersSet = userService.getByIds(Arrays.asList(groupDto.getFriends())).stream().collect(Collectors.toSet());
             group.setFriends(newMembersSet);
         } else {
             group.getFriends().clear();
@@ -122,7 +125,12 @@ public class FriendGroupServiceImpl implements FriendGroupService {
     }
 
     @Override
-    public List<FriendsGroup> getFriendsGroups(User owner, String propertyName, Object value) {
+    public List<User> getAllMembersByGroupIds(List<Long> groupIds) {
+        return repository.getAllMembersByGroupIds(groupIds);
+    }
+
+    @Override
+    public List<FriendsGroup> getFriendGroups(User owner, String propertyName, Object value) {
         return repository.getFriendsGroups(owner, propertyName, value);
     }
 

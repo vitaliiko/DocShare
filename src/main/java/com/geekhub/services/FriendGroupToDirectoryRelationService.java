@@ -16,7 +16,7 @@ public interface FriendGroupToDirectoryRelationService extends EntityService<Fri
 
     FriendGroupToDirectoryRelation create(UserDirectory directory, FriendsGroup group, FileRelationType relationType);
 
-    void deleteByDirectoryBesidesOwner(UserDirectory directory);
+    void deleteByDirectory(UserDirectory directory);
 
     List<FriendGroupToDirectoryRelation> getAllByDirectory(UserDirectory directory);
 

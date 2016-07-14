@@ -1,9 +1,6 @@
 package com.geekhub.repositories.impl;
 
-import com.geekhub.entities.FriendGroupToDocumentRelation;
-import com.geekhub.entities.FriendsGroup;
-import com.geekhub.entities.UserDirectory;
-import com.geekhub.entities.UserDocument;
+import com.geekhub.entities.*;
 import com.geekhub.entities.enums.FileRelationType;
 import com.geekhub.repositories.FriendGroupToDocumentRelationRepository;
 import org.hibernate.SessionFactory;
@@ -80,11 +77,10 @@ public class FriendGroupToDocumentRelationRepositoryImpl implements FriendGroupT
     }
 
     @Override
-    public void deleteByDocumentBesidesOwner(UserDocument document) {
+    public void deleteByDocument(UserDocument document) {
         sessionFactory.getCurrentSession()
-                .createQuery("DELETE FriendGroupToDocumentRelation r WHERE r.document = :document AND r.fileRelationType != :relation")
+                .createQuery("DELETE FriendGroupToDocumentRelation r WHERE r.document = :document")
                 .setParameter("document", document)
-                .setParameter("relation", FileRelationType.OWNER)
                 .executeUpdate();
     }
 
@@ -95,5 +91,16 @@ public class FriendGroupToDocumentRelationRepositoryImpl implements FriendGroupT
                 .add(Restrictions.eq("friendsGroup", group))
                 .setProjection(Projections.rowCount())
                 .uniqueResult();
+    }
+
+    @Override
+    public List<User> getAllGroupsMembersByDocument(Long documentId) {
+        return sessionFactory.getCurrentSession()
+                .createCriteria(clazz, "rel")
+                .createAlias("rel.friendsGroup", "group")
+                .createAlias("rel.document", "doc")
+                .add(Restrictions.eq("doc.id", documentId))
+                .setProjection(Projections.property("group.friends"))
+                .list();
     }
 }

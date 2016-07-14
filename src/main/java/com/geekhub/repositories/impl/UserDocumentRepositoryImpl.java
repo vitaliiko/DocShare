@@ -157,7 +157,7 @@ public class UserDocumentRepositoryImpl implements UserDocumentRepository {
     }
 
     @Override
-    public List<UserDocument> getByUserAndRelationType(User user, FileRelationType relation) {
+    public List<UserDocument> getAllByUserAndRelationType(User user, FileRelationType relation) {
         return sessionFactory.getCurrentSession()
                 .createQuery("SELECT doc FROM UserToDocumentRelation rel JOIN rel.document doc " +
                         "WHERE rel.user = :user AND rel.fileRelationType = :relation")
@@ -167,7 +167,7 @@ public class UserDocumentRepositoryImpl implements UserDocumentRepository {
     }
 
     @Override
-    public List<UserDocument> getByFriendGroupAndRelationType(FriendsGroup group, FileRelationType relation) {
+    public List<UserDocument> getAllByFriendGroupAndRelationType(FriendsGroup group, FileRelationType relation) {
         return sessionFactory.getCurrentSession()
                 .createQuery("SELECT doc FROM FriendGroupToDocumentRelation rel JOIN rel.document doc " +
                         "WHERE rel.friendsGroup = :group AND rel.fileRelationType = :relation")

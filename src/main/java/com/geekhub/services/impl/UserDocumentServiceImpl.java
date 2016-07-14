@@ -19,6 +19,8 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
+
+import org.apache.commons.collections.ListUtils;
 import org.hibernate.Hibernate;
 import javax.inject.Inject;
 import org.springframework.stereotype.Service;
@@ -28,6 +30,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -214,39 +217,22 @@ public class UserDocumentServiceImpl implements UserDocumentService {
     @Override
     public Set<User> getAllReadersAndEditors(Long docId) {
         Set<User> users = new HashSet<>();
-//        UserDocument document = getById(docId);
-//        users.addAll(document.getReaders());
-//        users.addAll(document.getEditors());
-//        document.getReadersGroups().forEach(g -> users.addAll(g.getFriends()));
-//        document.getEditorsGroups().forEach(g -> users.addAll(g.getFriends()));
+        users.addAll(userToDocumentRelationService.getAllUsersByDocumentIdBesidesOwner(docId));
+        users.addAll(friendGroupToDocumentRelationService.getAllGroupsMembersByDocumentId(docId));
         return users;
-    }
-
-    @Override
-    public Set<UserDocument> getAllCanRead(User reader) {
-        Set<UserDocument> documents = new HashSet<>();
-//        documents.addAll(repository.getByReader(reader));
-//        documents.addAll(repository.getByEditor(reader));
-//
-//        List<FriendsGroup> groups = friendGroupService.getByFriend(reader);
-//        groups.forEach(g -> {
-//            documents.addAll(repository.getByReadersGroup(g));
-//            documents.addAll(repository.getByEditorsGroup(g));
-//        });
-
-        return documents;
     }
 
     @Override
     public String getLocation(UserDocument document) {
         String location = "";
         String patentDirectoryHash = document.getParentDirectoryHash();
+        User owner = userToDocumentRelationService.getDocumentOwner(document);
 
-//        while(!patentDirectoryHash.equals(document.getOwner().getLogin())) {
-//            UserDirectory directory = userDirectoryService.getByHashName(patentDirectoryHash);
-//            location = directory.getName() + "/" + location;
-//            patentDirectoryHash = directory.getParentDirectoryHash();
-//        }
+        while(!patentDirectoryHash.equals(owner.getLogin())) {
+            UserDirectory directory = userDirectoryService.getByHashName(patentDirectoryHash);
+            location = directory.getName() + "/" + location;
+            patentDirectoryHash = directory.getParentDirectoryHash();
+        }
 
         return location;
     }
@@ -448,7 +434,7 @@ public class UserDocumentServiceImpl implements UserDocumentService {
         createRelations(document, shared);
         update(document);
 
-        sendEvents(document, user, currentReadersAndEditors);
+        sendEvents(document, shared, user, currentReadersAndEditors);
         return document;
     }
 
@@ -468,7 +454,7 @@ public class UserDocumentServiceImpl implements UserDocumentService {
             userToDocumentRelationService.create(document, readers, FileRelationType.READER);
         }
 
-        friendGroupToDocumentRelationService.deleteByDocumentBesidesOwner(document);
+        friendGroupToDocumentRelationService.deleteByDocument(document);
         if (!CollectionUtils.isEmpty(shared.getEditorsGroups())) {
             List<FriendsGroup> editorGroups = friendGroupService.getByIds(shared.getEditorsGroups());
             friendGroupToDocumentRelationService.create(document, editorGroups, FileRelationType.EDITOR);
@@ -479,15 +465,22 @@ public class UserDocumentServiceImpl implements UserDocumentService {
         }
     }
 
-    private void sendEvents(UserDocument document, User user, Set<User> currentReadersAndEditors) {
-        Set<User> newReadersAndEditorsSet = getAllReadersAndEditors(document.getId());
-        newReadersAndEditorsSet.removeAll(currentReadersAndEditors);
+    private void sendEvents(UserDocument document, SharedDto shared, User user, Set<User> oldReadersAndEditors) {
+        List<User> groupMembers =
+                friendGroupService.getAllMembersByGroupIds(ListUtils.union(shared.getEditorsGroups(), shared.getReaders()));
+        List<User> currentAndEditorsSet =
+                userService.getByIds(ListUtils.union(groupMembers, ListUtils.union(shared.getEditors(), shared.getReaders())));
+
+        Set<User> newReadersAndEditorsSet = currentAndEditorsSet.stream()
+                .filter(u -> !oldReadersAndEditors.contains(u))
+                .collect(Collectors.toSet());
         eventSendingService
                 .sendShareEvent(newReadersAndEditorsSet, FileType.DOCUMENT, document.getName(), document.getId(), user);
 
-        newReadersAndEditorsSet = getAllReadersAndEditors(document.getId());
-        currentReadersAndEditors.removeAll(newReadersAndEditorsSet);
-        eventSendingService.sendProhibitAccessEvent(currentReadersAndEditors, FileType.DOCUMENT, document.getName(), user);
+        Set<User> removedReadersAndEditorsSet = oldReadersAndEditors.stream()
+                .filter(u -> !currentAndEditorsSet.contains(u))
+                .collect(Collectors.toSet());
+        eventSendingService.sendProhibitAccessEvent(removedReadersAndEditorsSet, FileType.DOCUMENT, document.getName(), user);
     }
 
     @Override

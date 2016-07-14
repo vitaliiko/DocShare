@@ -5,6 +5,7 @@ import com.geekhub.entities.User;
 import com.geekhub.entities.UserDocument;
 import com.geekhub.services.enams.FileType;
 
+import java.util.List;
 import java.util.Set;
 
 public interface EventSendingService {

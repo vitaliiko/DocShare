@@ -27,9 +27,9 @@ public interface UserDocumentRepository extends EntityRepository<UserDocument, L
 
     UserDocument getByFullNameAndOwner(Map<String, Object> propertiesMap);
 
-    List<UserDocument> getByUserAndRelationType(User user, FileRelationType relation);
+    List<UserDocument> getAllByUserAndRelationType(User user, FileRelationType relation);
 
-    List<UserDocument> getByFriendGroupAndRelationType(FriendsGroup friendsGroup, FileRelationType relation);
+    List<UserDocument> getAllByFriendGroupAndRelationType(FriendsGroup friendsGroup, FileRelationType relation);
 
     List<UserDocument> search(User owner, String propertyName, String value);
 

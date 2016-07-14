@@ -40,8 +40,6 @@ public interface UserService extends EntityService<User, Long> {
 
     void update(List<User> users);
 
-    Set<User> getSetByIds(Long[] usersIds);
-
     Set<User> searchByName(String name);
 
     Set<User> search(SearchDto searchDto);

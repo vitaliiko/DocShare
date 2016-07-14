@@ -61,8 +61,6 @@ public interface UserDocumentService extends EntityService<UserDocument, Long> {
 
     List<Object> getActualIdsByParentDirectoryHash(String parentDirectoryHash);
 
-    Set<UserDocument> getAllCanRead(User reader);
-
     String getLocation(UserDocument document);
 
     Set<UserDocument> getAllByOwnerAndAttribute(User owner, DocumentAttribute attribute);

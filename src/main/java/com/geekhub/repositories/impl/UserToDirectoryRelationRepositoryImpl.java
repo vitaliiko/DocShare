@@ -1,16 +1,19 @@
 package com.geekhub.repositories.impl;
 
+import com.geekhub.entities.User;
 import com.geekhub.entities.UserDirectory;
 import com.geekhub.entities.UserToDirectoryRelation;
 import com.geekhub.entities.enums.FileRelationType;
 import com.geekhub.repositories.UserToDirectoryRelationRepository;
 import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Order;
+import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.stereotype.Repository;
 
 import javax.inject.Inject;
 import java.util.List;
+import java.util.Set;
 
 @Repository
 @SuppressWarnings("unchecked")
@@ -83,5 +86,15 @@ public class UserToDirectoryRelationRepositoryImpl implements UserToDirectoryRel
                 .setParameter("directory", directory)
                 .setParameter("relation", FileRelationType.OWNER)
                 .executeUpdate();
+    }
+
+    @Override
+    public List<UserDirectory> getAllAccessibleDirectories(User user) {
+        return sessionFactory.getCurrentSession()
+                .createCriteria(clazz)
+                .add(Restrictions.eq("user", user))
+                .add(Restrictions.ne("relationType", FileRelationType.OWNER))
+                .setProjection(Projections.property("directory"))
+                .list();
     }
 }

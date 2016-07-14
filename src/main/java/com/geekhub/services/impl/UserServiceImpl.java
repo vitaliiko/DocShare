@@ -1,15 +1,12 @@
 package com.geekhub.services.impl;
 
-import com.geekhub.entities.UserToDocumentRelation;
 import com.geekhub.repositories.UserRepository;
 import com.geekhub.dto.SearchDto;
 import com.geekhub.entities.FriendsGroup;
 import com.geekhub.entities.User;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.TreeSet;
 
-import com.geekhub.entities.UserDocument;
 import com.geekhub.services.*;
 import com.geekhub.utils.UserFileUtil;
 import org.hibernate.Hibernate;
@@ -105,7 +102,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public FriendsGroup getFriendsGroupByName(Long ownerId, String groupName) {
         User owner = repository.getById(ownerId);
-        return friendGroupService.getFriendsGroups(owner, "name", groupName).get(0);
+        return friendGroupService.getFriendGroups(owner, "name", groupName).get(0);
     }
 
     @Override
@@ -196,13 +193,6 @@ public class UserServiceImpl implements UserService {
     @Override
     public void update(List<User> users) {
         users.forEach(this::update);
-    }
-
-    @Override
-    public Set<User> getSetByIds(Long[] usersIds) {
-        Set<User> users = new HashSet<>();
-        Arrays.stream(usersIds).forEach(id -> users.add(getById(id)));
-        return users;
     }
 
     @Override

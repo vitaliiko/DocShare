@@ -5,6 +5,7 @@ import com.geekhub.entities.User;
 import com.geekhub.repositories.FriendsGroupRepository;
 import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Order;
+import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import javax.inject.Inject;
 import org.springframework.stereotype.Repository;
@@ -114,6 +115,14 @@ public class FriendsGroupRepositoryImpl implements FriendsGroupRepository {
         return sessionFactory.getCurrentSession()
                 .createQuery("from FriendsGroup fg where :friend in elements(fg.friends)")
                 .setParameter("friend", friend)
+                .list();
+    }
+
+    @Override
+    public List<User> getAllMembersByGroupIds(List<Long> groupIds) {
+        return sessionFactory.getCurrentSession()
+                .createQuery("SELECT DISTINCT gr.friends FROM FriendsGroup gr WHERE gr.id IN :groupIds")
+                .setParameter("groupIds", groupIds)
                 .list();
     }
 }

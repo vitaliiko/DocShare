@@ -16,4 +16,6 @@ public interface FriendsGroupRepository extends EntityRepository<FriendsGroup, L
     List<FriendsGroup> getByOwnerAndFriend(User owner, User friend);
 
     List<FriendsGroup> getByFriend(User friend);
+
+    List<User> getAllMembersByGroupIds(List<Long> groupIds);
 }

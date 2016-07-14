@@ -97,4 +97,47 @@ public class UserToDocumentRelationRepositoryImpl implements UserToDocumentRelat
                 .setProjection(Projections.property("doc.hashName"))
                 .list();
     }
+
+    @Override
+    public User getDocumentOwner(UserDocument document) {
+        return (User) sessionFactory.getCurrentSession()
+                .createCriteria(clazz)
+                .add(Restrictions.eq("document", document))
+                .add(Restrictions.eq("relationType", FileRelationType.OWNER))
+                .setProjection(Projections.property("user"))
+                .uniqueResult();
+    }
+
+    @Override
+    public List<User> getAllUsersByDocumentIdBesidesOwner(Long documentId) {
+        return sessionFactory.getCurrentSession()
+                .createCriteria(clazz, "rel")
+                .createAlias("rel.document", "doc")
+                .add(Restrictions.eq("doc.id", documentId))
+                .add(Restrictions.ne("relationType", FileRelationType.OWNER))
+                .setProjection(Projections.property("user"))
+                .list();
+    }
+
+    @Override
+    public List<UserDocument> getAllAccessibleDocuments(User user) {
+        return sessionFactory.getCurrentSession()
+                .createCriteria(clazz)
+                .add(Restrictions.eq("user", user))
+                .add(Restrictions.ne("relationType", FileRelationType.OWNER))
+                .setProjection(Projections.property("document"))
+                .list();
+    }
+
+    @Override
+    public List<UserDocument> getAllAccessibleDocumentsInRoot(User user, List<String> directoryHashes) {
+        return sessionFactory.getCurrentSession()
+                .createCriteria(clazz, "rel")
+                .createAlias("rel.document", "doc")
+                .add(Restrictions.eq("user", user))
+                .add(Restrictions.ne("relationType", FileRelationType.OWNER))
+                .add(Restrictions.not(Restrictions.in("doc.parentDirectoryHash", directoryHashes)))
+                .setProjection(Projections.property("document"))
+                .list();
+    }
 }
