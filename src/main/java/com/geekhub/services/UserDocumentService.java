@@ -67,8 +67,6 @@ public interface UserDocumentService extends EntityService<UserDocument, Long> {
 
     Set<UserDocument> getAllByOwnerAndAttribute(User owner, DocumentAttribute attribute);
 
-    List<UserDocument> getAllByOwner(User owner);
-
     Set<UserDocument> searchByName(User owner, String name);
 
     UserDocument saveOrUpdateDocument(MultipartFile multipartFile, UserDirectory directory,

@@ -41,7 +41,8 @@ public class RemovedDocumentRepositoryImpl implements RemovedDocumentRepository 
                 .uniqueResult();
     }
 
-    @Override public RemovedDocument get(User owner, String propertyName, Object value) {
+    @Override
+    public RemovedDocument get(User owner, String propertyName, Object value) {
         return (RemovedDocument) sessionFactory.getCurrentSession()
                 .createCriteria(clazz)
                 .add(Restrictions.eq("owner", owner))
@@ -49,7 +50,8 @@ public class RemovedDocumentRepositoryImpl implements RemovedDocumentRepository 
                 .uniqueResult();
     }
 
-    @Override public RemovedDocument getByUserDocumentHashName(String userDocumentHashName) {
+    @Override
+    public RemovedDocument getByUserDocumentHashName(String userDocumentHashName) {
         return (RemovedDocument) sessionFactory.getCurrentSession()
                 .createCriteria(clazz, "rem")
                 .createAlias("rem.userDocument", "doc")

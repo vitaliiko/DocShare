@@ -18,4 +18,6 @@ public interface UserToDocumentRelationService extends EntityService<UserToDocum
     void deleteByDocumentBesidesOwner(UserDocument document);
 
     List<UserToDocumentRelation> getAllByDocument(UserDocument document);
+
+    List<String> getAllDocumentHashNamesByOwner(User owner);
 }

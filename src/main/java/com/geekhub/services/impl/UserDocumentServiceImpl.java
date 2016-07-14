@@ -257,11 +257,6 @@ public class UserDocumentServiceImpl implements UserDocumentService {
     }
 
     @Override
-    public List<UserDocument> getAllByOwner(User owner) {
-        return repository.getList("owner", owner);
-    }
-
-    @Override
     public void replace(Long docId, String destinationDirectoryHash) {
         UserDocument document = repository.getById(docId);
         UserDirectory destinationDir = null;

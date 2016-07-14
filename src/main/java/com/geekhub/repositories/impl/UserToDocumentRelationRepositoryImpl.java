@@ -1,11 +1,13 @@
 package com.geekhub.repositories.impl;
 
+import com.geekhub.entities.User;
 import com.geekhub.entities.UserDocument;
 import com.geekhub.entities.UserToDocumentRelation;
 import com.geekhub.entities.enums.FileRelationType;
 import com.geekhub.repositories.UserToDocumentRelationRepository;
 import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Order;
+import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.stereotype.Repository;
 
@@ -83,5 +85,16 @@ public class UserToDocumentRelationRepositoryImpl implements UserToDocumentRelat
                 .setParameter("document", document)
                 .setParameter("relation", FileRelationType.OWNER)
                 .executeUpdate();
+    }
+
+    @Override
+    public List<String> getAllDocumentHashNamesByOwner(User owner) {
+        return sessionFactory.getCurrentSession()
+                .createCriteria(clazz, "rel")
+                .createAlias("rel.document", "doc")
+                .add(Restrictions.eq("user", owner))
+                .add(Restrictions.eq("fileRelationType", FileRelationType.OWNER))
+                .setProjection(Projections.property("doc.hashName"))
+                .list();
     }
 }

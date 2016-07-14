@@ -79,4 +79,9 @@ public class UserToDocumentRelationServiceImpl implements UserToDocumentRelation
     public List<UserToDocumentRelation> getAllByDocument(UserDocument document) {
         return repository.getList("document", document);
     }
+
+    @Override
+    public List<String> getAllDocumentHashNamesByOwner(User owner) {
+        return repository.getAllDocumentHashNamesByOwner(owner);
+    }
 }

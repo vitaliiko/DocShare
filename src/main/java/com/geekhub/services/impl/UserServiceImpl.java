@@ -1,5 +1,6 @@
 package com.geekhub.services.impl;
 
+import com.geekhub.entities.UserToDocumentRelation;
 import com.geekhub.repositories.UserRepository;
 import com.geekhub.dto.SearchDto;
 import com.geekhub.entities.FriendsGroup;
@@ -9,10 +10,7 @@ import java.util.HashSet;
 import java.util.TreeSet;
 
 import com.geekhub.entities.UserDocument;
-import com.geekhub.services.EventSendingService;
-import com.geekhub.services.FriendGroupService;
-import com.geekhub.services.UserDocumentService;
-import com.geekhub.services.UserService;
+import com.geekhub.services.*;
 import com.geekhub.utils.UserFileUtil;
 import org.hibernate.Hibernate;
 import org.hibernate.HibernateException;
@@ -43,6 +41,9 @@ public class UserServiceImpl implements UserService {
     @Inject
     private UserDocumentService userDocumentService;
 
+    @Inject
+    private UserToDocumentRelationService userToDocumentRelationService;
+
     @Override
     public List<User> getAll(String orderParameter) {
         return repository.getAll(orderParameter);
@@ -71,8 +72,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public void delete(User entity) {
         removeFromFriends(entity);
-        List<String> filesHashNames =
-                userDocumentService.getAllByOwner(entity).stream().map(UserDocument::getName).collect(Collectors.toList());
+        List<String> filesHashNames = userToDocumentRelationService.getAllDocumentHashNamesByOwner(entity);
         repository.delete(entity);
         UserFileUtil.removeUserFiles(filesHashNames);
     }
