@@ -1,5 +1,8 @@
 package com.geekhub.entities;
 
+import lombok.Getter;
+import lombok.Setter;
+
 import javax.persistence.*;
 
 @Entity
@@ -8,69 +11,28 @@ public class DocumentStatistic {
 
     @Id
     @GeneratedValue
+    @Getter @Setter
     private Long id;
 
     @Column
+    @Getter @Setter
     private Integer allViews;
 
     @Column
+    @Getter @Setter
     private Integer lastVersionViews;
 
     @Column
+    @Getter @Setter
     private Integer allDownloads;
 
     @Column
+    @Getter @Setter
     private Integer lastVersionDownloads;
 
     @OneToOne
     @JoinColumn(name = "user_document_id")
+    @Getter @Setter
     private UserDocument userDocument;
 
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public Integer getAllViews() {
-        return allViews;
-    }
-
-    public void setAllViews(Integer allViews) {
-        this.allViews = allViews;
-    }
-
-    public Integer getLastVersionViews() {
-        return lastVersionViews;
-    }
-
-    public void setLastVersionViews(Integer lastVersionViews) {
-        this.lastVersionViews = lastVersionViews;
-    }
-
-    public Integer getAllDownloads() {
-        return allDownloads;
-    }
-
-    public void setAllDownloads(Integer allDownloads) {
-        this.allDownloads = allDownloads;
-    }
-
-    public Integer getLastVersionDownloads() {
-        return lastVersionDownloads;
-    }
-
-    public void setLastVersionDownloads(Integer lastVersionDownloads) {
-        this.lastVersionDownloads = lastVersionDownloads;
-    }
-
-    public UserDocument getUserDocument() {
-        return userDocument;
-    }
-
-    public void setUserDocument(UserDocument userDocument) {
-        this.userDocument = userDocument;
-    }
 }

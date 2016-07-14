@@ -1,79 +1,30 @@
 package com.geekhub.dto;
 
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
+
 import java.util.List;
 
+@EqualsAndHashCode(of = "docId")
 public class SharedDto {
 
+    @Getter @Setter
     private long docId;
+
+    @Getter @Setter
     private String access;
+
+    @Getter @Setter
     private List<Long> readers;
+
+    @Getter @Setter
     private List<Long> readersGroups;
+
+    @Getter @Setter
     private List<Long> editors;
+
+    @Getter @Setter
     private List<Long> editorsGroups;
 
-    public long getDocId() {
-        return docId;
-    }
-
-    public void setDocId(long docId) {
-        this.docId = docId;
-    }
-
-    public String getAccess() {
-        return access;
-    }
-
-    public void setAccess(String access) {
-        this.access = access;
-    }
-
-    public List<Long> getReaders() {
-        return readers;
-    }
-
-    public void setReaders(List<Long> readers) {
-        this.readers = readers;
-    }
-
-    public List<Long> getReadersGroups() {
-        return readersGroups;
-    }
-
-    public void setReadersGroups(List<Long> readersGroups) {
-        this.readersGroups = readersGroups;
-    }
-
-    public List<Long> getEditors() {
-        return editors;
-    }
-
-    public void setEditors(List<Long> editors) {
-        this.editors = editors;
-    }
-
-    public List<Long> getEditorsGroups() {
-        return editorsGroups;
-    }
-
-    public void setEditorsGroups(List<Long> editorsGroups) {
-        this.editorsGroups = editorsGroups;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        SharedDto sharedDto = (SharedDto) o;
-
-        return docId == sharedDto.docId && access.equals(sharedDto.access);
-
-    }
-
-    @Override
-    public int hashCode() {
-        int result = (int) (docId ^ (docId >>> 32));
-        result = 31 * result + access.hashCode();
-        return result;
-    }
 }

@@ -2,161 +2,56 @@ package com.geekhub.dto;
 
 import com.geekhub.entities.FriendsGroup;
 import com.geekhub.entities.User;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
+
 import java.util.Set;
 
+@EqualsAndHashCode(of = "id")
 public class UserFileDto implements Comparable<UserFileDto> {
 
+    @Getter @Setter
     private long id;
+
+    @Getter @Setter
     private String type;
+
+    @Getter @Setter
     private String name;
+
+    @Getter @Setter
     private String ownerName;
+
+    @Getter @Setter
     private String description;
+
+    @Getter @Setter
     private String hashName;
+
+    @Getter @Setter
     private String access;
+
+    @Getter @Setter
     private String size;
+
+    @Getter @Setter
     private String parentDirectoryHash;
+
+    @Getter @Setter
     private String lastModifyTime;
+
+    @Getter @Setter
     private Set<User> readers;
+
+    @Getter @Setter
     private Set<FriendsGroup> readersGroups;
+
+    @Getter @Setter
     private Set<User> editors;
+
+    @Getter @Setter
     private Set<FriendsGroup> editorsGroups;
-
-    public long getId() {
-        return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
-    }
-
-    public String getType() {
-        return type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getOwnerName() {
-        return ownerName;
-    }
-
-    public void setOwnerName(String ownerName) {
-        this.ownerName = ownerName;
-    }
-
-    public String getHashName() {
-        return hashName;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public void setHashName(String hashName) {
-        this.hashName = hashName;
-    }
-
-    public String getAccess() {
-        return access;
-    }
-
-    public void setAccess(String access) {
-        this.access = access;
-    }
-
-    public String getSize() {
-        return size;
-    }
-
-    public void setSize(String size) {
-        this.size = size;
-    }
-
-    public String getParentDirectoryHash() {
-        return parentDirectoryHash;
-    }
-
-    public void setParentDirectoryHash(String parentDirectoryHash) {
-        this.parentDirectoryHash = parentDirectoryHash;
-    }
-
-    public String getLastModifyTime() {
-        return lastModifyTime;
-    }
-
-    public void setLastModifyTime(String lastModifyTime) {
-        this.lastModifyTime = lastModifyTime;
-    }
-
-    public Set<User> getReaders() {
-        return readers;
-    }
-
-    public void setReaders(Set<User> readers) {
-        this.readers = readers;
-    }
-
-    public Set<FriendsGroup> getReadersGroups() {
-        return readersGroups;
-    }
-
-    public void setReadersGroups(Set<FriendsGroup> readersGroups) {
-        this.readersGroups = readersGroups;
-    }
-
-    public Set<User> getEditors() {
-        return editors;
-    }
-
-    public void setEditors(Set<User> editors) {
-        this.editors = editors;
-    }
-
-    public Set<FriendsGroup> getEditorsGroups() {
-        return editorsGroups;
-    }
-
-    public void setEditorsGroups(Set<FriendsGroup> editorsGroups) {
-        this.editorsGroups = editorsGroups;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        UserFileDto that = (UserFileDto) o;
-
-        return id == that.id
-                && type.equals(that.type)
-                && name.equals(that.name)
-                && ownerName.equals(that.ownerName)
-                && hashName.equals(that.hashName);
-
-    }
-
-    @Override
-    public int hashCode() {
-        int result = (int) (id ^ (id >>> 32));
-        result = 31 * result + type.hashCode();
-        result = 31 * result + name.hashCode();
-        result = 31 * result + ownerName.hashCode();
-        result = 31 * result + hashName.hashCode();
-        return result;
-    }
 
     @Override
     public int compareTo(UserFileDto o) {
