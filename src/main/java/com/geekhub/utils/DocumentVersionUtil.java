@@ -7,10 +7,10 @@ public class DocumentVersionUtil {
 
     public static DocumentOldVersion createOldVersion(UserDocument document) {
         DocumentOldVersion oldVersion = new DocumentOldVersion();
-        oldVersion.setModifiedBy(document.getModifiedBy());
         oldVersion.setName(document.getName());
         oldVersion.setSize(document.getSize());
         oldVersion.setHashName(document.getHashName());
+        oldVersion.setModifiedBy(document.getModifiedBy());
         oldVersion.setLastModifyTime(document.getLastModifyTime());
         return oldVersion;
     }

@@ -80,9 +80,12 @@ public class UserDocumentsResource {
 
     @RequestMapping(value = "/documents", method = RequestMethod.GET)
     public ModelAndView createUploadDocumentPageModel(HttpSession session) {
-        ModelAndView model = new ModelAndView("home");
         User user = getUserFromSession(session);
+        return prepareModel(user);
+    }
 
+    private ModelAndView prepareModel(User user) {
+        ModelAndView model = new ModelAndView("home");
         List<FriendsGroup> friendsGroups = userService.getAllFriendsGroups(user.getId());
         Set<FriendGroupDto> friendGroupDtoSet = friendsGroups.stream()
                 .map(EntityToDtoConverter::convert)
@@ -155,17 +158,25 @@ public class UserDocumentsResource {
 
     @RequestMapping(value = "/documents/{docId}/browse", method = RequestMethod.GET)
     public ModelAndView browseDocument(@PathVariable long docId, HttpSession session) {
-        ModelAndView model = new ModelAndView();
         User user = getUserFromSession(session);
         UserDocument document = userDocumentService.getById(docId);
 
         if (!documentAccessService.canRead(document, user)) {
             throw new ResourceNotFoundException();
         }
+        return prepareModel(user, document);
+    }
+
+    private ModelAndView prepareModel(User user, UserDocument document) {
+        UserFileDto fileDto = EntityToDtoConverter.convert(document);
+        if (fileDto.getModifiedBy().equals(user.getFullName())) {
+            fileDto.setModifiedBy("Me");
+        }
 
         boolean abilityToComment = AbilityToCommentDocument.getBoolean(document.getAbilityToComment());
+        ModelAndView model = new ModelAndView();
         model.setViewName("document");
-        model.addObject("doc", EntityToDtoConverter.convert(document));
+        model.addObject("doc", fileDto);
         model.addObject("location", userDocumentService.getLocation(document));
         model.addObject("renderSettings", documentAccessService.isOwner(document, user) || abilityToComment);
         model.addObject("renderComments", abilityToComment);
@@ -226,18 +237,32 @@ public class UserDocumentsResource {
     }
 
     @RequestMapping(value = "/documents/{docId}/history", method = RequestMethod.GET)
-    public ModelAndView showHistory(@PathVariable Long docId, HttpSession session) {
-        ModelAndView model = new ModelAndView("history");
+    public ModelAndView showDocumentOldVersions(@PathVariable Long docId, HttpSession session) {
         User user = getUserFromSession(session);
         UserDocument document = userDocumentService.getWithOldVersions(docId);
         if (documentAccessService.isOwnerOfActual(document, user)) {
-            List<DocumentOldVersionDto> versions = document.getDocumentOldVersions().stream()
-                    .map(EntityToDtoConverter::convert)
-                    .collect(Collectors.toList());
-            model.addObject("versions", versions);
-            return model;
+            return prepareModel(docId, user, document);
         }
         throw new ResourceNotFoundException();
+    }
+
+    private ModelAndView prepareModel(Long docId, User user, UserDocument document) {
+        ModelAndView model = new ModelAndView("history");
+        List<DocumentOldVersionDto> versions = document.getDocumentOldVersions().stream()
+                .map(EntityToDtoConverter::convert)
+                .sorted(DocumentOldVersionDto::compareTo)
+                .collect(Collectors.toList());
+        versions.stream()
+                .filter(dto -> dto.getChangedBy().equals(user.getFullName()))
+                .forEachOrdered(dto -> dto.setChangedBy("Me"));
+        UserFileDto currentVersionDto = EntityToDtoConverter.convert(document);
+        if (currentVersionDto.getModifiedBy().equals(user.getFullName())) {
+            currentVersionDto.setModifiedBy("Me");
+        }
+        model.addObject("versions", versions);
+        model.addObject("currentVersion", currentVersionDto);
+        model.addObject("docId", docId);
+        return model;
     }
 
     @RequestMapping(value = "/documents/versions/{oldVersionId}/recover", method = RequestMethod.POST)
@@ -277,6 +302,10 @@ public class UserDocumentsResource {
         List<String> directoryHashes = directories.stream().map(UserDirectory::getHashName).collect(Collectors.toList());
         Set<UserDocument> documents = userToDocumentRelationService.getAllAccessibleDocumentsInRoot(user, directoryHashes);
 
+        return prepareModel(directories, documents);
+    }
+
+    private ModelAndView prepareModel(Set<UserDirectory> directories, Set<UserDocument> documents) {
         Set<UserFileDto> documentDtos = documents.stream()
                 .map(EntityToDtoConverter::convert).collect(Collectors.toCollection(TreeSet::new));
 

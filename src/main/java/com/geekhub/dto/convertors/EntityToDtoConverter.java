@@ -24,7 +24,7 @@ public class EntityToDtoConverter {
         oldVersionDto.setId(oldVersion.getId());
         oldVersionDto.setName(oldVersion.getUserDocument().getName());
         oldVersionDto.setChangedBy(oldVersion.getModifiedBy());
-        oldVersionDto.setLastModifyTime(oldVersion.getUserDocument().getLastModifyTime());
+        oldVersionDto.setLastModifyTime(oldVersion.getLastModifyTime());
         oldVersionDto.setSize(oldVersion.getSize());
         return oldVersionDto;
     }
@@ -36,6 +36,7 @@ public class EntityToDtoConverter {
         documentDto.setType("doc");
         documentDto.setSize(document.getSize());
         documentDto.setLastModifyTime(df.format(document.getLastModifyTime()));
+        documentDto.setModifiedBy(document.getModifiedBy());
         documentDto.setName(document.getName());
         documentDto.setDescription(document.getDescription());
         documentDto.setParentDirectoryHash(document.getParentDirectoryHash());

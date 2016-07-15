@@ -16,16 +16,18 @@
 
 <div class="container col-md-10" style="width: 900px;">
     <input type="hidden" class="doc-id" value="${doc.id}">
-    <h4>${location}${doc.name}</h4>
-    <h5>
-        ${doc.size} &nbsp&nbsp Changed: ${doc.lastModifyTime}
-        <a href="<c:url value='/api/documents/${doc.id}/download' />" class="btn btn-default custom-width">Download</a>
+    <h4>
+        ${location}${doc.name}
+        <a href="<c:url value='/api/documents/${doc.id}/download' />" class="btn btn-default custom-width">Download (${doc.size})</a>
         <c:if test="${historyLink != null}">
             <a href="${historyLink}" class="btn btn-default custom-width">
                 Previous versions
             </a>
         </c:if>
         <a href="#" class="btn btn-default custom-width">Upload new version</a>
+    </h4>
+    <h5>
+         Changed: ${doc.lastModifyTime} by ${doc.modifiedBy}
     </h5>
     <c:if test="${doc.description != null}">
         Description: ${doc.description}

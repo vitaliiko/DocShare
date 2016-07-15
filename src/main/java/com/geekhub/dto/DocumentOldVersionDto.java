@@ -9,7 +9,7 @@ import java.util.Date;
 
 @NoArgsConstructor
 @EqualsAndHashCode
-public class DocumentOldVersionDto {
+public class DocumentOldVersionDto implements Comparable<DocumentOldVersionDto> {
 
     @Getter @Setter
     private long id;
@@ -26,4 +26,8 @@ public class DocumentOldVersionDto {
     @Getter @Setter
     private String size;
 
+    @Override
+    public int compareTo(DocumentOldVersionDto o) {
+        return o.getLastModifyTime().compareTo(this.getLastModifyTime());
+    }
 }

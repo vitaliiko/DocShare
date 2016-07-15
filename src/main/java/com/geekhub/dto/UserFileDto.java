@@ -42,6 +42,9 @@ public class UserFileDto implements Comparable<UserFileDto> {
     private String lastModifyTime;
 
     @Getter @Setter
+    private String modifiedBy;
+
+    @Getter @Setter
     private List<User> readers;
 
     @Getter @Setter

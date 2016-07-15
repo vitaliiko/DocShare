@@ -484,6 +484,7 @@ public class UserDocumentServiceImpl implements UserDocumentService {
         DocumentOldVersion currentVersion = DocumentVersionUtil.createOldVersion(oldVersionDocument);
         oldVersionDocument.getDocumentOldVersions().add(currentVersion);
         UserDocument recoveredDocument = DocumentVersionUtil.recoverOldVersion(oldVersion);
+        oldVersionDocument.getDocumentOldVersions().remove(oldVersion);
         update(recoveredDocument);
         documentOldVersionService.delete(oldVersion);
         return recoveredDocument;
