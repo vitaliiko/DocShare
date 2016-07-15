@@ -1,5 +1,6 @@
 package com.geekhub.services.impl;
 
+import com.geekhub.dto.UserFileDto;
 import com.geekhub.entities.*;
 import com.geekhub.entities.enums.FileRelationType;
 import com.geekhub.repositories.UserDocumentRepository;
@@ -504,6 +505,20 @@ public class UserDocumentServiceImpl implements UserDocumentService {
     @Override
     public void updateDocumentAttribute(DocumentAttribute attribute, List<Long> documentIds) {
         repository.updateDocumentAttribute(attribute, documentIds);
+    }
+
+    @Override
+    public UserFileDto findAllRelations(UserFileDto fileDto) {
+        List<User> editors = userToDocumentRelationService.getAllByDocumentIdAndRelation(fileDto.getId(), FileRelationType.EDITOR);
+        List<User> readers = userToDocumentRelationService.getAllByDocumentIdAndRelation(fileDto.getId(), FileRelationType.READER);
+        List<FriendsGroup> editorGroups = friendGroupToDocumentRelationService.getAllGroupsByDocumentIdAndRelation(fileDto.getId(), FileRelationType.EDITOR);
+        List<FriendsGroup> readerGroups = friendGroupToDocumentRelationService.getAllGroupsByDocumentIdAndRelation(fileDto.getId(), FileRelationType.READER);
+
+        fileDto.setReaders(readers);
+        fileDto.setEditors(editors);
+        fileDto.setReaderGroups(readerGroups);
+        fileDto.setEditorGroups(editorGroups);
+        return fileDto;
     }
 
     @Override

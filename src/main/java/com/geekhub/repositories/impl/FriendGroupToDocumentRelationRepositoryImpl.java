@@ -103,4 +103,25 @@ public class FriendGroupToDocumentRelationRepositoryImpl implements FriendGroupT
                 .setProjection(Projections.property("group.friends"))
                 .list();
     }
+
+    @Override
+    public List<FriendsGroup> getAllGroupsByDocumentId(Long documentId) {
+        return sessionFactory.getCurrentSession()
+                .createCriteria(clazz, "rel")
+                .createAlias("rel.document", "doc")
+                .add(Restrictions.eq("doc.id", documentId))
+                .setProjection(Projections.property("friendsGroup"))
+                .list();
+    }
+
+    @Override
+    public List<FriendsGroup> getAllGroupsByDocumentIdAndRelation(Long documentId, FileRelationType relationType) {
+        return sessionFactory.getCurrentSession()
+                .createCriteria(clazz, "rel")
+                .createAlias("rel.document", "doc")
+                .add(Restrictions.eq("doc.id", documentId))
+                .add(Restrictions.eq("fileRelationType", relationType))
+                .setProjection(Projections.property("friendsGroup"))
+                .list();
+    }
 }

@@ -1,5 +1,6 @@
 package com.geekhub.resources;
 
+import com.geekhub.entities.enums.FileRelationType;
 import com.geekhub.resources.utils.FileControllersUtil;
 import com.geekhub.dto.*;
 import com.geekhub.dto.convertors.EntityToDtoConverter;
@@ -64,6 +65,9 @@ public class UserDocumentsResource {
 
     @Inject
     private UserToDocumentRelationService userToDocumentRelationService;
+
+    @Inject
+    private FriendGroupToDocumentRelationService friendGroupToDocumentRelationService;
 
     private User getUserFromSession(HttpSession session) {
         return userService.getById((Long) session.getAttribute("userId"));
@@ -177,7 +181,9 @@ public class UserDocumentsResource {
         User user = getUserFromSession(session);
         UserDocument document = userDocumentService.getById(docId);
         if (documentAccessService.isOwnerOfActual(document, user)) {
-            return ResponseEntity.ok().body(EntityToDtoConverter.convert(document));
+            UserFileDto documentDto = EntityToDtoConverter.convert(document);
+            documentDto = userDocumentService.findAllRelations(documentDto);
+            return ResponseEntity.ok().body(documentDto);
         }
         return ResponseEntity.badRequest().body(null);
     }

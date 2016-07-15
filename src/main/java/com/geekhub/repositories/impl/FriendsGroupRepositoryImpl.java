@@ -122,7 +122,7 @@ public class FriendsGroupRepositoryImpl implements FriendsGroupRepository {
     public List<User> getAllMembersByGroupIds(List<Long> groupIds) {
         return sessionFactory.getCurrentSession()
                 .createQuery("SELECT DISTINCT gr.friends FROM FriendsGroup gr WHERE gr.id IN :groupIds")
-                .setParameter("groupIds", groupIds)
+                .setParameterList("groupIds", groupIds)
                 .list();
     }
 }

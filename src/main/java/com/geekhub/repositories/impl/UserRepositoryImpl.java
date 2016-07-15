@@ -5,6 +5,8 @@ import java.util.Map;
 
 import com.geekhub.repositories.UserRepository;
 import org.hibernate.Criteria;
+import org.hibernate.SQLQuery;
+import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Order;
@@ -79,12 +81,20 @@ public class UserRepositoryImpl implements UserRepository {
         sessionFactory.getCurrentSession().delete(user);
     }
 
+    // TODO: 15.07.2016 with criteria or hql throw ClassCastException (trying cast User to Long, don't know why)
     @Override
     public List<User> getByIds(List<Long> userIds) {
-        return sessionFactory.getCurrentSession()
-                .createCriteria(clazz)
-                .add(Restrictions.in("id", userIds))
-                .list();
+        String sql = "SELECT * FROM User u WHERE u.id IN (";
+        for (int i = 1; i <= userIds.size(); i++) {
+            sql += "?" + (i == userIds.size() ? ")" : ", ");
+        }
+        Session session = sessionFactory.getCurrentSession();
+        SQLQuery query = session.createSQLQuery(sql);
+        query.addEntity(User.class);
+        for (int i = 0; i < userIds.size(); i++) {
+            query.setParameter(i, userIds.get(i));
+        }
+        return query.list();
     }
 
     @Override

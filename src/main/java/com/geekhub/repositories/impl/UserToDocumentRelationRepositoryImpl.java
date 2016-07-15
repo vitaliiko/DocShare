@@ -103,7 +103,7 @@ public class UserToDocumentRelationRepositoryImpl implements UserToDocumentRelat
         return (User) sessionFactory.getCurrentSession()
                 .createCriteria(clazz)
                 .add(Restrictions.eq("document", document))
-                .add(Restrictions.eq("relationType", FileRelationType.OWNER))
+                .add(Restrictions.eq("fileRelationType", FileRelationType.OWNER))
                 .setProjection(Projections.property("user"))
                 .uniqueResult();
     }
@@ -114,7 +114,7 @@ public class UserToDocumentRelationRepositoryImpl implements UserToDocumentRelat
                 .createCriteria(clazz, "rel")
                 .createAlias("rel.document", "doc")
                 .add(Restrictions.eq("doc.id", documentId))
-                .add(Restrictions.ne("relationType", FileRelationType.OWNER))
+                .add(Restrictions.ne("fileRelationType", FileRelationType.OWNER))
                 .setProjection(Projections.property("user"))
                 .list();
     }
@@ -124,7 +124,7 @@ public class UserToDocumentRelationRepositoryImpl implements UserToDocumentRelat
         return sessionFactory.getCurrentSession()
                 .createCriteria(clazz)
                 .add(Restrictions.eq("user", user))
-                .add(Restrictions.ne("relationType", FileRelationType.OWNER))
+                .add(Restrictions.ne("fileRelationType", FileRelationType.OWNER))
                 .setProjection(Projections.property("document"))
                 .list();
     }
@@ -135,9 +135,20 @@ public class UserToDocumentRelationRepositoryImpl implements UserToDocumentRelat
                 .createCriteria(clazz, "rel")
                 .createAlias("rel.document", "doc")
                 .add(Restrictions.eq("user", user))
-                .add(Restrictions.ne("relationType", FileRelationType.OWNER))
+                .add(Restrictions.ne("fileRelationType", FileRelationType.OWNER))
                 .add(Restrictions.not(Restrictions.in("doc.parentDirectoryHash", directoryHashes)))
                 .setProjection(Projections.property("document"))
+                .list();
+    }
+
+    @Override
+    public List<User> getAllByDocumentIdAndRelation(Long documentId, FileRelationType relationType) {
+        return sessionFactory.getCurrentSession()
+                .createCriteria(clazz, "rel")
+                .createAlias("rel.document", "doc")
+                .add(Restrictions.eq("doc.id", documentId))
+                .add(Restrictions.eq("fileRelationType", relationType))
+                .setProjection(Projections.property("user"))
                 .list();
     }
 }

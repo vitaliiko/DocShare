@@ -93,7 +93,7 @@ public class UserToDirectoryRelationRepositoryImpl implements UserToDirectoryRel
         return sessionFactory.getCurrentSession()
                 .createCriteria(clazz)
                 .add(Restrictions.eq("user", user))
-                .add(Restrictions.ne("relationType", FileRelationType.OWNER))
+                .add(Restrictions.ne("fileRelationType", FileRelationType.OWNER))
                 .setProjection(Projections.property("directory"))
                 .list();
     }

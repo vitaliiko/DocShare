@@ -159,9 +159,9 @@ public class UserDirectoryRepositoryImpl implements UserDirectoryRepository {
     @Override
     public void updateDocumentAttribute(DocumentAttribute attribute, List<Long> directoryIds) {
         sessionFactory.getCurrentSession()
-                .createQuery("UPDATE UserDirectory d SET d.documentAttribute = :attribute WHERE d.id in :ids")
+                .createQuery("UPDATE UserDirectory d SET d.documentAttribute = :attribute WHERE d.id IN :ids")
                 .setParameter("attribute", attribute)
-                .setParameter("ids", directoryIds)
+                .setParameterList("ids", directoryIds)
                 .executeUpdate();
     }
 }

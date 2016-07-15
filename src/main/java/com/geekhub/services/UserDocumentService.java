@@ -1,6 +1,7 @@
 package com.geekhub.services;
 
 import com.geekhub.dto.SharedDto;
+import com.geekhub.dto.UserFileDto;
 import com.geekhub.entities.*;
 import com.geekhub.entities.enums.DocumentAttribute;
 
@@ -86,4 +87,6 @@ public interface UserDocumentService extends EntityService<UserDocument, Long> {
     void recoverRemovedDocument(Long removedDocId, User user);
 
     void updateDocumentAttribute(DocumentAttribute attribute, List<Long> documentIds);
+
+    UserFileDto findAllRelations(UserFileDto fileDto);
 }

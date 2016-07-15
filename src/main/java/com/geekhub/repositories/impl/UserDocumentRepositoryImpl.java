@@ -188,9 +188,9 @@ public class UserDocumentRepositoryImpl implements UserDocumentRepository {
     @Override
     public void updateDocumentAttribute(DocumentAttribute attribute, List<Long> documentIds) {
         sessionFactory.getCurrentSession()
-                .createQuery("UPDATE UserDocument d SET d.documentAttribute = :attribute WHERE d.id in :ids")
+                .createQuery("UPDATE UserDocument d SET d.documentAttribute = :attribute WHERE d.id IN :ids")
                 .setParameter("attribute", attribute)
-                .setParameter("ids", documentIds)
+                .setParameterList("ids", documentIds)
                 .executeUpdate();
     }
 }

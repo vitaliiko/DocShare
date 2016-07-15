@@ -24,6 +24,8 @@ public interface UserToDocumentRelationService extends EntityService<UserToDocum
 
     User getDocumentOwner(UserDocument document);
 
+    List<User> getAllByDocumentIdAndRelation(Long documentId, FileRelationType relationType);
+
     List<String> getAllDocumentHashNamesByOwner(User owner);
 
     Set<UserDocument> getAllAccessibleDocuments(User user);

@@ -37,14 +37,9 @@ public class EntityToDtoConverter {
         documentDto.setSize(document.getSize());
         documentDto.setLastModifyTime(df.format(document.getLastModifyTime()));
         documentDto.setName(document.getName());
-//        documentDto.setOwnerName(document.getOwner().getFullName());
         documentDto.setDescription(document.getDescription());
         documentDto.setParentDirectoryHash(document.getParentDirectoryHash());
         documentDto.setAccess(document.getDocumentAttribute().toString());
-//        documentDto.setReaders(document.getReaders());
-//        documentDto.setReadersGroups(document.getReadersGroups());
-//        documentDto.setEditors(document.getEditors());
-//        documentDto.setEditorsGroups(document.getEditorsGroups());
         return documentDto;
     }
 

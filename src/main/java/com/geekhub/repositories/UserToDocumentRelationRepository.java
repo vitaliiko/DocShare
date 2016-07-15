@@ -3,6 +3,7 @@ package com.geekhub.repositories;
 import com.geekhub.entities.User;
 import com.geekhub.entities.UserDocument;
 import com.geekhub.entities.UserToDocumentRelation;
+import com.geekhub.entities.enums.FileRelationType;
 
 import java.util.List;
 import java.util.Set;
@@ -20,4 +21,6 @@ public interface UserToDocumentRelationRepository extends EntityRepository<UserT
     List<UserDocument> getAllAccessibleDocuments(User user);
 
     List<UserDocument> getAllAccessibleDocumentsInRoot(User user, List<String> directoryHashes);
+
+    List<User> getAllByDocumentIdAndRelation(Long documentId, FileRelationType relationType);
 }

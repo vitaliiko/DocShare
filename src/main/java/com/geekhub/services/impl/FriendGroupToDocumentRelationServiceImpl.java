@@ -79,6 +79,16 @@ public class FriendGroupToDocumentRelationServiceImpl implements FriendGroupToDo
     }
 
     @Override
+    public List<FriendsGroup> getAllGroupsByDocumentId(Long documentId) {
+        return repository.getAllGroupsByDocumentId(documentId);
+    }
+
+    @Override
+    public List<FriendsGroup> getAllGroupsByDocumentIdAndRelation(Long documentId, FileRelationType relationType) {
+        return repository.getAllGroupsByDocumentIdAndRelation(documentId, relationType);
+    }
+
+    @Override
     public List<User> getAllGroupsMembersByDocumentId(Long documentId) {
         return repository.getAllGroupsMembersByDocument(documentId);
     }

@@ -6,7 +6,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.Set;
+import java.util.List;
 
 @EqualsAndHashCode(of = "id")
 public class UserFileDto implements Comparable<UserFileDto> {
@@ -42,16 +42,16 @@ public class UserFileDto implements Comparable<UserFileDto> {
     private String lastModifyTime;
 
     @Getter @Setter
-    private Set<User> readers;
+    private List<User> readers;
 
     @Getter @Setter
-    private Set<FriendsGroup> readersGroups;
+    private List<FriendsGroup> readerGroups;
 
     @Getter @Setter
-    private Set<User> editors;
+    private List<User> editors;
 
     @Getter @Setter
-    private Set<FriendsGroup> editorsGroups;
+    private List<FriendsGroup> editorGroups;
 
     @Override
     public int compareTo(UserFileDto o) {
