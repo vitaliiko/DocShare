@@ -159,12 +159,6 @@ public class UserDocumentServiceImpl implements UserDocumentService {
     }
 
     @Override
-    public UserDocument getByFullNameAndOwner(User owner, String parentDirectoryHash, String name) {
-        Map<String, Object> propertiesMap = UserFileUtil.createPropertiesMap(owner, parentDirectoryHash, name);
-        return repository.getByFullNameAndOwner(propertiesMap);
-    }
-
-    @Override
     public UserDocument getDocumentWithComments(Long docId) {
         UserDocument document = repository.getById(docId);
         Hibernate.initialize(document.getComments());
@@ -347,7 +341,7 @@ public class UserDocumentServiceImpl implements UserDocumentService {
 
         String docName = multipartFile.getOriginalFilename();
         String parentDirectoryHash = parentDirectory == null ? user.getLogin() : parentDirectory.getHashName();
-        UserDocument document = getByFullNameAndOwner(user, parentDirectoryHash, docName);
+        UserDocument document = userToDocumentRelationService.getDocumentByFullNameAndOwner(parentDirectoryHash, docName, user);
 
         if (document == null) {
             document = createDocument(multipartFile, parentDirectory, description, user);

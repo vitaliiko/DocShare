@@ -13,6 +13,7 @@ import org.springframework.stereotype.Repository;
 
 import javax.inject.Inject;
 import java.util.List;
+import java.util.Map;
 
 @Repository
 @SuppressWarnings("unchecked")
@@ -150,5 +151,18 @@ public class UserToDocumentRelationRepositoryImpl implements UserToDocumentRelat
                 .add(Restrictions.eq("fileRelationType", relationType))
                 .setProjection(Projections.property("user"))
                 .list();
+    }
+
+    @Override
+    public UserDocument getDocumentByFullNameAndOwner(String parentDirHash, String docName, User owner) {
+        return (UserDocument) sessionFactory.getCurrentSession()
+                .createCriteria(clazz, "rel")
+                .createAlias("rel.document", "doc")
+                .add(Restrictions.eq("doc.parentDirectoryHash", parentDirHash))
+                .add(Restrictions.eq("doc.name", docName))
+                .add(Restrictions.eq("rel.user", owner))
+                .add(Restrictions.eq("rel.fileRelationType", FileRelationType.OWNER))
+                .setProjection(Projections.property("document"))
+                .uniqueResult();
     }
 }

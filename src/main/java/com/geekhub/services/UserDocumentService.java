@@ -42,8 +42,6 @@ public interface UserDocumentService extends EntityService<UserDocument, Long> {
 
     UserDocument getByNameAndOwnerId(Long ownerId, String name);
 
-    UserDocument getByFullNameAndOwner(User owner, String parentDirectoryHash, String name);
-
     UserDocument getDocumentWithComments(Long docId);
 
     UserDocument getDocumentWithOldVersions(Long docId);

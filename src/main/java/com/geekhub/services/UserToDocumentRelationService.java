@@ -7,6 +7,7 @@ import com.geekhub.entities.enums.FileRelationType;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 @Service
@@ -31,4 +32,6 @@ public interface UserToDocumentRelationService extends EntityService<UserToDocum
     Set<UserDocument> getAllAccessibleDocuments(User user);
 
     Set<UserDocument> getAllAccessibleDocumentsInRoot(User user, List<String> directoryHashes);
+
+    UserDocument getDocumentByFullNameAndOwner(String parentDirHash, String docName, User owner);
 }

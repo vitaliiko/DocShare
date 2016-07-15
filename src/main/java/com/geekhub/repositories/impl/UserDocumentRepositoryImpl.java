@@ -3,6 +3,7 @@ package com.geekhub.repositories.impl;
 import com.geekhub.entities.FriendsGroup;
 import com.geekhub.entities.User;
 import com.geekhub.entities.UserDocument;
+import com.geekhub.entities.UserToDocumentRelation;
 import com.geekhub.entities.enums.DocumentAttribute;
 import com.geekhub.entities.enums.DocumentStatus;
 import java.util.Map;

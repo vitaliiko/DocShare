@@ -11,10 +11,7 @@ import org.springframework.util.CollectionUtils;
 
 import javax.inject.Inject;
 import javax.transaction.Transactional;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -115,5 +112,10 @@ public class UserToDocumentRelationServiceImpl implements UserToDocumentRelation
             return new HashSet<>();
         }
         return repository.getAllAccessibleDocumentsInRoot(user, directoryHashes).stream().collect(Collectors.toSet());
+    }
+
+    @Override
+    public UserDocument getDocumentByFullNameAndOwner(String parentDirHash, String docName, User owner) {
+        return repository.getDocumentByFullNameAndOwner(parentDirHash, docName, owner);
     }
 }

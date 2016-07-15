@@ -204,8 +204,8 @@ public class UserDocumentsResource {
             return ResponseEntity.badRequest().body(null);
         }
 
-        UserDocument existingDocument =
-                userDocumentService.getByFullNameAndOwner(user, document.getParentDirectoryHash(), newDocName);
+        UserDocument existingDocument = userToDocumentRelationService
+                .getDocumentByFullNameAndOwner(document.getParentDirectoryHash(), newDocName, user);
         if (existingDocument == null && UserFileUtil.validateDocumentNameWithoutExtension(newDocName)) {
             UserDocument documentWithNewName = userDocumentService.renameDocument(document, newDocName, user);
             return ResponseEntity.ok(EntityToDtoConverter.convert(documentWithNewName));
