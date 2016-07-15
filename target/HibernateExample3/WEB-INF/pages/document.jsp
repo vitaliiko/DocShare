@@ -29,9 +29,6 @@
     <h5>
          Changed: ${doc.lastModifyTime} by ${doc.modifiedBy}
     </h5>
-    <c:if test="${doc.description != null}">
-        Description: ${doc.description}
-    </c:if>
     <br>
     <br>
     <br>

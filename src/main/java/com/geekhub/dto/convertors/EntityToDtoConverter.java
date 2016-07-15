@@ -38,7 +38,6 @@ public class EntityToDtoConverter {
         documentDto.setLastModifyTime(df.format(document.getLastModifyTime()));
         documentDto.setModifiedBy(document.getModifiedBy());
         documentDto.setName(document.getName());
-        documentDto.setDescription(document.getDescription());
         documentDto.setParentDirectoryHash(document.getParentDirectoryHash());
         documentDto.setAccess(document.getDocumentAttribute().toString());
         return documentDto;

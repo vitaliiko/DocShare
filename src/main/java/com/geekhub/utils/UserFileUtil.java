@@ -51,13 +51,11 @@ public class UserFileUtil {
 
     public static UserDocument createUserDocument(MultipartFile multipartFile,
                                                   UserDirectory directory,
-                                                  String description,
                                                   User user) throws IOException {
 
         UserDocument document = new UserDocument();
         document.setNameWithExtension(multipartFile.getOriginalFilename());
         document.setParentDirectoryHash(directory == null ? user.getLogin() : directory.getHashName());
-        document.setDescription(description);
         document.setLastModifyTime(Calendar.getInstance().getTime());
         document.setType(multipartFile.getContentType());
         document.setSize(convertDocumentSize(multipartFile.getSize()));
@@ -69,12 +67,8 @@ public class UserFileUtil {
 
     public static UserDocument updateUserDocument(UserDocument document,
                                                   MultipartFile multipartFile,
-                                                  String description,
                                                   User user) throws IOException {
 
-        if (description != null && !description.isEmpty()) {
-            document.setDescription(description);
-        }
         String hashName = UserFileUtil.createHashName();
         document.setLastModifyTime(Calendar.getInstance().getTime());
         document.setModifiedBy(user.getFullName());

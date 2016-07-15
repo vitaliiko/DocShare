@@ -116,13 +116,12 @@ $(document).ready(function() {
 
     $('.upload-btn').click(function() {
         var files = new FormData();
-        var description = $('#description').val();
         files.append('file', $('#file').files[0]);
         if (files.length) {
             $.ajax({
                 url: 'upload',
                 type: 'POST',
-                data: {files: files, description: description},
+                data: {files: files},
                 cache: false,
                 contentType: false,
                 processData: false,

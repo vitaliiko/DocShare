@@ -336,29 +336,29 @@ public class UserDocumentServiceImpl implements UserDocumentService {
     }
 
     @Override
-    public UserDocument saveOrUpdateDocument(MultipartFile multipartFile, UserDirectory parentDirectory,
-                                             String description, User user) throws IOException {
+    public UserDocument saveOrUpdateDocument(MultipartFile multipartFile, UserDirectory parentDirectory, User user)
+            throws IOException {
 
         String docName = multipartFile.getOriginalFilename();
         String parentDirectoryHash = parentDirectory == null ? user.getLogin() : parentDirectory.getHashName();
         UserDocument document = userToDocumentRelationService.getDocumentByFullNameAndOwner(parentDirectoryHash, docName, user);
 
         if (document == null) {
-            document = createDocument(multipartFile, parentDirectory, description, user);
+            document = createDocument(multipartFile, parentDirectory, user);
         } else if (document.getDocumentStatus() == DocumentStatus.REMOVED) {
-            document = recoverAndUpdate(multipartFile, description, user, document);
+            document = recoverAndUpdate(multipartFile, user, document);
         } else if (userDocumentAccessService.canEdit(document, user)) {
             document = getDocumentWithOldVersions(document.getId());
-            updateDocument(document, user, description, multipartFile);
+            updateDocument(document, user, multipartFile);
         }
 
         return document;
     }
 
-    private UserDocument createDocument(MultipartFile multipartFile, UserDirectory parentDirectory, String description, User user)
+    private UserDocument createDocument(MultipartFile multipartFile, UserDirectory parentDirectory, User user)
             throws IOException {
 
-        UserDocument document = UserFileUtil.createUserDocument(multipartFile, parentDirectory, description, user);
+        UserDocument document = UserFileUtil.createUserDocument(multipartFile, parentDirectory, user);
         multipartFile.transferTo(UserFileUtil.createFile(document.getHashName()));
         Long docId = save(document);
         document.setId(docId);
@@ -383,23 +383,23 @@ public class UserDocumentServiceImpl implements UserDocumentService {
         }
     }
 
-    private UserDocument recoverAndUpdate(MultipartFile multipartFile, String description, User user, UserDocument document)
+    private UserDocument recoverAndUpdate(MultipartFile multipartFile, User user, UserDocument document)
             throws IOException {
 
         RemovedDocument removedDocument = removedDocumentService.getByOwnerAndDocument(user, document);
         Long recoveredDocId = recover(removedDocument);
         document = getDocumentWithOldVersions(recoveredDocId);
-        updateDocument(document, user, description, multipartFile);
+        updateDocument(document, user, multipartFile);
         return document;
     }
 
     @Override
-    public void updateDocument(UserDocument document, User user, String description, MultipartFile multipartFile)
+    public void updateDocument(UserDocument document, User user, MultipartFile multipartFile)
             throws IOException {
 
         DocumentOldVersion oldVersion = DocumentVersionUtil.createOldVersion(document);
         document.getDocumentOldVersions().add(oldVersion);
-        UserDocument updatedDocument = UserFileUtil.updateUserDocument(document, multipartFile, description, user);
+        UserDocument updatedDocument = UserFileUtil.updateUserDocument(document, multipartFile, user);
         update(updatedDocument);
         eventSendingService.sendUpdateEvent(updatedDocument, user);
     }

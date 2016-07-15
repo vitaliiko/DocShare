@@ -106,7 +106,6 @@ public class UserDocumentsResource {
     @RequestMapping(value = "/documents/upload", method = RequestMethod.POST)
     public ModelAndView uploadDocument(@RequestParam("files[]") MultipartFile[] files,
                                        @RequestParam(required = false, name = "dirHashName") String parentDirectoryHash,
-                                       @RequestParam(required = false) String description,
                                        HttpSession session) throws IOException {
 
         User user = getUserFromSession(session);
@@ -120,7 +119,7 @@ public class UserDocumentsResource {
 
         if (UserFileUtil.isValidFileUploading(files)) {
             for (MultipartFile file : files) {
-                userDocumentService.saveOrUpdateDocument(file, parentDirectory, description, user);
+                userDocumentService.saveOrUpdateDocument(file, parentDirectory, user);
             }
         }
 

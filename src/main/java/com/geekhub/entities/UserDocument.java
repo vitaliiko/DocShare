@@ -38,10 +38,6 @@ public class UserDocument implements Comparable<UserDocument>, Serializable {
 
     @Column
     @Getter @Setter
-    private String description;
-
-    @Column
-    @Getter @Setter
     private Date lastModifyTime;
 
     @Column
