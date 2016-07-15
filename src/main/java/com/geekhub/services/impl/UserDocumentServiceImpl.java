@@ -468,7 +468,7 @@ public class UserDocumentServiceImpl implements UserDocumentService {
 
     private void sendEvents(UserDocument document, SharedDto shared, User user, Set<User> oldReadersAndEditors) {
         List<User> groupMembers =
-                friendGroupService.getAllMembersByGroupIds(ListUtils.union(shared.getEditorsGroups(), shared.getReaders()));
+                friendGroupService.getAllMembersByGroupIds(ListUtils.union(shared.getEditorsGroups(), shared.getReadersGroups()));
         List<User> currentAndEditorsSet =
                 userService.getByIds(ListUtils.union(groupMembers, ListUtils.union(shared.getEditors(), shared.getReaders())));
 

@@ -4,8 +4,8 @@ import com.geekhub.repositories.UserRepository;
 import com.geekhub.dto.SearchDto;
 import com.geekhub.entities.FriendsGroup;
 import com.geekhub.entities.User;
-import java.util.Arrays;
-import java.util.TreeSet;
+
+import java.util.*;
 
 import com.geekhub.services.*;
 import com.geekhub.utils.UserFileUtil;
@@ -16,10 +16,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -82,7 +78,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public List<User> getByIds(List<Long> userIds) {
         if (CollectionUtils.isEmpty(userIds)) {
-            return null;
+            return new ArrayList<>();
         }
         return repository.getByIds(userIds);
     }

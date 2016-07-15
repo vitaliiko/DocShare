@@ -11,11 +11,9 @@ import org.hibernate.Hibernate;
 import javax.inject.Inject;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -68,6 +66,9 @@ public class FriendGroupServiceImpl implements FriendGroupService {
 
     @Override
     public List<FriendsGroup> getByIds(List<Long> groupIds) {
+        if (CollectionUtils.isEmpty(groupIds)) {
+            return new ArrayList<>();
+        }
         return repository.getByIds(groupIds);
     }
 
@@ -126,6 +127,9 @@ public class FriendGroupServiceImpl implements FriendGroupService {
 
     @Override
     public List<User> getAllMembersByGroupIds(List<Long> groupIds) {
+        if (CollectionUtils.isEmpty(groupIds)) {
+            return new ArrayList<>();
+        }
         return repository.getAllMembersByGroupIds(groupIds);
     }
 

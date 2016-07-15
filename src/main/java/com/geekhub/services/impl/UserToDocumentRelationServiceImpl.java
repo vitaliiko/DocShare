@@ -7,9 +7,12 @@ import com.geekhub.entities.enums.FileRelationType;
 import com.geekhub.repositories.UserToDocumentRelationRepository;
 import com.geekhub.services.UserToDocumentRelationService;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import javax.inject.Inject;
 import javax.transaction.Transactional;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -108,6 +111,9 @@ public class UserToDocumentRelationServiceImpl implements UserToDocumentRelation
 
     @Override
     public Set<UserDocument> getAllAccessibleDocumentsInRoot(User user, List<String> directoryHashes) {
+        if (CollectionUtils.isEmpty(directoryHashes)) {
+            return new HashSet<>();
+        }
         return repository.getAllAccessibleDocumentsInRoot(user, directoryHashes).stream().collect(Collectors.toSet());
     }
 }
