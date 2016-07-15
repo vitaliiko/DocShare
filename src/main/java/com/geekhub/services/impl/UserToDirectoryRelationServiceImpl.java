@@ -85,4 +85,9 @@ public class UserToDirectoryRelationServiceImpl implements UserToDirectoryRelati
     public Set<UserDirectory> getAllAccessibleDirectories(User user) {
         return repository.getAllAccessibleDirectories(user).stream().collect(Collectors.toSet());
     }
+
+    @Override
+    public List<User> getAllByDirectoryIdAndRelation(Long directoryId, FileRelationType relationType) {
+        return repository.getAllByDirectoryIdAndRelation(directoryId, relationType);
+    }
 }

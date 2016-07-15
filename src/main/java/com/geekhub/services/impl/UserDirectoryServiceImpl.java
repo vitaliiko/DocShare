@@ -387,6 +387,25 @@ public class UserDirectoryServiceImpl implements UserDirectoryService {
     }
 
     @Override
+    public UserFileDto findAllRelations(UserFileDto fileDto) {
+        List<User> editors = userToDirectoryRelationService
+                .getAllByDirectoryIdAndRelation(fileDto.getId(), FileRelationType.EDITOR);
+        List<User> readers = userToDirectoryRelationService
+                .getAllByDirectoryIdAndRelation(fileDto.getId(), FileRelationType.READER);
+
+        List<FriendsGroup> editorGroups = friendGroupToDirectoryRelationService
+                .getAllGroupsByDirectoryIdAndRelation(fileDto.getId(), FileRelationType.EDITOR);
+        List<FriendsGroup> readerGroups = friendGroupToDirectoryRelationService
+                .getAllGroupsByDirectoryIdAndRelation(fileDto.getId(), FileRelationType.READER);
+
+        fileDto.setReaders(readers);
+        fileDto.setEditors(editors);
+        fileDto.setReaderGroups(readerGroups);
+        fileDto.setEditorGroups(editorGroups);
+        return fileDto;
+    }
+
+    @Override
     public void copy(Long dirId, String destinationDirectoryHash) {
         UserDirectory directory = repository.getById(dirId);
         UserDirectory copy = UserFileUtil.copyDirectory(directory);

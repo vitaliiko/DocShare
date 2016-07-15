@@ -509,10 +509,15 @@ public class UserDocumentServiceImpl implements UserDocumentService {
 
     @Override
     public UserFileDto findAllRelations(UserFileDto fileDto) {
-        List<User> editors = userToDocumentRelationService.getAllByDocumentIdAndRelation(fileDto.getId(), FileRelationType.EDITOR);
-        List<User> readers = userToDocumentRelationService.getAllByDocumentIdAndRelation(fileDto.getId(), FileRelationType.READER);
-        List<FriendsGroup> editorGroups = friendGroupToDocumentRelationService.getAllGroupsByDocumentIdAndRelation(fileDto.getId(), FileRelationType.EDITOR);
-        List<FriendsGroup> readerGroups = friendGroupToDocumentRelationService.getAllGroupsByDocumentIdAndRelation(fileDto.getId(), FileRelationType.READER);
+        List<User> editors = userToDocumentRelationService
+                .getAllByDocumentIdAndRelation(fileDto.getId(), FileRelationType.EDITOR);
+        List<User> readers = userToDocumentRelationService
+                .getAllByDocumentIdAndRelation(fileDto.getId(), FileRelationType.READER);
+
+        List<FriendsGroup> editorGroups = friendGroupToDocumentRelationService
+                .getAllGroupsByDocumentIdAndRelation(fileDto.getId(), FileRelationType.EDITOR);
+        List<FriendsGroup> readerGroups = friendGroupToDocumentRelationService
+                .getAllGroupsByDocumentIdAndRelation(fileDto.getId(), FileRelationType.READER);
 
         fileDto.setReaders(readers);
         fileDto.setEditors(editors);

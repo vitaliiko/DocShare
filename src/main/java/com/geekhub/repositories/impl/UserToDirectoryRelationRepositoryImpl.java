@@ -97,4 +97,15 @@ public class UserToDirectoryRelationRepositoryImpl implements UserToDirectoryRel
                 .setProjection(Projections.property("directory"))
                 .list();
     }
+
+    @Override
+    public List<User> getAllByDirectoryIdAndRelation(Long directoryId, FileRelationType relationType) {
+        return sessionFactory.getCurrentSession()
+                .createCriteria(clazz, "rel")
+                .createAlias("rel.directory", "dir")
+                .add(Restrictions.eq("dir.id", directoryId))
+                .add(Restrictions.eq("fileRelationType", relationType))
+                .setProjection(Projections.property("user"))
+                .list();
+    }
 }

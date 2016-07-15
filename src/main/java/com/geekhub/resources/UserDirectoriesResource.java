@@ -77,7 +77,9 @@ public class UserDirectoriesResource {
         User user = getUserFromSession(session);
         UserDirectory directory = userDirectoryService.getById(dirId);
         if (directoryAccessService.isOwnerOfActual(directory, user)) {
-            return ResponseEntity.ok(EntityToDtoConverter.convert(directory));
+            UserFileDto directoryDto = EntityToDtoConverter.convert(directory);
+            directoryDto = userDirectoryService.findAllRelations(directoryDto);
+            return ResponseEntity.ok(directoryDto);
         }
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
     }

@@ -88,4 +88,9 @@ public class FriendGroupToDirectoryRelationServiceImpl implements FriendGroupToD
     public Long getCountByFriendGroup(FriendsGroup group) {
         return repository.getCountByFriendGroup(group);
     }
+
+    @Override
+    public List<FriendsGroup> getAllGroupsByDirectoryIdAndRelation(Long directoryId, FileRelationType relationType) {
+        return repository.getAllGroupsByDirectoryIdAndRelation(directoryId, relationType);
+    }
 }

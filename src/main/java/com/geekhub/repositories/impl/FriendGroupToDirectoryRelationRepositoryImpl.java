@@ -94,4 +94,15 @@ public class FriendGroupToDirectoryRelationRepositoryImpl implements FriendGroup
                 .setProjection(Projections.rowCount())
                 .uniqueResult();
     }
+
+    @Override
+    public List<FriendsGroup> getAllGroupsByDirectoryIdAndRelation(Long directoryId, FileRelationType relationType) {
+        return sessionFactory.getCurrentSession()
+                .createCriteria(clazz, "rel")
+                .createAlias("rel.directory", "dir")
+                .add(Restrictions.eq("dir.id", directoryId))
+                .add(Restrictions.eq("fileRelationType", relationType))
+                .setProjection(Projections.property("friendsGroup"))
+                .list();
+    }
 }

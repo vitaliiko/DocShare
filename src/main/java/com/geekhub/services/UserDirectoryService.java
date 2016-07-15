@@ -67,4 +67,6 @@ public interface UserDirectoryService extends EntityService<UserDirectory, Long>
     Set<UserFileDto> getDirectoryContent(String dirHashName);
 
     void updateDocumentAttribute(DocumentAttribute attribute, List<Long> directoryIds);
+
+    UserFileDto findAllRelations(UserFileDto fileDto);
 }

@@ -51,8 +51,6 @@ public class EntityToDtoConverter {
         directoryDto.setHashName(directory.getHashName());
         directoryDto.setParentDirectoryHash(directory.getParentDirectoryHash());
         directoryDto.setAccess(directory.getDocumentAttribute().toString());
-//        directoryDto.setReaders(directory.getReaders());
-//        directoryDto.setReadersGroups(directory.getReadersGroups());
         return directoryDto;
     }
 
