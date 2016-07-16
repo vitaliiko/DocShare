@@ -1,5 +1,6 @@
 package com.geekhub.configuration;
 
+import com.geekhub.interceptors.DocumentAccessInterceptor;
 import com.geekhub.interceptors.MainInterceptor;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
@@ -17,6 +18,7 @@ import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 import org.springframework.web.servlet.view.InternalResourceViewResolver;
 
+import javax.inject.Inject;
 import javax.servlet.annotation.MultipartConfig;
 import java.io.IOException;
 
@@ -26,6 +28,12 @@ import java.io.IOException;
 @EnableWebMvc
 @MultipartConfig
 public class WebAppConfig extends WebMvcConfigurerAdapter {
+
+    @Inject
+    private MainInterceptor mainInterceptor;
+
+    @Inject
+    private DocumentAccessInterceptor documentAccessInterceptor;
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
@@ -54,7 +62,11 @@ public class WebAppConfig extends WebMvcConfigurerAdapter {
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(new MainInterceptor());
+        registry.addInterceptor(mainInterceptor);
+
+        registry.addInterceptor(documentAccessInterceptor)
+                .addPathPatterns("/api/documents/**")
+                .excludePathPatterns("/api/documents");
     }
 
     @Bean(name = "multipartResolver")
