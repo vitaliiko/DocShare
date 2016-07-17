@@ -108,10 +108,12 @@ public class UserDirectoriesResource {
         return ResponseEntity.badRequest().body(null);
     }
 
-    @RequestMapping(value = "/directories/share", method = RequestMethod.POST)
-    public ResponseEntity<UserFileDto> shareUserDirectory(@RequestBody SharedDto shared, HttpSession session) {
+    @RequestMapping(value = "/directories/{dirId}/share", method = RequestMethod.POST)
+    public ResponseEntity<UserFileDto> shareUserDirectory(@PathVariable Long dirId,
+                                                          @RequestBody SharedDto shared, HttpSession session) {
+
         User user = getUserFromSession(session);
-        UserDirectory directory = userDirectoryService.getById(shared.getDocId());
+        UserDirectory directory = userDirectoryService.getById(dirId);
 
         if (directoryAccessService.isOwnerOfActual(directory, user)) {
             UserDirectory sharedDirectory = userDirectoryService.shareDirectory(directory, shared, user);

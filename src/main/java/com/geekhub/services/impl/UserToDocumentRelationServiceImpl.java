@@ -118,4 +118,9 @@ public class UserToDocumentRelationServiceImpl implements UserToDocumentRelation
     public UserDocument getDocumentByFullNameAndOwner(String parentDirHash, String docName, User owner) {
         return repository.getDocumentByFullNameAndOwner(parentDirHash, docName, owner);
     }
+
+    @Override
+    public UserToDocumentRelation getByDocumentIdAndUserId(Long documentId, Long userId) {
+        return repository.getByDocumentIdAndUserId(documentId, userId);
+    }
 }

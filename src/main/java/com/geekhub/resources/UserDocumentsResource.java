@@ -223,10 +223,12 @@ public class UserDocumentsResource {
         return ResponseEntity.badRequest().body(null);
     }
 
-    @RequestMapping(value = "/documents/share", method = RequestMethod.POST)
-    public ResponseEntity<UserFileDto> shareUserDocument(@RequestBody SharedDto shared, HttpSession session) {
+    @RequestMapping(value = "/documents/{docId}/share", method = RequestMethod.POST)
+    public ResponseEntity<UserFileDto> shareUserDocument(@PathVariable Long docId,
+                                                         @RequestBody SharedDto shared, HttpSession session) {
+
         User user = getUserFromSession(session);
-        UserDocument document = userDocumentService.getById(shared.getDocId());
+        UserDocument document = userDocumentService.getById(docId);
 
         if (documentAccessService.isOwnerOfActual(document, user)) {
             UserDocument sharedDocument = userDocumentService.shareDocument(document, shared, user);

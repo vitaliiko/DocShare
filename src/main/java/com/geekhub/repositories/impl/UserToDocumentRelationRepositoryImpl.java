@@ -165,4 +165,13 @@ public class UserToDocumentRelationRepositoryImpl implements UserToDocumentRelat
                 .setProjection(Projections.property("document"))
                 .uniqueResult();
     }
+
+    @Override
+    public UserToDocumentRelation getByDocumentIdAndUserId(Long documentId, Long userId) {
+        return (UserToDocumentRelation) sessionFactory.getCurrentSession()
+                .createQuery("FROM UserToDocumentRelation rel WHERE rel.document.id = :docId AND rel.user.id = :userId")
+                .setParameter("docId", documentId)
+                .setParameter("userId", userId)
+                .uniqueResult();
+    }
 }

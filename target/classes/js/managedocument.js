@@ -1,7 +1,6 @@
 $(document).ready(function() {
 
     var content = $('.content');
-    var fileId;
     var fileAccess;
     var shareUrl;
     var files;
@@ -184,11 +183,10 @@ $(document).ready(function() {
         clearModalWindow();
         makeBoxesUnchecked();
         $('.group-check-box').show();
-        shareUrl = '/api/documents/share';
 
-        var docId = $(this).val();
-        $.getJSON('/api/documents/' + docId, function(document) {
-            fileId = document.id;
+        var getUrl = '/api/documents/' + $(this).val();
+        shareUrl = getUrl + '/share';
+        $.getJSON(getUrl, function(document) {
             fileAccess = document.access;
             makeBoxesChecked(document.readers, $('.reader-check-box'));
             makeBoxesChecked(document.editors, $('.editor-check-box'));
@@ -203,11 +201,10 @@ $(document).ready(function() {
         clearModalWindow();
         makeBoxesUnchecked();
         $('.group-check-box').hide();
-        shareUrl = '/api/directories/share';
 
-        var dirId = $(this).val();
-        $.getJSON('/api/directories/' + dirId, function(directory) {
-            fileId = directory.id;
+        var getUrl = '/api/directories/' + $(this).val();
+        shareUrl = getUrl + '/share';
+        $.getJSON(getUrl, function(directory) {
             fileAccess = directory.access;
             makeBoxesChecked(directory.readers, $('.reader-check-box'));
             makeBoxesChecked(directory.readersGroups, $('.readers-group-check-box'));
@@ -249,7 +246,6 @@ $(document).ready(function() {
             type: 'POST',
             contentType: 'application/json',
             data: JSON.stringify({
-                docId: fileId,
                 access: access,
                 readers: readers,
                 readersGroups: readersGroups,

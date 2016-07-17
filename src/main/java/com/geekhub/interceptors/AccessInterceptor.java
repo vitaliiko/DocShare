@@ -7,18 +7,18 @@ import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.Map;
-import java.util.function.BiPredicate;
+import java.util.function.Predicate;
 
-public abstract class AccessInterceptor<T> extends HandlerInterceptorAdapter {
+public abstract class AccessInterceptor<R> extends HandlerInterceptorAdapter {
 
-    private Map<String, BiPredicate<T, User>> predicateMap = new HashedMap();
+    private Map<String, Predicate<R>> predicateMap = new HashedMap();
 
-    public Map<String, BiPredicate<T, User>> putPredicate(String url, BiPredicate<T, User> predicate) {
+    public Map<String, Predicate<R>> addPredicate(String url, Predicate<R> predicate) {
         predicateMap.put(url, predicate);
         return predicateMap;
     }
 
-    public BiPredicate<T, User> getPredicate(String url) {
+    public Predicate<R> getPredicate(String url) {
         return predicateMap.get(url);
     }
 
@@ -26,5 +26,5 @@ public abstract class AccessInterceptor<T> extends HandlerInterceptorAdapter {
     public abstract boolean preHandle(HttpServletRequest req, HttpServletResponse resp, Object handler)
             throws Exception;
 
-    public abstract boolean permitAccess(T object, User user, String url);
+    public abstract boolean permitAccess(Long objectId, Long userId, String url);
 }
