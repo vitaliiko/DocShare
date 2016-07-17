@@ -3,6 +3,7 @@ package com.geekhub.interceptors;
 import com.geekhub.entities.UserToDocumentRelation;
 import com.geekhub.security.FileAccessService;
 import com.geekhub.services.UserToDocumentRelationService;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.servlet.HandlerMapping;
@@ -43,7 +44,12 @@ public class DocumentAccessInterceptor extends AccessInterceptor<UserToDocumentR
         for (String var : pathVariables.values()) {
             url = url.replace(var, "*");
         }
-        return permitAccess(Long.valueOf(docId), userId, url);
+        if (permitAccess(Long.valueOf(docId), userId, url)) {
+            return true;
+        } else {
+            resp.setStatus(HttpStatus.FORBIDDEN.value());
+            return false;
+        }
     }
 
     @Override

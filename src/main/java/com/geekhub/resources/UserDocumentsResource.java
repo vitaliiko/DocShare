@@ -29,6 +29,7 @@ import org.springframework.web.servlet.ModelAndView;
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import javax.validation.Valid;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -163,14 +164,14 @@ public class UserDocumentsResource {
         if (!documentAccessService.canRead(document, user)) {
             throw new ResourceNotFoundException();
         }
-        return prepareModel(user, document);
-    }
-
-    private ModelAndView prepareModel(User user, UserDocument document) {
         UserFileDto fileDto = EntityToDtoConverter.convert(document);
         if (fileDto.getModifiedBy().equals(user.getFullName())) {
             fileDto.setModifiedBy("Me");
         }
+        return prepareModel(fileDto, user, document);
+    }
+
+    private ModelAndView prepareModel(UserFileDto fileDto, User user, UserDocument document) {
 
         boolean abilityToComment = AbilityToCommentDocument.getBoolean(document.getAbilityToComment());
         ModelAndView model = new ModelAndView();
@@ -225,16 +226,12 @@ public class UserDocumentsResource {
 
     @RequestMapping(value = "/documents/{docId}/share", method = RequestMethod.POST)
     public ResponseEntity<UserFileDto> shareUserDocument(@PathVariable Long docId,
-                                                         @RequestBody SharedDto shared, HttpSession session) {
+                                                         @Valid @RequestBody SharedDto shared, HttpSession session) {
 
         User user = getUserFromSession(session);
         UserDocument document = userDocumentService.getById(docId);
-
-        if (documentAccessService.isOwnerOfActual(document, user)) {
-            UserDocument sharedDocument = userDocumentService.shareDocument(document, shared, user);
-            return ResponseEntity.ok(EntityToDtoConverter.convert(sharedDocument));
-        }
-        return ResponseEntity.badRequest().body(null);
+        UserDocument sharedDocument = userDocumentService.shareDocument(document, shared, user);
+        return ResponseEntity.ok(EntityToDtoConverter.convert(sharedDocument));
     }
 
     @RequestMapping(value = "/documents/{docId}/history", method = RequestMethod.GET)
@@ -242,12 +239,12 @@ public class UserDocumentsResource {
         User user = getUserFromSession(session);
         UserDocument document = userDocumentService.getWithOldVersions(docId);
         if (documentAccessService.isOwnerOfActual(document, user)) {
-            return prepareModel(docId, user, document);
+            return prepareModel(user, document);
         }
         throw new ResourceNotFoundException();
     }
 
-    private ModelAndView prepareModel(Long docId, User user, UserDocument document) {
+    private ModelAndView prepareModel(User user, UserDocument document) {
         ModelAndView model = new ModelAndView("history");
         List<DocumentOldVersionDto> versions = document.getDocumentOldVersions().stream()
                 .map(EntityToDtoConverter::convert)
@@ -262,12 +259,13 @@ public class UserDocumentsResource {
         }
         model.addObject("versions", versions);
         model.addObject("currentVersion", currentVersionDto);
-        model.addObject("docId", docId);
         return model;
     }
 
-    @RequestMapping(value = "/documents/versions/{oldVersionId}/recover", method = RequestMethod.POST)
-    public ModelAndView recoverVersion(@PathVariable Long oldVersionId, HttpSession session) {
+    @RequestMapping(value = "/documents/{docId}/versions/{oldVersionId}/recover", method = RequestMethod.POST)
+    public ModelAndView recoverVersion(@PathVariable Long docId,
+                                       @PathVariable Long oldVersionId, HttpSession session) {
+
         User user = getUserFromSession(session);
         DocumentOldVersion oldVersion = documentOldVersionService.getById(oldVersionId);
         UserDocument document = oldVersion.getUserDocument();
@@ -279,8 +277,9 @@ public class UserDocumentsResource {
         throw new ResourceNotFoundException();
     }
 
-    @RequestMapping(value = "/documents/versions/{versionId}/download", method = RequestMethod.GET)
-    public ResponseEntity downloadDocumentOldVersion(@PathVariable long versionId,
+    @RequestMapping(value = "/documents/{docId}/versions/{versionId}/download", method = RequestMethod.GET)
+    public ResponseEntity downloadDocumentOldVersion(@PathVariable Long docId,
+                                                     @PathVariable Long versionId,
                                                      HttpSession session,
                                                      HttpServletResponse response) throws IOException {
 

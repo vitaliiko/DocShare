@@ -15,11 +15,7 @@ import com.geekhub.utils.DocumentVersionUtil;
 import com.geekhub.utils.UserFileUtil;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.*;
 
 import org.apache.commons.collections.ListUtils;
 import org.hibernate.Hibernate;
@@ -29,8 +25,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.Arrays;
-import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
@@ -461,21 +455,30 @@ public class UserDocumentServiceImpl implements UserDocumentService {
     }
 
     private void sendEvents(UserDocument document, SharedDto shared, User user, Set<User> oldReadersAndEditors) {
-        List<User> groupMembers =
-                friendGroupService.getAllMembersByGroupIds(ListUtils.union(shared.getEditorsGroups(), shared.getReadersGroups()));
-        List<User> currentAndEditorsSet =
-                userService.getByIds(ListUtils.union(groupMembers, ListUtils.union(shared.getEditors(), shared.getReaders())));
+        List<User> currentReadersAndEditorsList = new ArrayList<>();
 
-        Set<User> newReadersAndEditorsSet = currentAndEditorsSet.stream()
+        List<Long> groupIdList = unionLists(shared.getEditorsGroups(), shared.getReadersGroups());
+        currentReadersAndEditorsList.addAll(friendGroupService.getAllMembersByGroupIds(groupIdList));
+        List<Long> userIdList = unionLists(shared.getReaders(), shared.getEditors());
+        currentReadersAndEditorsList.addAll(userService.getByIds(userIdList));
+
+        Set<User> newReadersAndEditorsSet = currentReadersAndEditorsList.stream()
                 .filter(u -> !oldReadersAndEditors.contains(u))
                 .collect(Collectors.toSet());
         eventSendingService
                 .sendShareEvent(newReadersAndEditorsSet, FileType.DOCUMENT, document.getName(), document.getId(), user);
 
         Set<User> removedReadersAndEditorsSet = oldReadersAndEditors.stream()
-                .filter(u -> !currentAndEditorsSet.contains(u))
+                .filter(u -> !currentReadersAndEditorsList.contains(u))
                 .collect(Collectors.toSet());
         eventSendingService.sendProhibitAccessEvent(removedReadersAndEditorsSet, FileType.DOCUMENT, document.getName(), user);
+    }
+
+    @SafeVarargs
+    private final <T> List<T> unionLists(List<T>... lists) {
+        List<T> union = new ArrayList<>();
+        Arrays.stream(lists).filter(list -> !CollectionUtils.isEmpty(list)).forEach(union::addAll);
+        return union;
     }
 
     @Override

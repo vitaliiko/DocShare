@@ -32,6 +32,6 @@ public class FileAccessService {
             && r.getDocument().getDocumentStatus() == DocumentStatus.ACTUAL;
 
     public <T> boolean permitAccess(T relation, Predicate<T> predicate) {
-        return predicate.test(relation);
+        return relation != null && predicate.test(relation);
     }
 }

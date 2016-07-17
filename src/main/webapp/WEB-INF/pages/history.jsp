@@ -15,7 +15,7 @@
 <div class="container col-md-10" style="width: 900px;">
     <table class="table table-hover tbody tr:hover td" id="documentTable">
         <caption>
-            <h3>List of Previous Versions Documents  |  <a href="/api/documents/${docId}/browse">Back</a> </h3>
+            <h3>List of Previous Versions Documents  |  <a href="/api/documents/${currentVersion.id}/browse">Back</a> </h3>
         </caption>
         <tr>
             <th id="file-name">File Name</th>
@@ -46,12 +46,12 @@
                      by ${version.changedBy}
                 </td>
                 <td>
-                    <form action="/api/documents/versions/${version.id}/recover" method="post">
+                    <form action="/api/documents/${currentVersion.id}/versions/${version.id}/recover" method="post">
                         <input type="submit" class="btn btn-default custom-width" value="Recover">
                     </form>
                 </td>
                 <td>
-                    <form action="/api/documents/versions/${version.id}/download" method="get">
+                    <form action="/api/documents/${currentVersion.id}/versions/${version.id}/download" method="get">
                         <input type="submit" class="btn btn-default custom-width" value="Download">
                     </form>
                 </td>
