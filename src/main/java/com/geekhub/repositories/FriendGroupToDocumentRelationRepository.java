@@ -16,4 +16,6 @@ public interface FriendGroupToDocumentRelationRepository extends EntityRepositor
     List<FriendsGroup> getAllGroupsByDocumentId(Long documentId);
 
     List<FriendsGroup> getAllGroupsByDocumentIdAndRelation(Long documentId, FileRelationType relationType);
+
+    List<FileRelationType> getAllRelationsByDocumentIdAndUserId(Long documentId, User user);
 }

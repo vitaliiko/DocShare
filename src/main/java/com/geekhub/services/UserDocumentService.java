@@ -12,7 +12,6 @@ import com.geekhub.entities.enums.DocumentStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.print.Doc;
 import java.util.List;
 
 @Service
@@ -33,10 +32,6 @@ public interface UserDocumentService extends EntityService<UserDocument, Long> {
     void copy(Long docId, String destinationDirectoryHash);
 
     boolean copy(Long[] docIds, String destinationDirectoryHash, User user);
-
-    Long recover(Long removedDocId);
-
-    void recover(Long[] removedDocIds);
 
     UserDocument getByHashName(String hashName);
 
@@ -70,7 +65,7 @@ public interface UserDocumentService extends EntityService<UserDocument, Long> {
 
     void updateDocument(UserDocument document, User user, MultipartFile multipartFile) throws IOException;
 
-    void changeAbilityToComment(UserDocument document, boolean abilityToComment);
+    void changeAbilityToComment(Long documentId, boolean abilityToComment);
 
     UserDocument renameDocument(UserDocument document, String newDocName, User user);
 

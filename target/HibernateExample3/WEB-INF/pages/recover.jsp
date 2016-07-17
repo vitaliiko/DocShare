@@ -28,20 +28,21 @@
                     <fmt:formatDate type="date" timeStyle="short" dateStyle="short" value="${dir.removalDate}"/>
                     by ${dir.removerName}
                 </td>
-                <td><form action="/api/directory/${dir.id}/recover" method="post">
+                <td><form action="/api/directory/${dir.fileId}/recover" method="post">
                     <input type="hidden" name="remDirId" value="">
                     <input type="submit" class="btn btn-primary custom-width" value="Recover">
                 </form></td>
             </tr>
         </c:forEach>
-        <c:forEach items="${documents}" var="version">
+
+        <c:forEach items="${documents}" var="doc">
             <tr>
-                <td>${version.name}</td>
+                <td>${doc.name}</td>
                 <td>
-                    <fmt:formatDate type="date" timeStyle="short" dateStyle="short" value="${version.removalDate}"/>
-                    by ${version.removerName}
+                    <fmt:formatDate type="date" timeStyle="short" dateStyle="short" value="${doc.removalDate}"/>
+                    by ${doc.removerName}
                 </td>
-                <td><form action="/api/documents/${version.id}/recover" method="post">
+                <td><form action="/api/documents/${doc.fileId}/recover" method="post">
                     <input type="submit" class="btn btn-primary custom-width" value="Recover">
                 </form></td>
             </tr>

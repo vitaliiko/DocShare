@@ -1,6 +1,5 @@
 package com.geekhub.resources;
 
-import com.geekhub.entities.enums.FileRelationType;
 import com.geekhub.resources.utils.FileControllersUtil;
 import com.geekhub.dto.*;
 import com.geekhub.dto.convertors.EntityToDtoConverter;
@@ -12,7 +11,6 @@ import com.geekhub.security.UserDocumentAccessService;
 import com.geekhub.services.*;
 import com.geekhub.utils.UserFileUtil;
 import com.geekhub.validators.FileValidator;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.FileCopyUtils;
 import org.springframework.web.bind.WebDataBinder;
@@ -128,42 +126,27 @@ public class UserDocumentsResource {
     }
 
     @RequestMapping(value = "/documents/{docId}/download", method = RequestMethod.GET)
-    public ResponseEntity downloadDocument(@PathVariable long docId,
-                                           HttpSession session, HttpServletResponse response) throws IOException {
+    public ResponseEntity downloadDocument(@PathVariable Long docId,
+                                           HttpServletResponse response) throws IOException {
 
-        User user = getUserFromSession(session);
         UserDocument document = userDocumentService.getById(docId);
-
-        if (documentAccessService.canRead(document, user)) {
-            openOutputStream(document, response);
-            return ResponseEntity.ok().build();
-        }
-        throw new ResourceNotFoundException();
+        openOutputStream(document, response);
+        return ResponseEntity.ok().build();
     }
 
     @RequestMapping(value = "/documents/{docId}/comment-ability", method = RequestMethod.POST)
-    public ResponseEntity setCommentAbility(@PathVariable long docId,
-                                            @RequestParam boolean abilityToComment,
-                                            HttpSession session) {
+    public ResponseEntity setCommentAbility(@PathVariable Long docId,
+                                            @RequestParam boolean abilityToComment) {
 
-        User user = getUserFromSession(session);
-        UserDocument document = userDocumentService.getById(docId);
-
-        if (!documentAccessService.isOwner(document, user)) {
-            throw new ResourceNotFoundException();
-        }
-        userDocumentService.changeAbilityToComment(document, abilityToComment);
+        userDocumentService.changeAbilityToComment(docId, abilityToComment);
         return ResponseEntity.ok().build();
     }
 
     @RequestMapping(value = "/documents/{docId}/browse", method = RequestMethod.GET)
-    public ModelAndView browseDocument(@PathVariable long docId, HttpSession session) {
+    public ModelAndView browseDocument(@PathVariable Long docId, HttpSession session) {
         User user = getUserFromSession(session);
         UserDocument document = userDocumentService.getById(docId);
 
-        if (!documentAccessService.canRead(document, user)) {
-            throw new ResourceNotFoundException();
-        }
         UserFileDto fileDto = EntityToDtoConverter.convert(document);
         if (fileDto.getModifiedBy().equals(user.getFullName())) {
             fileDto.setModifiedBy("Me");
@@ -188,15 +171,11 @@ public class UserDocumentsResource {
     }
 
     @RequestMapping(value = "/documents/{docId}", method = RequestMethod.GET)
-    public ResponseEntity<UserFileDto> getUserDocument(@PathVariable long docId, HttpSession session) {
-        User user = getUserFromSession(session);
+    public ResponseEntity<UserFileDto> getUserDocument(@PathVariable Long docId) {
         UserDocument document = userDocumentService.getById(docId);
-        if (documentAccessService.isOwnerOfActual(document, user)) {
-            UserFileDto documentDto = EntityToDtoConverter.convert(document);
-            documentDto = userDocumentService.findAllRelations(documentDto);
-            return ResponseEntity.ok().body(documentDto);
-        }
-        return ResponseEntity.badRequest().body(null);
+        UserFileDto documentDto = EntityToDtoConverter.convert(document);
+        documentDto = userDocumentService.findAllRelations(documentDto);
+        return ResponseEntity.ok().body(documentDto);
     }
 
     @RequestMapping(value = "/documents/{docId}/rename", method = RequestMethod.POST)
@@ -204,24 +183,21 @@ public class UserDocumentsResource {
                                                       @RequestParam String newDocName,
                                                       HttpSession session) {
 
-        User user = getUserFromSession(session);
         UserDocument document = userDocumentService.getById(docId);
         newDocName = newDocName + document.getExtension();
 
-        if (!documentAccessService.isOwnerOfActual(document, user)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
-        }
         if (document.getName().equals(newDocName)) {
             return ResponseEntity.badRequest().body(null);
         }
 
+        User user = getUserFromSession(session);
         UserDocument existingDocument = userToDocumentRelationService
                 .getDocumentByFullNameAndOwner(document.getParentDirectoryHash(), newDocName, user);
-        if (existingDocument == null && UserFileUtil.validateDocumentNameWithoutExtension(newDocName)) {
-            UserDocument documentWithNewName = userDocumentService.renameDocument(document, newDocName, user);
-            return ResponseEntity.ok(EntityToDtoConverter.convert(documentWithNewName));
+        if (existingDocument != null || !UserFileUtil.validateDocumentNameWithoutExtension(newDocName)) {
+            return ResponseEntity.badRequest().body(null);
         }
-        return ResponseEntity.badRequest().body(null);
+        UserDocument documentWithNewName = userDocumentService.renameDocument(document, newDocName, user);
+        return ResponseEntity.ok(EntityToDtoConverter.convert(documentWithNewName));
     }
 
     @RequestMapping(value = "/documents/{docId}/share", method = RequestMethod.POST)
@@ -238,10 +214,7 @@ public class UserDocumentsResource {
     public ModelAndView showDocumentOldVersions(@PathVariable Long docId, HttpSession session) {
         User user = getUserFromSession(session);
         UserDocument document = userDocumentService.getWithOldVersions(docId);
-        if (documentAccessService.isOwnerOfActual(document, user)) {
-            return prepareModel(user, document);
-        }
-        throw new ResourceNotFoundException();
+        return prepareModel(user, document);
     }
 
     private ModelAndView prepareModel(User user, UserDocument document) {
@@ -264,34 +237,22 @@ public class UserDocumentsResource {
 
     @RequestMapping(value = "/documents/{docId}/versions/{oldVersionId}/recover", method = RequestMethod.POST)
     public ModelAndView recoverVersion(@PathVariable Long docId,
-                                       @PathVariable Long oldVersionId, HttpSession session) {
+                                       @PathVariable Long oldVersionId) {
 
-        User user = getUserFromSession(session);
         DocumentOldVersion oldVersion = documentOldVersionService.getById(oldVersionId);
-        UserDocument document = oldVersion.getUserDocument();
-
-        if (documentAccessService.isOwnerOfActual(document, user)) {
-            userDocumentService.recoverOldVersion(oldVersion);
-            return new ModelAndView("redirect:/api/documents");
-        }
-        throw new ResourceNotFoundException();
+        userDocumentService.recoverOldVersion(oldVersion);
+        return new ModelAndView("redirect:/api/documents");
     }
 
     @RequestMapping(value = "/documents/{docId}/versions/{versionId}/download", method = RequestMethod.GET)
     public ResponseEntity downloadDocumentOldVersion(@PathVariable Long docId,
                                                      @PathVariable Long versionId,
-                                                     HttpSession session,
                                                      HttpServletResponse response) throws IOException {
 
-        User user = getUserFromSession(session);
         DocumentOldVersion oldVersion = documentOldVersionService.getById(versionId);
         UserDocument document = oldVersion.getUserDocument();
-
-        if (documentAccessService.canRead(document, user)) {
-            openOutputStream(oldVersion.getHashName(), document.getType(), oldVersion.getName(), response);
-            return ResponseEntity.ok().build();
-        }
-        return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        openOutputStream(oldVersion.getHashName(), document.getType(), oldVersion.getName(), response);
+        return ResponseEntity.ok().build();
     }
 
     @RequestMapping(value = "/documents/accessible", method = RequestMethod.GET)
@@ -318,14 +279,11 @@ public class UserDocumentsResource {
         return model;
     }
 
-    @RequestMapping(value = "/documents/{removedDocId}/recover", method = RequestMethod.POST)
-    public ModelAndView recoverDocument(@PathVariable long removedDocId, HttpSession session) {
+    @RequestMapping(value = "/documents/{docId}/recover", method = RequestMethod.POST)
+    public ModelAndView recoverDocument(@PathVariable Long docId, HttpSession session) {
         User user = getUserFromSession(session);
-        if (documentAccessService.canRecover(removedDocId, user)) {
-            userDocumentService.recoverRemovedDocument(removedDocId, user);
-            return new ModelAndView("redirect:/api/documents");
-        }
-        throw new ResourceNotFoundException();
+        userDocumentService.recoverRemovedDocument(docId, user);
+        return new ModelAndView("redirect:/api/documents");
     }
 
     private static void openOutputStream(UserDocument document, HttpServletResponse response) throws IOException {

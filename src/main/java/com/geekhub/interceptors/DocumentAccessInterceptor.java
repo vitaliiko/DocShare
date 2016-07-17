@@ -1,8 +1,8 @@
 package com.geekhub.interceptors;
 
-import com.geekhub.entities.UserToDocumentRelation;
+import com.geekhub.entities.User;
+import com.geekhub.entities.UserDocument;
 import com.geekhub.security.FileAccessService;
-import com.geekhub.services.UserToDocumentRelationService;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -13,20 +13,26 @@ import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.Map;
-import java.util.function.Predicate;
+import java.util.function.BiPredicate;
 
 @Service
-public class DocumentAccessInterceptor extends AccessInterceptor<UserToDocumentRelation> {
+public class DocumentAccessInterceptor extends AccessInterceptor<UserDocument> {
 
     @Inject
     private FileAccessService fileAccessService;
 
-    @Inject
-    private UserToDocumentRelationService userToDocumentRelationService;
-
     @PostConstruct
     public void init() {
-        addPredicate("/api/documents/*/share", FileAccessService.SHARE);
+        addPredicate("/api/documents/*", FileAccessService.OWNER)
+        .addPredicate("/api/documents/*/share", FileAccessService.OWNER)
+        .addPredicate("/api/documents/*/rename", FileAccessService.OWNER)
+        .addPredicate("/api/documents/*/history", FileAccessService.OWNER)
+        .addPredicate("/api/documents/*/recover", FileAccessService.OWNER_OF_REMOVED)
+        .addPredicate("/api/documents/*/download", FileAccessService.READER)
+        .addPredicate("/api/documents/*/browse", FileAccessService.READER)
+        .addPredicate("/api/documents/*/comment-ability", FileAccessService.OWNER)
+        .addPredicate("/api/documents/*/versions/*/recover", FileAccessService.OWNER)
+        .addPredicate("/api/documents/*/versions/*/download", FileAccessService.OWNER);
     }
 
     @Override
@@ -54,8 +60,7 @@ public class DocumentAccessInterceptor extends AccessInterceptor<UserToDocumentR
 
     @Override
     public boolean permitAccess(Long docId, Long userId, String url) {
-        UserToDocumentRelation relation = userToDocumentRelationService.getByDocumentIdAndUserId(docId, userId);
-        Predicate<UserToDocumentRelation> predicate = getPredicate(url);
-        return predicate == null || fileAccessService.permitAccess(relation, predicate);
+        BiPredicate<User, UserDocument> predicate = getPredicate(url);
+        return predicate == null || fileAccessService.permitAccess(docId, userId, predicate);
     }
 }

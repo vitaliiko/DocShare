@@ -71,7 +71,7 @@ public class RemovedDocumentServiceImpl implements RemovedDocumentService {
     }
 
     @Override
-    public RemovedDocument getByUserDocumentHashName(String userDocumentHashName) {
-        return repository.getByUserDocumentHashName(userDocumentHashName);
+    public RemovedDocument getByUserDocumentId(Long documentId) {
+        return repository.getByDocumentId(documentId);
     }
 }

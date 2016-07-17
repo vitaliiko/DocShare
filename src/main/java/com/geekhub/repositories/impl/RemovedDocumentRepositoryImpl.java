@@ -51,11 +51,11 @@ public class RemovedDocumentRepositoryImpl implements RemovedDocumentRepository 
     }
 
     @Override
-    public RemovedDocument getByUserDocumentHashName(String userDocumentHashName) {
+    public RemovedDocument getByDocumentId(Long documentId) {
         return (RemovedDocument) sessionFactory.getCurrentSession()
                 .createCriteria(clazz, "rem")
                 .createAlias("rem.userDocument", "doc")
-                .add(Restrictions.eq("doc.hashName", userDocumentHashName))
+                .add(Restrictions.eq("doc.id", documentId))
                 .uniqueResult();
     }
 

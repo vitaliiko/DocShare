@@ -6,6 +6,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.Date;
 import java.util.List;
 
 @EqualsAndHashCode(of = "id")
@@ -36,7 +37,7 @@ public class UserFileDto implements Comparable<UserFileDto> {
     private String parentDirectoryHash;
 
     @Getter @Setter
-    private String lastModifyTime;
+    private Date lastModifyTime;
 
     @Getter @Setter
     private String modifiedBy;

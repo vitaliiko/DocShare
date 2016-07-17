@@ -66,7 +66,7 @@ public class WebAppConfig extends WebMvcConfigurerAdapter {
 
         registry.addInterceptor(documentAccessInterceptor)
                 .addPathPatterns("/api/documents/**")
-                .excludePathPatterns("/api/documents");
+                .excludePathPatterns("/api/documents", "/api/documents/accessible");
     }
 
     @Bean(name = "multipartResolver")

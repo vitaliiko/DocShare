@@ -7,5 +7,5 @@ public interface RemovedDocumentRepository extends EntityRepository<RemovedDocum
 
     RemovedDocument get(User owner, String propertyName, Object value);
 
-    RemovedDocument getByUserDocumentHashName(String userDocumentHashName);
+    RemovedDocument getByDocumentId(Long documentId);
 }

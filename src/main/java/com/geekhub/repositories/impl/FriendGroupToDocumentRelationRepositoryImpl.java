@@ -124,4 +124,14 @@ public class FriendGroupToDocumentRelationRepositoryImpl implements FriendGroupT
                 .setProjection(Projections.property("friendsGroup"))
                 .list();
     }
+
+    @Override
+    public List<FileRelationType> getAllRelationsByDocumentIdAndUserId(Long documentId, User user) {
+        return sessionFactory.getCurrentSession()
+                .createQuery("SELECT rel.fileRelationType FROM FriendGroupToDocumentRelation rel " +
+                        "WHERE rel.document.id = :docId AND :user IN ELEMENTS(rel.friendsGroup.friends)")
+                .setParameter("docId", documentId)
+                .setParameter("user", user)
+                .list();
+    }
 }

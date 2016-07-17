@@ -6,11 +6,11 @@ import lombok.Setter;
 
 import java.util.Date;
 
-@EqualsAndHashCode(of = "id")
+@EqualsAndHashCode(of = "fileId")
 public class RemovedFileDto implements Comparable<RemovedFileDto> {
 
     @Getter @Setter
-    private long id;
+    private long fileId;
 
     @Getter @Setter
     private String name;

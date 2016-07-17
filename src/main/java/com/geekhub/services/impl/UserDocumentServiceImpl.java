@@ -17,7 +17,6 @@ import com.geekhub.utils.UserFileUtil;
 import java.io.IOException;
 import java.util.*;
 
-import org.apache.commons.collections.ListUtils;
 import org.hibernate.Hibernate;
 import javax.inject.Inject;
 import org.springframework.stereotype.Service;
@@ -122,23 +121,12 @@ public class UserDocumentServiceImpl implements UserDocumentService {
         Arrays.stream(docIds).forEach(id -> moveToTrash(id, removerId));
     }
 
-    @Override
-    public Long recover(Long removedDocId) {
-        RemovedDocument removedDocument = removedDocumentService.getById(removedDocId);
-        return recover(removedDocument);
-    }
-
     private Long recover(RemovedDocument removedDocument) {
         UserDocument document = removedDocument.getUserDocument();
         document.setDocumentStatus(DocumentStatus.ACTUAL);
         removedDocumentService.delete(removedDocument);
         repository.update(document);
         return document.getId();
-    }
-
-    @Override
-    public void recover(Long[] removedDocIds) {
-        Arrays.stream(removedDocIds).forEach(this::recover);
     }
 
     @Override
@@ -207,7 +195,7 @@ public class UserDocumentServiceImpl implements UserDocumentService {
     public Set<User> getAllReadersAndEditors(Long docId) {
         Set<User> users = new HashSet<>();
         users.addAll(userToDocumentRelationService.getAllUsersByDocumentIdBesidesOwner(docId));
-        users.addAll(friendGroupToDocumentRelationService.getAllGroupsMembersByDocumentId(docId));
+        users.addAll(friendGroupToDocumentRelationService.getAllGroupMembersByDocumentId(docId));
         return users;
     }
 
@@ -399,8 +387,9 @@ public class UserDocumentServiceImpl implements UserDocumentService {
     }
 
     @Override
-    public void changeAbilityToComment(UserDocument document, boolean abilityToComment) {
+    public void changeAbilityToComment(Long documentId, boolean abilityToComment) {
         AbilityToCommentDocument ability = AbilityToCommentDocument.getAttribute(abilityToComment);
+        UserDocument document = getById(documentId);
         document.setAbilityToComment(ability);
         update(document);
     }
@@ -477,7 +466,7 @@ public class UserDocumentServiceImpl implements UserDocumentService {
     @SafeVarargs
     private final <T> List<T> unionLists(List<T>... lists) {
         List<T> union = new ArrayList<>();
-        Arrays.stream(lists).filter(list -> !CollectionUtils.isEmpty(list)).forEach(union::addAll);
+        Arrays.stream(lists).filter(list -> !CollectionUtils.isEmpty(list)).distinct().forEach(union::addAll);
         return union;
     }
 
@@ -494,8 +483,9 @@ public class UserDocumentServiceImpl implements UserDocumentService {
     }
 
     @Override
-    public void recoverRemovedDocument(Long removedDocId, User user) {
-        Long docId = recover(removedDocId);
+    public void recoverRemovedDocument(Long documentId, User user) {
+        RemovedDocument removedDocument = removedDocumentService.getByUserDocumentId(documentId);
+        Long docId = recover(removedDocument);
         String docName = getById(docId).getName();
         eventSendingService.sendRecoverEvent(this, FileType.DOCUMENT, docName, docId, user);
     }

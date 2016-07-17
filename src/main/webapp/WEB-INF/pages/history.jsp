@@ -37,21 +37,21 @@
                 </form>
             </td>
         </tr>
-        <c:forEach items="${versions}" var="version">
+        <c:forEach items="${versions}" var="doc">
             <tr>
-                <td>${version.name}</td>
-                <td>${version.size}</td>
+                <td>${doc.name}</td>
+                <td>${doc.size}</td>
                 <td>
-                    <fmt:formatDate type="both" pattern="dd.MM.yy | h.mm" dateStyle="short" value="${version.lastModifyTime}"/>
-                     by ${version.changedBy}
+                    <fmt:formatDate type="both" pattern="dd.MM.yy | h.mm" dateStyle="short" value="${doc.lastModifyTime}"/>
+                     by ${doc.changedBy}
                 </td>
                 <td>
-                    <form action="/api/documents/${currentVersion.id}/versions/${version.id}/recover" method="post">
+                    <form action="/api/documents/${currentVersion.id}/versions/${doc.id}/recover" method="post">
                         <input type="submit" class="btn btn-default custom-width" value="Recover">
                     </form>
                 </td>
                 <td>
-                    <form action="/api/documents/${currentVersion.id}/versions/${version.id}/download" method="get">
+                    <form action="/api/documents/${currentVersion.id}/versions/${doc.id}/download" method="get">
                         <input type="submit" class="btn btn-default custom-width" value="Download">
                     </form>
                 </td>

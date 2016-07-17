@@ -30,12 +30,11 @@ public class EntityToDtoConverter {
     }
 
     public static UserFileDto convert(UserDocument document) {
-        DateFormat df = new SimpleDateFormat("MM.dd.yy");
         UserFileDto documentDto = new UserFileDto();
         documentDto.setId(document.getId());
         documentDto.setType("doc");
         documentDto.setSize(document.getSize());
-        documentDto.setLastModifyTime(df.format(document.getLastModifyTime()));
+        documentDto.setLastModifyTime(document.getLastModifyTime());
         documentDto.setModifiedBy(document.getModifiedBy());
         documentDto.setName(document.getName());
         documentDto.setParentDirectoryHash(document.getParentDirectoryHash());
@@ -99,7 +98,7 @@ public class EntityToDtoConverter {
 
     public static RemovedFileDto convert(RemovedDocument document, String removerName) {
         RemovedFileDto removedFileDto = new RemovedFileDto();
-        removedFileDto.setId(document.getId());
+        removedFileDto.setFileId(document.getUserDocument().getId());
         removedFileDto.setName(document.getUserDocument().getName());
         removedFileDto.setRemovalDate(document.getRemovalDate());
         removedFileDto.setRemoverName(removerName);
@@ -109,7 +108,7 @@ public class EntityToDtoConverter {
 
     public static RemovedFileDto convert(RemovedDirectory directory, String removerName) {
         RemovedFileDto removedFileDto = new RemovedFileDto();
-        removedFileDto.setId(directory.getId());
+        removedFileDto.setFileId(directory.getUserDirectory().getId());
         removedFileDto.setName(directory.getUserDirectory().getName());
         removedFileDto.setRemovalDate(directory.getRemovalDate());
         removedFileDto.setRemoverName(removerName);
