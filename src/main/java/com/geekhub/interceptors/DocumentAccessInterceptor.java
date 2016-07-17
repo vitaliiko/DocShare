@@ -23,29 +23,27 @@ public class DocumentAccessInterceptor extends AccessInterceptor<UserDocument> {
 
     @PostConstruct
     public void init() {
-        addPredicate("/api/documents/*", FileAccessService.OWNER)
-        .addPredicate("/api/documents/*/share", FileAccessService.OWNER)
-        .addPredicate("/api/documents/*/rename", FileAccessService.OWNER)
-        .addPredicate("/api/documents/*/history", FileAccessService.OWNER)
-        .addPredicate("/api/documents/*/recover", FileAccessService.OWNER_OF_REMOVED)
-        .addPredicate("/api/documents/*/download", FileAccessService.READER)
-        .addPredicate("/api/documents/*/browse", FileAccessService.READER)
-        .addPredicate("/api/documents/*/comment-ability", FileAccessService.OWNER)
-        .addPredicate("/api/documents/*/versions/*/recover", FileAccessService.OWNER)
-        .addPredicate("/api/documents/*/versions/*/download", FileAccessService.OWNER);
+        addPredicate("/api/documents/*", FileAccessService.DOCUMENT_OWNER)
+        .addPredicate("/api/documents/*/share", FileAccessService.DOCUMENT_OWNER)
+        .addPredicate("/api/documents/*/rename", FileAccessService.DOCUMENT_OWNER)
+        .addPredicate("/api/documents/*/browse", FileAccessService.DOCUMENT_READER)
+        .addPredicate("/api/documents/*/history", FileAccessService.DOCUMENT_OWNER)
+        .addPredicate("/api/documents/*/download", FileAccessService.DOCUMENT_READER)
+        .addPredicate("/api/documents/*/recover", FileAccessService.REMOVED_DOCUMENT_OWNER)
+        .addPredicate("/api/documents/*/comment-ability", FileAccessService.DOCUMENT_OWNER)
+        .addPredicate("/api/documents/*/versions/*/recover", FileAccessService.DOCUMENT_OWNER)
+        .addPredicate("/api/documents/*/versions/*/download", FileAccessService.DOCUMENT_OWNER);
     }
 
     @Override
     public boolean preHandle(HttpServletRequest req, HttpServletResponse resp, Object handler) throws Exception {
         Long userId = (Long) req.getSession().getAttribute("userId");
         Map<String, String> pathVariables = (Map) req.getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);
-        if (userId == null || CollectionUtils.isEmpty(pathVariables)) {
+        if (userId == null || CollectionUtils.isEmpty(pathVariables) || pathVariables.get("docId") == null) {
+            resp.setStatus(HttpStatus.BAD_REQUEST.value());
             return false;
         }
         String docId = pathVariables.get("docId");
-        if (docId == null) {
-            return false;
-        }
         String url = req.getRequestURI();
         for (String var : pathVariables.values()) {
             url = url.replace(var, "*");

@@ -44,27 +44,27 @@ public class FileAccessService {
     }
 
 
-    public static final BiPredicate<User, UserDocument> OWNER = (u, d) -> {
+    public static final BiPredicate<User, UserDocument> DOCUMENT_OWNER = (u, d) -> {
         FileRelationType relationType = getUserToDocumentRelationType(d.getId(), u.getId());
         return relationType != null
                 && relationType == FileRelationType.OWNER
                 && d.getDocumentStatus() == DocumentStatus.ACTUAL;
     };
 
-    public static final BiPredicate<User, UserDocument> OWNER_OF_REMOVED = (u, d) -> {
+    public static final BiPredicate<User, UserDocument> REMOVED_DOCUMENT_OWNER = (u, d) -> {
         FileRelationType relationType = getUserToDocumentRelationType(d.getId(), u.getId());
         return relationType != null
                 && relationType == FileRelationType.OWNER
                 && d.getDocumentStatus() == DocumentStatus.REMOVED;
     };
 
-    public static final BiPredicate<User, UserDocument> READER = (u, d) -> {
+    public static final BiPredicate<User, UserDocument> DOCUMENT_READER = (u, d) -> {
         FileRelationType relationType = getUserToDocumentRelationType(d.getId(), u.getId());
         return d.getDocumentStatus() == DocumentStatus.ACTUAL
                 && (relationType != null || isInReaderOrEditorGroups(u, d));
     };
 
-    public static final BiPredicate<User, UserDocument> EDITOR = (u, d) -> {
+    public static final BiPredicate<User, UserDocument> DOCUMENT_EDITOR = (u, d) -> {
         FileRelationType relationType = getUserToDocumentRelationType(d.getId(), u.getId());
         return relationType != null
                 && d.getDocumentStatus() == DocumentStatus.ACTUAL

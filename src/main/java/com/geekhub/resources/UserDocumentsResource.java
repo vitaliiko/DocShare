@@ -45,16 +45,10 @@ public class UserDocumentsResource {
     private UserDocumentService userDocumentService;
 
     @Inject
-    private UserDirectoryService userDirectoryService;
-
-    @Inject
     private FileValidator fileValidator;
 
     @Inject
     private DocumentOldVersionService documentOldVersionService;
-
-    @Inject
-    private UserDirectoryAccessService directoryAccessService;
 
     @Inject
     private UserDocumentAccessService documentAccessService;
@@ -64,9 +58,6 @@ public class UserDocumentsResource {
 
     @Inject
     private UserToDocumentRelationService userToDocumentRelationService;
-
-    @Inject
-    private FriendGroupToDocumentRelationService friendGroupToDocumentRelationService;
 
     private User getUserFromSession(HttpSession session) {
         return userService.getById((Long) session.getAttribute("userId"));
@@ -100,29 +91,6 @@ public class UserDocumentsResource {
         model.addObject("friends", friendsDtoSet);
         model.addObject("userLogin", user.getLogin());
         return model;
-    }
-
-    @RequestMapping(value = "/documents/upload", method = RequestMethod.POST)
-    public ModelAndView uploadDocument(@RequestParam("files[]") MultipartFile[] files,
-                                       @RequestParam(required = false, name = "dirHashName") String parentDirectoryHash,
-                                       HttpSession session) throws IOException {
-
-        User user = getUserFromSession(session);
-        UserDirectory parentDirectory = null;
-        if (parentDirectoryHash != null && !parentDirectoryHash.isEmpty()) {
-            parentDirectory = userDirectoryService.getByHashName(parentDirectoryHash);
-            if (!directoryAccessService.isOwnerOfActual(parentDirectory, user)) {
-                throw new ResourceNotFoundException();
-            }
-        }
-
-        if (UserFileUtil.isValidFileUploading(files)) {
-            for (MultipartFile file : files) {
-                userDocumentService.saveOrUpdateDocument(file, parentDirectory, user);
-            }
-        }
-
-        return new ModelAndView("redirect:/api/documents");
     }
 
     @RequestMapping(value = "/documents/{docId}/download", method = RequestMethod.GET)

@@ -40,11 +40,10 @@
         <p class="alert-text"></p>
     </div>
 
-    <form action="/api/documents/upload" method="post" enctype="multipart/form-data">
+    <form id="uploadingForm" action="/api/directories/root/documents/upload" method="post" enctype="multipart/form-data">
         <label class="col-md-3 control-lable" for="files">Upload a document</label>
         <input type="file" multiple name="files[]" id="files" class="form-control input-sm"/>
         <br>
-        <input type="hidden" value="" id="dirHashNameHidden" name="dirHashName">
         <div class="form-actions floatRight">
             <input type="submit" value="Upload" class="btn btn-primary btn-sm">
 

@@ -315,7 +315,7 @@ $(document).ready(function() {
 
             $('.back-link').prop('href', '/api/directories/' + dirHashName + '/parent/content');
             $('.doc-table tr').not('.table-head').remove();
-            $('#dirHashNameHidden').val(dirHashName);
+            $('#uploadingForm').attr('action', '/api/directories/' + dirHashName + '/documents/upload');
 
             renderDirectories(files);
             renderDocuments(files);
@@ -338,6 +338,7 @@ $(document).ready(function() {
             dirHashName = files[0].parentDirectoryHash;
             $('.back-link').prop('href', '/api/directories/' + dirHashName + '/parent/content');
             $('.doc-table tr').not('.table-head').remove();
+            $('#uploadingForm').attr('action', '/api/directories/' + dirHashName + '/documents/upload');
 
             renderDirectories(files);
             renderDocuments(files);

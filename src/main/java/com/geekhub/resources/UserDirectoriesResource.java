@@ -8,6 +8,7 @@ import com.geekhub.entities.UserDirectory;
 import com.geekhub.exceptions.ResourceNotFoundException;
 import com.geekhub.security.UserDirectoryAccessService;
 import com.geekhub.services.UserDirectoryService;
+import com.geekhub.services.UserDocumentService;
 import com.geekhub.services.UserService;
 import com.geekhub.utils.UserFileUtil;
 import org.springframework.http.HttpStatus;
@@ -18,10 +19,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.inject.Inject;
 import javax.servlet.http.HttpSession;
+import java.io.IOException;
 import java.util.Set;
 
 @RestController
@@ -35,10 +38,36 @@ public class UserDirectoriesResource {
     private UserDirectoryService userDirectoryService;
 
     @Inject
+    private UserDocumentService userDocumentService;
+
+    @Inject
     private UserDirectoryAccessService directoryAccessService;
 
     private User getUserFromSession(HttpSession session) {
         return userService.getById((Long) session.getAttribute("userId"));
+    }
+
+    @RequestMapping(value = "/directories/{dirHashName}/documents/upload", method = RequestMethod.POST)
+    public ModelAndView uploadDocuments(@RequestParam("files[]") MultipartFile[] files,
+                                        @PathVariable String dirHashName,
+                                        HttpSession session) throws IOException {
+
+        User user = getUserFromSession(session);
+        UserDirectory parentDirectory = null;
+        if (dirHashName != null && !dirHashName.isEmpty()) {
+            parentDirectory = userDirectoryService.getByHashName(dirHashName);
+            if (!directoryAccessService.isOwnerOfActual(parentDirectory, user)) {
+                throw new ResourceNotFoundException();
+            }
+        }
+
+        if (UserFileUtil.isValidFileUploading(files)) {
+            for (MultipartFile file : files) {
+                userDocumentService.saveOrUpdateDocument(file, parentDirectory, user);
+            }
+        }
+
+        return new ModelAndView("redirect:/api/documents");
     }
 
     @RequestMapping(value = "/directories/{removedDirId}/recover", method = RequestMethod.POST)
@@ -144,7 +173,8 @@ public class UserDirectoriesResource {
         UserDirectory currentDirectory = userDirectoryService.getByHashName(dirHashName);
         if (directoryAccessService.canRead(currentDirectory, user)) {
             String parentDirectoryHash = currentDirectory.getParentDirectoryHash();
-            return ResponseEntity.ok(userDirectoryService.getDirectoryContent(parentDirectoryHash));
+            Set<UserFileDto> directoryContent = userDirectoryService.getDirectoryContent(parentDirectoryHash);
+            return ResponseEntity.ok(directoryContent);
         }
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
     }
