@@ -13,9 +13,8 @@ public abstract class AccessInterceptor<T> extends HandlerInterceptorAdapter {
 
     private Map<String, BiPredicate<User, T>> predicateMap = new HashedMap();
 
-    public AccessInterceptor<T> addPredicate(String url, BiPredicate<User, T> predicate) {
+    public void addPredicate(String url, BiPredicate<User, T> predicate) {
         predicateMap.put(url, predicate);
-        return this;
     }
 
     public BiPredicate<User, T> getPredicate(String url) {
@@ -23,8 +22,7 @@ public abstract class AccessInterceptor<T> extends HandlerInterceptorAdapter {
     }
 
     @Override
-    public abstract boolean preHandle(HttpServletRequest req, HttpServletResponse resp, Object handler)
-            throws Exception;
+    public abstract boolean preHandle(HttpServletRequest req, HttpServletResponse resp, Object handler) throws Exception;
 
     public abstract boolean permitAccess(Long objectId, Long userId, String url);
 }

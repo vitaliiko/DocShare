@@ -3,6 +3,8 @@ package com.geekhub.interceptors;
 import com.geekhub.entities.User;
 import com.geekhub.entities.UserDocument;
 import com.geekhub.security.FileAccessService;
+import com.geekhub.services.UserDocumentService;
+import com.geekhub.services.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -21,44 +23,52 @@ public class DocumentAccessInterceptor extends AccessInterceptor<UserDocument> {
     @Inject
     private FileAccessService fileAccessService;
 
+    @Inject
+    private UserService userService;
+
+    @Inject
+    private UserDocumentService userDocumentService;
+
     @PostConstruct
     public void init() {
-        addPredicate("/api/documents/*", FileAccessService.DOCUMENT_OWNER)
-        .addPredicate("/api/documents/*/share", FileAccessService.DOCUMENT_OWNER)
-        .addPredicate("/api/documents/*/rename", FileAccessService.DOCUMENT_OWNER)
-        .addPredicate("/api/documents/*/browse", FileAccessService.DOCUMENT_READER)
-        .addPredicate("/api/documents/*/history", FileAccessService.DOCUMENT_OWNER)
-        .addPredicate("/api/documents/*/download", FileAccessService.DOCUMENT_READER)
-        .addPredicate("/api/documents/*/recover", FileAccessService.REMOVED_DOCUMENT_OWNER)
-        .addPredicate("/api/documents/*/comment-ability", FileAccessService.DOCUMENT_OWNER)
-        .addPredicate("/api/documents/*/versions/*/recover", FileAccessService.DOCUMENT_OWNER)
-        .addPredicate("/api/documents/*/versions/*/download", FileAccessService.DOCUMENT_OWNER);
+        addPredicate("/api/documents/*", FileAccessService.DOCUMENT_OWNER);
+        addPredicate("/api/documents/*/share", FileAccessService.DOCUMENT_OWNER);
+        addPredicate("/api/documents/*/rename", FileAccessService.DOCUMENT_OWNER);
+        addPredicate("/api/documents/*/browse", FileAccessService.DOCUMENT_READER);
+        addPredicate("/api/documents/*/history", FileAccessService.DOCUMENT_OWNER);
+        addPredicate("/api/documents/*/download", FileAccessService.DOCUMENT_READER);
+        addPredicate("/api/documents/*/recover", FileAccessService.REMOVED_DOCUMENT_OWNER);
+        addPredicate("/api/documents/*/comment-ability", FileAccessService.DOCUMENT_OWNER);
+        addPredicate("/api/documents/*/versions/*/recover", FileAccessService.DOCUMENT_OWNER);
+        addPredicate("/api/documents/*/versions/*/download", FileAccessService.DOCUMENT_OWNER);
     }
 
     @Override
     public boolean preHandle(HttpServletRequest req, HttpServletResponse resp, Object handler) throws Exception {
         Long userId = (Long) req.getSession().getAttribute("userId");
         Map<String, String> pathVariables = (Map) req.getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);
-        if (userId == null || CollectionUtils.isEmpty(pathVariables) || pathVariables.get("docId") == null) {
+        if (userId == null || CollectionUtils.isEmpty(pathVariables)) {
             resp.setStatus(HttpStatus.BAD_REQUEST.value());
             return false;
         }
-        String docId = pathVariables.get("docId");
-        String url = req.getRequestURI();
-        for (String var : pathVariables.values()) {
-            url = url.replace(var, "*");
-        }
-        if (permitAccess(Long.valueOf(docId), userId, url)) {
-            return true;
-        } else {
-            resp.setStatus(HttpStatus.FORBIDDEN.value());
+        if (pathVariables.get("docId") == null) {
+            resp.setStatus(HttpStatus.BAD_REQUEST.value());
             return false;
         }
+        String url = removeVariablesFromURI(req, pathVariables);
+        String docId = pathVariables.get("docId");
+        if (permitAccess(Long.valueOf(docId), userId, url)) {
+            return true;
+        }
+        resp.setStatus(HttpStatus.FORBIDDEN.value());
+        return false;
     }
 
     @Override
     public boolean permitAccess(Long docId, Long userId, String url) {
         BiPredicate<User, UserDocument> predicate = getPredicate(url);
-        return predicate == null || fileAccessService.permitAccess(docId, userId, predicate);
+        User user = userService.getById(userId);
+        UserDocument document = userDocumentService.getById(docId);
+        return predicate == null || fileAccessService.permitAccess(document, user, predicate);
     }
 }

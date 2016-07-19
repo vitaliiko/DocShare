@@ -1,6 +1,7 @@
 package com.geekhub.security;
 
 import com.geekhub.entities.User;
+import com.geekhub.entities.UserDirectory;
 import com.geekhub.entities.UserDocument;
 import com.geekhub.entities.UserToDocumentRelation;
 import com.geekhub.entities.enums.DocumentStatus;
@@ -72,9 +73,7 @@ public class FileAccessService {
     };
 
 
-    public boolean permitAccess(Long documentId, Long userId, BiPredicate<User, UserDocument> predicate) {
-        User user = userService.getById(userId);
-        UserDocument document = userDocumentService.getById(documentId);
+    public <T> boolean permitAccess(T document, User user, BiPredicate<User, T> predicate) {
         return predicate.test(user, document);
     }
 
