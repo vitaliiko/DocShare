@@ -197,22 +197,23 @@ public class UserDirectoryServiceImpl implements UserDirectoryService {
     }
 
     @Override
-    public UserDirectory createDirectory(User owner, UserDirectory parentDirectory, String dirName) {
-        String parentDirHash = parentDirectory == null ? owner.getLogin() : parentDirectory.getHashName();
-        UserDirectory directory = getByFullNameAndOwner(owner, parentDirHash, dirName);
+    public UserDirectory createDirectory(User owner, String parentDirHash, String dirName) {
 
+        UserDirectory directory = getByFullNameAndOwner(owner, parentDirHash, dirName);
         if (directory != null && !UserFileUtil.validateDirectoryName(dirName)) {
             return null;
         }
         directory = UserFileUtil.createUserDirectory(owner, parentDirHash, dirName);
         long dirId = save(directory);
         directory.setId(dirId);
-        createRelations(owner, parentDirectory, directory);
+
+        createRelations(owner, parentDirHash, directory);
         return directory;
     }
 
-    private void createRelations(User owner, UserDirectory parentDirectory, UserDirectory directory) {
-        if (parentDirectory != null) {
+    private void createRelations(User owner, String parentDirHash, UserDirectory directory) {
+        if (!parentDirHash.equals("root") && !parentDirHash.equals(owner.getLogin())) {
+            UserDirectory parentDirectory = getByHashName(parentDirHash);
             List<UserToDirectoryRelation> userRelations =
                     userToDirectoryRelationService.getAllByDirectory(parentDirectory);
             List<FriendGroupToDirectoryRelation> friendGroupRelations =

@@ -1,5 +1,6 @@
 package com.geekhub.configuration;
 
+import com.geekhub.interceptors.DirectoryAccessInterceptor;
 import com.geekhub.interceptors.DocumentAccessInterceptor;
 import com.geekhub.interceptors.MainInterceptor;
 import org.springframework.context.MessageSource;
@@ -35,6 +36,9 @@ public class WebAppConfig extends WebMvcConfigurerAdapter {
     @Inject
     private DocumentAccessInterceptor documentAccessInterceptor;
 
+    @Inject
+    private DirectoryAccessInterceptor directoryAccessInterceptor;
+
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         registry.addResourceHandler("/resources/**")
@@ -67,6 +71,9 @@ public class WebAppConfig extends WebMvcConfigurerAdapter {
         registry.addInterceptor(documentAccessInterceptor)
                 .addPathPatterns("/api/documents/**")
                 .excludePathPatterns("/api/documents", "/api/documents/accessible");
+
+        registry.addInterceptor(directoryAccessInterceptor)
+                .addPathPatterns("/api/directories/**");
     }
 
     @Bean(name = "multipartResolver")

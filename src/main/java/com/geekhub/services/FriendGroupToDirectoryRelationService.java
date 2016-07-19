@@ -2,6 +2,7 @@ package com.geekhub.services;
 
 import com.geekhub.entities.FriendGroupToDirectoryRelation;
 import com.geekhub.entities.FriendsGroup;
+import com.geekhub.entities.User;
 import com.geekhub.entities.UserDirectory;
 import com.geekhub.entities.enums.FileRelationType;
 import org.springframework.stereotype.Service;
@@ -23,4 +24,6 @@ public interface FriendGroupToDirectoryRelationService extends EntityService<Fri
     Long getCountByFriendGroup(FriendsGroup group);
 
     List<FriendsGroup> getAllGroupsByDirectoryIdAndRelation(Long directoryId, FileRelationType relationType);
+
+    List<FileRelationType> getAllRelationsByDocumentIdAndUser(Long directoryId, User user);
 }

@@ -90,4 +90,9 @@ public class UserToDirectoryRelationServiceImpl implements UserToDirectoryRelati
     public List<User> getAllByDirectoryIdAndRelation(Long directoryId, FileRelationType relationType) {
         return repository.getAllByDirectoryIdAndRelation(directoryId, relationType);
     }
+
+    @Override
+    public UserToDirectoryRelation getByDirectoryIdAndUserId(Long directoryId, Long userId) {
+        return repository.getByDirectoryIdAndUserId(directoryId, userId);
+    }
 }

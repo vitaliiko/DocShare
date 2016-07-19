@@ -61,7 +61,7 @@ public interface UserDocumentService extends EntityService<UserDocument, Long> {
 
     Set<UserDocument> searchByName(User owner, String name);
 
-    UserDocument saveOrUpdateDocument(MultipartFile multipartFile, UserDirectory directory, User user) throws IOException;
+    UserDocument saveOrUpdateDocument(MultipartFile multipartFile, String parentDirHashName, User user) throws IOException;
 
     void updateDocument(UserDocument document, User user, MultipartFile multipartFile) throws IOException;
 

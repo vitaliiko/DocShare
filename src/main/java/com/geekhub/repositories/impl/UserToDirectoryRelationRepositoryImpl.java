@@ -13,7 +13,6 @@ import org.springframework.stereotype.Repository;
 
 import javax.inject.Inject;
 import java.util.List;
-import java.util.Set;
 
 @Repository
 @SuppressWarnings("unchecked")
@@ -107,5 +106,14 @@ public class UserToDirectoryRelationRepositoryImpl implements UserToDirectoryRel
                 .add(Restrictions.eq("fileRelationType", relationType))
                 .setProjection(Projections.property("user"))
                 .list();
+    }
+
+    @Override
+    public UserToDirectoryRelation getByDirectoryIdAndUserId(Long directoryId, Long userId) {
+        return (UserToDirectoryRelation) sessionFactory.getCurrentSession()
+                .createQuery("FROM UserToDirectoryRelation rel WHERE rel.directory.id = :dirId AND rel.user.id = :userId")
+                .setParameter("dirId", directoryId)
+                .setParameter("userId", userId)
+                .uniqueResult();
     }
 }

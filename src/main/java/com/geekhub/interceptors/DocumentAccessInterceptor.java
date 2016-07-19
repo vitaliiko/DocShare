@@ -2,6 +2,7 @@ package com.geekhub.interceptors;
 
 import com.geekhub.entities.User;
 import com.geekhub.entities.UserDocument;
+import com.geekhub.interceptors.utils.InterceptorUtil;
 import com.geekhub.security.FileAccessService;
 import com.geekhub.services.UserDocumentService;
 import com.geekhub.services.UserService;
@@ -55,7 +56,7 @@ public class DocumentAccessInterceptor extends AccessInterceptor<UserDocument> {
             resp.setStatus(HttpStatus.BAD_REQUEST.value());
             return false;
         }
-        String url = removeVariablesFromURI(req, pathVariables);
+        String url = InterceptorUtil.removeVariablesFromURI(req, pathVariables);
         String docId = pathVariables.get("docId");
         if (permitAccess(Long.valueOf(docId), userId, url)) {
             return true;

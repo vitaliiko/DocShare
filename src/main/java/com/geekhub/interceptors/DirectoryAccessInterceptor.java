@@ -7,6 +7,7 @@ import com.geekhub.security.FileAccessService;
 import com.geekhub.services.UserDirectoryService;
 import com.geekhub.services.UserService;
 import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.servlet.HandlerMapping;
 
@@ -17,6 +18,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.util.Map;
 import java.util.function.BiPredicate;
 
+@Service
 public class DirectoryAccessInterceptor extends AccessInterceptor<UserDirectory> {
 
     @Inject
@@ -30,7 +32,14 @@ public class DirectoryAccessInterceptor extends AccessInterceptor<UserDirectory>
 
     @PostConstruct
     public void init() {
-
+        addPredicate("/api/directories/*/documents/upload", FileAccessService.DIRECTORY_OWNER);
+        addPredicate("/api/directories/*/parent/content", FileAccessService.DIRECTORY_OWNER);
+        addPredicate("/api/directories/*/make-dir", FileAccessService.DIRECTORY_OWNER);
+        addPredicate("/api/directories/*/content", FileAccessService.DIRECTORY_OWNER);
+        addPredicate("/api/directories/*/recover", FileAccessService.DIRECTORY_OWNER);
+        addPredicate("/api/directories/*/rename", FileAccessService.DIRECTORY_OWNER);
+        addPredicate("/api/directories/*/share", FileAccessService.DIRECTORY_OWNER);
+        addPredicate("/api/directories/*", FileAccessService.DIRECTORY_OWNER);
     }
 
     @Override
@@ -75,6 +84,9 @@ public class DirectoryAccessInterceptor extends AccessInterceptor<UserDirectory>
         BiPredicate<User, UserDirectory> predicate = getPredicate(url);
         User user = userService.getById(userId);
         UserDirectory directory = userDirectoryService.getByHashName(dirHashName);
-        return predicate == null || fileAccessService.permitAccess(directory, user, predicate);
+        return predicate == null
+                || dirHashName.equals("root")
+                || dirHashName.equals(user.getLogin())
+                || fileAccessService.permitAccess(directory, user, predicate);
     }
 }

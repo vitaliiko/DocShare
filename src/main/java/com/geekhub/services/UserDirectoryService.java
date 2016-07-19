@@ -2,8 +2,6 @@ package com.geekhub.services;
 
 import com.geekhub.dto.SharedDto;
 import com.geekhub.dto.UserFileDto;
-import com.geekhub.entities.FriendsGroup;
-import com.geekhub.entities.RemovedDirectory;
 import com.geekhub.entities.User;
 import com.geekhub.entities.UserDirectory;
 import com.geekhub.entities.enums.DocumentAttribute;
@@ -16,7 +14,7 @@ import org.springframework.stereotype.Service;
 @Service
 public interface UserDirectoryService extends EntityService<UserDirectory, Long> {
 
-    UserDirectory createDirectory(User owner, UserDirectory parentDirectory, String dirName);
+    UserDirectory createDirectory(User owner, String parentDirHash, String dirName);
 
     Set<UserDirectory> getByIds(List<Long> dirIds);
 

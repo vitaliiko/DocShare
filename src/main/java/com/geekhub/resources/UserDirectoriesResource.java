@@ -5,7 +5,6 @@ import com.geekhub.dto.UserFileDto;
 import com.geekhub.dto.convertors.EntityToDtoConverter;
 import com.geekhub.entities.User;
 import com.geekhub.entities.UserDirectory;
-import com.geekhub.exceptions.ResourceNotFoundException;
 import com.geekhub.security.UserDirectoryAccessService;
 import com.geekhub.services.UserDirectoryService;
 import com.geekhub.services.UserDocumentService;
@@ -40,77 +39,51 @@ public class UserDirectoriesResource {
     @Inject
     private UserDocumentService userDocumentService;
 
-    @Inject
-    private UserDirectoryAccessService directoryAccessService;
-
     private User getUserFromSession(HttpSession session) {
         return userService.getById((Long) session.getAttribute("userId"));
     }
 
     @RequestMapping(value = "/directories/{dirHashName}/documents/upload", method = RequestMethod.POST)
     public ModelAndView uploadDocuments(@RequestParam("files[]") MultipartFile[] files,
-                                        @PathVariable String dirHashName,
+                                        @PathVariable("dirHashName") String parentDirectoryHash,
                                         HttpSession session) throws IOException {
 
         User user = getUserFromSession(session);
-        UserDirectory parentDirectory = null;
-        if (dirHashName != null && !dirHashName.isEmpty()) {
-            parentDirectory = userDirectoryService.getByHashName(dirHashName);
-            if (!directoryAccessService.isOwnerOfActual(parentDirectory, user)) {
-                throw new ResourceNotFoundException();
-            }
-        }
-
         if (UserFileUtil.isValidFileUploading(files)) {
             for (MultipartFile file : files) {
-                userDocumentService.saveOrUpdateDocument(file, parentDirectory, user);
+                userDocumentService.saveOrUpdateDocument(file, parentDirectoryHash, user);
             }
         }
 
         return new ModelAndView("redirect:/api/documents");
     }
 
-    @RequestMapping(value = "/directories/{removedDirId}/recover", method = RequestMethod.POST)
-    public ModelAndView recoverDirectory(@PathVariable long removedDirId, HttpSession session) {
-        User user = getUserFromSession(session);
-        if (directoryAccessService.canRecover(removedDirId, user)) {
-            userDirectoryService.recover(removedDirId);
-            return new ModelAndView("redirect:/api/documents");
-        }
-        throw new ResourceNotFoundException();
+    @RequestMapping(value = "/directories/{dirId}/recover", method = RequestMethod.POST)
+    public ModelAndView recoverDirectory(@PathVariable("dirId") Long removedDirId) {
+        userDirectoryService.recover(removedDirId);
+        return new ModelAndView("redirect:/api/documents");
     }
 
-    @RequestMapping(value = "/directories", method = RequestMethod.POST)
-    public ResponseEntity<UserFileDto> makeDir(@RequestParam String dirName,
-                                               @RequestParam(required = false, defaultValue = "root") String parentDirHash,
+    @RequestMapping(value = "/directories/{dirHashName}/make-dir", method = RequestMethod.POST)
+    public ResponseEntity<UserFileDto> makeDir(@PathVariable("dirHashName") String parentDirHash,
+                                               @RequestParam String dirName,
                                                HttpSession session) {
 
         User owner = getUserFromSession(session);
-        UserDirectory parentDirectory = null;
-        if (parentDirHash != null && !parentDirHash.isEmpty() && !parentDirHash.equals("root")) {
-            parentDirectory = userDirectoryService.getByHashName(parentDirHash);
-            if (!directoryAccessService.isOwnerOfActual(parentDirectory, owner)) {
-                throw new ResourceNotFoundException();
-            }
-        }
         UserDirectory existingDirectory = userDirectoryService.getByFullNameAndOwner(owner, parentDirHash, dirName);
         if (existingDirectory != null || !UserFileUtil.validateDirectoryName(dirName)) {
             return ResponseEntity.badRequest().body(null);
         }
-        UserDirectory newDirectory = userDirectoryService.createDirectory(owner, parentDirectory, dirName);
+        UserDirectory newDirectory = userDirectoryService.createDirectory(owner, parentDirHash, dirName);
         return ResponseEntity.ok(EntityToDtoConverter.convert(newDirectory));
     }
 
     @RequestMapping(value = "/directories/{dirId}", method = RequestMethod.GET)
-    public ResponseEntity<UserFileDto> getUserDirectory(@PathVariable Long dirId, HttpSession session) {
-        User user = getUserFromSession(session);
+    public ResponseEntity<UserFileDto> getUserDirectory(@PathVariable Long dirId) {
         UserDirectory directory = userDirectoryService.getById(dirId);
-        if (directoryAccessService.isOwnerOfActual(directory, user)) {
-            UserFileDto directoryDto = EntityToDtoConverter.convert(directory);
-            directoryDto = userDirectoryService.findAllRelations(directoryDto);
-            return ResponseEntity.ok(directoryDto);
-        }
-        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+        UserFileDto directoryDto = EntityToDtoConverter.convert(directory);
+        directoryDto = userDirectoryService.findAllRelations(directoryDto);
+        return ResponseEntity.ok(directoryDto);
     }
 
     @RequestMapping(value = "/directories/{dirId}/rename", method = RequestMethod.POST)
@@ -121,9 +94,6 @@ public class UserDirectoriesResource {
         UserDirectory directory = userDirectoryService.getById(dirId);
         User user = getUserFromSession(session);
 
-        if (directoryAccessService.isOwnerOfActual(directory, user)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
-        }
         if (directory.getName().equals(newDirName)) {
             return ResponseEntity.badRequest().body(null);
         }
@@ -143,12 +113,8 @@ public class UserDirectoriesResource {
 
         User user = getUserFromSession(session);
         UserDirectory directory = userDirectoryService.getById(dirId);
-
-        if (directoryAccessService.isOwnerOfActual(directory, user)) {
-            UserDirectory sharedDirectory = userDirectoryService.shareDirectory(directory, shared, user);
-            return ResponseEntity.ok(EntityToDtoConverter.convert(sharedDirectory));
-        }
-        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+        UserDirectory sharedDirectory = userDirectoryService.shareDirectory(directory, shared, user);
+        return ResponseEntity.ok(EntityToDtoConverter.convert(sharedDirectory));
     }
 
     @RequestMapping(value = "/directories/{dirHashName}/content", method = RequestMethod.GET)
@@ -158,24 +124,14 @@ public class UserDirectoriesResource {
             dirHashName = user.getLogin();
             return ResponseEntity.ok(userDirectoryService.getDirectoryContent(dirHashName));
         }
-        UserDirectory directory = userDirectoryService.getByHashName(dirHashName);
-        if (directoryAccessService.canRead(directory, user)) {
-            return ResponseEntity.ok(userDirectoryService.getDirectoryContent(dirHashName));
-        }
-        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+        return ResponseEntity.ok(userDirectoryService.getDirectoryContent(dirHashName));
     }
 
     @RequestMapping(value = "/directories/{dirHashName}/parent/content", method = RequestMethod.GET)
-    public ResponseEntity<Set<UserFileDto>> getParentDirectoryContent(@PathVariable String dirHashName,
-                                                                      HttpSession session) {
-
-        User user = getUserFromSession(session);
+    public ResponseEntity<Set<UserFileDto>> getParentDirectoryContent(@PathVariable String dirHashName) {
         UserDirectory currentDirectory = userDirectoryService.getByHashName(dirHashName);
-        if (directoryAccessService.canRead(currentDirectory, user)) {
-            String parentDirectoryHash = currentDirectory.getParentDirectoryHash();
-            Set<UserFileDto> directoryContent = userDirectoryService.getDirectoryContent(parentDirectoryHash);
-            return ResponseEntity.ok(directoryContent);
-        }
-        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+        String parentDirectoryHash = currentDirectory.getParentDirectoryHash();
+        Set<UserFileDto> directoryContent = userDirectoryService.getDirectoryContent(parentDirectoryHash);
+        return ResponseEntity.ok(directoryContent);
     }
 }

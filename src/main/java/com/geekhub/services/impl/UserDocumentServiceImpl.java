@@ -318,12 +318,18 @@ public class UserDocumentServiceImpl implements UserDocumentService {
     }
 
     @Override
-    public UserDocument saveOrUpdateDocument(MultipartFile multipartFile, UserDirectory parentDirectory, User user)
+    public UserDocument saveOrUpdateDocument(MultipartFile multipartFile, String parentDirectoryHash, User user)
             throws IOException {
 
         String docName = multipartFile.getOriginalFilename();
-        String parentDirectoryHash = parentDirectory == null ? user.getLogin() : parentDirectory.getHashName();
-        UserDocument document = userToDocumentRelationService.getDocumentByFullNameAndOwner(parentDirectoryHash, docName, user);
+        UserDirectory parentDirectory = null;
+        if (parentDirectoryHash.equals("root")) {
+            parentDirectoryHash = user.getLogin();
+        } else {
+            parentDirectory = userDirectoryService.getByHashName(parentDirectoryHash);
+        }
+        UserDocument document = userToDocumentRelationService
+                .getDocumentByFullNameAndOwner(parentDirectoryHash, docName, user);
 
         if (document == null) {
             document = createDocument(multipartFile, parentDirectory, user);

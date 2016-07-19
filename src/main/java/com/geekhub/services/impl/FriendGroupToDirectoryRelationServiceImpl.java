@@ -2,6 +2,7 @@ package com.geekhub.services.impl;
 
 import com.geekhub.entities.FriendGroupToDirectoryRelation;
 import com.geekhub.entities.FriendsGroup;
+import com.geekhub.entities.User;
 import com.geekhub.entities.UserDirectory;
 import com.geekhub.entities.enums.FileRelationType;
 import com.geekhub.repositories.FriendGroupToDirectoryRelationRepository;
@@ -92,5 +93,10 @@ public class FriendGroupToDirectoryRelationServiceImpl implements FriendGroupToD
     @Override
     public List<FriendsGroup> getAllGroupsByDirectoryIdAndRelation(Long directoryId, FileRelationType relationType) {
         return repository.getAllGroupsByDirectoryIdAndRelation(directoryId, relationType);
+    }
+
+    @Override
+    public List<FileRelationType> getAllRelationsByDocumentIdAndUser(Long directoryId, User user) {
+        return repository.getAllRelationsByDocumentIdAndUser(directoryId, user);
     }
 }

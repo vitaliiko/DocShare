@@ -126,7 +126,7 @@ public class FriendGroupToDocumentRelationRepositoryImpl implements FriendGroupT
     }
 
     @Override
-    public List<FileRelationType> getAllRelationsByDocumentIdAndUserId(Long documentId, User user) {
+    public List<FileRelationType> getAllRelationsByDocumentIdAndUser(Long documentId, User user) {
         return sessionFactory.getCurrentSession()
                 .createQuery("SELECT rel.fileRelationType FROM FriendGroupToDocumentRelation rel " +
                         "WHERE rel.document.id = :docId AND :user IN ELEMENTS(rel.friendsGroup.friends)")

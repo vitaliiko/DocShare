@@ -2,6 +2,7 @@ package com.geekhub.repositories.impl;
 
 import com.geekhub.entities.FriendGroupToDirectoryRelation;
 import com.geekhub.entities.FriendsGroup;
+import com.geekhub.entities.User;
 import com.geekhub.entities.UserDirectory;
 import com.geekhub.entities.enums.FileRelationType;
 import com.geekhub.repositories.FriendGroupToDirectoryRelationRepository;
@@ -103,6 +104,16 @@ public class FriendGroupToDirectoryRelationRepositoryImpl implements FriendGroup
                 .add(Restrictions.eq("dir.id", directoryId))
                 .add(Restrictions.eq("fileRelationType", relationType))
                 .setProjection(Projections.property("friendsGroup"))
+                .list();
+    }
+
+    @Override
+    public List<FileRelationType> getAllRelationsByDocumentIdAndUser(Long directoryId, User user) {
+        return sessionFactory.getCurrentSession()
+                .createQuery("SELECT rel.fileRelationType FROM FriendGroupToDirectoryRelation rel " +
+                        "WHERE rel.directory.id = :dirId AND :user IN ELEMENTS(rel.friendsGroup.friends)")
+                .setParameter("dirId", directoryId)
+                .setParameter("user", user)
                 .list();
     }
 }
