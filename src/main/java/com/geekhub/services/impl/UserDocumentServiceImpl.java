@@ -1,10 +1,10 @@
 package com.geekhub.services.impl;
 
-import com.geekhub.dto.UserFileDto;
+import com.geekhub.dto.*;
+import com.geekhub.dto.convertors.EntityToDtoConverter;
 import com.geekhub.entities.*;
 import com.geekhub.entities.enums.FileRelationType;
 import com.geekhub.repositories.UserDocumentRepository;
-import com.geekhub.dto.SharedDto;
 import com.geekhub.entities.enums.AbilityToCommentDocument;
 import com.geekhub.entities.enums.DocumentAttribute;
 import com.geekhub.entities.enums.DocumentStatus;
@@ -502,21 +502,22 @@ public class UserDocumentServiceImpl implements UserDocumentService {
     }
 
     @Override
-    public UserFileDto findAllRelations(UserFileDto fileDto) {
+    public FileAccessDto findAllRelations(Long documentId) {
         List<User> editors = userToDocumentRelationService
-                .getAllByDocumentIdAndRelation(fileDto.getId(), FileRelationType.EDITOR);
+                .getAllByDocumentIdAndRelation(documentId, FileRelationType.EDITOR);
         List<User> readers = userToDocumentRelationService
-                .getAllByDocumentIdAndRelation(fileDto.getId(), FileRelationType.READER);
+                .getAllByDocumentIdAndRelation(documentId, FileRelationType.READER);
 
         List<FriendsGroup> editorGroups = friendGroupToDocumentRelationService
-                .getAllGroupsByDocumentIdAndRelation(fileDto.getId(), FileRelationType.EDITOR);
+                .getAllGroupsByDocumentIdAndRelation(documentId, FileRelationType.EDITOR);
         List<FriendsGroup> readerGroups = friendGroupToDocumentRelationService
-                .getAllGroupsByDocumentIdAndRelation(fileDto.getId(), FileRelationType.READER);
+                .getAllGroupsByDocumentIdAndRelation(documentId, FileRelationType.READER);
 
-        fileDto.setReaders(readers);
-        fileDto.setEditors(editors);
-        fileDto.setReaderGroups(readerGroups);
-        fileDto.setEditorGroups(editorGroups);
+        FileAccessDto fileDto = new FileAccessDto();
+        fileDto.setReaders(EntityToDtoConverter.convertToBaseUserDtos(readers));
+        fileDto.setEditors(EntityToDtoConverter.convertToBaseUserDtos(editors));
+        fileDto.setReaderGroups(EntityToDtoConverter.convertToFriendGroupDtos(readerGroups));
+        fileDto.setEditorGroups(EntityToDtoConverter.convertToFriendGroupDtos(editorGroups));
         return fileDto;
     }
 

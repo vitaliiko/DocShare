@@ -1,11 +1,11 @@
 package com.geekhub.dto.convertors;
 
-import com.geekhub.dto.UserDto;
+import com.geekhub.dto.ExtendedUserDto;
 import com.geekhub.entities.User;
 
 public class DtoToEntityConverter {
     
-    public static User merge(UserDto userDto, User user) {
+    public static User merge(ExtendedUserDto userDto, User user) {
         user.setFirstName(userDto.getFirstName());
         user.setLastName(userDto.getLastName());
         user.setLogin(userDto.getLogin());

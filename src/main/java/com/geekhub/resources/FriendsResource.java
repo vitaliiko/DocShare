@@ -1,6 +1,7 @@
 package com.geekhub.resources;
 
 import com.geekhub.dto.CreateFriendGroupDto;
+import com.geekhub.dto.ExtendedUserDto;
 import com.geekhub.dto.UserDto;
 import com.geekhub.entities.Event;
 import com.geekhub.entities.FriendsGroup;

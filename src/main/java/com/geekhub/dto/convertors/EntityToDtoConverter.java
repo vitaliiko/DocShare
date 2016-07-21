@@ -37,7 +37,6 @@ public class EntityToDtoConverter {
         documentDto.setLastModifyTime(document.getLastModifyTime());
         documentDto.setModifiedBy(document.getModifiedBy());
         documentDto.setName(document.getName());
-        documentDto.setParentDirectoryHash(document.getParentDirectoryHash());
         documentDto.setAccess(document.getDocumentAttribute().toString());
         return documentDto;
     }
@@ -47,14 +46,12 @@ public class EntityToDtoConverter {
         directoryDto.setId(directory.getId());
         directoryDto.setType("dir");
         directoryDto.setName(directory.getName());
-        directoryDto.setHashName(directory.getHashName());
-        directoryDto.setParentDirectoryHash(directory.getParentDirectoryHash());
         directoryDto.setAccess(directory.getDocumentAttribute().toString());
         return directoryDto;
     }
 
-    public static UserDto convert(User user) {
-        UserDto userDto = new UserDto();
+    public static ExtendedUserDto extendedConvert(User user) {
+        ExtendedUserDto userDto = new ExtendedUserDto();
         userDto.setId(user.getId());
         userDto.setFirstName(user.getFirstName());
         userDto.setLastName(user.getLastName());
@@ -66,14 +63,23 @@ public class EntityToDtoConverter {
         return userDto;
     }
 
+    public static UserDto convert(User user) {
+        UserDto userDto = new UserDto();
+        userDto.setId(user.getId());
+        userDto.setFirstName(user.getFirstName());
+        userDto.setLastName(user.getLastName());
+        userDto.setLogin(user.getLogin());
+        return userDto;
+    }
+
     public static FriendGroupDto convert(FriendsGroup group) {
         FriendGroupDto groupDto = new FriendGroupDto();
         groupDto.setId(group.getId());
         groupDto.setName(group.getName());
 
-        Set<UserDto> friends = new TreeSet<>();
-        group.getFriends().forEach(f -> friends.add(convert(f)));
-        groupDto.setFriends(friends);
+        Set<UserDto> userDtos = group.getFriends().stream()
+                .map(EntityToDtoConverter::convert).collect(Collectors.toSet());
+        groupDto.setFriends(userDtos);
         return groupDto;
     }
 
@@ -124,5 +130,13 @@ public class EntityToDtoConverter {
             friendsDtoMap.put(EntityToDtoConverter.convert(user), userGroupDtoList);
         }
         return friendsDtoMap;
+    }
+
+    public static List<UserDto> convertToBaseUserDtos(List<User> users) {
+        return users.stream().map(EntityToDtoConverter::convert).collect(Collectors.toList());
+    }
+
+    public static List<FriendGroupDto> convertToFriendGroupDtos(List<FriendsGroup> groups) {
+        return groups.stream().map(EntityToDtoConverter::convert).collect(Collectors.toList());
     }
 }

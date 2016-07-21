@@ -5,8 +5,6 @@ import com.geekhub.dto.*;
 import com.geekhub.dto.convertors.EntityToDtoConverter;
 import com.geekhub.entities.*;
 import com.geekhub.entities.enums.AbilityToCommentDocument;
-import com.geekhub.exceptions.ResourceNotFoundException;
-import com.geekhub.security.UserDirectoryAccessService;
 import com.geekhub.security.UserDocumentAccessService;
 import com.geekhub.services.*;
 import com.geekhub.utils.UserFileUtil;
@@ -21,7 +19,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.inject.Inject;
@@ -139,11 +136,9 @@ public class UserDocumentsResource {
     }
 
     @RequestMapping(value = "/documents/{docId}", method = RequestMethod.GET)
-    public ResponseEntity<UserFileDto> getUserDocument(@PathVariable Long docId) {
-        UserDocument document = userDocumentService.getById(docId);
-        UserFileDto documentDto = EntityToDtoConverter.convert(document);
-        documentDto = userDocumentService.findAllRelations(documentDto);
-        return ResponseEntity.ok().body(documentDto);
+    public ResponseEntity<FileAccessDto> getUserDocument(@PathVariable Long docId) {
+        FileAccessDto accessDto = userDocumentService.findAllRelations(docId);
+        return ResponseEntity.ok().body(accessDto);
     }
 
     @RequestMapping(value = "/documents/{docId}/rename", method = RequestMethod.POST)
@@ -164,6 +159,7 @@ public class UserDocumentsResource {
         if (existingDocument != null || !UserFileUtil.validateDocumentNameWithoutExtension(newDocName)) {
             return ResponseEntity.badRequest().body(null);
         }
+
         UserDocument documentWithNewName = userDocumentService.renameDocument(document, newDocName, user);
         return ResponseEntity.ok(EntityToDtoConverter.convert(documentWithNewName));
     }

@@ -1,5 +1,7 @@
 package com.geekhub.resources;
 
+import com.geekhub.dto.DirectoryContentDto;
+import com.geekhub.dto.FileAccessDto;
 import com.geekhub.dto.SharedDto;
 import com.geekhub.dto.UserFileDto;
 import com.geekhub.dto.convertors.EntityToDtoConverter;
@@ -79,11 +81,9 @@ public class UserDirectoriesResource {
     }
 
     @RequestMapping(value = "/directories/{dirId}", method = RequestMethod.GET)
-    public ResponseEntity<UserFileDto> getUserDirectory(@PathVariable Long dirId) {
-        UserDirectory directory = userDirectoryService.getById(dirId);
-        UserFileDto directoryDto = EntityToDtoConverter.convert(directory);
-        directoryDto = userDirectoryService.findAllRelations(directoryDto);
-        return ResponseEntity.ok(directoryDto);
+    public ResponseEntity<FileAccessDto> getUserDirectory(@PathVariable Long dirId) {
+        FileAccessDto accessDto = userDirectoryService.findAllRelations(dirId);
+        return ResponseEntity.ok(accessDto);
     }
 
     @RequestMapping(value = "/directories/{dirId}/rename", method = RequestMethod.POST)
@@ -118,20 +118,19 @@ public class UserDirectoriesResource {
     }
 
     @RequestMapping(value = "/directories/{dirHashName}/content", method = RequestMethod.GET)
-    public ResponseEntity<Set<UserFileDto>> getDirectoryContent(@PathVariable String dirHashName, HttpSession session) {
+    public ResponseEntity<DirectoryContentDto> getDirectoryContent(@PathVariable String dirHashName, HttpSession session) {
         User user = getUserFromSession(session);
         if (dirHashName.equals("root")) {
             dirHashName = user.getLogin();
-            return ResponseEntity.ok(userDirectoryService.getDirectoryContent(dirHashName));
         }
         return ResponseEntity.ok(userDirectoryService.getDirectoryContent(dirHashName));
     }
 
     @RequestMapping(value = "/directories/{dirHashName}/parent/content", method = RequestMethod.GET)
     public ResponseEntity<Set<UserFileDto>> getParentDirectoryContent(@PathVariable String dirHashName) {
-        UserDirectory currentDirectory = userDirectoryService.getByHashName(dirHashName);
-        String parentDirectoryHash = currentDirectory.getParentDirectoryHash();
-        Set<UserFileDto> directoryContent = userDirectoryService.getDirectoryContent(parentDirectoryHash);
-        return ResponseEntity.ok(directoryContent);
+//        UserDirectory currentDirectory = userDirectoryService.getByHashName(dirHashName);
+//        String parentDirectoryHash = currentDirectory.getParentDirectoryHash();
+//        Set<UserFileDto> directoryContent = userDirectoryService.getDirectoryContent(parentDirectoryHash);
+        return ResponseEntity.ok(null);
     }
 }

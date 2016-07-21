@@ -214,11 +214,12 @@ $(document).ready(function() {
     });
 
     function makeBoxesChecked(readers, checkBoxes) {
+        var ids = [];
         $.each(readers, function (k, v) {
-            readers.push(v.id);
+            ids.push(v.id);
         });
         $(checkBoxes).each(function (k, v) {
-            var isChecked = $.inArray(parseInt(v.value), readers) != -1;
+            var isChecked = $.inArray(parseInt(v.value), ids) != -1;
             $(this).prop('checked', isChecked);
         });
     }

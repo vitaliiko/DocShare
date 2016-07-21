@@ -180,7 +180,7 @@
                         </tr>
                     </c:forEach>
                     <c:forEach var="friend" items="${friends}">
-                        <tr class="group-${friend.id}">
+                        <tr class="friend-${friend.id}">
                             <td>
                                 <label>
                                     <input type="checkbox" class="check-box reader-check-box" value="${friend.id}">

@@ -1,5 +1,7 @@
 package com.geekhub.services;
 
+import com.geekhub.dto.DirectoryContentDto;
+import com.geekhub.dto.FileAccessDto;
 import com.geekhub.dto.SharedDto;
 import com.geekhub.dto.UserFileDto;
 import com.geekhub.entities.User;
@@ -62,9 +64,9 @@ public interface UserDirectoryService extends EntityService<UserDirectory, Long>
 
     UserDirectory shareDirectory(UserDirectory directory, SharedDto sharedDto, User user);
 
-    Set<UserFileDto> getDirectoryContent(String dirHashName);
+    DirectoryContentDto getDirectoryContent(String dirHashName);
 
     void updateDocumentAttribute(DocumentAttribute attribute, List<Long> directoryIds);
 
-    UserFileDto findAllRelations(UserFileDto fileDto);
+    FileAccessDto findAllRelations(Long directoryId);
 }

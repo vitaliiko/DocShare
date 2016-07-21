@@ -1,10 +1,9 @@
 package com.geekhub.services.impl;
 
+import com.geekhub.dto.*;
 import com.geekhub.entities.*;
 import com.geekhub.entities.enums.FileRelationType;
 import com.geekhub.repositories.UserDirectoryRepository;
-import com.geekhub.dto.SharedDto;
-import com.geekhub.dto.UserFileDto;
 import com.geekhub.dto.convertors.EntityToDtoConverter;
 import com.geekhub.entities.enums.DocumentAttribute;
 import com.geekhub.entities.enums.DocumentStatus;
@@ -366,20 +365,25 @@ public class UserDirectoryServiceImpl implements UserDirectoryService {
     }
 
     @Override
-    public Set<UserFileDto> getDirectoryContent(String dirHashName) {
+    public DirectoryContentDto getDirectoryContent(String dirHashName) {
         List<UserDocument> documents;
         List<UserDirectory> directories;
         documents = userDocumentService.getAllByParentDirectoryHashAndStatus(dirHashName, DocumentStatus.ACTUAL);
         directories = getByParentDirectoryHashAndStatus(dirHashName, DocumentStatus.ACTUAL);
 
-        Set<UserFileDto> dtoSet = new TreeSet<>();
+        DirectoryContentDto contentDto = new DirectoryContentDto();
+        String parentDirectoryHash = null;
         if (documents != null) {
-            documents.forEach(d -> dtoSet.add(EntityToDtoConverter.convert(d)));
+            parentDirectoryHash = documents.get(0).getParentDirectoryHash();
+            documents.forEach(d -> contentDto.addFile(EntityToDtoConverter.convert(d)));
         }
         if (directories != null) {
-            directories.forEach(d -> dtoSet.add(EntityToDtoConverter.convert(d)));
+            parentDirectoryHash = directories.get(0).getParentDirectoryHash();
+            directories.forEach(d -> contentDto.addFile(EntityToDtoConverter.convert(d)));
         }
-        return dtoSet;
+        contentDto.setDirHashName(dirHashName);
+        contentDto.setParentDirHashName(parentDirectoryHash);
+        return contentDto;
     }
 
     @Override
@@ -388,21 +392,22 @@ public class UserDirectoryServiceImpl implements UserDirectoryService {
     }
 
     @Override
-    public UserFileDto findAllRelations(UserFileDto fileDto) {
+    public FileAccessDto findAllRelations(Long directoryId) {
         List<User> editors = userToDirectoryRelationService
-                .getAllByDirectoryIdAndRelation(fileDto.getId(), FileRelationType.EDITOR);
+                .getAllByDirectoryIdAndRelation(directoryId, FileRelationType.EDITOR);
         List<User> readers = userToDirectoryRelationService
-                .getAllByDirectoryIdAndRelation(fileDto.getId(), FileRelationType.READER);
+                .getAllByDirectoryIdAndRelation(directoryId, FileRelationType.READER);
 
         List<FriendsGroup> editorGroups = friendGroupToDirectoryRelationService
-                .getAllGroupsByDirectoryIdAndRelation(fileDto.getId(), FileRelationType.EDITOR);
+                .getAllGroupsByDirectoryIdAndRelation(directoryId, FileRelationType.EDITOR);
         List<FriendsGroup> readerGroups = friendGroupToDirectoryRelationService
-                .getAllGroupsByDirectoryIdAndRelation(fileDto.getId(), FileRelationType.READER);
+                .getAllGroupsByDirectoryIdAndRelation(directoryId, FileRelationType.READER);
 
-        fileDto.setReaders(readers);
-        fileDto.setEditors(editors);
-        fileDto.setReaderGroups(readerGroups);
-        fileDto.setEditorGroups(editorGroups);
+        FileAccessDto fileDto = new FileAccessDto();
+        fileDto.setReaders(EntityToDtoConverter.convertToBaseUserDtos(readers));
+        fileDto.setEditors(EntityToDtoConverter.convertToBaseUserDtos(editors));
+        fileDto.setReaderGroups(EntityToDtoConverter.convertToFriendGroupDtos(readerGroups));
+        fileDto.setEditorGroups(EntityToDtoConverter.convertToFriendGroupDtos(editorGroups));
         return fileDto;
     }
 

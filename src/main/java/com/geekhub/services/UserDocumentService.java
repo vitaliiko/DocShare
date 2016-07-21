@@ -1,5 +1,6 @@
 package com.geekhub.services;
 
+import com.geekhub.dto.FileAccessDto;
 import com.geekhub.dto.SharedDto;
 import com.geekhub.dto.UserFileDto;
 import com.geekhub.entities.*;
@@ -79,5 +80,5 @@ public interface UserDocumentService extends EntityService<UserDocument, Long> {
 
     void updateDocumentAttribute(DocumentAttribute attribute, List<Long> documentIds);
 
-    UserFileDto findAllRelations(UserFileDto fileDto);
+    FileAccessDto findAllRelations(Long documentId);
 }

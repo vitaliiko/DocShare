@@ -1,7 +1,7 @@
 package com.geekhub.security;
 
 import com.geekhub.dto.RegistrationInfoDto;
-import com.geekhub.dto.UserDto;
+import com.geekhub.dto.ExtendedUserDto;
 import com.geekhub.entities.User;
 import com.geekhub.entities.UserDirectory;
 import com.geekhub.entities.UserDocument;
@@ -115,7 +115,7 @@ public class UserProfileManager {
         return user;
     }
 
-    public void updateUserProfile(UserDto userDto, User user) throws ValidateUserInformationException {
+    public void updateUserProfile(ExtendedUserDto userDto, User user) throws ValidateUserInformationException {
         if (userDto != null && user != null) {
             validateNames(userDto.getFirstName(), userDto.getLastName(), userDto.getLogin());
             if (!user.getLogin().equals(userDto.getLogin())) {

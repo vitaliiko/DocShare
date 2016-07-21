@@ -19,7 +19,4 @@ public class RegistrationInfoDto {
     @Getter @Setter
     private String password;
 
-    @Getter @Setter
-    private String confirmationPassword;
-
 }

@@ -1,19 +1,19 @@
 package com.geekhub.exceptions;
 
 import com.geekhub.dto.RegistrationInfoDto;
-import com.geekhub.dto.UserDto;
+import com.geekhub.dto.ExtendedUserDto;
 
 public class ValidateUserInformationException extends Exception {
 
     private RegistrationInfoDto registrationInfoDto;
 
-    private UserDto userDto;
+    private ExtendedUserDto userDto;
 
     public ValidateUserInformationException(String message) {
         super(message);
     }
 
-    public ValidateUserInformationException(String message, UserDto userDto) {
+    public ValidateUserInformationException(String message, ExtendedUserDto userDto) {
         super(message);
         this.userDto = userDto;
     }
@@ -26,11 +26,11 @@ public class ValidateUserInformationException extends Exception {
         this.registrationInfoDto = registrationInfoDto;
     }
 
-    public UserDto getUserDto() {
+    public ExtendedUserDto getUserDto() {
         return userDto;
     }
 
-    public void setUserDto(UserDto userDto) {
+    public void setUserDto(ExtendedUserDto userDto) {
         this.userDto = userDto;
     }
 }

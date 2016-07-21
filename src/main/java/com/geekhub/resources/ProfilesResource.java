@@ -1,7 +1,7 @@
 package com.geekhub.resources;
 
 import com.geekhub.dto.SearchDto;
-import com.geekhub.dto.UserDto;
+import com.geekhub.dto.ExtendedUserDto;
 import com.geekhub.dto.UserFileDto;
 import com.geekhub.dto.convertors.EntityToDtoConverter;
 import com.geekhub.entities.User;
@@ -12,11 +12,10 @@ import com.geekhub.exceptions.ValidateUserInformationException;
 import com.geekhub.security.UserProfileManager;
 import com.geekhub.services.UserDocumentService;
 import com.geekhub.services.UserService;
-import com.geekhub.utils.UserFileUtil;
+
 import java.util.HashSet;
 import java.util.Set;
 import java.util.TreeSet;
-import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 
 import org.springframework.http.HttpStatus;
@@ -45,12 +44,12 @@ public class ProfilesResource {
     public ModelAndView profile(HttpSession session) {
         User user = userService.getById((Long) session.getAttribute("userId"));
         ModelAndView model = new ModelAndView("profile");
-        model.addObject("user", EntityToDtoConverter.convert(user));
+        model.addObject("user", EntityToDtoConverter.extendedConvert(user));
         return model;
     }
 
     @RequestMapping(value = "/profile", method = RequestMethod.POST)
-    public ModelAndView changeProfile(UserDto userDto, HttpSession session) throws ValidateUserInformationException {
+    public ModelAndView changeProfile(ExtendedUserDto userDto, HttpSession session) throws ValidateUserInformationException {
         ModelAndView model = new ModelAndView("profile");
         User user = userService.getById((Long) session.getAttribute("userId"));
         userProfileManager.updateUserProfile(userDto, user);
@@ -70,7 +69,7 @@ public class ProfilesResource {
         userProfileManager.changePassword(currentPassword, newPassword, user);
 
         model.addObject("message", "Your password updated successfully");
-        model.addObject("user", EntityToDtoConverter.convert(user));
+        model.addObject("user", EntityToDtoConverter.extendedConvert(user));
         return model;
     }
 
@@ -92,8 +91,8 @@ public class ProfilesResource {
 
         List<User> users = userService.getAll("firstName");
         users.remove(user);
-        Map<UserDto, Boolean> usersMap = users.stream()
-                .collect(Collectors.toMap(EntityToDtoConverter::convert, u -> !userService.areFriends(user.getId(), u)));
+        Map<ExtendedUserDto, Boolean> usersMap = users.stream()
+                .collect(Collectors.toMap(EntityToDtoConverter::extendedConvert, u -> !userService.areFriends(user.getId(), u)));
 
         ModelAndView model = new ModelAndView("search");
         model.addObject("usersMap", usersMap);
@@ -107,8 +106,8 @@ public class ProfilesResource {
 
         ModelAndView model = new ModelAndView();
 
-        Map<UserDto, Boolean> usersMap = users.stream()
-                .collect(Collectors.toMap(EntityToDtoConverter::convert, u -> !userService.areFriends(user.getId(), u)));
+        Map<ExtendedUserDto, Boolean> usersMap = users.stream()
+                .collect(Collectors.toMap(EntityToDtoConverter::extendedConvert, u -> !userService.areFriends(user.getId(), u)));
         model.setViewName("search");
         model.addObject("usersMap", usersMap);
         model.addObject("countOfResults", usersMap.size());
@@ -131,7 +130,7 @@ public class ProfilesResource {
         documents.forEach(d -> fileDtoSet.add(EntityToDtoConverter.convert(d)));
 
         ModelAndView model = new ModelAndView("userPage");
-        model.addObject("pageOwner", EntityToDtoConverter.convert(owner));
+        model.addObject("pageOwner", EntityToDtoConverter.extendedConvert(owner));
         model.addObject("documents", fileDtoSet);
         return model;
     }
