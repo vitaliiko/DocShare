@@ -16,12 +16,12 @@ public class SharedDto {
     private List<Long> readers;
 
     @Getter @Setter
-    private List<Long> readersGroups;
+    private List<Long> readerGroups;
 
     @Getter @Setter
     private List<Long> editors;
 
     @Getter @Setter
-    private List<Long> editorsGroups;
+    private List<Long> editorGroups;
 
 }

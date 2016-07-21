@@ -92,8 +92,8 @@ public class UserToDocumentRelationServiceImpl implements UserToDocumentRelation
     }
 
     @Override
-    public List<User> getAllByDocumentIdAndRelation(Long documentId, FileRelationType relationType) {
-        return repository.getAllByDocumentIdAndRelation(documentId, relationType);
+    public List<User> getAllByDocumentIdAndRelation(UserDocument document, FileRelationType relationType) {
+        return repository.getAllByDocumentIdAndRelation(document, relationType);
     }
 
     @Override

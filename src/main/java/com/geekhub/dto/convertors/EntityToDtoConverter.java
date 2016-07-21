@@ -45,6 +45,7 @@ public class EntityToDtoConverter {
         UserFileDto directoryDto = new UserFileDto();
         directoryDto.setId(directory.getId());
         directoryDto.setType("dir");
+        directoryDto.setHashName(directory.getHashName());
         directoryDto.setName(directory.getName());
         directoryDto.setAccess(directory.getDocumentAttribute().toString());
         return directoryDto;

@@ -439,12 +439,12 @@ public class UserDocumentServiceImpl implements UserDocumentService {
         }
 
         friendGroupToDocumentRelationService.deleteByDocument(document);
-        if (!CollectionUtils.isEmpty(shared.getEditorsGroups())) {
-            List<FriendsGroup> editorGroups = friendGroupService.getByIds(shared.getEditorsGroups());
+        if (!CollectionUtils.isEmpty(shared.getEditorGroups())) {
+            List<FriendsGroup> editorGroups = friendGroupService.getByIds(shared.getEditorGroups());
             friendGroupToDocumentRelationService.create(document, editorGroups, FileRelationType.EDITOR);
         }
-        if (!CollectionUtils.isEmpty(shared.getReadersGroups())) {
-            List<FriendsGroup> readerGroups = friendGroupService.getByIds(shared.getReadersGroups());
+        if (!CollectionUtils.isEmpty(shared.getReaderGroups())) {
+            List<FriendsGroup> readerGroups = friendGroupService.getByIds(shared.getReaderGroups());
             friendGroupToDocumentRelationService.create(document, readerGroups, FileRelationType.READER);
         }
     }
@@ -452,7 +452,7 @@ public class UserDocumentServiceImpl implements UserDocumentService {
     private void sendEvents(UserDocument document, SharedDto shared, User user, Set<User> oldReadersAndEditors) {
         List<User> currentReadersAndEditorsList = new ArrayList<>();
 
-        List<Long> groupIdList = unionLists(shared.getEditorsGroups(), shared.getReadersGroups());
+        List<Long> groupIdList = unionLists(shared.getEditorGroups(), shared.getReaderGroups());
         currentReadersAndEditorsList.addAll(friendGroupService.getAllMembersByGroupIds(groupIdList));
         List<Long> userIdList = unionLists(shared.getReaders(), shared.getEditors());
         currentReadersAndEditorsList.addAll(userService.getByIds(userIdList));
@@ -503,17 +503,17 @@ public class UserDocumentServiceImpl implements UserDocumentService {
 
     @Override
     public FileAccessDto findAllRelations(Long documentId) {
-        List<User> editors = userToDocumentRelationService
-                .getAllByDocumentIdAndRelation(documentId, FileRelationType.EDITOR);
-        List<User> readers = userToDocumentRelationService
-                .getAllByDocumentIdAndRelation(documentId, FileRelationType.READER);
+        UserDocument document = getById(documentId);
+        List<User> editors = userToDocumentRelationService.getAllByDocumentIdAndRelation(document, FileRelationType.EDITOR);
+        List<User> readers = userToDocumentRelationService.getAllByDocumentIdAndRelation(document, FileRelationType.READER);
 
         List<FriendsGroup> editorGroups = friendGroupToDocumentRelationService
-                .getAllGroupsByDocumentIdAndRelation(documentId, FileRelationType.EDITOR);
+                .getAllGroupsByDocumentIdAndRelation(document, FileRelationType.EDITOR);
         List<FriendsGroup> readerGroups = friendGroupToDocumentRelationService
-                .getAllGroupsByDocumentIdAndRelation(documentId, FileRelationType.READER);
+                .getAllGroupsByDocumentIdAndRelation(document, FileRelationType.READER);
 
         FileAccessDto fileDto = new FileAccessDto();
+        fileDto.setAttribute(document.getDocumentAttribute());
         fileDto.setReaders(EntityToDtoConverter.convertToBaseUserDtos(readers));
         fileDto.setEditors(EntityToDtoConverter.convertToBaseUserDtos(editors));
         fileDto.setReaderGroups(EntityToDtoConverter.convertToFriendGroupDtos(readerGroups));

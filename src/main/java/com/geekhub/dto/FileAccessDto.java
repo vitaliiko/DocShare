@@ -1,5 +1,6 @@
 package com.geekhub.dto;
 
+import com.geekhub.entities.enums.DocumentAttribute;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -9,6 +10,9 @@ public class FileAccessDto {
 
     @Getter @Setter
     private Long fileId;
+
+    @Getter @Setter
+    private DocumentAttribute attribute;
 
     @Getter @Setter
     private List<UserDto> readers;

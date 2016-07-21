@@ -48,7 +48,7 @@ public interface UserDirectoryService extends EntityService<UserDirectory, Long>
 
     List<UserDirectory> getTreeByParentDirectoryHash(String parentDirectoryHash);
 
-    List<UserDirectory> getByParentDirectoryHashAndStatus(String parentDirectoryHash, DocumentStatus status);
+    List<UserDirectory> getAllByParentDirectoryHashAndStatus(String parentDirectoryHash, DocumentStatus status);
 
     List<Object> getActualIdsByParentDirectoryHash(String parentDirectoryHash);
 
@@ -64,7 +64,7 @@ public interface UserDirectoryService extends EntityService<UserDirectory, Long>
 
     UserDirectory shareDirectory(UserDirectory directory, SharedDto sharedDto, User user);
 
-    DirectoryContentDto getDirectoryContent(String dirHashName);
+    DirectoryContentDto getDirectoryContent(String dirHashName, User user);
 
     void updateDocumentAttribute(DocumentAttribute attribute, List<Long> directoryIds);
 

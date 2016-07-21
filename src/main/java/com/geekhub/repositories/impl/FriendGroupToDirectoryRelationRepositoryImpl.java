@@ -97,11 +97,10 @@ public class FriendGroupToDirectoryRelationRepositoryImpl implements FriendGroup
     }
 
     @Override
-    public List<FriendsGroup> getAllGroupsByDirectoryIdAndRelation(Long directoryId, FileRelationType relationType) {
+    public List<FriendsGroup> getAllGroupsByDirectoryIdAndRelation(UserDirectory directory, FileRelationType relationType) {
         return sessionFactory.getCurrentSession()
-                .createCriteria(clazz, "rel")
-                .createAlias("rel.directory", "dir")
-                .add(Restrictions.eq("dir.id", directoryId))
+                .createCriteria(clazz)
+                .add(Restrictions.eq("directory", directory))
                 .add(Restrictions.eq("fileRelationType", relationType))
                 .setProjection(Projections.property("friendsGroup"))
                 .list();

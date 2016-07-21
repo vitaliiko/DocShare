@@ -19,6 +19,9 @@ public class UserFileDto implements Comparable<UserFileDto> {
     private String name;
 
     @Getter @Setter
+    private String hashName;
+
+    @Getter @Setter
     private String ownerName;
 
     @Getter @Setter

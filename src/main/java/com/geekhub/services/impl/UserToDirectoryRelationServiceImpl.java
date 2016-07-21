@@ -88,8 +88,8 @@ public class UserToDirectoryRelationServiceImpl implements UserToDirectoryRelati
     }
 
     @Override
-    public List<User> getAllByDirectoryIdAndRelation(Long directoryId, FileRelationType relationType) {
-        return repository.getAllByDirectoryIdAndRelation(directoryId, relationType);
+    public List<User> getAllByDirectoryIdAndRelation(UserDirectory directory, FileRelationType relationType) {
+        return repository.getAllByDirectoryIdAndRelation(directory, relationType);
     }
 
     @Override
@@ -101,5 +101,10 @@ public class UserToDirectoryRelationServiceImpl implements UserToDirectoryRelati
     public Long getDirectoriesCountByOwnerAndDirectoryIds(User owner, Long[] directoryIds) {
         List<Long> idList = Arrays.stream(directoryIds).collect(Collectors.toList());
         return repository.getDirectoriesCountByOwnerAndDirectoryIds(owner, idList);
+    }
+
+    @Override
+    public User getDirectoryOwner(UserDirectory directory) {
+        return repository.getDirectoryOwner(directory);
     }
 }

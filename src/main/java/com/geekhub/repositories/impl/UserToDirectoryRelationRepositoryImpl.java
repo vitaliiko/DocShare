@@ -99,11 +99,10 @@ public class UserToDirectoryRelationRepositoryImpl implements UserToDirectoryRel
     }
 
     @Override
-    public List<User> getAllByDirectoryIdAndRelation(Long directoryId, FileRelationType relationType) {
+    public List<User> getAllByDirectoryIdAndRelation(UserDirectory directory, FileRelationType relationType) {
         return sessionFactory.getCurrentSession()
-                .createCriteria(clazz, "rel")
-                .createAlias("rel.directory", "dir")
-                .add(Restrictions.eq("dir.id", directoryId))
+                .createCriteria(clazz)
+                .add(Restrictions.eq("directory", directory))
                 .add(Restrictions.eq("fileRelationType", relationType))
                 .setProjection(Projections.property("user"))
                 .list();
@@ -127,6 +126,16 @@ public class UserToDirectoryRelationRepositoryImpl implements UserToDirectoryRel
                 .add(Restrictions.eq("fileRelationType", FileRelationType.OWNER))
                 .add(Restrictions.in("dir.id", idList))
                 .setProjection(Projections.rowCount())
+                .uniqueResult();
+    }
+
+    @Override
+    public User getDirectoryOwner(UserDirectory directory) {
+        return (User) sessionFactory.getCurrentSession()
+                .createCriteria(clazz)
+                .add(Restrictions.eq("directory", directory))
+                .add(Restrictions.eq("fileRelationType", FileRelationType.OWNER))
+                .setProjection(Projections.property("user"))
                 .uniqueResult();
     }
 }

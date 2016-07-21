@@ -21,7 +21,7 @@ public interface UserToDocumentRelationRepository extends EntityRepository<UserT
 
     List<UserDocument> getAllAccessibleDocumentsInRoot(User user, List<String> directoryHashes);
 
-    List<User> getAllByDocumentIdAndRelation(Long documentId, FileRelationType relationType);
+    List<User> getAllByDocumentIdAndRelation(UserDocument document, FileRelationType relationType);
 
     UserDocument getDocumentByFullNameAndOwner(String parentDirHash, String docName, User owner);
 

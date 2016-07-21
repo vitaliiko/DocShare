@@ -120,17 +120,6 @@ public class UserDirectoriesResource {
     @RequestMapping(value = "/directories/{dirHashName}/content", method = RequestMethod.GET)
     public ResponseEntity<DirectoryContentDto> getDirectoryContent(@PathVariable String dirHashName, HttpSession session) {
         User user = getUserFromSession(session);
-        if (dirHashName.equals("root")) {
-            dirHashName = user.getLogin();
-        }
-        return ResponseEntity.ok(userDirectoryService.getDirectoryContent(dirHashName));
-    }
-
-    @RequestMapping(value = "/directories/{dirHashName}/parent/content", method = RequestMethod.GET)
-    public ResponseEntity<Set<UserFileDto>> getParentDirectoryContent(@PathVariable String dirHashName) {
-//        UserDirectory currentDirectory = userDirectoryService.getByHashName(dirHashName);
-//        String parentDirectoryHash = currentDirectory.getParentDirectoryHash();
-//        Set<UserFileDto> directoryContent = userDirectoryService.getDirectoryContent(parentDirectoryHash);
-        return ResponseEntity.ok(null);
+        return ResponseEntity.ok(userDirectoryService.getDirectoryContent(dirHashName, user));
     }
 }

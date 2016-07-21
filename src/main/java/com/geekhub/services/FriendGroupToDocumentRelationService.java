@@ -21,7 +21,7 @@ public interface FriendGroupToDocumentRelationService extends EntityService<Frie
 
     List<FriendsGroup> getAllGroupsByDocumentId(Long documentId);
 
-    List<FriendsGroup> getAllGroupsByDocumentIdAndRelation(Long documentId, FileRelationType relationType);
+    List<FriendsGroup> getAllGroupsByDocumentIdAndRelation(UserDocument document, FileRelationType relationType);
 
     List<User> getAllGroupMembersByDocumentId(Long documentId);
 

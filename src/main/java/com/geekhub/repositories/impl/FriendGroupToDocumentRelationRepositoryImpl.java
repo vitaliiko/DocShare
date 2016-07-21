@@ -115,11 +115,10 @@ public class FriendGroupToDocumentRelationRepositoryImpl implements FriendGroupT
     }
 
     @Override
-    public List<FriendsGroup> getAllGroupsByDocumentIdAndRelation(Long documentId, FileRelationType relationType) {
+    public List<FriendsGroup> getAllGroupsByDocumentIdAndRelation(UserDocument document, FileRelationType relationType) {
         return sessionFactory.getCurrentSession()
-                .createCriteria(clazz, "rel")
-                .createAlias("rel.document", "doc")
-                .add(Restrictions.eq("doc.id", documentId))
+                .createCriteria(clazz)
+                .add(Restrictions.eq("document", document))
                 .add(Restrictions.eq("fileRelationType", relationType))
                 .setProjection(Projections.property("friendsGroup"))
                 .list();

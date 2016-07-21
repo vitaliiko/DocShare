@@ -117,7 +117,7 @@ public class UserDirectoryServiceImpl implements UserDirectoryService {
         documents.forEach(d -> d.setDocumentStatus(DocumentStatus.REMOVED));
 
         List<UserDirectory> directories =
-                getByParentDirectoryHashAndStatus(directory.getHashName(), DocumentStatus.ACTUAL);
+                getAllByParentDirectoryHashAndStatus(directory.getHashName(), DocumentStatus.ACTUAL);
         directories.forEach(this::setRemovedStatus);
     }
 
@@ -149,7 +149,7 @@ public class UserDirectoryServiceImpl implements UserDirectoryService {
 //                .forEach(d -> d.setDocumentStatus(DocumentStatus.ACTUAL));
 
         List<UserDirectory> directories =
-                getByParentDirectoryHashAndStatus(directory.getHashName(), DocumentStatus.REMOVED);
+                getAllByParentDirectoryHashAndStatus(directory.getHashName(), DocumentStatus.REMOVED);
         directories.stream()
                 .filter(d -> removedDirectoryService.getByUserDirectory(d) == null)
                 .forEach(this::setActualStatus);
@@ -183,7 +183,7 @@ public class UserDirectoryServiceImpl implements UserDirectoryService {
     }
 
     @Override
-    public List<UserDirectory> getByParentDirectoryHashAndStatus(String parentDirectoryHash, DocumentStatus status) {
+    public List<UserDirectory> getAllByParentDirectoryHashAndStatus(String parentDirectoryHash, DocumentStatus status) {
         Map<String, Object> propertiesMap = new HashMap<>();
         propertiesMap.put("parentDirectoryHash", parentDirectoryHash);
         propertiesMap.put("documentStatus", status);
@@ -234,23 +234,20 @@ public class UserDirectoryServiceImpl implements UserDirectoryService {
 
     @Override
     public Set<User> getAllReadersAndEditors(Long docId) {
-        Set<User> users = new HashSet<>();
-//        UserDirectory document = getById(docId);
-//        users.addAll(document.getReaders());
-//        document.getReadersGroups().forEach(g -> users.addAll(g.getFriends()));
-        return users;
+        return new HashSet<>();
     }
 
     @Override
     public String getLocation(UserDirectory directory) {
         String location = "";
         String patentDirectoryHash = directory.getParentDirectoryHash();
+        User owner = userToDirectoryRelationService.getDirectoryOwner(directory);
 
-//        while(!patentDirectoryHash.equals(directory.getOwner().getLogin())) {
-//            UserDirectory dir = getByHashName(patentDirectoryHash);
-//            location = dir.getName() + "/" + location;
-//            patentDirectoryHash = dir.getParentDirectoryHash();
-//        }
+        while(!patentDirectoryHash.equals(owner.getLogin())) {
+            UserDirectory dir = getByHashName(patentDirectoryHash);
+            location = dir.getName() + "/" + location;
+            patentDirectoryHash = dir.getParentDirectoryHash();
+        }
 
         return location;
     }
@@ -344,12 +341,12 @@ public class UserDirectoryServiceImpl implements UserDirectoryService {
         }
 
         friendGroupToDirectoryRelationService.deleteByDirectory(directory);
-        if (!CollectionUtils.isEmpty(sharedDto.getReadersGroups())) {
-            List<FriendsGroup> readerGroups = friendGroupService.getByIds(sharedDto.getReadersGroups());
+        if (!CollectionUtils.isEmpty(sharedDto.getReaderGroups())) {
+            List<FriendsGroup> readerGroups = friendGroupService.getByIds(sharedDto.getReaderGroups());
             friendGroupToDirectoryRelationService.create(directory, readerGroups, FileRelationType.READER);
         }
-        if (!CollectionUtils.isEmpty(sharedDto.getEditorsGroups())) {
-            List<FriendsGroup> editorGroups = friendGroupService.getByIds(sharedDto.getReadersGroups());
+        if (!CollectionUtils.isEmpty(sharedDto.getEditorGroups())) {
+            List<FriendsGroup> editorGroups = friendGroupService.getByIds(sharedDto.getReaderGroups());
             friendGroupToDirectoryRelationService.create(directory, editorGroups, FileRelationType.EDITOR);
         }
     }
@@ -365,24 +362,26 @@ public class UserDirectoryServiceImpl implements UserDirectoryService {
     }
 
     @Override
-    public DirectoryContentDto getDirectoryContent(String dirHashName) {
-        List<UserDocument> documents;
-        List<UserDirectory> directories;
-        documents = userDocumentService.getAllByParentDirectoryHashAndStatus(dirHashName, DocumentStatus.ACTUAL);
-        directories = getByParentDirectoryHashAndStatus(dirHashName, DocumentStatus.ACTUAL);
-
+    public DirectoryContentDto getDirectoryContent(String dirHashName, User user) {
         DirectoryContentDto contentDto = new DirectoryContentDto();
-        String parentDirectoryHash = null;
-        if (documents != null) {
-            parentDirectoryHash = documents.get(0).getParentDirectoryHash();
+        contentDto.setDirHashName(dirHashName);
+        if (dirHashName.equals("root")) {
+            dirHashName = user.getLogin();
+        } else if (!dirHashName.equals(user.getLogin())) {
+            UserDirectory directory = getByHashName(dirHashName);
+            contentDto.setParentDirHashName(directory.getParentDirectoryHash());
+        }
+
+        List<UserDocument> documents =
+                userDocumentService.getAllByParentDirectoryHashAndStatus(dirHashName, DocumentStatus.ACTUAL);
+        List<UserDirectory> directories = getAllByParentDirectoryHashAndStatus(dirHashName, DocumentStatus.ACTUAL);
+
+        if (!CollectionUtils.isEmpty(documents)) {
             documents.forEach(d -> contentDto.addFile(EntityToDtoConverter.convert(d)));
         }
-        if (directories != null) {
-            parentDirectoryHash = directories.get(0).getParentDirectoryHash();
+        if (!CollectionUtils.isEmpty(directories)) {
             directories.forEach(d -> contentDto.addFile(EntityToDtoConverter.convert(d)));
         }
-        contentDto.setDirHashName(dirHashName);
-        contentDto.setParentDirHashName(parentDirectoryHash);
         return contentDto;
     }
 
@@ -393,17 +392,17 @@ public class UserDirectoryServiceImpl implements UserDirectoryService {
 
     @Override
     public FileAccessDto findAllRelations(Long directoryId) {
-        List<User> editors = userToDirectoryRelationService
-                .getAllByDirectoryIdAndRelation(directoryId, FileRelationType.EDITOR);
-        List<User> readers = userToDirectoryRelationService
-                .getAllByDirectoryIdAndRelation(directoryId, FileRelationType.READER);
+        UserDirectory directory = getById(directoryId);
+        List<User> editors = userToDirectoryRelationService.getAllByDirectoryIdAndRelation(directory, FileRelationType.EDITOR);
+        List<User> readers = userToDirectoryRelationService.getAllByDirectoryIdAndRelation(directory, FileRelationType.READER);
 
         List<FriendsGroup> editorGroups = friendGroupToDirectoryRelationService
-                .getAllGroupsByDirectoryIdAndRelation(directoryId, FileRelationType.EDITOR);
+                .getAllGroupsByDirectoryIdAndRelation(directory, FileRelationType.EDITOR);
         List<FriendsGroup> readerGroups = friendGroupToDirectoryRelationService
-                .getAllGroupsByDirectoryIdAndRelation(directoryId, FileRelationType.READER);
+                .getAllGroupsByDirectoryIdAndRelation(directory, FileRelationType.READER);
 
         FileAccessDto fileDto = new FileAccessDto();
+        fileDto.setAttribute(directory.getDocumentAttribute());
         fileDto.setReaders(EntityToDtoConverter.convertToBaseUserDtos(readers));
         fileDto.setEditors(EntityToDtoConverter.convertToBaseUserDtos(editors));
         fileDto.setReaderGroups(EntityToDtoConverter.convertToFriendGroupDtos(readerGroups));

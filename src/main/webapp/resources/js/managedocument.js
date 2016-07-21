@@ -1,7 +1,7 @@
 $(document).ready(function() {
 
     var content = $('.content');
-    var fileAccess;
+    var fileAccessAttribute;
     var shareUrl;
     var files;
     var docIds = [];
@@ -14,6 +14,7 @@ $(document).ready(function() {
     var handlebarsPath = '/resources/js/templates/';
     var backLink = $('.back-link');
     var dirHashName = 'root';
+    var parentDirHashName;
     var dangerAlert = $('.alert-danger');
     var successAlert = $('.alert-success');
     var alertText = $('.alert-text');
@@ -187,13 +188,13 @@ $(document).ready(function() {
         var getUrl = '/api/documents/' + $(this).val();
         shareUrl = getUrl + '/share';
         $.getJSON(getUrl, function(document) {
-            fileAccess = document.access;
+            fileAccessAttribute = document.attribute;
             makeBoxesChecked(document.readers, $('.reader-check-box'));
             makeBoxesChecked(document.editors, $('.editor-check-box'));
-            makeBoxesChecked(document.readersGroups, $('.readers-group-check-box'));
-            makeBoxesChecked(document.editorsGroups, $('.editors-group-check-box'));
+            makeBoxesChecked(document.readerGroups, $('.readers-group-check-box'));
+            makeBoxesChecked(document.editorGroups, $('.editors-group-check-box'));
             $('.share-modal-title').text('Share ' + document.name);
-            $('#' + document.access).prop('checked', true);
+            $('#' + document.attribute).prop('checked', true);
         });
     });
 
@@ -205,11 +206,11 @@ $(document).ready(function() {
         var getUrl = '/api/directories/' + $(this).val();
         shareUrl = getUrl + '/share';
         $.getJSON(getUrl, function(directory) {
-            fileAccess = directory.access;
+            fileAccessAttribute = directory.attribute;
             makeBoxesChecked(directory.readers, $('.reader-check-box'));
-            makeBoxesChecked(directory.readersGroups, $('.readers-group-check-box'));
+            makeBoxesChecked(directory.readerGroups, $('.readers-group-check-box'));
             $('.share-modal-title').text('Share ' + directory.name);
-            $('#' + directory.access).prop('checked', true);
+            $('#' + directory.attribute).prop('checked', true);
         });
     });
 
@@ -226,18 +227,18 @@ $(document).ready(function() {
 
     $('#shareDocument').click(function() {
         var readers = [];
-        var readersGroups = [];
+        var readerGroups = [];
         var editors = [];
-        var editorsGroups = [];
+        var editorGroups = [];
         var access = $('input[name=access]:checked').val();
         $('.readers-group-check-box:checked').each(function (k, v) {
-            readersGroups.push(v.value);
+            readerGroups.push(v.value);
         });
         $('.reader-check-box:checked').each(function (k, v) {
             readers.push(v.value);
         });
         $('.editors-group-check-box:checked').each(function (k, v) {
-            editorsGroups.push(v.value);
+            editorGroups.push(v.value);
         });
         $('.editor-check-box:checked').each(function (k, v) {
             editors.push(v.value);
@@ -249,22 +250,22 @@ $(document).ready(function() {
             data: JSON.stringify({
                 access: access,
                 readers: readers,
-                readersGroups: readersGroups,
+                readerGroups: readerGroups,
                 editors: editors,
-                editorsGroups: editorsGroups
+                editorGroups: editorGroups
             }),
             success: function (file) {
                 clearModalWindow();
-                if (fileAccess !== file.access) {
+                if (fileAccessAttribute !== file.attribute) {
                     if (file.type === 'doc') {
-                        $('.' + fileAccess).find($('.tr-doc' + file.id)).remove();
+                        $('.' + fileAccessAttribute).find($('.tr-doc' + file.id)).remove();
                         loadTemplate(handlebarsPath + 'documentRow.html', function (template) {
-                            $('.' + file.access).append(template(file));
+                            $('.' + file.attribute).append(template(file));
                         });
                     } else {
-                        $('.' + fileAccess).find($('.tr-dir' + file.id)).remove();
+                        $('.' + fileAccessAttribute).find($('.tr-dir' + file.id)).remove();
                         loadTemplate(handlebarsPath + 'directoryRow.html', function (template) {
-                            $('.' + file.access).append(template(file));
+                            $('.' + file.attribute).append(template(file));
                         });
                     }
                 }
@@ -309,17 +310,18 @@ $(document).ready(function() {
         dirHashName = this.id;
         var url = '/api/directories/' + dirHashName + '/content';
 
-        $.getJSON(url, function(files) {
+        $.getJSON(url, function(directoryContent) {
             var locationElement = $('#location');
             var location = locationElement.text();
             locationElement.text(location + '/' + dirName);
+            parentDirHashName = directoryContent.parentDirHashName;
 
-            $('.back-link').prop('href', '/api/directories/' + dirHashName + '/parent/content');
+            $('.back-link').prop('href', '/api/directories/' + parentDirHashName + '/content');
             $('.doc-table tr').not('.table-head').remove();
             $('#uploadingForm').attr('action', '/api/directories/' + dirHashName + '/documents/upload');
 
-            renderDirectories(files);
-            renderDocuments(files);
+            renderDirectories(directoryContent);
+            renderDocuments(directoryContent);
             hideShowBackLink();
         });
         if ($('.add-action-btn').is(':visible')) {
@@ -331,18 +333,19 @@ $(document).ready(function() {
         event.preventDefault();
         var url = $(this).prop('href');
 
-        $.getJSON(url, function(files) {
+        $.getJSON(url, function(directoryContent) {
             var locationElement = $('#location');
             var location = locationElement.text();
             locationElement.text(location.substring(0, location.lastIndexOf('/')));
 
-            dirHashName = files[0].parentDirectoryHash;
-            $('.back-link').prop('href', '/api/directories/' + dirHashName + '/parent/content');
+            dirHashName = directoryContent.dirHashName;
+            parentDirHashName = directoryContent.parentDirHashName;
+            $('.back-link').prop('href', '/api/directories/' + parentDirHashName + '/content');
             $('.doc-table tr').not('.table-head').remove();
             $('#uploadingForm').attr('action', '/api/directories/' + dirHashName + '/documents/upload');
 
-            renderDirectories(files);
-            renderDocuments(files);
+            renderDirectories(directoryContent);
+            renderDocuments(directoryContent);
             hideShowBackLink();
         });
         if ($('.add-action-btn').is(':visible')) {
@@ -376,23 +379,23 @@ $(document).ready(function() {
         }
     }
 
-    function renderDirectories(files) {
-        $.each(files, function (k, file) {
+    function renderDirectories(directoryContent) {
+        $.each(directoryContent.files, function (k, file) {
             if (file.type === 'dir') {
                 loadTemplate(handlebarsPath + 'directoryRow.html', function (template) {
                     allTable.append(template(file));
-                    $('.' + file.access).append(template(file));
+                    $('.' + file.attribute).append(template(file));
                 });
             }
         });
     }
 
-    function renderDocuments(files) {
-        $.each(files, function(k, file) {
+    function renderDocuments(directoryContent) {
+        $.each(directoryContent.files, function(k, file) {
             if (file.type === 'doc') {
                 loadTemplate(handlebarsPath + 'documentRow.html', function (template) {
                     allTable.append(template(file));
-                    $('.' + file.access).append(template(file));
+                    $('.' + file.attribute).append(template(file));
                 });
             }
         });

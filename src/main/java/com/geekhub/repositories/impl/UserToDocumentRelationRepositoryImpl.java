@@ -13,7 +13,6 @@ import org.springframework.stereotype.Repository;
 
 import javax.inject.Inject;
 import java.util.List;
-import java.util.Map;
 
 @Repository
 @SuppressWarnings("unchecked")
@@ -143,11 +142,10 @@ public class UserToDocumentRelationRepositoryImpl implements UserToDocumentRelat
     }
 
     @Override
-    public List<User> getAllByDocumentIdAndRelation(Long documentId, FileRelationType relationType) {
+    public List<User> getAllByDocumentIdAndRelation(UserDocument document, FileRelationType relationType) {
         return sessionFactory.getCurrentSession()
-                .createCriteria(clazz, "rel")
-                .createAlias("rel.document", "doc")
-                .add(Restrictions.eq("doc.id", documentId))
+                .createCriteria(clazz)
+                .add(Restrictions.eq("document", document))
                 .add(Restrictions.eq("fileRelationType", relationType))
                 .setProjection(Projections.property("user"))
                 .list();

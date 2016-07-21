@@ -6,7 +6,6 @@ import com.geekhub.entities.UserToDirectoryRelation;
 import com.geekhub.entities.enums.FileRelationType;
 
 import java.util.List;
-import java.util.Set;
 
 public interface UserToDirectoryRelationRepository extends EntityRepository<UserToDirectoryRelation, Long> {
 
@@ -14,9 +13,11 @@ public interface UserToDirectoryRelationRepository extends EntityRepository<User
 
     List<UserDirectory> getAllAccessibleDirectories(User user);
 
-    List<User> getAllByDirectoryIdAndRelation(Long directoryId, FileRelationType relationType);
+    List<User> getAllByDirectoryIdAndRelation(UserDirectory directory, FileRelationType relationType);
 
     UserToDirectoryRelation getByDirectoryIdAndUserId(Long directoryId, Long userId);
 
     Long getDirectoriesCountByOwnerAndDirectoryIds(User owner, List<Long> idList);
+
+    User getDirectoryOwner(UserDirectory directory);
 }

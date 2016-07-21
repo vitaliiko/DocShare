@@ -14,7 +14,7 @@ public interface FriendGroupToDirectoryRelationRepository extends EntityReposito
 
     Long getCountByFriendGroup(FriendsGroup group);
 
-    List<FriendsGroup> getAllGroupsByDirectoryIdAndRelation(Long directoryId, FileRelationType relationType);
+    List<FriendsGroup> getAllGroupsByDirectoryIdAndRelation(UserDirectory directory, FileRelationType relationType);
 
     List<FileRelationType> getAllRelationsByDirectoryIdAndUser(Long directoryId, User user);
 }
