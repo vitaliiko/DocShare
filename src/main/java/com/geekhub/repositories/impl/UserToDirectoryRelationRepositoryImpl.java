@@ -84,7 +84,7 @@ public class UserToDirectoryRelationRepositoryImpl implements UserToDirectoryRel
                 .createQuery("DELETE UserToDirectoryRelation r " +
                              "WHERE r.directory = :directory AND r.fileRelationType != :relation")
                 .setParameter("directory", directory)
-                .setParameter("relation", FileRelationType.OWNER)
+                .setParameter("relation", FileRelationType.OWN)
                 .executeUpdate();
     }
 
@@ -93,7 +93,7 @@ public class UserToDirectoryRelationRepositoryImpl implements UserToDirectoryRel
         return sessionFactory.getCurrentSession()
                 .createCriteria(clazz)
                 .add(Restrictions.eq("user", user))
-                .add(Restrictions.ne("fileRelationType", FileRelationType.OWNER))
+                .add(Restrictions.ne("fileRelationType", FileRelationType.OWN))
                 .setProjection(Projections.property("directory"))
                 .list();
     }
@@ -123,7 +123,7 @@ public class UserToDirectoryRelationRepositoryImpl implements UserToDirectoryRel
                 .createCriteria(clazz, "rel")
                 .createAlias("rel.directory", "dir")
                 .add(Restrictions.eq("user", owner))
-                .add(Restrictions.eq("fileRelationType", FileRelationType.OWNER))
+                .add(Restrictions.eq("fileRelationType", FileRelationType.OWN))
                 .add(Restrictions.in("dir.id", idList))
                 .setProjection(Projections.rowCount())
                 .uniqueResult();
@@ -134,7 +134,7 @@ public class UserToDirectoryRelationRepositoryImpl implements UserToDirectoryRel
         return (User) sessionFactory.getCurrentSession()
                 .createCriteria(clazz)
                 .add(Restrictions.eq("directory", directory))
-                .add(Restrictions.eq("fileRelationType", FileRelationType.OWNER))
+                .add(Restrictions.eq("fileRelationType", FileRelationType.OWN))
                 .setProjection(Projections.property("user"))
                 .uniqueResult();
     }

@@ -159,7 +159,7 @@ public class UserDocumentRepositoryImpl implements UserDocumentRepository {
                 .setParameter("parentDirHash", propertiesMap.get("parentDirectoryHash"))
                 .setParameter("name", propertiesMap.get("name"))
                 .setParameter("owner", propertiesMap.get("owner"))
-                .setParameter("relation", FileRelationType.OWNER)
+                .setParameter("relation", FileRelationType.OWN)
                 .uniqueResult();
     }
 

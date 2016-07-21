@@ -12,6 +12,8 @@ import com.geekhub.entities.User;
 import com.geekhub.entities.UserDirectory;
 import com.geekhub.entities.UserDocument;
 import com.geekhub.entities.enums.EventStatus;
+import com.geekhub.services.enams.FileType;
+
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -32,7 +34,7 @@ public class EntityToDtoConverter {
     public static UserFileDto convert(UserDocument document) {
         UserFileDto documentDto = new UserFileDto();
         documentDto.setId(document.getId());
-        documentDto.setType("doc");
+        documentDto.setType(FileType.DOCUMENT);
         documentDto.setSize(document.getSize());
         documentDto.setLastModifyTime(document.getLastModifyTime());
         documentDto.setModifiedBy(document.getModifiedBy());
@@ -44,7 +46,7 @@ public class EntityToDtoConverter {
     public static UserFileDto convert(UserDirectory directory) {
         UserFileDto directoryDto = new UserFileDto();
         directoryDto.setId(directory.getId());
-        directoryDto.setType("dir");
+        directoryDto.setType(FileType.DIRECTORY);
         directoryDto.setHashName(directory.getHashName());
         directoryDto.setName(directory.getName());
         directoryDto.setAccess(directory.getDocumentAttribute().toString());
@@ -109,7 +111,7 @@ public class EntityToDtoConverter {
         removedFileDto.setName(document.getUserDocument().getName());
         removedFileDto.setRemovalDate(document.getRemovalDate());
         removedFileDto.setRemoverName(removerName);
-        removedFileDto.setType("doc");
+        removedFileDto.setType(FileType.DOCUMENT);
         return removedFileDto;
     }
 
@@ -119,7 +121,7 @@ public class EntityToDtoConverter {
         removedFileDto.setName(directory.getUserDirectory().getName());
         removedFileDto.setRemovalDate(directory.getRemovalDate());
         removedFileDto.setRemoverName(removerName);
-        removedFileDto.setType("dir");
+        removedFileDto.setType(FileType.DIRECTORY);
         return removedFileDto;
     }
 
@@ -139,5 +141,16 @@ public class EntityToDtoConverter {
 
     public static List<FriendGroupDto> convertToFriendGroupDtos(List<FriendsGroup> groups) {
         return groups.stream().map(EntityToDtoConverter::convert).collect(Collectors.toList());
+    }
+
+    public static List<DocumentOldVersionDto> convertToVersionDtos(UserDocument document, User user) {
+        List<DocumentOldVersionDto> versions = document.getDocumentOldVersions().stream()
+                .map(EntityToDtoConverter::convert)
+                .sorted(DocumentOldVersionDto::compareTo)
+                .collect(Collectors.toList());
+        versions.stream()
+                .filter(dto -> dto.getChangedBy().equals(user.getFullName()))
+                .forEachOrdered(dto -> dto.setChangedBy("Me"));
+        return versions;
     }
 }

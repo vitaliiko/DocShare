@@ -83,7 +83,7 @@ public class UserToDocumentRelationRepositoryImpl implements UserToDocumentRelat
         sessionFactory.getCurrentSession()
                 .createQuery("DELETE UserToDocumentRelation r WHERE r.document = :document AND r.fileRelationType != :relation")
                 .setParameter("document", document)
-                .setParameter("relation", FileRelationType.OWNER)
+                .setParameter("relation", FileRelationType.OWN)
                 .executeUpdate();
     }
 
@@ -93,7 +93,7 @@ public class UserToDocumentRelationRepositoryImpl implements UserToDocumentRelat
                 .createCriteria(clazz, "rel")
                 .createAlias("rel.document", "doc")
                 .add(Restrictions.eq("user", owner))
-                .add(Restrictions.eq("fileRelationType", FileRelationType.OWNER))
+                .add(Restrictions.eq("fileRelationType", FileRelationType.OWN))
                 .setProjection(Projections.property("doc.hashName"))
                 .list();
     }
@@ -103,7 +103,7 @@ public class UserToDocumentRelationRepositoryImpl implements UserToDocumentRelat
         return (User) sessionFactory.getCurrentSession()
                 .createCriteria(clazz)
                 .add(Restrictions.eq("document", document))
-                .add(Restrictions.eq("fileRelationType", FileRelationType.OWNER))
+                .add(Restrictions.eq("fileRelationType", FileRelationType.OWN))
                 .setProjection(Projections.property("user"))
                 .uniqueResult();
     }
@@ -114,7 +114,7 @@ public class UserToDocumentRelationRepositoryImpl implements UserToDocumentRelat
                 .createCriteria(clazz, "rel")
                 .createAlias("rel.document", "doc")
                 .add(Restrictions.eq("doc.id", documentId))
-                .add(Restrictions.ne("fileRelationType", FileRelationType.OWNER))
+                .add(Restrictions.ne("fileRelationType", FileRelationType.OWN))
                 .setProjection(Projections.property("user"))
                 .list();
     }
@@ -124,7 +124,7 @@ public class UserToDocumentRelationRepositoryImpl implements UserToDocumentRelat
         return sessionFactory.getCurrentSession()
                 .createCriteria(clazz)
                 .add(Restrictions.eq("user", user))
-                .add(Restrictions.ne("fileRelationType", FileRelationType.OWNER))
+                .add(Restrictions.ne("fileRelationType", FileRelationType.OWN))
                 .setProjection(Projections.property("document"))
                 .list();
     }
@@ -135,7 +135,7 @@ public class UserToDocumentRelationRepositoryImpl implements UserToDocumentRelat
                 .createCriteria(clazz, "rel")
                 .createAlias("rel.document", "doc")
                 .add(Restrictions.eq("user", user))
-                .add(Restrictions.ne("fileRelationType", FileRelationType.OWNER))
+                .add(Restrictions.ne("fileRelationType", FileRelationType.OWN))
                 .add(Restrictions.not(Restrictions.in("doc.parentDirectoryHash", directoryHashes)))
                 .setProjection(Projections.property("document"))
                 .list();
@@ -159,7 +159,7 @@ public class UserToDocumentRelationRepositoryImpl implements UserToDocumentRelat
                 .add(Restrictions.eq("doc.parentDirectoryHash", parentDirHash))
                 .add(Restrictions.eq("doc.name", docName))
                 .add(Restrictions.eq("rel.user", owner))
-                .add(Restrictions.eq("rel.fileRelationType", FileRelationType.OWNER))
+                .add(Restrictions.eq("rel.fileRelationType", FileRelationType.OWN))
                 .setProjection(Projections.property("document"))
                 .uniqueResult();
     }
@@ -179,7 +179,7 @@ public class UserToDocumentRelationRepositoryImpl implements UserToDocumentRelat
                 .createCriteria(clazz, "rel")
                 .createAlias("rel.document", "doc")
                 .add(Restrictions.eq("user", owner))
-                .add(Restrictions.eq("fileRelationType", FileRelationType.OWNER))
+                .add(Restrictions.eq("fileRelationType", FileRelationType.OWN))
                 .add(Restrictions.in("doc.id", idList))
                 .setProjection(Projections.rowCount())
                 .uniqueResult();

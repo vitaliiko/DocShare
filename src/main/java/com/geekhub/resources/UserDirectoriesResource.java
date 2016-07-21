@@ -78,7 +78,7 @@ public class UserDirectoriesResource {
     }
 
     @RequestMapping(value = "/directories/{dirId}/access", method = RequestMethod.GET)
-    public ResponseEntity<FileAccessDto> getUserDirectory(@PathVariable Long dirId) {
+    public ResponseEntity<FileAccessDto> getUserDirectoryAccessAttributes(@PathVariable Long dirId) {
         FileAccessDto accessDto = userDirectoryService.findAllRelations(dirId);
         return ResponseEntity.ok(accessDto);
     }

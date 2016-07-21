@@ -223,7 +223,7 @@ public class UserDirectoryServiceImpl implements UserDirectoryService {
             userRelations.forEach(r -> userToDirectoryRelationService
                     .create(directory, r.getUser(), r.getFileRelationType()));
         } else {
-            userToDirectoryRelationService.create(directory, owner, FileRelationType.OWNER);
+            userToDirectoryRelationService.create(directory, owner, FileRelationType.OWN);
         }
     }
 
@@ -333,21 +333,21 @@ public class UserDirectoryServiceImpl implements UserDirectoryService {
         userToDirectoryRelationService.deleteByDirectoryBesidesOwner(directory);
         if (!CollectionUtils.isEmpty(sharedDto.getReaders())) {
             List<User> readers = userService.getByIds(sharedDto.getReaders());
-            userToDirectoryRelationService.create(directory, readers, FileRelationType.READER);
+            userToDirectoryRelationService.create(directory, readers, FileRelationType.READ);
         }
         if (!CollectionUtils.isEmpty(sharedDto.getEditors())) {
             List<User> editors = userService.getByIds(sharedDto.getEditors());
-            userToDirectoryRelationService.create(directory, editors, FileRelationType.EDITOR);
+            userToDirectoryRelationService.create(directory, editors, FileRelationType.EDIT);
         }
 
         friendGroupToDirectoryRelationService.deleteByDirectory(directory);
         if (!CollectionUtils.isEmpty(sharedDto.getReaderGroups())) {
             List<FriendsGroup> readerGroups = friendGroupService.getByIds(sharedDto.getReaderGroups());
-            friendGroupToDirectoryRelationService.create(directory, readerGroups, FileRelationType.READER);
+            friendGroupToDirectoryRelationService.create(directory, readerGroups, FileRelationType.READ);
         }
         if (!CollectionUtils.isEmpty(sharedDto.getEditorGroups())) {
             List<FriendsGroup> editorGroups = friendGroupService.getByIds(sharedDto.getReaderGroups());
-            friendGroupToDirectoryRelationService.create(directory, editorGroups, FileRelationType.EDITOR);
+            friendGroupToDirectoryRelationService.create(directory, editorGroups, FileRelationType.EDIT);
         }
     }
 
@@ -393,13 +393,13 @@ public class UserDirectoryServiceImpl implements UserDirectoryService {
     @Override
     public FileAccessDto findAllRelations(Long directoryId) {
         UserDirectory directory = getById(directoryId);
-        List<User> editors = userToDirectoryRelationService.getAllByDirectoryIdAndRelation(directory, FileRelationType.EDITOR);
-        List<User> readers = userToDirectoryRelationService.getAllByDirectoryIdAndRelation(directory, FileRelationType.READER);
+        List<User> editors = userToDirectoryRelationService.getAllByDirectoryIdAndRelation(directory, FileRelationType.EDIT);
+        List<User> readers = userToDirectoryRelationService.getAllByDirectoryIdAndRelation(directory, FileRelationType.READ);
 
         List<FriendsGroup> editorGroups = friendGroupToDirectoryRelationService
-                .getAllGroupsByDirectoryIdAndRelation(directory, FileRelationType.EDITOR);
+                .getAllGroupsByDirectoryIdAndRelation(directory, FileRelationType.EDIT);
         List<FriendsGroup> readerGroups = friendGroupToDirectoryRelationService
-                .getAllGroupsByDirectoryIdAndRelation(directory, FileRelationType.READER);
+                .getAllGroupsByDirectoryIdAndRelation(directory, FileRelationType.READ);
 
         FileAccessDto fileDto = new FileAccessDto();
         fileDto.setAttribute(directory.getDocumentAttribute());

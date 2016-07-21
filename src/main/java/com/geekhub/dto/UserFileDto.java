@@ -1,5 +1,6 @@
 package com.geekhub.dto;
 
+import com.geekhub.services.enams.FileType;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
@@ -13,7 +14,7 @@ public class UserFileDto implements Comparable<UserFileDto> {
     private long id;
 
     @Getter @Setter
-    private String type;
+    private FileType type;
 
     @Getter @Setter
     private String name;

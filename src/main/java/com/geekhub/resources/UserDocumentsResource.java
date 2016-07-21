@@ -176,13 +176,7 @@ public class UserDocumentsResource {
 
     private ModelAndView prepareModel(User user, UserDocument document) {
         ModelAndView model = new ModelAndView("history");
-        List<DocumentOldVersionDto> versions = document.getDocumentOldVersions().stream()
-                .map(EntityToDtoConverter::convert)
-                .sorted(DocumentOldVersionDto::compareTo)
-                .collect(Collectors.toList());
-        versions.stream()
-                .filter(dto -> dto.getChangedBy().equals(user.getFullName()))
-                .forEachOrdered(dto -> dto.setChangedBy("Me"));
+        List<DocumentOldVersionDto> versions = EntityToDtoConverter.convertToVersionDtos(document, user);
         UserFileDto currentVersionDto = EntityToDtoConverter.convert(document);
         if (currentVersionDto.getModifiedBy().equals(user.getFullName())) {
             currentVersionDto.setModifiedBy("Me");

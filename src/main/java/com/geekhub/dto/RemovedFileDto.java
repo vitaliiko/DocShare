@@ -1,5 +1,6 @@
 package com.geekhub.dto;
 
+import com.geekhub.services.enams.FileType;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
@@ -16,7 +17,7 @@ public class RemovedFileDto implements Comparable<RemovedFileDto> {
     private String name;
 
     @Getter @Setter
-    private String type;
+    private FileType type;
 
     @Getter @Setter
     private Date removalDate;

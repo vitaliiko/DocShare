@@ -257,7 +257,7 @@ $(document).ready(function() {
             success: function (file) {
                 clearModalWindow();
                 if (fileAccessAttribute !== file.attribute) {
-                    if (file.type === 'doc') {
+                    if (file.type === 'DOCUMENT') {
                         $('.' + fileAccessAttribute).find($('.tr-doc' + file.id)).remove();
                         loadTemplate(handlebarsPath + 'documentRow.html', function (template) {
                             $('.' + file.attribute).append(template(file));
@@ -381,7 +381,7 @@ $(document).ready(function() {
 
     function renderDirectories(directoryContent) {
         $.each(directoryContent.files, function (k, file) {
-            if (file.type === 'dir') {
+            if (file.type === 'DIRECTORY') {
                 loadTemplate(handlebarsPath + 'directoryRow.html', function (template) {
                     allTable.append(template(file));
                     $('.' + file.attribute).append(template(file));
@@ -392,7 +392,7 @@ $(document).ready(function() {
 
     function renderDocuments(directoryContent) {
         $.each(directoryContent.files, function(k, file) {
-            if (file.type === 'doc') {
+            if (file.type === 'DOCUMENT') {
                 loadTemplate(handlebarsPath + 'documentRow.html', function (template) {
                     allTable.append(template(file));
                     $('.' + file.attribute).append(template(file));

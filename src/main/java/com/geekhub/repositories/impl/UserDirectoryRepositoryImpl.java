@@ -141,7 +141,7 @@ public class UserDirectoryRepositoryImpl implements UserDirectoryRepository {
                 .setParameter("parentDirHash", propertiesMap.get("parentDirectoryHash"))
                 .setParameter("name", propertiesMap.get("name"))
                 .setParameter("owner", propertiesMap.get("owner"))
-                .setParameter("relation", FileRelationType.OWNER)
+                .setParameter("relation", FileRelationType.OWN)
                 .uniqueResult();
     }
 
