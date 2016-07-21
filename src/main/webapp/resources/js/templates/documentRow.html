@@ -3,15 +3,14 @@
         <input type="checkbox" class="check-box select select-doc big-check-box" value="{{id}}"/>
     </td>
     <td class="document-name">
-        <a href="/api/documents/{{id}}/browse">{{name}}</a>
+        <a href="/api/documents/{{id}}">{{name}}</a>
     </td>
     <td>{{size}}</td>
     <td class="document-date">{{lastModifyTime}}</td>
     <td>
         <a href="/api/documents/{{id}}/download"
            class="btn btn-default btn-sm custom-width download-btn table-btn">Download</a>
-    </td>
-    <td>
+
         <button type="button" class="btn btn-default btn-sm share-doc-btn table-btn"
                 data-toggle="modal" data-target="#shareDialog" value="{{id}}">Share</button>
     </td>

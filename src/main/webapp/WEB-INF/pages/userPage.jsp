@@ -29,7 +29,7 @@
             </tr>
             <c:forEach items="${documents}" var="doc">
                 <tr>
-                    <td><a href="/api/documents/${doc.id}/browse">${doc.name}</a></td>
+                    <td><a href="/api/documents/${doc.id}">${doc.name}</a></td>
                     <td>${doc.size}</td>
                     <td>${doc.lastModifyTime}</td>
                     <td>

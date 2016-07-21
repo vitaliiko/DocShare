@@ -107,7 +107,7 @@ public class UserDocumentsResource {
         return ResponseEntity.ok().build();
     }
 
-    @RequestMapping(value = "/documents/{docId}/browse", method = RequestMethod.GET)
+    @RequestMapping(value = "/documents/{docId}", method = RequestMethod.GET)
     public ModelAndView browseDocument(@PathVariable Long docId, HttpSession session) {
         User user = getUserFromSession(session);
         UserDocument document = userDocumentService.getById(docId);
@@ -135,7 +135,7 @@ public class UserDocumentsResource {
         return model;
     }
 
-    @RequestMapping(value = "/documents/{docId}", method = RequestMethod.GET)
+    @RequestMapping(value = "/documents/{docId}/access", method = RequestMethod.GET)
     public ResponseEntity<FileAccessDto> getUserDocument(@PathVariable Long docId) {
         FileAccessDto accessDto = userDocumentService.findAllRelations(docId);
         return ResponseEntity.ok().body(accessDto);

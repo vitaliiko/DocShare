@@ -187,7 +187,7 @@ $(document).ready(function() {
 
         var getUrl = '/api/documents/' + $(this).val();
         shareUrl = getUrl + '/share';
-        $.getJSON(getUrl, function(document) {
+        $.getJSON(getUrl + '/access', function(document) {
             fileAccessAttribute = document.attribute;
             makeBoxesChecked(document.readers, $('.reader-check-box'));
             makeBoxesChecked(document.editors, $('.editor-check-box'));
@@ -205,7 +205,7 @@ $(document).ready(function() {
 
         var getUrl = '/api/directories/' + $(this).val();
         shareUrl = getUrl + '/share';
-        $.getJSON(getUrl, function(directory) {
+        $.getJSON(getUrl + '/access', function(directory) {
             fileAccessAttribute = directory.attribute;
             makeBoxesChecked(directory.readers, $('.reader-check-box'));
             makeBoxesChecked(directory.readerGroups, $('.readers-group-check-box'));
@@ -286,7 +286,7 @@ $(document).ready(function() {
     $('#makeDir').click(function() {
         var dirName = $('#directoryName').val();
         $.ajax({
-            url: '/api/directories/' + dirHashName,
+            url: '/api/directories/' + dirHashName + '/make-dir',
             type: 'POST',
             data: {dirName: dirName},
             success: function (directory) {
@@ -314,8 +314,8 @@ $(document).ready(function() {
             var locationElement = $('#location');
             var location = locationElement.text();
             locationElement.text(location + '/' + dirName);
-            parentDirHashName = directoryContent.parentDirHashName;
 
+            parentDirHashName = directoryContent.parentDirHashName;
             $('.back-link').prop('href', '/api/directories/' + parentDirHashName + '/content');
             $('.doc-table tr').not('.table-head').remove();
             $('#uploadingForm').attr('action', '/api/directories/' + dirHashName + '/documents/upload');
@@ -361,7 +361,7 @@ $(document).ready(function() {
             locationElement.text(location.substring(0, location.indexOf('/')));
 
             dirHashName = files[0].parentDirectoryHash;
-            $('.back-link').prop('href', '/api/directories/' + dirHashName + '/parent/content');
+            $('.back-link').prop('href', '/api/directories/' + dirHashName + '/content');
             $('.doc-table tr').not('.table-head').remove();
 
             renderDirectories(files);
@@ -484,7 +484,7 @@ $(document).ready(function() {
                         $('.doc-table')
                             .find($('.tr-doc' + document.id))
                             .find('.document-name')
-                            .html("<a href='/api/documents/'" + document.id + "'/browse'>" + document.name + "</a>")
+                            .html("<a href='/api/documents/'" + document.id + ">" + document.name + "</a>")
                     }
                     dangerAlert.hide(true);
                 },

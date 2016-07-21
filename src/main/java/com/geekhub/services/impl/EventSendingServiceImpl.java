@@ -197,6 +197,6 @@ public class EventSendingServiceImpl implements EventSendingService {
     }
 
     private String buildBrowseDocumentURL(long documentId) {
-        return "/api/documents/" + documentId + "/browse";
+        return "/api/documents/" + documentId;
     }
 }

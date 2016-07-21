@@ -94,7 +94,6 @@
                     <th>Size</th>
                     <th>Changed</th>
                     <th width="15"></th>
-                    <th width="15"></th>
                 </tr>
             </table>
         </c:forEach>

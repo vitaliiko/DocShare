@@ -80,7 +80,7 @@ public class UserDirectoriesResource {
         return ResponseEntity.ok(EntityToDtoConverter.convert(newDirectory));
     }
 
-    @RequestMapping(value = "/directories/{dirId}", method = RequestMethod.GET)
+    @RequestMapping(value = "/directories/{dirId}/access", method = RequestMethod.GET)
     public ResponseEntity<FileAccessDto> getUserDirectory(@PathVariable Long dirId) {
         FileAccessDto accessDto = userDirectoryService.findAllRelations(dirId);
         return ResponseEntity.ok(accessDto);

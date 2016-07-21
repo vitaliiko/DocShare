@@ -32,10 +32,10 @@ public class DocumentAccessInterceptor extends AccessInterceptor<UserDocument> {
 
     @PostConstruct
     public void init() {
-        addPredicate("/api/documents/*", FileAccessService.DOCUMENT_OWNER);
+        addPredicate("/api/documents/*", FileAccessService.DOCUMENT_READER);
         addPredicate("/api/documents/*/share", FileAccessService.DOCUMENT_OWNER);
+        addPredicate("/api/documents/*/access", FileAccessService.DOCUMENT_OWNER);
         addPredicate("/api/documents/*/rename", FileAccessService.DOCUMENT_OWNER);
-        addPredicate("/api/documents/*/browse", FileAccessService.DOCUMENT_READER);
         addPredicate("/api/documents/*/history", FileAccessService.DOCUMENT_OWNER);
         addPredicate("/api/documents/*/download", FileAccessService.DOCUMENT_READER);
         addPredicate("/api/documents/*/recover", FileAccessService.REMOVED_DOCUMENT_OWNER);

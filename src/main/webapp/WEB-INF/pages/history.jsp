@@ -15,7 +15,7 @@
 <div class="container col-md-10" style="width: 900px;">
     <table class="table table-hover tbody tr:hover td" id="documentTable">
         <caption>
-            <h3>List of Previous Versions Documents  |  <a href="/api/documents/${currentVersion.id}/browse">Back</a> </h3>
+            <h3>List of Previous Versions Documents  |  <a href="/api/documents/${currentVersion.id}">Back</a> </h3>
         </caption>
         <tr>
             <th id="file-name">File Name</th>
