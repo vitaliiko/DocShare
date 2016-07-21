@@ -25,5 +25,5 @@ public interface FriendGroupToDirectoryRelationService extends EntityService<Fri
 
     List<FriendsGroup> getAllGroupsByDirectoryIdAndRelation(Long directoryId, FileRelationType relationType);
 
-    List<FileRelationType> getAllRelationsByDocumentIdAndUser(Long directoryId, User user);
+    List<FileRelationType> getAllRelationsByDirectoryIdAndUser(Long directoryId, User user);
 }

@@ -3,9 +3,7 @@ package com.geekhub.repositories.impl;
 import com.geekhub.entities.FriendsGroup;
 import com.geekhub.entities.User;
 import com.geekhub.entities.UserDocument;
-import com.geekhub.entities.UserToDocumentRelation;
 import com.geekhub.entities.enums.DocumentAttribute;
-import com.geekhub.entities.enums.DocumentStatus;
 import java.util.Map;
 
 import com.geekhub.entities.enums.FileRelationType;
@@ -110,6 +108,14 @@ public class UserDocumentRepositoryImpl implements UserDocumentRepository {
     }
 
     @Override
+    public <T> List<UserDocument> getList(String propertyName, List<T> values) {
+        return sessionFactory.getCurrentSession()
+                .createCriteria(clazz)
+                .add(Restrictions.in(propertyName, values))
+                .list();
+    }
+
+    @Override
     public List<Object> getPropertiesList(String selectProperty, String propertyName, String value) {
         return sessionFactory.getCurrentSession()
                 .createCriteria(this.clazz)
@@ -148,8 +154,8 @@ public class UserDocumentRepositoryImpl implements UserDocumentRepository {
     public UserDocument getByFullNameAndOwner(Map<String, Object> propertiesMap) {
         return (UserDocument) sessionFactory.getCurrentSession()
                 .createQuery("SELECT doc FROM UserToDocumentRelation rel JOIN rel.document doc " +
-                        "WHERE doc.parentDirectoryHash = :parentDirHash AND doc.name = :name AND rel.user = :owner " +
-                        "AND rel.fileRelationType = :relation")
+                             "WHERE doc.parentDirectoryHash = :parentDirHash AND doc.name = :name AND rel.user = :owner " +
+                             "AND rel.fileRelationType = :relation")
                 .setParameter("parentDirHash", propertiesMap.get("parentDirectoryHash"))
                 .setParameter("name", propertiesMap.get("name"))
                 .setParameter("owner", propertiesMap.get("owner"))
@@ -161,7 +167,7 @@ public class UserDocumentRepositoryImpl implements UserDocumentRepository {
     public List<UserDocument> getAllByUserAndRelationType(User user, FileRelationType relation) {
         return sessionFactory.getCurrentSession()
                 .createQuery("SELECT doc FROM UserToDocumentRelation rel JOIN rel.document doc " +
-                        "WHERE rel.user = :user AND rel.fileRelationType = :relation")
+                             "WHERE rel.user = :user AND rel.fileRelationType = :relation")
                 .setParameter("user", user)
                 .setParameter("relation", relation)
                 .list();
@@ -171,7 +177,7 @@ public class UserDocumentRepositoryImpl implements UserDocumentRepository {
     public List<UserDocument> getAllByFriendGroupAndRelationType(FriendsGroup group, FileRelationType relation) {
         return sessionFactory.getCurrentSession()
                 .createQuery("SELECT doc FROM FriendGroupToDocumentRelation rel JOIN rel.document doc " +
-                        "WHERE rel.friendsGroup = :group AND rel.fileRelationType = :relation")
+                             "WHERE rel.friendsGroup = :group AND rel.fileRelationType = :relation")
                 .setParameter("group", group)
                 .setParameter("relation", relation)
                 .list();

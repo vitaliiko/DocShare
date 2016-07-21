@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import javax.transaction.Transactional;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -94,5 +95,11 @@ public class UserToDirectoryRelationServiceImpl implements UserToDirectoryRelati
     @Override
     public UserToDirectoryRelation getByDirectoryIdAndUserId(Long directoryId, Long userId) {
         return repository.getByDirectoryIdAndUserId(directoryId, userId);
+    }
+
+    @Override
+    public Long getDirectoriesCountByOwnerAndDirectoryIds(User owner, Long[] directoryIds) {
+        List<Long> idList = Arrays.stream(directoryIds).collect(Collectors.toList());
+        return repository.getDirectoriesCountByOwnerAndDirectoryIds(owner, idList);
     }
 }

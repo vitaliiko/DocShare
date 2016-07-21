@@ -36,4 +36,6 @@ public interface UserToDocumentRelationService extends EntityService<UserToDocum
     UserDocument getDocumentByFullNameAndOwner(String parentDirHash, String docName, User owner);
 
     UserToDocumentRelation getByDocumentIdAndUserId(Long documentId, Long userId);
+
+    Long getDocumentsCountByOwnerAndDocumentIds(User owner, Long[] documentIds);
 }

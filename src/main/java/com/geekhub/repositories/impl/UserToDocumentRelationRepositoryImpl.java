@@ -174,4 +174,16 @@ public class UserToDocumentRelationRepositoryImpl implements UserToDocumentRelat
                 .setParameter("userId", userId)
                 .uniqueResult();
     }
+
+    @Override
+    public Long getCountByOwnerAndDocumentIds(User owner, List<Long> idList) {
+        return (Long) sessionFactory.getCurrentSession()
+                .createCriteria(clazz, "rel")
+                .createAlias("rel.document", "doc")
+                .add(Restrictions.eq("user", owner))
+                .add(Restrictions.eq("fileRelationType", FileRelationType.OWNER))
+                .add(Restrictions.in("doc.id", idList))
+                .setProjection(Projections.rowCount())
+                .uniqueResult();
+    }
 }

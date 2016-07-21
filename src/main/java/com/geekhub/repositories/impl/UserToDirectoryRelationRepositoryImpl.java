@@ -81,7 +81,8 @@ public class UserToDirectoryRelationRepositoryImpl implements UserToDirectoryRel
     @Override
     public void deleteByDirectoryBesidesOwner(UserDirectory directory) {
         sessionFactory.getCurrentSession()
-                .createQuery("DELETE UserToDirectoryRelation r WHERE r.directory = :directory AND r.fileRelationType != :relation")
+                .createQuery("DELETE UserToDirectoryRelation r " +
+                             "WHERE r.directory = :directory AND r.fileRelationType != :relation")
                 .setParameter("directory", directory)
                 .setParameter("relation", FileRelationType.OWNER)
                 .executeUpdate();
@@ -114,6 +115,18 @@ public class UserToDirectoryRelationRepositoryImpl implements UserToDirectoryRel
                 .createQuery("FROM UserToDirectoryRelation rel WHERE rel.directory.id = :dirId AND rel.user.id = :userId")
                 .setParameter("dirId", directoryId)
                 .setParameter("userId", userId)
+                .uniqueResult();
+    }
+
+    @Override
+    public Long getDirectoriesCountByOwnerAndDirectoryIds(User owner, List<Long> idList) {
+        return (Long) sessionFactory.getCurrentSession()
+                .createCriteria(clazz, "rel")
+                .createAlias("rel.directory", "dir")
+                .add(Restrictions.eq("user", owner))
+                .add(Restrictions.eq("fileRelationType", FileRelationType.OWNER))
+                .add(Restrictions.in("dir.id", idList))
+                .setProjection(Projections.rowCount())
                 .uniqueResult();
     }
 }

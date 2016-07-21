@@ -6,8 +6,6 @@ import com.geekhub.entities.UserToDocumentRelation;
 import com.geekhub.entities.enums.FileRelationType;
 
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 public interface UserToDocumentRelationRepository extends EntityRepository<UserToDocumentRelation, Long> {
 
@@ -28,4 +26,6 @@ public interface UserToDocumentRelationRepository extends EntityRepository<UserT
     UserDocument getDocumentByFullNameAndOwner(String parentDirHash, String docName, User owner);
 
     UserToDocumentRelation getByDocumentIdAndUserId(Long documentId, Long userId);
+
+    Long getCountByOwnerAndDocumentIds(User owner, List<Long> idList);
 }

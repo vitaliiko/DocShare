@@ -175,7 +175,7 @@ public class UserDocumentServiceImpl implements UserDocumentService {
 
     @Override
     public List<UserDocument> getAllByParentDirectoryHashes(List<String> parentDirectoryHashList) {
-        return null;
+        return repository.getList("parentDirectoryHash", parentDirectoryHashList);
     }
 
     @Override

@@ -96,7 +96,7 @@ public class FriendGroupToDirectoryRelationServiceImpl implements FriendGroupToD
     }
 
     @Override
-    public List<FileRelationType> getAllRelationsByDocumentIdAndUser(Long directoryId, User user) {
-        return repository.getAllRelationsByDocumentIdAndUser(directoryId, user);
+    public List<FileRelationType> getAllRelationsByDirectoryIdAndUser(Long directoryId, User user) {
+        return repository.getAllRelationsByDirectoryIdAndUser(directoryId, user);
     }
 }

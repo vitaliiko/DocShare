@@ -14,9 +14,9 @@ import java.util.function.BiPredicate;
 @Service
 public class FileAccessService {
 
-    private static FriendGroupToDocumentRelationService staticFriendGroupToDocumentRelationService;
-    private static UserToDirectoryRelationService staticUserToDirectoryRelationService;
     private static UserToDocumentRelationService staticUserToDocumentRelationService;
+    private static UserToDirectoryRelationService staticUserToDirectoryRelationService;
+    private static FriendGroupToDocumentRelationService staticFriendGroupToDocumentRelationService;
     private static FriendGroupToDirectoryRelationService staticFriendGroupToDirectoryRelationService;
 
     @Inject
@@ -33,9 +33,9 @@ public class FileAccessService {
 
     @PostConstruct
     public void init() {
-        staticFriendGroupToDocumentRelationService = friendGroupToDocumentRelationService;
         staticUserToDocumentRelationService = userToDocumentRelationService;
         staticUserToDirectoryRelationService = userToDirectoryRelationService;
+        staticFriendGroupToDocumentRelationService = friendGroupToDocumentRelationService;
         staticFriendGroupToDirectoryRelationService = friendGroupToDirectoryRelationService;
     }
 
@@ -76,15 +76,14 @@ public class FileAccessService {
 
     public static final BiPredicate<User, UserDirectory> DIRECTORY_READER = (u, d) -> {
         FileRelationType relationType = getUserToDirectoryRelationType(d.getId(), u.getId());
-        return relationType != null
-                && relationType == FileRelationType.OWNER
-                && d.getDocumentStatus() == DocumentStatus.ACTUAL;
+        return d.getDocumentStatus() == DocumentStatus.ACTUAL
+                && (relationType != null || isInReaderOrEditorGroups(u, d));
     };
 
     public static final BiPredicate<User, UserDirectory> DIRECTORY_EDITOR = (u, d) -> {
         FileRelationType relationType = getUserToDirectoryRelationType(d.getId(), u.getId());
         return d.getDocumentStatus() == DocumentStatus.ACTUAL
-                && (relationType != null || isInReaderOrEditorGroups(u, d));
+                && (relationType != FileRelationType.READER || isInEditorGroups(u, d));
     };
 
 
@@ -116,13 +115,19 @@ public class FileAccessService {
 
     private static boolean isInReaderOrEditorGroups(User user, UserDirectory directory) {
         List<FileRelationType> relations = staticFriendGroupToDirectoryRelationService
-                .getAllRelationsByDocumentIdAndUser(directory.getId(), user);
+                .getAllRelationsByDirectoryIdAndUser(directory.getId(), user);
         return relations.size() > 0;
     }
 
     private static boolean isInEditorGroups(User user, UserDocument document) {
         List<FileRelationType> relations = staticFriendGroupToDocumentRelationService
                 .getAllRelationsByDocumentIdAndUser(document.getId(), user);
+        return relations.contains(FileRelationType.EDITOR);
+    }
+
+    private static boolean isInEditorGroups(User user, UserDirectory directory) {
+        List<FileRelationType> relations = staticFriendGroupToDirectoryRelationService
+                .getAllRelationsByDirectoryIdAndUser(directory.getId(), user);
         return relations.contains(FileRelationType.EDITOR);
     }
 }

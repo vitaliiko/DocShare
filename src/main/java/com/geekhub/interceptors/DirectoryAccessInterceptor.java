@@ -33,9 +33,9 @@ public class DirectoryAccessInterceptor extends AccessInterceptor<UserDirectory>
     @PostConstruct
     public void init() {
         addPredicate("/api/directories/*/documents/upload", FileAccessService.DIRECTORY_OWNER);
-        addPredicate("/api/directories/*/parent/content", FileAccessService.DIRECTORY_OWNER);
+        addPredicate("/api/directories/*/parent/content", FileAccessService.DIRECTORY_READER);
         addPredicate("/api/directories/*/make-dir", FileAccessService.DIRECTORY_OWNER);
-        addPredicate("/api/directories/*/content", FileAccessService.DIRECTORY_OWNER);
+        addPredicate("/api/directories/*/content", FileAccessService.DIRECTORY_READER);
         addPredicate("/api/directories/*/recover", FileAccessService.DIRECTORY_OWNER);
         addPredicate("/api/directories/*/rename", FileAccessService.DIRECTORY_OWNER);
         addPredicate("/api/directories/*/share", FileAccessService.DIRECTORY_OWNER);

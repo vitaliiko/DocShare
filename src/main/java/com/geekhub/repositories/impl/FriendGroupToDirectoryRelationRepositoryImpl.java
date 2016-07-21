@@ -108,10 +108,10 @@ public class FriendGroupToDirectoryRelationRepositoryImpl implements FriendGroup
     }
 
     @Override
-    public List<FileRelationType> getAllRelationsByDocumentIdAndUser(Long directoryId, User user) {
+    public List<FileRelationType> getAllRelationsByDirectoryIdAndUser(Long directoryId, User user) {
         return sessionFactory.getCurrentSession()
                 .createQuery("SELECT rel.fileRelationType FROM FriendGroupToDirectoryRelation rel " +
-                        "WHERE rel.directory.id = :dirId AND :user IN ELEMENTS(rel.friendsGroup.friends)")
+                             "WHERE rel.directory.id = :dirId AND :user IN ELEMENTS(rel.friendsGroup.friends)")
                 .setParameter("dirId", directoryId)
                 .setParameter("user", user)
                 .list();

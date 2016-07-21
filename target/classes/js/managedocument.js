@@ -284,9 +284,9 @@ $(document).ready(function() {
     $('#makeDir').click(function() {
         var dirName = $('#directoryName').val();
         $.ajax({
-            url: '/api/directories',
+            url: '/api/directories/' + dirHashName,
             type: 'POST',
-            data: {dirName: dirName, parentDirHash: dirHashName},
+            data: {dirName: dirName},
             success: function (directory) {
                 loadTemplate(handlebarsPath + 'directoryRow.html', function(template) {
                     var html = template(directory);

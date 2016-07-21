@@ -17,6 +17,8 @@ public interface UserDocumentRepository extends EntityRepository<UserDocument, L
 
     List<UserDocument> getList(Map<String, Object> propertiesMap);
 
+    <T> List<UserDocument> getList(String propertyName, List<T> values);
+
     List<Object> getPropertiesList(String selectProperty, String propertyName, String value);
 
     UserDocument get(User owner, String propertyName, Object value);

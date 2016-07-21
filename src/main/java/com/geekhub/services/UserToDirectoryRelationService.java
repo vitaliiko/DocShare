@@ -25,4 +25,6 @@ public interface UserToDirectoryRelationService extends EntityService<UserToDire
     List<User> getAllByDirectoryIdAndRelation(Long directoryId, FileRelationType relationType);
 
     UserToDirectoryRelation getByDirectoryIdAndUserId(Long directoryId, Long userId);
+
+    Long getDirectoriesCountByOwnerAndDirectoryIds(User owner, Long[] directoryIds);
 }

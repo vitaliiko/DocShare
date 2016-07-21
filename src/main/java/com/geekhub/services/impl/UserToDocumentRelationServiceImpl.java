@@ -123,4 +123,10 @@ public class UserToDocumentRelationServiceImpl implements UserToDocumentRelation
     public UserToDocumentRelation getByDocumentIdAndUserId(Long documentId, Long userId) {
         return repository.getByDocumentIdAndUserId(documentId, userId);
     }
+
+    @Override
+    public Long getDocumentsCountByOwnerAndDocumentIds(User owner, Long[] documentIds) {
+        List<Long> idList = Arrays.stream(documentIds).collect(Collectors.toList());
+        return repository.getCountByOwnerAndDocumentIds(owner, idList);
+    }
 }
