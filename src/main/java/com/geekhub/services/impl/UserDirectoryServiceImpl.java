@@ -411,6 +411,12 @@ public class UserDirectoryServiceImpl implements UserDirectoryService {
     }
 
     @Override
+    public boolean isDirectoryNameValid(String parentDirectoryHash, String dirName, User owner) {
+        UserDirectory existingDirectory = getByFullNameAndOwner(owner, parentDirectoryHash, dirName);
+        return existingDirectory == null && !UserFileUtil.validateDocumentNameWithoutExtension(dirName);
+    }
+
+    @Override
     public void copy(Long dirId, String destinationDirectoryHash) {
         UserDirectory directory = repository.getById(dirId);
         UserDirectory copy = UserFileUtil.copyDirectory(directory);

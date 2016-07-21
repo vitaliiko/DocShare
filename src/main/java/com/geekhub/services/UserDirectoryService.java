@@ -69,4 +69,6 @@ public interface UserDirectoryService extends EntityService<UserDirectory, Long>
     void updateDocumentAttribute(DocumentAttribute attribute, List<Long> directoryIds);
 
     FileAccessDto findAllRelations(Long directoryId);
+
+    boolean isDirectoryNameValid(String parentDirectoryHash, String dirName, User owner);
 }

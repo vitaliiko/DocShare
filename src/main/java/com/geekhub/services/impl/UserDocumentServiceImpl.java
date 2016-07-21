@@ -522,6 +522,13 @@ public class UserDocumentServiceImpl implements UserDocumentService {
     }
 
     @Override
+    public boolean isDocumentNameValid(String parentDirectoryHash, String docName, User owner) {
+        UserDocument existingDocument = userToDocumentRelationService
+                .getDocumentByFullNameAndOwner(parentDirectoryHash, docName, owner);
+        return existingDocument == null && UserFileUtil.validateDocumentNameWithoutExtension(docName);
+    }
+
+    @Override
     public List<Object> getActualIdsByParentDirectoryHash(String parentDirectoryHash) {
         return repository.getPropertiesList("id", "parentDirectoryHash", parentDirectoryHash);
     }

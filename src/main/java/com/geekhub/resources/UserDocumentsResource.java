@@ -148,18 +148,11 @@ public class UserDocumentsResource {
 
         UserDocument document = userDocumentService.getById(docId);
         newDocName = newDocName + document.getExtension();
-
-        if (document.getName().equals(newDocName)) {
-            return ResponseEntity.badRequest().body(null);
-        }
-
         User user = getUserFromSession(session);
-        UserDocument existingDocument = userToDocumentRelationService
-                .getDocumentByFullNameAndOwner(document.getParentDirectoryHash(), newDocName, user);
-        if (existingDocument != null || !UserFileUtil.validateDocumentNameWithoutExtension(newDocName)) {
+        if (document.getName().equals(newDocName)
+                || !userDocumentService.isDocumentNameValid(document.getParentDirectoryHash(), newDocName, user)) {
             return ResponseEntity.badRequest().body(null);
         }
-
         UserDocument documentWithNewName = userDocumentService.renameDocument(document, newDocName, user);
         return ResponseEntity.ok(EntityToDtoConverter.convert(documentWithNewName));
     }

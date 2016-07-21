@@ -455,21 +455,6 @@ $(document).ready(function() {
         $('.add-action-btn').hide();
     });
 
-    $('.rename-btn').click(function() {
-        var docCheckBox = $('.select-doc:visible:checked');
-        var dirCheckBox = $('.select-dir:visible:checked');
-        if (docCheckBox.length == 1) {
-            $.getJSON('/api/documents/' + docCheckBox.val(), function(document) {
-                var docName = document.name;
-                $('#newFileName').val(docName.substring(0, docName.lastIndexOf('.')));
-            });
-        } else if (dirCheckBox.length == 1) {
-            $.getJSON('/api/directories/' + dirCheckBox.val(), function(directory) {
-                $('#newFileName').val(directory.name);
-            });
-        }
-    });
-
     $('#renameFile').click(function() {
         var newName = $('#newFileName').val();
         var docCheckBox = $('.select-doc:visible:checked');
@@ -513,5 +498,6 @@ $(document).ready(function() {
                 }
             });
         }
+        $('#newFileName').val('');
     });
 });

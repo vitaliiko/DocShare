@@ -1,10 +1,8 @@
 package com.geekhub.repositories.impl;
 
-import com.geekhub.entities.FriendsGroup;
 import com.geekhub.entities.User;
 import com.geekhub.entities.UserDirectory;
 import com.geekhub.entities.enums.DocumentAttribute;
-import com.geekhub.entities.enums.DocumentStatus;
 import java.util.List;
 import java.util.Map;
 
@@ -138,8 +136,8 @@ public class UserDirectoryRepositoryImpl implements UserDirectoryRepository {
     public UserDirectory getByFullNameAndOwner(Map<String, Object> propertiesMap) {
         return (UserDirectory) sessionFactory.getCurrentSession()
                 .createQuery("SELECT dir FROM UserToDirectoryRelation rel JOIN rel.directory dir " +
-                        "WHERE dir.parentDirectoryHash = :parentDirHash AND dir.name = :name AND rel.user = :owner " +
-                        "AND rel.fileRelationType = :relation")
+                             "WHERE dir.parentDirectoryHash = :parentDirHash AND dir.name = :name AND rel.user = :owner " +
+                             "AND rel.fileRelationType = :relation")
                 .setParameter("parentDirHash", propertiesMap.get("parentDirectoryHash"))
                 .setParameter("name", propertiesMap.get("name"))
                 .setParameter("owner", propertiesMap.get("owner"))

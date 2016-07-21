@@ -81,4 +81,6 @@ public interface UserDocumentService extends EntityService<UserDocument, Long> {
     void updateDocumentAttribute(DocumentAttribute attribute, List<Long> documentIds);
 
     FileAccessDto findAllRelations(Long documentId);
+
+    boolean isDocumentNameValid(String parentDirectoryHash, String docName, User owner);
 }

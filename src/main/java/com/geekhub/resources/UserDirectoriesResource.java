@@ -7,12 +7,10 @@ import com.geekhub.dto.UserFileDto;
 import com.geekhub.dto.convertors.EntityToDtoConverter;
 import com.geekhub.entities.User;
 import com.geekhub.entities.UserDirectory;
-import com.geekhub.security.UserDirectoryAccessService;
 import com.geekhub.services.UserDirectoryService;
 import com.geekhub.services.UserDocumentService;
 import com.geekhub.services.UserService;
 import com.geekhub.utils.UserFileUtil;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -26,7 +24,6 @@ import org.springframework.web.servlet.ModelAndView;
 import javax.inject.Inject;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
-import java.util.Set;
 
 @RestController
 @RequestMapping("/api")
@@ -93,18 +90,12 @@ public class UserDirectoriesResource {
 
         UserDirectory directory = userDirectoryService.getById(dirId);
         User user = getUserFromSession(session);
-
-        if (directory.getName().equals(newDirName)) {
+        if (directory.getName().equals(newDirName)
+                || !userDocumentService.isDocumentNameValid(directory.getParentDirectoryHash(), newDirName, user)) {
             return ResponseEntity.badRequest().body(null);
         }
-
-        UserDirectory existingDirectory =
-                userDirectoryService.getByFullNameAndOwner(user, directory.getParentDirectoryHash(), newDirName);
-        if (existingDirectory == null && UserFileUtil.validateDirectoryName(newDirName)) {
-            UserDirectory renamedDirectory = userDirectoryService.renameDirectory(directory, newDirName, user);
-            return new ResponseEntity<>(EntityToDtoConverter.convert(renamedDirectory), HttpStatus.OK);
-        }
-        return ResponseEntity.badRequest().body(null);
+        UserDirectory directoryWithNewName = userDirectoryService.renameDirectory(directory, newDirName, user);
+        return ResponseEntity.ok(EntityToDtoConverter.convert(directoryWithNewName));
     }
 
     @RequestMapping(value = "/directories/{dirId}/share", method = RequestMethod.POST)
