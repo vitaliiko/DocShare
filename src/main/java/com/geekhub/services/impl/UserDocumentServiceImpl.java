@@ -220,49 +220,51 @@ public class UserDocumentServiceImpl implements UserDocumentService {
     }
 
     @Override
-    public void replace(Long docId, String destinationDirectoryHash) {
-        UserDocument document = repository.getById(docId);
+    public void replace(Long[] docIds, String destinationDirectoryHash, User user) {
+        Set<UserDocument> documents = getByIds(Arrays.asList(docIds));
         UserDirectory destinationDir = null;
-//        if (!document.getOwner().getLogin().equals(destinationDirectoryHash)) {
-//            destinationDir = userDirectoryService.getByHashName(destinationDirectoryHash);
-//            if (destinationDir == null) {
-//                return;
-//            }
-//        }
-        String docName = document.getName();
+        if (destinationDirectoryHash.equals("root")) {
+            destinationDirectoryHash = user.getLogin();
+        } else {
+            destinationDir = userDirectoryService.getByHashName(destinationDirectoryHash);
+        }
+        List<String> docNames = documents.stream().map(UserDocument::getName).collect(Collectors.toList());
+        List<String> similarDocNames = getSimilarDocumentNamesInDirectory(destinationDirectoryHash, docNames);
+        similarDocNames.size();
 
-        if (!document.getParentDirectoryHash().equals(destinationDirectoryHash)) {
+
+//        String docName = document.getName();
+//
+//        if (!document.getParentDirectoryHash().equals(destinationDirectoryHash)) {
 //            if (getByFullNameAndOwner(document.getOwner(), destinationDirectoryHash, docName) != null) {
 //                String docNameWithoutExtension = docName.substring(0, docName.lastIndexOf("."));
 //                int matchesCount = repository.getLike(destinationDirectoryHash, docNameWithoutExtension).size();
 //                document.setName(docNameWithoutExtension + " (" + (matchesCount + 1) + ")" + document.getExtension());
 //            }
-            document.setParentDirectoryHash(destinationDirectoryHash);
-            if (destinationDir != null) {
-                document.setDocumentAttribute(destinationDir.getDocumentAttribute());
-
+//            document.setParentDirectoryHash(destinationDirectoryHash);
+//            if (destinationDir != null) {
+//                document.setDocumentAttribute(destinationDir.getDocumentAttribute());
+//
 //                document.getReaders().clear();
 //                document.getReadersGroups().clear();
 //
 //                destinationDir.getReaders().forEach(document.getReaders()::add);
 //                destinationDir.getReadersGroups().forEach(document.getReadersGroups()::add);
-            } else {
-                document.setDocumentAttribute(DocumentAttribute.PRIVATE);
-            }
-
-            repository.update(document);
-        }
+//            } else {
+//                document.setDocumentAttribute(DocumentAttribute.PRIVATE);
+//            }
+//
+//            repository.update(document);
+//        }
     }
 
-    @Override
-    public boolean replace(Long[] docIds, String destinationDirectoryHash, User user) {
-        Set<UserDocument> documents = getByIds(Arrays.asList(docIds));
-        if (userDocumentAccessService.isOwner(documents, user)) {
-            Arrays.stream(docIds).forEach(id -> replace(id, destinationDirectoryHash));
-            return true;
-        }
-        return false;
-    }
+//    private String generateNewName(String parentDirHash, String oldName) {
+//        String extension = oldName.substring(oldName.lastIndexOf("."));
+//        String docNameWithoutExtension = oldName.replace(extension, "");
+//        int matchesCount = repository.getLike(parentDirHash, docNameWithoutExtension).size();
+//        return docNameWithoutExtension + " (" + (matchesCount) + ")" + document.getExtension();
+//    }
+
 
     @Override
     public void copy(Long docId, String destinationDirectoryHash) {
@@ -526,6 +528,24 @@ public class UserDocumentServiceImpl implements UserDocumentService {
         UserDocument existingDocument = userToDocumentRelationService
                 .getDocumentByFullNameAndOwner(parentDirectoryHash, docName, owner);
         return existingDocument == null && UserFileUtil.validateDocumentNameWithoutExtension(docName);
+    }
+
+    @Override
+    public List<String> getSimilarDocumentNamesInDirectory(String directoryHash, List<String> documentNames) {
+        documentNames.stream().map(n -> n.substring(0, n.lastIndexOf(".")) + ".").collect(Collectors.toList());
+
+        StringBuilder pattern = new StringBuilder("'");
+        Iterator<String> iterator = documentNames.iterator();
+        while (iterator.hasNext()) {
+            String docName = iterator.next();
+            pattern.append(docName.substring(0, docName.lastIndexOf("."))).append(".");
+            if (iterator.hasNext()) {
+                pattern.append("|");
+            } else {
+                pattern.append("'");
+            }
+        }
+        return repository.getSimilarDocumentNamesInDirectory(directoryHash, pattern.toString());
     }
 
     @Override

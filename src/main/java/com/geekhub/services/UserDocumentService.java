@@ -2,7 +2,6 @@ package com.geekhub.services;
 
 import com.geekhub.dto.FileAccessDto;
 import com.geekhub.dto.SharedDto;
-import com.geekhub.dto.UserFileDto;
 import com.geekhub.entities.*;
 import com.geekhub.entities.enums.DocumentAttribute;
 
@@ -26,9 +25,7 @@ public interface UserDocumentService extends EntityService<UserDocument, Long> {
 
     void moveToTrash(Long[] docIds, Long removerId);
 
-    void replace(Long docId, String destinationDirectoryHash);
-
-    boolean replace(Long[] docIds, String destinationDirectoryHash, User user);
+    void replace(Long[] docIds, String destinationDirectoryHash, User user);
 
     void copy(Long docId, String destinationDirectoryHash);
 
@@ -83,4 +80,6 @@ public interface UserDocumentService extends EntityService<UserDocument, Long> {
     FileAccessDto findAllRelations(Long documentId);
 
     boolean isDocumentNameValid(String parentDirectoryHash, String docName, User owner);
+
+    List<String> getSimilarDocumentNamesInDirectory(String directoryHash, List<String> documentNames);
 }

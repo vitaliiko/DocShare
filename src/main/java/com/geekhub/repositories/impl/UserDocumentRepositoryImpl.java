@@ -4,12 +4,13 @@ import com.geekhub.entities.FriendsGroup;
 import com.geekhub.entities.User;
 import com.geekhub.entities.UserDocument;
 import com.geekhub.entities.enums.DocumentAttribute;
+
+import java.util.Iterator;
 import java.util.Map;
 
 import com.geekhub.entities.enums.FileRelationType;
 import com.geekhub.repositories.UserDocumentRepository;
 import org.hibernate.SessionFactory;
-import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
@@ -134,11 +135,11 @@ public class UserDocumentRepositoryImpl implements UserDocumentRepository {
     }
 
     @Override
-    public List<UserDocument> getLike(String parentDirectoryHash, String docName) {
+    public List<String> getSimilarDocumentNamesInDirectory(String directoryHash, String pattern) {
+        String sql = "SELECT d.name FROM user_document d WHERE d.parentDirectoryHash = ? AND d.name REGEXP " + pattern;
         return sessionFactory.getCurrentSession()
-                .createCriteria(clazz)
-                .add(Restrictions.eq("parentDirectoryHash", parentDirectoryHash))
-                .add(Restrictions.like("name", docName, MatchMode.START))
+                .createSQLQuery(sql)
+                .setParameter(0, directoryHash)
                 .list();
     }
 

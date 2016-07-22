@@ -166,6 +166,19 @@ public class UserToDocumentRelationRepositoryImpl implements UserToDocumentRelat
     }
 
     @Override
+    public List<UserDocument> getAllDocumentsByFullNamesAndOwner(String parentDirHash, List<String> docNames, User owner) {
+        return sessionFactory.getCurrentSession()
+                .createCriteria(clazz, "rel")
+                .createAlias("rel.document", "doc")
+                .add(Restrictions.eq("doc.parentDirectoryHash", parentDirHash))
+                .add(Restrictions.in("doc.name", docNames))
+                .add(Restrictions.eq("rel.user", owner))
+                .add(Restrictions.eq("rel.fileRelationType", FileRelationType.OWN))
+                .setProjection(Projections.property("document"))
+                .list();
+    }
+
+    @Override
     public UserToDocumentRelation getByDocumentAndUser(UserDocument document, User user) {
         return (UserToDocumentRelation) sessionFactory.getCurrentSession()
                 .createQuery("FROM UserToDocumentRelation rel WHERE rel.document = :doc AND rel.user = :user")

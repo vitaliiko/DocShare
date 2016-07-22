@@ -11,19 +11,11 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 @Entity
-@Table(name = "user_document")
+@Table(name = "user_document",
+        uniqueConstraints = @UniqueConstraint(columnNames = {"name", "parentDirectoryHash"}))
 @EqualsAndHashCode(of = "id")
 public class UserDocument implements Comparable<UserDocument>, Serializable {
 

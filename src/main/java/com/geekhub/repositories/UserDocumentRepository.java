@@ -23,7 +23,7 @@ public interface UserDocumentRepository extends EntityRepository<UserDocument, L
 
     UserDocument get(User owner, String propertyName, Object value);
 
-    List<UserDocument> getLike(String parentDirectoryHash, String docName);
+    List<String> getSimilarDocumentNamesInDirectory(String directoryHash, String pattern);
 
     UserDocument get(Map<String, Object> propertiesMap);
 

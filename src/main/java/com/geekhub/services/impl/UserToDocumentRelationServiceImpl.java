@@ -120,6 +120,11 @@ public class UserToDocumentRelationServiceImpl implements UserToDocumentRelation
     }
 
     @Override
+    public List<UserDocument> getAllDocumentsByFullNamesAndOwner(String parentDirHash, List<String> docNames, User owner) {
+        return repository.getAllDocumentsByFullNamesAndOwner(parentDirHash, docNames, owner);
+    }
+
+    @Override
     public UserToDocumentRelation getByDocumentAndUser(UserDocument document, User user) {
         return repository.getByDocumentAndUser(document, user);
     }
