@@ -51,18 +51,6 @@ public class FilesResource {
     @Inject
     private RemovedDirectoryService removedDirectoryService;
 
-    @Inject
-    private UserDirectoryAccessService directoryAccessService;
-
-    @Inject
-    private UserDocumentAccessService documentAccessService;
-
-    @Inject
-    private UserDirectoryAccessService userDirectoryAccessService;
-
-    @Inject
-    private EventSendingService eventSendingService;
-
     private User getUserFromSession(HttpSession session) {
         return userService.getById((Long) session.getAttribute("userId"));
     }
@@ -94,18 +82,17 @@ public class FilesResource {
     }
 
     @RequestMapping(value = "/files/replace", method = RequestMethod.POST)
-    public ResponseEntity<Void> replaceFiles(@RequestParam(value = "docIds[]", required = false) Long[] docIds,
-                                             @RequestParam(value = "dirIds[]", required = false) Long[] dirIds,
-                                             @RequestParam String destinationDirHash,
-                                             HttpSession session) {
+    public ResponseEntity replaceFiles(@RequestParam(value = "docIds[]", required = false) Long[] docIds,
+                                       @RequestParam(value = "dirIds[]", required = false) Long[] dirIds,
+                                       @RequestParam String destinationDirHash,
+                                       HttpSession session) {
 
         User user = getUserFromSession(session);
-
-        if (docIds != null && !userDocumentService.replace(docIds, destinationDirHash, user)) {
-            return ResponseEntity.badRequest().build();
+        if (docIds != null) {
+            userDocumentService.replace(docIds, destinationDirHash, user);
         }
-        if (dirIds != null && !userDirectoryService.replace(dirIds, destinationDirHash, user)) {
-            return ResponseEntity.badRequest().build();
+        if (dirIds != null) {
+            userDirectoryService.replace(dirIds, destinationDirHash, user);
         }
         return ResponseEntity.ok().build();
     }
@@ -117,46 +104,27 @@ public class FilesResource {
                                           HttpSession session) {
 
         User user = getUserFromSession(session);
-
-        if (destinationDirHash.equals("root")) {
-            destinationDirHash = user.getLogin();
+        if (docIds != null) {
+            userDocumentService.copy(docIds, destinationDirHash, user);
         }
-        if (!userDirectoryAccessService.isOwner(destinationDirHash, user)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-        }
-        if (docIds != null && !userDocumentService.copy(docIds, destinationDirHash, user)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-        }
-        if (dirIds != null && !userDirectoryService.copy(dirIds, destinationDirHash, user)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        if (dirIds != null) {
+            userDirectoryService.copy(dirIds, destinationDirHash, user);
         }
         return ResponseEntity.ok().build();
     }
 
     @RequestMapping(value = "/files/move-to-trash", method = RequestMethod.POST)
-    public ResponseEntity moveDocumentToTrash(@RequestParam(value = "docIds[]", required = false) Long[] docIds,
-                                              @RequestParam(value = "dirIds[]", required = false) Long[] dirIds,
-                                              HttpSession session) {
+    public ResponseEntity moveFilesToTrash(@RequestParam(value = "docIds[]", required = false) Long[] docIds,
+                                           @RequestParam(value = "dirIds[]", required = false) Long[] dirIds,
+                                           HttpSession session) {
 
         Long userId = (Long) session.getAttribute("userId");
-        User user = getUserFromSession(session);
         if (docIds != null) {
-            Set<UserDocument> documents = userDocumentService.getByIds(Arrays.asList(docIds));
-            if (documentAccessService.canRemove(documents, user)) {
-                userDocumentService.moveToTrash(docIds, userId);
-                documents.forEach(doc -> eventSendingService
-                        .sendRemoveEvent(userDocumentService, FileType.DOCUMENT, doc.getName(), doc.getId(), user));
-            }
+            userDocumentService.moveToTrash(docIds, userId);
         }
         if (dirIds != null) {
-            Set<UserDirectory> directories = userDirectoryService.getByIds(Arrays.asList(dirIds));
-            if (directoryAccessService.canRemove(directories, user)) {
-                userDirectoryService.moveToTrash(dirIds, userId);
-                directories.forEach(dir -> eventSendingService
-                        .sendRemoveEvent(userDirectoryService, FileType.DIRECTORY, dir.getName(), dir.getId(), user));
-            }
+            userDirectoryService.moveToTrash(dirIds, userId);
         }
-
         return ResponseEntity.ok().build();
     }
 

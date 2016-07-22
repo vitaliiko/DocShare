@@ -39,12 +39,16 @@ public class FilesAccessInterceptor extends AccessInterceptor {
         Long userId = (Long) req.getSession().getAttribute("userId");
         Map<String, String[]> parameterMap = req.getParameterMap();
         if (userId != null && !CollectionUtils.isEmpty(parameterMap)) {
-            String[] dirIds = parameterMap.get("dirIds");
-            String[] docIds = parameterMap.get("docIds");
+            String[] dirIds = parameterMap.get("dirIds[]");
+            String[] docIds = parameterMap.get("docIds[]");
+            String[] destinationDirHash = parameterMap.get("destinationDirHash");
             if ((dirIds != null && permitAccess(dirIds, FileType.DIRECTORY, userId))
-                    || (docIds != null && permitAccess(docIds, FileType.DOCUMENT, userId))) {
+                    || (docIds != null && permitAccess(docIds, FileType.DOCUMENT, userId))
+                    && (destinationDirHash == null || (destinationDirHash.length == 1
+                    && permitAccess(destinationDirHash[0], userId)))) {
                 return true;
             }
+            return true;
         }
         resp.setStatus(HttpStatus.BAD_REQUEST.value());
         return false;
@@ -64,5 +68,13 @@ public class FilesAccessInterceptor extends AccessInterceptor {
         }
         List<UserDirectory> directories = new ArrayList<>(userDirectoryService.getByIds(idsInLong));
         return fileAccessService.permitAccess(directories, user, AccessPredicates.DIRECTORIES_OWNER);
+    }
+
+    private boolean permitAccess(String dirHashName, Long userId) {
+        User user = userService.getById(userId);
+        UserDirectory directory = userDirectoryService.getByHashName(dirHashName);
+        return dirHashName.equals("root")
+                || dirHashName.equals(user.getLogin())
+                || fileAccessService.permitAccess(directory, user, AccessPredicates.DIRECTORY_OWNER);
     }
 }
