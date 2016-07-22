@@ -15,9 +15,11 @@ public interface UserToDirectoryRelationRepository extends EntityRepository<User
 
     List<User> getAllByDirectoryIdAndRelation(UserDirectory directory, FileRelationType relationType);
 
-    UserToDirectoryRelation getByDirectoryIdAndUserId(Long directoryId, Long userId);
+    UserToDirectoryRelation getByDirectoryAndUser(UserDirectory directory, User user);
 
     Long getDirectoriesCountByOwnerAndDirectoryIds(User owner, List<Long> idList);
 
     User getDirectoryOwner(UserDirectory directory);
+
+    List<FileRelationType> getAllRelationsByDirectoriesAndUser(List<UserDirectory> directories, User user);
 }

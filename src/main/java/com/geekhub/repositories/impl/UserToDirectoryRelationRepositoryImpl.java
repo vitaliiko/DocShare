@@ -109,11 +109,11 @@ public class UserToDirectoryRelationRepositoryImpl implements UserToDirectoryRel
     }
 
     @Override
-    public UserToDirectoryRelation getByDirectoryIdAndUserId(Long directoryId, Long userId) {
+    public UserToDirectoryRelation getByDirectoryAndUser(UserDirectory directory, User user) {
         return (UserToDirectoryRelation) sessionFactory.getCurrentSession()
-                .createQuery("FROM UserToDirectoryRelation rel WHERE rel.directory.id = :dirId AND rel.user.id = :userId")
-                .setParameter("dirId", directoryId)
-                .setParameter("userId", userId)
+                .createQuery("FROM UserToDirectoryRelation rel WHERE rel.directory = :dir AND rel.user = :user")
+                .setParameter("dir", directory)
+                .setParameter("user", user)
                 .uniqueResult();
     }
 
@@ -137,5 +137,15 @@ public class UserToDirectoryRelationRepositoryImpl implements UserToDirectoryRel
                 .add(Restrictions.eq("fileRelationType", FileRelationType.OWN))
                 .setProjection(Projections.property("user"))
                 .uniqueResult();
+    }
+
+    @Override
+    public List<FileRelationType> getAllRelationsByDirectoriesAndUser(List<UserDirectory> directories, User user) {
+        return sessionFactory.getCurrentSession()
+                .createQuery("SELECT rel.fileRelationType FROM UserToDirectoryRelation rel " +
+                             "WHERE rel.directory IN :dirs AND rel.user = :user")
+                .setParameter("user", user)
+                .setParameterList("dirs", directories)
+                .list();
     }
 }

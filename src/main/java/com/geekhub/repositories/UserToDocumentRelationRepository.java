@@ -25,7 +25,9 @@ public interface UserToDocumentRelationRepository extends EntityRepository<UserT
 
     UserDocument getDocumentByFullNameAndOwner(String parentDirHash, String docName, User owner);
 
-    UserToDocumentRelation getByDocumentIdAndUserId(Long documentId, Long userId);
+    UserToDocumentRelation getByDocumentAndUser(UserDocument document, User user);
 
     Long getCountByOwnerAndDocumentIds(User owner, List<Long> idList);
+
+    List<FileRelationType> getAllRelationsByDocumentsAndUser(List<UserDocument> documents, User user);
 }

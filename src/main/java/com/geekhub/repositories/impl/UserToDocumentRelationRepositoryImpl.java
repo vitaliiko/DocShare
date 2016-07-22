@@ -81,7 +81,8 @@ public class UserToDocumentRelationRepositoryImpl implements UserToDocumentRelat
     @Override
     public void deleteByDocumentBesidesOwner(UserDocument document) {
         sessionFactory.getCurrentSession()
-                .createQuery("DELETE UserToDocumentRelation r WHERE r.document = :document AND r.fileRelationType != :relation")
+                .createQuery("DELETE UserToDocumentRelation r " +
+                             "WHERE r.document = :document AND r.fileRelationType != :relation")
                 .setParameter("document", document)
                 .setParameter("relation", FileRelationType.OWN)
                 .executeUpdate();
@@ -165,11 +166,11 @@ public class UserToDocumentRelationRepositoryImpl implements UserToDocumentRelat
     }
 
     @Override
-    public UserToDocumentRelation getByDocumentIdAndUserId(Long documentId, Long userId) {
+    public UserToDocumentRelation getByDocumentAndUser(UserDocument document, User user) {
         return (UserToDocumentRelation) sessionFactory.getCurrentSession()
-                .createQuery("FROM UserToDocumentRelation rel WHERE rel.document.id = :docId AND rel.user.id = :userId")
-                .setParameter("docId", documentId)
-                .setParameter("userId", userId)
+                .createQuery("FROM UserToDocumentRelation rel WHERE rel.document = :doc AND rel.user = :user")
+                .setParameter("doc", document)
+                .setParameter("user", user)
                 .uniqueResult();
     }
 
@@ -183,5 +184,15 @@ public class UserToDocumentRelationRepositoryImpl implements UserToDocumentRelat
                 .add(Restrictions.in("doc.id", idList))
                 .setProjection(Projections.rowCount())
                 .uniqueResult();
+    }
+
+    @Override
+    public List<FileRelationType> getAllRelationsByDocumentsAndUser(List<UserDocument> documents, User user) {
+        return sessionFactory.getCurrentSession()
+                .createQuery("SELECT rel.fileRelationType FROM UserToDocumentRelation rel " +
+                             "WHERE rel.document IN :docs AND rel.user = :user")
+                .setParameter("user", user)
+                .setParameterList("docs", documents)
+                .list();
     }
 }

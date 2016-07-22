@@ -3,6 +3,7 @@ package com.geekhub.interceptors;
 import com.geekhub.entities.User;
 import com.geekhub.entities.UserDocument;
 import com.geekhub.interceptors.utils.InterceptorUtil;
+import com.geekhub.security.AccessPredicates;
 import com.geekhub.security.FileAccessService;
 import com.geekhub.services.UserDocumentService;
 import com.geekhub.services.UserService;
@@ -32,36 +33,30 @@ public class DocumentAccessInterceptor extends AccessInterceptor<UserDocument> {
 
     @PostConstruct
     public void init() {
-        addPredicate("/api/documents/*", FileAccessService.DOCUMENT_READER);
-        addPredicate("/api/documents/*/share", FileAccessService.DOCUMENT_OWNER);
-        addPredicate("/api/documents/*/access", FileAccessService.DOCUMENT_OWNER);
-        addPredicate("/api/documents/*/rename", FileAccessService.DOCUMENT_OWNER);
-        addPredicate("/api/documents/*/history", FileAccessService.DOCUMENT_OWNER);
-        addPredicate("/api/documents/*/download", FileAccessService.DOCUMENT_READER);
-        addPredicate("/api/documents/*/recover", FileAccessService.REMOVED_DOCUMENT_OWNER);
-        addPredicate("/api/documents/*/comment-ability", FileAccessService.DOCUMENT_OWNER);
-        addPredicate("/api/documents/*/versions/*/recover", FileAccessService.DOCUMENT_OWNER);
-        addPredicate("/api/documents/*/versions/*/download", FileAccessService.DOCUMENT_OWNER);
+        addPredicate("/api/documents/*", AccessPredicates.DOCUMENT_READER);
+        addPredicate("/api/documents/*/share", AccessPredicates.DOCUMENT_OWNER);
+        addPredicate("/api/documents/*/access", AccessPredicates.DOCUMENT_OWNER);
+        addPredicate("/api/documents/*/rename", AccessPredicates.DOCUMENT_OWNER);
+        addPredicate("/api/documents/*/history", AccessPredicates.DOCUMENT_OWNER);
+        addPredicate("/api/documents/*/download", AccessPredicates.DOCUMENT_READER);
+        addPredicate("/api/documents/*/recover", AccessPredicates.REMOVED_DOCUMENT_OWNER);
+        addPredicate("/api/documents/*/comment-ability", AccessPredicates.DOCUMENT_OWNER);
+        addPredicate("/api/documents/*/versions/*/recover", AccessPredicates.DOCUMENT_OWNER);
+        addPredicate("/api/documents/*/versions/*/download", AccessPredicates.DOCUMENT_OWNER);
     }
 
     @Override
     public boolean preHandle(HttpServletRequest req, HttpServletResponse resp, Object handler) throws Exception {
         Long userId = (Long) req.getSession().getAttribute("userId");
         Map<String, String> pathVariables = (Map) req.getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);
-        if (userId == null || CollectionUtils.isEmpty(pathVariables)) {
-            resp.setStatus(HttpStatus.BAD_REQUEST.value());
-            return false;
+        if (userId != null && !CollectionUtils.isEmpty(pathVariables)) {
+            String docId = pathVariables.get("docId");
+            String url = InterceptorUtil.removeVariablesFromURI(req, pathVariables);
+            if (docId != null && permitAccess(Long.valueOf(docId), userId, url)) {
+                return true;
+            }
         }
-        if (pathVariables.get("docId") == null) {
-            resp.setStatus(HttpStatus.BAD_REQUEST.value());
-            return false;
-        }
-        String url = InterceptorUtil.removeVariablesFromURI(req, pathVariables);
-        String docId = pathVariables.get("docId");
-        if (permitAccess(Long.valueOf(docId), userId, url)) {
-            return true;
-        }
-        resp.setStatus(HttpStatus.FORBIDDEN.value());
+        resp.setStatus(HttpStatus.BAD_REQUEST.value());
         return false;
     }
 
