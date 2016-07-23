@@ -73,8 +73,8 @@ public class UserToDirectoryRelationServiceImpl implements UserToDirectoryRelati
     }
 
     @Override
-    public void deleteByDirectoryBesidesOwner(UserDirectory directory) {
-        repository.deleteByDirectoryBesidesOwner(directory);
+    public void deleteAllBesidesOwnerByDirectory(UserDirectory directory) {
+        repository.deleteAllBesidesOwnerByDirectory(directory);
     }
 
     @Override

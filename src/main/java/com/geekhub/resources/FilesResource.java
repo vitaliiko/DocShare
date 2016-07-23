@@ -89,10 +89,18 @@ public class FilesResource {
 
         User user = getUserFromSession(session);
         if (docIds != null) {
-            userDocumentService.replace(docIds, destinationDirHash, user);
+            Set<UserDocument> documents = userDocumentService.getByIds(Arrays.asList(docIds));
+            if (documents.stream().anyMatch(d -> d.getParentDirectoryHash().equals(destinationDirHash))) {
+                return ResponseEntity.badRequest().build();
+            }
+            userDocumentService.replace(documents, destinationDirHash, user);
         }
         if (dirIds != null) {
-            userDirectoryService.replace(dirIds, destinationDirHash, user);
+            Set<UserDirectory> directories = userDirectoryService.getByIds(Arrays.asList(dirIds));
+            if (directories.stream().anyMatch(d -> d.getParentDirectoryHash().equals(destinationDirHash))) {
+                return ResponseEntity.badRequest().build();
+            }
+            userDirectoryService.replace(directories, destinationDirHash, user);
         }
         return ResponseEntity.ok().build();
     }

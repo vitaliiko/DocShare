@@ -9,7 +9,7 @@ import java.util.List;
 
 public interface UserToDirectoryRelationRepository extends EntityRepository<UserToDirectoryRelation, Long> {
 
-    void deleteByDirectoryBesidesOwner(UserDirectory directory);
+    void deleteAllBesidesOwnerByDirectory(UserDirectory directory);
 
     List<UserDirectory> getAllAccessibleDirectories(User user);
 

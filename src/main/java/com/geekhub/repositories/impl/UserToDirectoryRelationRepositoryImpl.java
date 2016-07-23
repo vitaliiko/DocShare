@@ -79,7 +79,7 @@ public class UserToDirectoryRelationRepositoryImpl implements UserToDirectoryRel
     }
 
     @Override
-    public void deleteByDirectoryBesidesOwner(UserDirectory directory) {
+    public void deleteAllBesidesOwnerByDirectory(UserDirectory directory) {
         sessionFactory.getCurrentSession()
                 .createQuery("DELETE UserToDirectoryRelation r " +
                              "WHERE r.directory = :directory AND r.fileRelationType != :relation")

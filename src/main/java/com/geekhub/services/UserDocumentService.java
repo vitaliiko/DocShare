@@ -25,7 +25,7 @@ public interface UserDocumentService extends EntityService<UserDocument, Long> {
 
     void moveToTrash(Long[] docIds, Long removerId);
 
-    void replace(Long[] docIds, String destinationDirectoryHash, User user);
+    void replace(Set<UserDocument> documents, String destinationDirectoryHash, User user);
 
     void copy(Long docId, String destinationDirectoryHash);
 

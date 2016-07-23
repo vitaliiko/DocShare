@@ -16,7 +16,7 @@ public interface UserToDirectoryRelationService extends EntityService<UserToDire
 
     UserToDirectoryRelation create(UserDirectory directory, User user, FileRelationType relationType);
 
-    void deleteByDirectoryBesidesOwner(UserDirectory directory);
+    void deleteAllBesidesOwnerByDirectory(UserDirectory directory);
 
     List<UserToDirectoryRelation> getAllByDirectory(UserDirectory directory);
 

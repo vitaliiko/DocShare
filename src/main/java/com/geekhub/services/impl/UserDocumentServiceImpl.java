@@ -24,7 +24,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -222,8 +221,7 @@ public class UserDocumentServiceImpl implements UserDocumentService {
     }
 
     @Override
-    public void replace(Long[] docIds, String destinationDirectoryHash, User user) {
-        Set<UserDocument> documents = getByIds(Arrays.asList(docIds));
+    public void replace(Set<UserDocument> documents, String destinationDirectoryHash, User user) {
         UserDirectory destinationDir = null;
         if (destinationDirectoryHash.equals("root")) {
             destinationDirectoryHash = user.getLogin();
@@ -242,8 +240,10 @@ public class UserDocumentServiceImpl implements UserDocumentService {
         List<String> similarDocNames = getSimilarDocumentNamesInDirectory(destinationDirectoryHash, documents);
         documents.stream().filter(doc -> similarDocNames.contains(doc.getName())).forEach(doc -> {
             Pattern namePattern = Pattern.compile(doc.getNameWithoutExtension() + " \\((\\d+)\\)" + doc.getExtension());
-            int documentIndex = UserFileUtil.countDocumentIndex(similarDocNames, namePattern);
-            doc.setName(doc.getNameWithoutExtension() + " (" + documentIndex + ")" + doc.getExtension());
+            int documentIndex = UserFileUtil.countFileNameIndex(similarDocNames, namePattern);
+            String newDocName = doc.getNameWithoutExtension() + " (" + documentIndex + ")" + doc.getExtension();
+            doc.setName(newDocName);
+            similarDocNames.add(newDocName);
         });
         documents.forEach(d -> d.setParentDirectoryHash(destinationDirectoryHash));
         return documents;

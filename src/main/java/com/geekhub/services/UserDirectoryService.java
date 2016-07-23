@@ -5,7 +5,6 @@ import com.geekhub.dto.FileAccessDto;
 import com.geekhub.dto.SharedDto;
 import com.geekhub.entities.User;
 import com.geekhub.entities.UserDirectory;
-import com.geekhub.entities.UserDocument;
 import com.geekhub.entities.enums.DocumentAttribute;
 import java.util.List;
 import java.util.Set;
@@ -26,9 +25,7 @@ public interface UserDirectoryService extends EntityService<UserDirectory, Long>
 
     void moveToTrash(Long[] dirIds, Long removerId);
 
-    void replace(Long dirId, String destinationDirectoryHash);
-
-    boolean replace(Long[] dirIds, String destinationDirectoryHash, User user);
+    void replace(Set<UserDirectory> directories, String destinationDirectoryHash, User user);
 
     Long recover(Long removedDirId);
 
@@ -71,4 +68,6 @@ public interface UserDirectoryService extends EntityService<UserDirectory, Long>
     FileAccessDto findAllRelations(Long directoryId);
 
     boolean isDirectoryNameValid(String parentDirectoryHash, String dirName, User owner);
+
+    List<String> getSimilarDirectoryNamesInDirectory(String directoryHash, Set<UserDirectory> directories);
 }

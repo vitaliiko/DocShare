@@ -28,4 +28,6 @@ public interface UserDirectoryRepository extends EntityRepository<UserDirectory,
     List<UserDirectory> search(User owner, String propertyName, String value);
 
     void updateDocumentAttribute(DocumentAttribute attribute, List<Long> directoryIds);
+
+    List<String> getSimilarDirectoryNamesInDirectory(String directoryHash, String pattern);
 }

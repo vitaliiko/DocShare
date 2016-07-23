@@ -163,4 +163,13 @@ public class UserDirectoryRepositoryImpl implements UserDirectoryRepository {
                 .setParameterList("ids", directoryIds)
                 .executeUpdate();
     }
+
+    @Override
+    public List<String> getSimilarDirectoryNamesInDirectory(String directoryHash, String pattern) {
+        String sql = "SELECT d.name FROM user_directory d WHERE d.parentDirectoryHash = ? AND d.name REGEXP " + pattern;
+        return sessionFactory.getCurrentSession()
+                .createSQLQuery(sql)
+                .setParameter(0, directoryHash)
+                .list();
+    }
 }

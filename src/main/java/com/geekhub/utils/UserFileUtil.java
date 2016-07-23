@@ -195,7 +195,7 @@ public class UserFileUtil {
         }
     }
 
-    public static int countDocumentIndex(List<String> similarDocNames, Pattern namePattern) {
+    public static int countFileNameIndex(List<String> similarDocNames, Pattern namePattern) {
         List<Integer> indexes = new ArrayList<>();
         for (String name : similarDocNames) {
             Matcher match = namePattern.matcher(name);
@@ -215,7 +215,8 @@ public class UserFileUtil {
         StringBuilder pattern = new StringBuilder("'");
         Iterator<String> iterator = documentNames.iterator();
         while (iterator.hasNext()) {
-            pattern.append(iterator.next());
+            String name = iterator.next();
+            pattern.append(name).append("|").append(name);
             if (iterator.hasNext()) {
                 pattern.append(".|");
             } else {

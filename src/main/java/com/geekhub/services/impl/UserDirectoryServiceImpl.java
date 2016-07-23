@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import javax.inject.Inject;
 import org.springframework.stereotype.Service;
@@ -259,30 +260,38 @@ public class UserDirectoryServiceImpl implements UserDirectoryService {
     }
 
     @Override
-    public void replace(Long dirId, String destinationDirectoryHash) {
-        UserDirectory directory = repository.getById(dirId);
-        String dirName = directory.getName();
-        String dirLocation = getLocation(directory) + dirName;
-        String destinationDirLocation = getDestinationDirectoryLocation(directory, destinationDirectoryHash);
-
-        if (!destinationDirLocation.startsWith(dirLocation)) {
-//            if (getByFullNameAndOwner(directory.getOwner(), destinationDirectoryHash, dirName) != null) {
-//                int matchesCount = repository.getLike(destinationDirectoryHash, dirName).size();
-//                directory.setName(dirName + " (" + (matchesCount + 1) + ")");
-//            }
-            directory.setParentDirectoryHash(destinationDirectoryHash);
-            repository.update(directory);
+    public void replace(Set<UserDirectory> directories, String destinationDirectoryHash, User user) {
+        if (destinationDirectoryHash.equals("root")) {
+            destinationDirectoryHash = user.getLogin();
+        }
+        directories = setDirectoriesFullNames(destinationDirectoryHash, directories);
+        for (UserDirectory dir : directories) {
+            update(dir);
+            userToDirectoryRelationService.deleteAllBesidesOwnerByDirectory(dir);
+            createRelations(dir, destinationDirectoryHash, user);
         }
     }
 
+    private Set<UserDirectory> setDirectoriesFullNames(String destinationDirectoryHash, Set<UserDirectory> directories) {
+        List<String> similarDocNames = getSimilarDirectoryNamesInDirectory(destinationDirectoryHash, directories);
+        directories.stream().filter(dir -> similarDocNames.contains(dir.getName())).forEach(dir -> {
+            Pattern namePattern = Pattern.compile(dir.getName() + " \\((\\d+)\\)");
+            int documentIndex = UserFileUtil.countFileNameIndex(similarDocNames, namePattern);
+            String newDirName = dir.getName() + " (" + documentIndex + ")";
+            dir.setName(newDirName);
+            similarDocNames.add(newDirName);
+        });
+        directories.forEach(d -> d.setParentDirectoryHash(destinationDirectoryHash));
+        return directories;
+    }
+
     @Override
-    public boolean replace(Long[] dirIds, String destinationDirectoryHash, User user) {
-        Set<UserDirectory> directories = getByIds(Arrays.asList(dirIds));
-        if (userDirectoryAccessService.isOwner(directories, user)) {
-            Arrays.stream(dirIds).forEach(id -> replace(id, destinationDirectoryHash));
-            return true;
-        }
-        return false;
+    public List<String> getSimilarDirectoryNamesInDirectory(String directoryHash, Set<UserDirectory> directories) {
+        List<String> documentNames = directories.stream()
+                .map(UserDirectory::getName)
+                .collect(Collectors.toList());
+        String pattern = UserFileUtil.createNamesPattern(documentNames);
+        return repository.getSimilarDirectoryNamesInDirectory(directoryHash, pattern);
     }
 
     @Override
@@ -331,7 +340,7 @@ public class UserDirectoryServiceImpl implements UserDirectoryService {
     }
 
     private void createRelations(UserDirectory directory, SharedDto sharedDto) {
-        userToDirectoryRelationService.deleteByDirectoryBesidesOwner(directory);
+        userToDirectoryRelationService.deleteAllBesidesOwnerByDirectory(directory);
         if (!CollectionUtils.isEmpty(sharedDto.getReaders())) {
             List<User> readers = userService.getByIds(sharedDto.getReaders());
             userToDirectoryRelationService.create(directory, readers, FileRelationType.READ);
