@@ -27,9 +27,7 @@ public interface UserDocumentService extends EntityService<UserDocument, Long> {
 
     void replace(Set<UserDocument> documents, String destinationDirectoryHash, User user);
 
-    void copy(Long docId, String destinationDirectoryHash);
-
-    boolean copy(Long[] docIds, String destinationDirectoryHash, User user);
+    void copy(Long[] docIds, String destinationDirectoryHash, User user);
 
     UserDocument getByHashName(String hashName);
 

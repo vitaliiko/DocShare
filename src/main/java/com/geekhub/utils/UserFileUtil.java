@@ -155,8 +155,7 @@ public class UserFileUtil {
 
     public static UserDocument copyDocument(UserDocument original) {
         String[] ignoredProperties = new String[] {
-                "id", "parentDirectoryHash", "hashName", "comments", "readers",
-                "readersGroups", "editors", "editorsGroups", "documentOldVersions"
+                "id", "hashName", "comments", "documentOldVersions"
         };
         UserDocument copy = new UserDocument();
         BeanUtils.copyProperties(original, copy, ignoredProperties);
@@ -223,6 +222,8 @@ public class UserFileUtil {
                 pattern.append(".'");
             }
         }
-        return pattern.toString();
+        String patternInString = pattern.toString().replace("(", "\\\\(");
+        patternInString = patternInString.replace(")", "\\\\)");
+        return patternInString;
     }
 }

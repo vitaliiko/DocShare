@@ -261,11 +261,15 @@ public class UserDirectoryServiceImpl implements UserDirectoryService {
 
     @Override
     public void replace(Set<UserDirectory> directories, String destinationDirectoryHash, User user) {
+        UserDirectory destinationDir = null;
         if (destinationDirectoryHash.equals("root")) {
             destinationDirectoryHash = user.getLogin();
+        } else {
+            destinationDir = getByHashName(destinationDirectoryHash);
         }
         directories = setDirectoriesFullNames(destinationDirectoryHash, directories);
         for (UserDirectory dir : directories) {
+            dir.setDocumentAttribute(destinationDir == null ? DocumentAttribute.PRIVATE : destinationDir.getDocumentAttribute());
             update(dir);
             userToDirectoryRelationService.deleteAllBesidesOwnerByDirectory(dir);
             createRelations(dir, destinationDirectoryHash, user);
@@ -445,7 +449,7 @@ public class UserDirectoryServiceImpl implements UserDirectoryService {
             repository.save(copy);
 
             List<Object> docIds = userDocumentService.getActualIdsByParentDirectoryHash(directory.getHashName());
-            docIds.forEach(id -> userDocumentService.copy((Long) id, copy.getHashName()));
+//            docIds.forEach(id -> userDocumentService.copy((Long) id, copy.getHashName()));
 
             List<Object> dirIds = getActualIdsByParentDirectoryHash(directory.getHashName());
             dirIds.forEach(id -> copy((Long) id, copy.getHashName()));

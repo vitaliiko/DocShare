@@ -230,6 +230,8 @@ public class UserDocumentServiceImpl implements UserDocumentService {
         }
         documents = setDocumentFullNames(destinationDirectoryHash, documents);
         for (UserDocument doc : documents) {
+            doc.setDocumentAttribute(destinationDir == null ? DocumentAttribute.PRIVATE
+                    : destinationDir.getDocumentAttribute());
             update(doc);
             userToDocumentRelationService.deleteAllBesidesOwnerByDocument(doc);
             createRelations(doc, destinationDir);
@@ -250,48 +252,29 @@ public class UserDocumentServiceImpl implements UserDocumentService {
     }
 
     @Override
-    public void copy(Long docId, String destinationDirectoryHash) {
-        UserDocument document = repository.getById(docId);
-        UserDocument copy = UserFileUtil.copyDocument(document);
+    public void copy(Long[] docIds, String destinationDirectoryHash, User user) {
+        Set<UserDocument> documents = getByIds(Arrays.asList(docIds));
         UserDirectory destinationDir = null;
-
-//        if (!document.getOwner().getLogin().equals(destinationDirectoryHash)) {
-//            destinationDir = userDirectoryService.getByHashName(destinationDirectoryHash);
-//            if (destinationDir == null) {
-//                return;
-//            }
-//        }
-        String copyName = document.getName();
-
-//        if (getByFullNameAndOwner(document.getOwner(), destinationDirectoryHash, copyName) != null) {
-//            String copyNameWithoutExtension = copyName.substring(0, copyName.lastIndexOf("."));
-//            int matchesCount = repository.getLike(destinationDirectoryHash, copyNameWithoutExtension).size();
-//            copy.setName(copyNameWithoutExtension + " (" + (matchesCount + 1) + ")" + document.getExtension());
-//        }
-        copy.setParentDirectoryHash(destinationDirectoryHash);
-        copy.setHashName(UserFileUtil.createHashName());
-
-        if (destinationDir != null) {
-            copy.setDocumentAttribute(destinationDir.getDocumentAttribute());
-
-//            destinationDir.getReaders().forEach(copy.getReaders()::add);
-//            destinationDir.getReadersGroups().forEach(copy.getReadersGroups()::add);
+        if (destinationDirectoryHash.equals("root")) {
+            destinationDirectoryHash = user.getLogin();
         } else {
-            copy.setDocumentAttribute(DocumentAttribute.PRIVATE);
+            destinationDir = userDirectoryService.getByHashName(destinationDirectoryHash);
         }
-
-        UserFileUtil.copyFile(document.getHashName(), copy.getHashName());
-        repository.save(copy);
+        documents = setDocumentFullNames(destinationDirectoryHash, documents);
+        for (UserDocument doc : documents) {
+            createCopy(user, destinationDir, doc);
+        }
     }
 
-    @Override
-    public boolean copy(Long[] docIds, String destinationDirectoryHash, User user) {
-        Set<UserDocument> documents = getByIds(Arrays.asList(docIds));
-        if (userDocumentAccessService.isOwner(documents, user)) {
-            Arrays.stream(docIds).forEach(id -> copy(id, destinationDirectoryHash));
-            return true;
-        }
-        return false;
+    private void createCopy(User user, UserDirectory destinationDir, UserDocument doc) {
+        UserDocument copiedDoc = UserFileUtil.copyDocument(doc);
+        copiedDoc.setDocumentAttribute(destinationDir == null ? DocumentAttribute.PRIVATE
+                : destinationDir.getDocumentAttribute());
+        copiedDoc.setHashName(UserFileUtil.createHashName());
+        UserFileUtil.copyFile(doc.getHashName(), copiedDoc.getHashName());
+        save(copiedDoc);
+        createRelations(copiedDoc, destinationDir);
+        userToDocumentRelationService.create(copiedDoc, user, FileRelationType.OWN);
     }
 
     @Override
