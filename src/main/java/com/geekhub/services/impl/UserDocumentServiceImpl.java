@@ -24,6 +24,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @Service
@@ -228,43 +230,24 @@ public class UserDocumentServiceImpl implements UserDocumentService {
         } else {
             destinationDir = userDirectoryService.getByHashName(destinationDirectoryHash);
         }
-        List<String> docNames = documents.stream().map(UserDocument::getName).collect(Collectors.toList());
-        List<String> similarDocNames = getSimilarDocumentNamesInDirectory(destinationDirectoryHash, docNames);
-        similarDocNames.size();
-
-
-//        String docName = document.getName();
-//
-//        if (!document.getParentDirectoryHash().equals(destinationDirectoryHash)) {
-//            if (getByFullNameAndOwner(document.getOwner(), destinationDirectoryHash, docName) != null) {
-//                String docNameWithoutExtension = docName.substring(0, docName.lastIndexOf("."));
-//                int matchesCount = repository.getLike(destinationDirectoryHash, docNameWithoutExtension).size();
-//                document.setName(docNameWithoutExtension + " (" + (matchesCount + 1) + ")" + document.getExtension());
-//            }
-//            document.setParentDirectoryHash(destinationDirectoryHash);
-//            if (destinationDir != null) {
-//                document.setDocumentAttribute(destinationDir.getDocumentAttribute());
-//
-//                document.getReaders().clear();
-//                document.getReadersGroups().clear();
-//
-//                destinationDir.getReaders().forEach(document.getReaders()::add);
-//                destinationDir.getReadersGroups().forEach(document.getReadersGroups()::add);
-//            } else {
-//                document.setDocumentAttribute(DocumentAttribute.PRIVATE);
-//            }
-//
-//            repository.update(document);
-//        }
+        documents = setDocumentFullNames(destinationDirectoryHash, documents);
+        for (UserDocument doc : documents) {
+            update(doc);
+            userToDocumentRelationService.deleteAllBesidesOwnerByDocument(doc);
+            createRelations(doc, destinationDir);
+        }
     }
 
-//    private String generateNewName(String parentDirHash, String oldName) {
-//        String extension = oldName.substring(oldName.lastIndexOf("."));
-//        String docNameWithoutExtension = oldName.replace(extension, "");
-//        int matchesCount = repository.getLike(parentDirHash, docNameWithoutExtension).size();
-//        return docNameWithoutExtension + " (" + (matchesCount) + ")" + document.getExtension();
-//    }
-
+    private Set<UserDocument> setDocumentFullNames(String destinationDirectoryHash, Set<UserDocument> documents) {
+        List<String> similarDocNames = getSimilarDocumentNamesInDirectory(destinationDirectoryHash, documents);
+        documents.stream().filter(doc -> similarDocNames.contains(doc.getName())).forEach(doc -> {
+            Pattern namePattern = Pattern.compile(doc.getNameWithoutExtension() + " \\((\\d+)\\)" + doc.getExtension());
+            int documentIndex = UserFileUtil.countDocumentIndex(similarDocNames, namePattern);
+            doc.setName(doc.getNameWithoutExtension() + " (" + documentIndex + ")" + doc.getExtension());
+        });
+        documents.forEach(d -> d.setParentDirectoryHash(destinationDirectoryHash));
+        return documents;
+    }
 
     @Override
     public void copy(Long docId, String destinationDirectoryHash) {
@@ -352,14 +335,17 @@ public class UserDocumentServiceImpl implements UserDocumentService {
         multipartFile.transferTo(UserFileUtil.createFile(document.getHashName()));
         Long docId = save(document);
         document.setId(docId);
-        createRelations(document, parentDirectory, user);
+        createRelations(document, parentDirectory);
+        userToDocumentRelationService.create(document, user, FileRelationType.OWN);
         return document;
     }
 
-    private void createRelations(UserDocument document, UserDirectory parentDirectory, User owner) {
+    private void createRelations(UserDocument document, UserDirectory parentDirectory) {
         if (parentDirectory != null) {
             List<UserToDirectoryRelation> userRelations =
-                    userToDirectoryRelationService.getAllByDirectory(parentDirectory);
+                    userToDirectoryRelationService.getAllByDirectory(parentDirectory).stream()
+                            .filter(r -> r.getFileRelationType() != FileRelationType.OWN)
+                            .collect(Collectors.toList());
             List<FriendGroupToDirectoryRelation> friendGroupRelations =
                     friendGroupToDirectoryRelationService.getAllByDirectory(parentDirectory);
 
@@ -368,8 +354,6 @@ public class UserDocumentServiceImpl implements UserDocumentService {
 
             friendGroupRelations.forEach(r -> friendGroupToDocumentRelationService
                     .create(document, r.getFriendsGroup(), r.getFileRelationType()));
-        } else {
-            userToDocumentRelationService.create(document, owner, FileRelationType.OWN);
         }
     }
 
@@ -430,7 +414,7 @@ public class UserDocumentServiceImpl implements UserDocumentService {
     }
 
     private void createRelations(UserDocument document, SharedDto shared) {
-        userToDocumentRelationService.deleteByDocumentBesidesOwner(document);
+        userToDocumentRelationService.deleteAllBesidesOwnerByDocument(document);
         if (!CollectionUtils.isEmpty(shared.getEditors())) {
             List<User> editors = userService.getByIds(shared.getEditors());
             userToDocumentRelationService.create(document, editors, FileRelationType.EDIT);
@@ -531,21 +515,12 @@ public class UserDocumentServiceImpl implements UserDocumentService {
     }
 
     @Override
-    public List<String> getSimilarDocumentNamesInDirectory(String directoryHash, List<String> documentNames) {
-        documentNames.stream().map(n -> n.substring(0, n.lastIndexOf(".")) + ".").collect(Collectors.toList());
-
-        StringBuilder pattern = new StringBuilder("'");
-        Iterator<String> iterator = documentNames.iterator();
-        while (iterator.hasNext()) {
-            String docName = iterator.next();
-            pattern.append(docName.substring(0, docName.lastIndexOf("."))).append(".");
-            if (iterator.hasNext()) {
-                pattern.append("|");
-            } else {
-                pattern.append("'");
-            }
-        }
-        return repository.getSimilarDocumentNamesInDirectory(directoryHash, pattern.toString());
+    public List<String> getSimilarDocumentNamesInDirectory(String directoryHash, Set<UserDocument> documents) {
+        List<String> documentNames = documents.stream()
+                .map(UserDocument::getNameWithoutExtension)
+                .collect(Collectors.toList());
+        String pattern = UserFileUtil.createNamesPattern(documentNames);
+        return repository.getSimilarDocumentNamesInDirectory(directoryHash, pattern);
     }
 
     @Override

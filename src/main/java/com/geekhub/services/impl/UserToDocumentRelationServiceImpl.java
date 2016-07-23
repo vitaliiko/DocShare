@@ -72,8 +72,8 @@ public class UserToDocumentRelationServiceImpl implements UserToDocumentRelation
     }
 
     @Override
-    public void deleteByDocumentBesidesOwner(UserDocument document) {
-        repository.deleteByDocumentBesidesOwner(document);
+    public void deleteAllBesidesOwnerByDocument(UserDocument document) {
+        repository.deleteAllBesidesOwnerByDocument(document);
     }
 
     @Override

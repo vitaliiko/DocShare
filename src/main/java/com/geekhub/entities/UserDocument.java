@@ -86,6 +86,10 @@ public class UserDocument implements Comparable<UserDocument>, Serializable {
         this.extension = name.substring(name.lastIndexOf("."));
     }
 
+    public String getNameWithoutExtension() {
+        return name.replace(extension, "");
+    }
+
     @Override
     public int compareTo(UserDocument o) {
         return this.getName().compareTo(o.getName());

@@ -16,7 +16,7 @@ public interface UserToDocumentRelationService extends EntityService<UserToDocum
 
     UserToDocumentRelation create(UserDocument document, User user, FileRelationType relationType);
 
-    void deleteByDocumentBesidesOwner(UserDocument document);
+    void deleteAllBesidesOwnerByDocument(UserDocument document);
 
     List<UserToDocumentRelation> getAllByDocument(UserDocument document);
 

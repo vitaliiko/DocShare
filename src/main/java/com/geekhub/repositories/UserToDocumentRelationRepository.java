@@ -9,7 +9,7 @@ import java.util.List;
 
 public interface UserToDocumentRelationRepository extends EntityRepository<UserToDocumentRelation, Long> {
 
-    void deleteByDocumentBesidesOwner(UserDocument document);
+    void deleteAllBesidesOwnerByDocument(UserDocument document);
 
     List<String> getAllDocumentHashNamesByOwner(User owner);
 

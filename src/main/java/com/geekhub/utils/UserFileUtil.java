@@ -7,12 +7,8 @@ import com.geekhub.entities.UserDirectory;
 import com.geekhub.entities.UserDocument;
 import com.geekhub.entities.enums.DocumentAttribute;
 import java.io.File;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.beans.BeanUtils;
@@ -197,5 +193,35 @@ public class UserFileUtil {
         if (!file.exists()) {
             file.mkdir();
         }
+    }
+
+    public static int countDocumentIndex(List<String> similarDocNames, Pattern namePattern) {
+        List<Integer> indexes = new ArrayList<>();
+        for (String name : similarDocNames) {
+            Matcher match = namePattern.matcher(name);
+            while (match.find()) {
+                indexes.add(Integer.valueOf(match.group(1)));
+            }
+        }
+        for (int i = 1; i <= indexes.size(); i++) {
+            if (!indexes.contains(i)) {
+                return i;
+            }
+        }
+        return indexes.size() + 1;
+    }
+
+    public static String createNamesPattern(List<String> documentNames) {
+        StringBuilder pattern = new StringBuilder("'");
+        Iterator<String> iterator = documentNames.iterator();
+        while (iterator.hasNext()) {
+            pattern.append(iterator.next());
+            if (iterator.hasNext()) {
+                pattern.append(".|");
+            } else {
+                pattern.append(".'");
+            }
+        }
+        return pattern.toString();
     }
 }

@@ -79,7 +79,7 @@ public class UserToDocumentRelationRepositoryImpl implements UserToDocumentRelat
     }
 
     @Override
-    public void deleteByDocumentBesidesOwner(UserDocument document) {
+    public void deleteAllBesidesOwnerByDocument(UserDocument document) {
         sessionFactory.getCurrentSession()
                 .createQuery("DELETE UserToDocumentRelation r " +
                              "WHERE r.document = :document AND r.fileRelationType != :relation")

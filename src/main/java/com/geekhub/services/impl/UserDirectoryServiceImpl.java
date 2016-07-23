@@ -206,15 +206,18 @@ public class UserDirectoryServiceImpl implements UserDirectoryService {
         long dirId = save(directory);
         directory.setId(dirId);
 
-        createRelations(owner, parentDirHash, directory);
+        createRelations(directory, parentDirHash, owner);
+        userToDirectoryRelationService.create(directory, owner, FileRelationType.OWN);
         return directory;
     }
 
-    private void createRelations(User owner, String parentDirHash, UserDirectory directory) {
+    private void createRelations(UserDirectory directory, String parentDirHash, User owner) {
         if (!parentDirHash.equals("root") && !parentDirHash.equals(owner.getLogin())) {
             UserDirectory parentDirectory = getByHashName(parentDirHash);
             List<UserToDirectoryRelation> userRelations =
-                    userToDirectoryRelationService.getAllByDirectory(parentDirectory);
+                    userToDirectoryRelationService.getAllByDirectory(parentDirectory).stream()
+                            .filter(r -> r.getFileRelationType() != FileRelationType.OWN)
+                            .collect(Collectors.toList());
             List<FriendGroupToDirectoryRelation> friendGroupRelations =
                     friendGroupToDirectoryRelationService.getAllByDirectory(parentDirectory);
 
@@ -222,8 +225,6 @@ public class UserDirectoryServiceImpl implements UserDirectoryService {
                     .create(directory, r.getFriendsGroup(), r.getFileRelationType()));
             userRelations.forEach(r -> userToDirectoryRelationService
                     .create(directory, r.getUser(), r.getFileRelationType()));
-        } else {
-            userToDirectoryRelationService.create(directory, owner, FileRelationType.OWN);
         }
     }
 
