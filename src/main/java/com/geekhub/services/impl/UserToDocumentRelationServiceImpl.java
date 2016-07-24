@@ -58,6 +58,9 @@ public class UserToDocumentRelationServiceImpl implements UserToDocumentRelation
 
     @Override
     public List<UserToDocumentRelation> create(UserDocument document, List<User> users, FileRelationType relationType) {
+        if (CollectionUtils.isEmpty(users)) {
+            return new ArrayList<>();
+        }
         return users.stream().map(u -> create(document, u, relationType)).collect(Collectors.toList());
     }
 

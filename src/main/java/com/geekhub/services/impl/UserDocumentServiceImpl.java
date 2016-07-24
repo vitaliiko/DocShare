@@ -26,6 +26,7 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 @Transactional
@@ -444,24 +445,28 @@ public class UserDocumentServiceImpl implements UserDocumentService {
 
     private void createRelations(UserDocument document, SharedDto shared) {
         userToDocumentRelationService.deleteAllBesidesOwnerByDocument(document);
-        if (!CollectionUtils.isEmpty(shared.getEditors())) {
-            List<User> editors = userService.getByIds(shared.getEditors());
-            userToDocumentRelationService.create(document, editors, FileRelationType.EDIT);
-        }
-        if (!CollectionUtils.isEmpty(shared.getReaders())) {
-            List<User> readers = userService.getByIds(shared.getReaders());
-            userToDocumentRelationService.create(document, readers, FileRelationType.READ);
-        }
+        List<User> users = userService.getByIds(unionLists(shared.getReaders(), shared.getEditors()));
+
+        List<User> editors = users.stream()
+                .filter(u -> shared.getEditors().contains(u.getId())).collect(Collectors.toList());
+        userToDocumentRelationService.create(document, editors, FileRelationType.EDIT);
+
+        List<User> readers = users.stream()
+                .filter(u -> shared.getReaders().contains(u.getId())).collect(Collectors.toList());
+        userToDocumentRelationService.create(document, readers, FileRelationType.READ);
 
         friendGroupToDocumentRelationService.deleteAllByDocument(document);
-        if (!CollectionUtils.isEmpty(shared.getEditorGroups())) {
-            List<FriendsGroup> editorGroups = friendGroupService.getByIds(shared.getEditorGroups());
-            friendGroupToDocumentRelationService.create(document, editorGroups, FileRelationType.EDIT);
-        }
-        if (!CollectionUtils.isEmpty(shared.getReaderGroups())) {
-            List<FriendsGroup> readerGroups = friendGroupService.getByIds(shared.getReaderGroups());
-            friendGroupToDocumentRelationService.create(document, readerGroups, FileRelationType.READ);
-        }
+        List<FriendsGroup> groups =
+                friendGroupService.getByIds(unionLists(shared.getReaderGroups(), shared.getEditorGroups()));
+
+        List<FriendsGroup> editorGroups = groups.stream()
+                .filter(g -> shared.getEditorGroups().contains(g.getId())).collect(Collectors.toList());
+        friendGroupToDocumentRelationService.create(document, editorGroups, FileRelationType.EDIT);
+
+        List<FriendsGroup> readerGroups = groups.stream()
+                .filter(g -> shared.getReaderGroups().contains(g.getId())).collect(Collectors.toList());
+        friendGroupToDocumentRelationService.create(document, readerGroups, FileRelationType.READ);
+
     }
 
     private void sendEvents(UserDocument document, SharedDto shared, User user, Set<User> oldReadersAndEditors) {
