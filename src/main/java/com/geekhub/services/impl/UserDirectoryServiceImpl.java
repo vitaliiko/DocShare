@@ -10,6 +10,7 @@ import com.geekhub.entities.enums.DocumentStatus;
 import com.geekhub.services.*;
 import com.geekhub.services.enams.FileType;
 import com.geekhub.utils.DirectoryWithRelations;
+import com.geekhub.utils.CollectionTools;
 import com.geekhub.utils.UserFileUtil;
 
 import java.util.*;
@@ -437,26 +438,29 @@ public class UserDirectoryServiceImpl implements UserDirectoryService {
         userDocumentService.shareDocuments(childDocuments, sharedDto);
     }
 
-    private void createRelations(UserDirectory directory, SharedDto sharedDto) {
+    private void createRelations(UserDirectory directory, SharedDto shared) {
         userToDirectoryRelationService.deleteAllBesidesOwnerByDirectory(directory);
-        if (!CollectionUtils.isEmpty(sharedDto.getReaders())) {
-            List<User> readers = userService.getByIds(sharedDto.getReaders());
-            userToDirectoryRelationService.create(directory, readers, FileRelationType.READ);
-        }
-        if (!CollectionUtils.isEmpty(sharedDto.getEditors())) {
-            List<User> editors = userService.getByIds(sharedDto.getEditors());
-            userToDirectoryRelationService.create(directory, editors, FileRelationType.EDIT);
-        }
+        List<User> users = userService.getByIds(CollectionTools.unionLists(shared.getReaders(), shared.getEditors()));
+
+        List<User> editors = users.stream()
+                .filter(u -> shared.getEditors().contains(u.getId())).collect(Collectors.toList());
+        userToDirectoryRelationService.create(directory, editors, FileRelationType.EDIT);
+
+        List<User> readers = users.stream()
+                .filter(u -> shared.getReaders().contains(u.getId())).collect(Collectors.toList());
+        userToDirectoryRelationService.create(directory, readers, FileRelationType.READ);
 
         friendGroupToDirectoryRelationService.deleteAllByDirectory(directory);
-        if (!CollectionUtils.isEmpty(sharedDto.getReaderGroups())) {
-            List<FriendsGroup> readerGroups = friendGroupService.getByIds(sharedDto.getReaderGroups());
-            friendGroupToDirectoryRelationService.create(directory, readerGroups, FileRelationType.READ);
-        }
-        if (!CollectionUtils.isEmpty(sharedDto.getEditorGroups())) {
-            List<FriendsGroup> editorGroups = friendGroupService.getByIds(sharedDto.getReaderGroups());
-            friendGroupToDirectoryRelationService.create(directory, editorGroups, FileRelationType.EDIT);
-        }
+        List<FriendsGroup> groups = friendGroupService
+                .getByIds(CollectionTools.unionLists(shared.getReaderGroups(), shared.getEditorGroups()));
+
+        List<FriendsGroup> editorGroups = groups.stream()
+                .filter(g -> shared.getEditorGroups().contains(g.getId())).collect(Collectors.toList());
+        friendGroupToDirectoryRelationService.create(directory, editorGroups, FileRelationType.EDIT);
+
+        List<FriendsGroup> readerGroups = groups.stream()
+                .filter(g -> shared.getReaderGroups().contains(g.getId())).collect(Collectors.toList());
+        friendGroupToDirectoryRelationService.create(directory, readerGroups, FileRelationType.READ);
     }
 
     private void sendEvents(UserDirectory directory, User user, Set<User> currentReadersAndEditors) {

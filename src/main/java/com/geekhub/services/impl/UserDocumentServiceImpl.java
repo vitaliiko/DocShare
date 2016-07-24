@@ -13,6 +13,7 @@ import com.geekhub.services.*;
 import com.geekhub.services.enams.FileType;
 import com.geekhub.utils.DirectoryWithRelations;
 import com.geekhub.utils.DocumentVersionUtil;
+import com.geekhub.utils.CollectionTools;
 import com.geekhub.utils.UserFileUtil;
 
 import java.io.IOException;
@@ -26,7 +27,6 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Service
 @Transactional
@@ -445,7 +445,7 @@ public class UserDocumentServiceImpl implements UserDocumentService {
 
     private void createRelations(UserDocument document, SharedDto shared) {
         userToDocumentRelationService.deleteAllBesidesOwnerByDocument(document);
-        List<User> users = userService.getByIds(unionLists(shared.getReaders(), shared.getEditors()));
+        List<User> users = userService.getByIds(CollectionTools.unionLists(shared.getReaders(), shared.getEditors()));
 
         List<User> editors = users.stream()
                 .filter(u -> shared.getEditors().contains(u.getId())).collect(Collectors.toList());
@@ -456,8 +456,8 @@ public class UserDocumentServiceImpl implements UserDocumentService {
         userToDocumentRelationService.create(document, readers, FileRelationType.READ);
 
         friendGroupToDocumentRelationService.deleteAllByDocument(document);
-        List<FriendsGroup> groups =
-                friendGroupService.getByIds(unionLists(shared.getReaderGroups(), shared.getEditorGroups()));
+        List<FriendsGroup> groups = friendGroupService
+                .getByIds(CollectionTools.unionLists(shared.getReaderGroups(), shared.getEditorGroups()));
 
         List<FriendsGroup> editorGroups = groups.stream()
                 .filter(g -> shared.getEditorGroups().contains(g.getId())).collect(Collectors.toList());
@@ -472,9 +472,9 @@ public class UserDocumentServiceImpl implements UserDocumentService {
     private void sendEvents(UserDocument document, SharedDto shared, User user, Set<User> oldReadersAndEditors) {
         List<User> currentReadersAndEditorsList = new ArrayList<>();
 
-        List<Long> groupIdList = unionLists(shared.getEditorGroups(), shared.getReaderGroups());
+        List<Long> groupIdList = CollectionTools.unionLists(shared.getEditorGroups(), shared.getReaderGroups());
         currentReadersAndEditorsList.addAll(friendGroupService.getAllMembersByGroupIds(groupIdList));
-        List<Long> userIdList = unionLists(shared.getReaders(), shared.getEditors());
+        List<Long> userIdList = CollectionTools.unionLists(shared.getReaders(), shared.getEditors());
         currentReadersAndEditorsList.addAll(userService.getByIds(userIdList));
 
         Set<User> newReadersAndEditorsSet = currentReadersAndEditorsList.stream()
@@ -487,13 +487,6 @@ public class UserDocumentServiceImpl implements UserDocumentService {
                 .filter(u -> !currentReadersAndEditorsList.contains(u))
                 .collect(Collectors.toSet());
         eventSendingService.sendProhibitAccessEvent(removedReadersAndEditorsSet, FileType.DOCUMENT, document.getName(), user);
-    }
-
-    @SafeVarargs
-    private final <T> List<T> unionLists(List<T>... lists) {
-        List<T> union = new ArrayList<>();
-        Arrays.stream(lists).filter(list -> !CollectionUtils.isEmpty(list)).distinct().forEach(union::addAll);
-        return union;
     }
 
     @Override
