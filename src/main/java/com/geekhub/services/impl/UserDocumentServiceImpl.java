@@ -188,8 +188,13 @@ public class UserDocumentServiceImpl implements UserDocumentService {
     }
 
     @Override
-    public Set<UserDocument> getByIds(List<Long> docIds) {
+    public Set<UserDocument> getAllByIds(List<Long> docIds) {
         return new HashSet<>(repository.getAll("id", docIds));
+    }
+
+    @Override
+    public Set<UserDocument> getAllByIds(Long[] docIds) {
+        return getAllByIds(Arrays.asList(docIds));
     }
 
     @Override
@@ -238,6 +243,30 @@ public class UserDocumentServiceImpl implements UserDocumentService {
         }
     }
 
+    @Override
+    public void copy(Collection<UserDocument> documents, String destinationDirectoryHash, User user) {
+        UserDirectory destinationDir = null;
+        if (destinationDirectoryHash.equals("root")) {
+            destinationDirectoryHash = user.getLogin();
+        } else {
+            destinationDir = userDirectoryService.getByHashName(destinationDirectoryHash);
+        }
+        documents = setDocumentFullNames(destinationDirectoryHash, documents.stream().collect(Collectors.toSet()));
+        for (UserDocument doc : documents) {
+            createCopy(user, destinationDir, doc);
+        }
+    }
+
+    private void createCopy(User user, UserDirectory destinationDir, UserDocument doc) {
+        UserDocument copiedDoc = UserFileUtil.copyDocument(doc);
+        copiedDoc.setDocumentAttribute(destinationDir == null ? DocumentAttribute.PRIVATE
+                : destinationDir.getDocumentAttribute());
+        save(copiedDoc);
+        createRelations(copiedDoc, destinationDir);
+        userToDocumentRelationService.create(copiedDoc, user, FileRelationType.OWN);
+        UserFileUtil.copyFile(doc.getHashName(), copiedDoc.getHashName());
+    }
+
     private Set<UserDocument> setDocumentFullNames(String destinationDirectoryHash, Set<UserDocument> documents) {
         List<String> similarDocNames = getSimilarDocumentNamesInDirectory(destinationDirectoryHash, documents);
         documents.stream().filter(doc -> similarDocNames.contains(doc.getName())).forEach(doc -> {
@@ -252,29 +281,16 @@ public class UserDocumentServiceImpl implements UserDocumentService {
     }
 
     @Override
-    public void copy(Long[] docIds, String destinationDirectoryHash, User user) {
-        Set<UserDocument> documents = getByIds(Arrays.asList(docIds));
-        UserDirectory destinationDir = null;
-        if (destinationDirectoryHash.equals("root")) {
-            destinationDirectoryHash = user.getLogin();
-        } else {
-            destinationDir = userDirectoryService.getByHashName(destinationDirectoryHash);
-        }
-        documents = setDocumentFullNames(destinationDirectoryHash, documents);
+    public void copy(Collection<UserDocument> documents, UserDirectory destinationDirectory, User user) {
         for (UserDocument doc : documents) {
-            createCopy(user, destinationDir, doc);
+            UserDocument copiedDoc = UserFileUtil.copyDocument(doc);
+            copiedDoc.setDocumentAttribute(destinationDirectory.getDocumentAttribute());
+            copiedDoc.setParentDirectoryHash(destinationDirectory.getHashName());
+            save(copiedDoc);
+            createRelations(copiedDoc, destinationDirectory);
+            userToDocumentRelationService.create(copiedDoc, user, FileRelationType.OWN);
+            UserFileUtil.copyFile(doc.getHashName(), copiedDoc.getHashName());
         }
-    }
-
-    private void createCopy(User user, UserDirectory destinationDir, UserDocument doc) {
-        UserDocument copiedDoc = UserFileUtil.copyDocument(doc);
-        copiedDoc.setDocumentAttribute(destinationDir == null ? DocumentAttribute.PRIVATE
-                : destinationDir.getDocumentAttribute());
-        copiedDoc.setHashName(UserFileUtil.createHashName());
-        UserFileUtil.copyFile(doc.getHashName(), copiedDoc.getHashName());
-        save(copiedDoc);
-        createRelations(copiedDoc, destinationDir);
-        userToDocumentRelationService.create(copiedDoc, user, FileRelationType.OWN);
     }
 
     @Override
@@ -499,6 +515,9 @@ public class UserDocumentServiceImpl implements UserDocumentService {
 
     @Override
     public List<String> getSimilarDocumentNamesInDirectory(String directoryHash, Set<UserDocument> documents) {
+        if (CollectionUtils.isEmpty(documents)) {
+            return new ArrayList<>();
+        }
         List<String> documentNames = documents.stream()
                 .map(UserDocument::getNameWithoutExtension)
                 .collect(Collectors.toList());

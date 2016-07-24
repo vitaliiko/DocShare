@@ -7,17 +7,11 @@ import com.geekhub.repositories.UserDirectoryRepository;
 import com.geekhub.dto.convertors.EntityToDtoConverter;
 import com.geekhub.entities.enums.DocumentAttribute;
 import com.geekhub.entities.enums.DocumentStatus;
-import com.geekhub.security.UserDirectoryAccessService;
 import com.geekhub.services.*;
 import com.geekhub.services.enams.FileType;
 import com.geekhub.utils.UserFileUtil;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
+
+import java.util.*;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import javax.inject.Inject;
@@ -43,9 +37,6 @@ public class UserDirectoryServiceImpl implements UserDirectoryService {
 
     @Inject
     private UserDocumentService userDocumentService;
-
-    @Inject
-    private UserDirectoryAccessService userDirectoryAccessService;
 
     @Inject
     private EventSendingService eventSendingService;
@@ -230,8 +221,13 @@ public class UserDirectoryServiceImpl implements UserDirectoryService {
     }
 
     @Override
-    public Set<UserDirectory> getByIds(List<Long> dirIds) {
+    public Set<UserDirectory> getAllByIds(List<Long> dirIds) {
         return new HashSet<>(repository.getAll("id", dirIds));
+    }
+
+    @Override
+    public Set<UserDirectory> getAllByIds(Long[] dirIds) {
+        return getAllByIds(Arrays.asList(dirIds));
     }
 
     @Override
@@ -276,10 +272,39 @@ public class UserDirectoryServiceImpl implements UserDirectoryService {
         }
     }
 
+    @Override
+    public void copy(Collection<UserDirectory> directories, String destinationDirectoryHash, User user) {
+        UserDirectory destinationDir = null;
+        if (destinationDirectoryHash.equals("root")) {
+            destinationDirectoryHash = user.getLogin();
+        } else {
+            destinationDir = getByHashName(destinationDirectoryHash);
+        }
+        directories = setDirectoriesFullNames(destinationDirectoryHash, directories.stream().collect(Collectors.toSet()));
+        for (UserDirectory dir : directories) {
+            UserDirectory copiedDir = UserFileUtil.copyDirectory(dir);
+            copiedDir.setDocumentAttribute(destinationDir == null ? DocumentAttribute.PRIVATE
+                    : destinationDir.getDocumentAttribute());
+            save(copiedDir);
+            createRelations(copiedDir, destinationDirectoryHash, user);
+            userToDirectoryRelationService.create(copiedDir, user, FileRelationType.OWN);
+            copyContent(user, dir, copiedDir);
+        }
+    }
+
+    private void copyContent(User user, UserDirectory originalDir, UserDirectory destinationDir) {
+        List<UserDocument> containedDocuments =
+                userDocumentService.getAllByParentDirectoryHashAndStatus(originalDir.getHashName(), DocumentStatus.ACTUAL);
+        userDocumentService.copy(containedDocuments, destinationDir, user);
+        List<UserDirectory> containedDirectories =
+                getAllByParentDirectoryHashAndStatus(originalDir.getHashName(), DocumentStatus.ACTUAL);
+        copy(containedDirectories, destinationDir, user);
+    }
+
     private Set<UserDirectory> setDirectoriesFullNames(String destinationDirectoryHash, Set<UserDirectory> directories) {
         List<String> similarDocNames = getSimilarDirectoryNamesInDirectory(destinationDirectoryHash, directories);
         directories.stream().filter(dir -> similarDocNames.contains(dir.getName())).forEach(dir -> {
-            Pattern namePattern = Pattern.compile(dir.getName() + " \\((\\d+)\\)");
+            Pattern namePattern = Pattern.compile(dir.getName().replace("(", "\\\\(").replace(")", "\\\\)") + " \\((\\d+)\\)");
             int documentIndex = UserFileUtil.countFileNameIndex(similarDocNames, namePattern);
             String newDirName = dir.getName() + " (" + documentIndex + ")";
             dir.setName(newDirName);
@@ -290,7 +315,23 @@ public class UserDirectoryServiceImpl implements UserDirectoryService {
     }
 
     @Override
+    public void copy(Collection<UserDirectory> directories, UserDirectory destinationDir, User user) {
+        for (UserDirectory dir : directories) {
+            UserDirectory copiedDir = UserFileUtil.copyDirectory(dir);
+            copiedDir.setDocumentAttribute(destinationDir.getDocumentAttribute());
+            copiedDir.setParentDirectoryHash(destinationDir.getHashName());
+            save(copiedDir);
+            createRelations(copiedDir, destinationDir.getHashName(), user);
+            userToDirectoryRelationService.create(copiedDir, user, FileRelationType.OWN);
+            copyContent(user, dir, copiedDir);
+        }
+    }
+
+    @Override
     public List<String> getSimilarDirectoryNamesInDirectory(String directoryHash, Set<UserDirectory> directories) {
+        if (CollectionUtils.isEmpty(directories)) {
+            return new ArrayList<>();
+        }
         List<String> documentNames = directories.stream()
                 .map(UserDirectory::getName)
                 .collect(Collectors.toList());
@@ -431,58 +472,7 @@ public class UserDirectoryServiceImpl implements UserDirectoryService {
     }
 
     @Override
-    public void copy(Long dirId, String destinationDirectoryHash) {
-        UserDirectory directory = repository.getById(dirId);
-        UserDirectory copy = UserFileUtil.copyDirectory(directory);
-        String copyName = directory.getName();
-        String copyLocation = getLocation(directory) + copyName;
-        String destinationDirLocation = getDestinationDirectoryLocation(directory, destinationDirectoryHash);
-
-        if (!destinationDirLocation.startsWith(copyLocation)) {
-//            if (getByFullNameAndOwner(directory.getOwner(), destinationDirectoryHash, copyName) != null) {
-//                int matchesCount = repository.getLike(destinationDirectoryHash, copyName).size();
-//                copy.setName(copyName + " (" + (matchesCount + 1) + ")");
-//            }
-
-            copy.setParentDirectoryHash(destinationDirectoryHash);
-            copy.setHashName(UserFileUtil.createHashName());
-            repository.save(copy);
-
-            List<Object> docIds = userDocumentService.getActualIdsByParentDirectoryHash(directory.getHashName());
-//            docIds.forEach(id -> userDocumentService.copy((Long) id, copy.getHashName()));
-
-            List<Object> dirIds = getActualIdsByParentDirectoryHash(directory.getHashName());
-            dirIds.forEach(id -> copy((Long) id, copy.getHashName()));
-        }
-    }
-
-    @Override
-    public boolean copy(Long[] dirIds, String destinationDirectoryHash, User user) {
-        Set<UserDirectory> directories = getByIds(Arrays.asList(dirIds));
-        if (userDirectoryAccessService.isOwner(directories, user)) {
-            Arrays.stream(dirIds).forEach(id -> copy(id, destinationDirectoryHash));
-            return true;
-        }
-        return false;
-    }
-
-    @Override
     public List<Object> getActualIdsByParentDirectoryHash(String parentDirectoryHash) {
         return repository.getPropertiesList("id", "parentDirectoryHash", parentDirectoryHash);
-    }
-
-    private String getDestinationDirectoryLocation(UserDirectory directory, String destinationDirHash) {
-        UserDirectory destinationDir = null;
-//        if (!directory.getOwner().getLogin().equals(destinationDirHash)) {
-//            destinationDir = getByHashName(destinationDirHash);
-//        }
-
-        String destinationDirLocation = null;
-        if (destinationDir != null) {
-            destinationDirLocation = getLocation(destinationDir) + destinationDir.getName();
-        } else {
-//            destinationDirLocation = directory.getOwner().getLogin();
-        }
-        return destinationDirLocation;
     }
 }

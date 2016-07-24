@@ -63,10 +63,10 @@ public class FilesAccessInterceptor extends AccessInterceptor {
         List<Long> idsInLong = Arrays.stream(fileIds).map(Long::valueOf).collect(Collectors.toList());
         User user = userService.getById(userId);
         if (fileType == FileType.DOCUMENT) {
-            List<UserDocument> documents = new ArrayList<>(userDocumentService.getByIds(idsInLong));
+            List<UserDocument> documents = new ArrayList<>(userDocumentService.getAllByIds(idsInLong));
             return fileAccessService.permitAccess(documents, user, AccessPredicates.DOCUMENTS_OWNER);
         }
-        List<UserDirectory> directories = new ArrayList<>(userDirectoryService.getByIds(idsInLong));
+        List<UserDirectory> directories = new ArrayList<>(userDirectoryService.getAllByIds(idsInLong));
         return fileAccessService.permitAccess(directories, user, AccessPredicates.DIRECTORIES_OWNER);
     }
 

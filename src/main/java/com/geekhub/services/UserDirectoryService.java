@@ -6,6 +6,8 @@ import com.geekhub.dto.SharedDto;
 import com.geekhub.entities.User;
 import com.geekhub.entities.UserDirectory;
 import com.geekhub.entities.enums.DocumentAttribute;
+
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
@@ -17,7 +19,9 @@ public interface UserDirectoryService extends EntityService<UserDirectory, Long>
 
     UserDirectory createDirectory(User owner, String parentDirHash, String dirName);
 
-    Set<UserDirectory> getByIds(List<Long> dirIds);
+    Set<UserDirectory> getAllByIds(List<Long> dirIds);
+
+    Set<UserDirectory> getAllByIds(Long[] dirIds);
 
     List<UserDirectory> getAllByOwnerId(Long ownerId);
 
@@ -29,9 +33,9 @@ public interface UserDirectoryService extends EntityService<UserDirectory, Long>
 
     Long recover(Long removedDirId);
 
-    void copy(Long dirId, String destinationDirectoryHash);
+    void copy(Collection<UserDirectory> directories, String destinationDirectoryHash, User user);
 
-    boolean copy(Long[] dirIds, String destinationDirectoryHash, User user);
+    void copy(Collection<UserDirectory> directories, UserDirectory destinationDirectory, User user);
 
     void recover(Long[] removedDirIds);
 

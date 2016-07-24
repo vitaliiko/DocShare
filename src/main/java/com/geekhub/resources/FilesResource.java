@@ -84,14 +84,14 @@ public class FilesResource {
 
         User user = getUserFromSession(session);
         if (docIds != null) {
-            Set<UserDocument> documents = userDocumentService.getByIds(Arrays.asList(docIds));
+            Set<UserDocument> documents = userDocumentService.getAllByIds(docIds);
             if (documents.stream().anyMatch(d -> d.getParentDirectoryHash().equals(destinationDirHash))) {
                 return ResponseEntity.badRequest().build();
             }
             userDocumentService.replace(documents, destinationDirHash, user);
         }
         if (dirIds != null) {
-            Set<UserDirectory> directories = userDirectoryService.getByIds(Arrays.asList(dirIds));
+            Set<UserDirectory> directories = userDirectoryService.getAllByIds(dirIds);
             if (directories.stream().anyMatch(d -> d.getParentDirectoryHash().equals(destinationDirHash))) {
                 return ResponseEntity.badRequest().build();
             }
@@ -108,10 +108,12 @@ public class FilesResource {
 
         User user = getUserFromSession(session);
         if (docIds != null) {
-            userDocumentService.copy(docIds, destinationDirHash, user);
+            Set<UserDocument> documents = userDocumentService.getAllByIds(docIds);
+            userDocumentService.copy(documents, destinationDirHash, user);
         }
         if (dirIds != null) {
-            userDirectoryService.copy(dirIds, destinationDirHash, user);
+            Set<UserDirectory> directories = userDirectoryService.getAllByIds(dirIds);
+            userDirectoryService.copy(directories, destinationDirHash, user);
         }
         return ResponseEntity.ok().build();
     }

@@ -6,6 +6,7 @@ import com.geekhub.entities.*;
 import com.geekhub.entities.enums.DocumentAttribute;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.Set;
 
 import com.geekhub.entities.enums.DocumentStatus;
@@ -17,7 +18,9 @@ import java.util.List;
 @Service
 public interface UserDocumentService extends EntityService<UserDocument, Long> {
 
-    Set<UserDocument> getByIds(List<Long> docIds);
+    Set<UserDocument> getAllByIds(List<Long> docIds);
+
+    Set<UserDocument> getAllByIds(Long[] docIds);
 
     List<UserDocument> getAllByOwnerId(Long ownerId);
 
@@ -27,7 +30,9 @@ public interface UserDocumentService extends EntityService<UserDocument, Long> {
 
     void replace(Set<UserDocument> documents, String destinationDirectoryHash, User user);
 
-    void copy(Long[] docIds, String destinationDirectoryHash, User user);
+    void copy(Collection<UserDocument> documents, String destinationDirectoryHash, User user);
+
+    void copy(Collection<UserDocument> documents, UserDirectory destinationDirectory, User user);
 
     UserDocument getByHashName(String hashName);
 
