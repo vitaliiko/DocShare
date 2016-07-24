@@ -108,6 +108,14 @@ public class UserDirectoryRepositoryImpl implements UserDirectoryRepository {
     }
 
     @Override
+    public <T> List<UserDirectory> getList(String propertyName, List<T> values) {
+        return sessionFactory.getCurrentSession()
+                .createCriteria(clazz)
+                .add(Restrictions.in(propertyName, values))
+                .list();
+    }
+
+    @Override
     public List<Object> getPropertiesList(String selectProperty, String propertyName, String value) {
         return sessionFactory.getCurrentSession()
                 .createCriteria(this.clazz)

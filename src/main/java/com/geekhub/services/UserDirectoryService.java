@@ -48,6 +48,8 @@ public interface UserDirectoryService extends EntityService<UserDirectory, Long>
 
     List<UserDirectory> getAllByParentDirectoryHash(String parentDirectoryHash);
 
+    List<UserDirectory> getAllByParentDirectoryHashes(List<String> parentDirectoryHashes);
+
     List<UserDirectory> getTreeByParentDirectoryHash(String parentDirectoryHash);
 
     List<UserDirectory> getAllByParentDirectoryHashAndStatus(String parentDirectoryHash, DocumentStatus status);

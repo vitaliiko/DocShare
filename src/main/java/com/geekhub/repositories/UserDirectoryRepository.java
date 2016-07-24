@@ -16,6 +16,8 @@ public interface UserDirectoryRepository extends EntityRepository<UserDirectory,
 
     List<UserDirectory> getList(Map<String, Object> propertiesMap);
 
+    <T> List<UserDirectory> getList(String propertyName, List<T> values);
+
     List<Object> getPropertiesList(String selectProperty, String propertyName, String value);
 
     List<UserDirectory> getLike(String parentDirectoryHash, String dirName);

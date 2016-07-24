@@ -445,6 +445,9 @@ public class UserDocumentServiceImpl implements UserDocumentService {
             friendGroupToDocumentRelationService.deleteAllByDocument(d);
             friendGroupToDocumentRelationService.create(d, readersAndEditors.getReaderGroups(), FileRelationType.READ);
             friendGroupToDocumentRelationService.create(d, readersAndEditors.getEditorGroups(), FileRelationType.READ);
+
+            d.setDocumentAttribute(readersAndEditors.getDocumentAttribute());
+            update(d);
         });
     }
 

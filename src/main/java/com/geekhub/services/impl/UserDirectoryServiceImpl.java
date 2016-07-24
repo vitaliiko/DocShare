@@ -172,8 +172,21 @@ public class UserDirectoryServiceImpl implements UserDirectoryService {
     }
 
     @Override
+    public List<UserDirectory> getAllByParentDirectoryHashes(List<String> parentDirectoryHashes) {
+        return repository.getList("parentDirectoryHash", parentDirectoryHashes);
+    }
+
+    @Override
     public List<UserDirectory> getTreeByParentDirectoryHash(String parentDirectoryHash) {
-        return null;
+        List<UserDirectory> childDirectories = new ArrayList<>();
+        List<String> hashes = new ArrayList<>();
+        hashes.add(parentDirectoryHash);
+        while (hashes.size() > 0) {
+            List<UserDirectory> directories = getAllByParentDirectoryHashes(hashes);
+            hashes = directories.stream().map(UserDirectory::getHashName).collect(Collectors.toList());
+            childDirectories.addAll(directories);
+        }
+        return childDirectories;
     }
 
     @Override
@@ -431,6 +444,7 @@ public class UserDirectoryServiceImpl implements UserDirectoryService {
 
     private ReadersAndEditors convertSharedDtoToUsers(SharedDto shared) {
         ReadersAndEditors readersAndEditors = new ReadersAndEditors();
+        readersAndEditors.setDocumentAttribute(DocumentAttribute.getValue(shared.getAccess()));
         List<User> users = userService.getByIds(CollectionTools.unionLists(shared.getReaders(), shared.getEditors()));
 
         List<User> editors = users.stream()
@@ -458,7 +472,11 @@ public class UserDirectoryServiceImpl implements UserDirectoryService {
         List<UserDirectory> childDirectories = getTreeByParentDirectoryHash(dirHashName);
         List<String> parentDirHashList = new ArrayList<>();
         if (!CollectionUtils.isEmpty(childDirectories)) {
-            childDirectories.forEach(d -> createRelations(d, readersAndEditors));
+            childDirectories.forEach(d -> {
+                createRelations(d, readersAndEditors);
+                d.setDocumentAttribute(readersAndEditors.getDocumentAttribute());
+                update(d);
+            });
             parentDirHashList = childDirectories.stream().map(UserDirectory::getHashName).collect(Collectors.toList());
         }
         parentDirHashList.add(dirHashName);
