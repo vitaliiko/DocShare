@@ -11,6 +11,7 @@ import com.geekhub.entities.enums.DocumentStatus;
 import com.geekhub.security.UserDocumentAccessService;
 import com.geekhub.services.*;
 import com.geekhub.services.enams.FileType;
+import com.geekhub.utils.DirectoryWithRelations;
 import com.geekhub.utils.DocumentVersionUtil;
 import com.geekhub.utils.UserFileUtil;
 
@@ -24,7 +25,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @Service
@@ -280,16 +280,24 @@ public class UserDocumentServiceImpl implements UserDocumentService {
     }
 
     @Override
-    public void copy(Collection<UserDocument> documents, UserDirectory destinationDirectory, User user) {
+    public void copy(Collection<UserDocument> documents, DirectoryWithRelations destinationDirectory) {
         for (UserDocument doc : documents) {
             UserDocument copiedDoc = UserFileUtil.copyDocument(doc);
             copiedDoc.setDocumentAttribute(destinationDirectory.getDocumentAttribute());
             copiedDoc.setParentDirectoryHash(destinationDirectory.getHashName());
             save(copiedDoc);
             createRelations(copiedDoc, destinationDirectory);
-            userToDocumentRelationService.create(copiedDoc, user, FileRelationType.OWN);
+            userToDocumentRelationService.create(copiedDoc, destinationDirectory.getOwner(), FileRelationType.OWN);
             UserFileUtil.copyFile(doc.getHashName(), copiedDoc.getHashName());
         }
+    }
+
+    private void createRelations(UserDocument document, DirectoryWithRelations parentDirectory) {
+        parentDirectory.getUserRelations().forEach(r -> userToDocumentRelationService
+                .create(document, r.getUser(), r.getFileRelationType()));
+
+        parentDirectory.getGroupRelations().forEach(r -> friendGroupToDocumentRelationService
+                .create(document, r.getFriendsGroup(), r.getFileRelationType()));
     }
 
     @Override

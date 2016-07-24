@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Set;
 
 import com.geekhub.entities.enums.DocumentStatus;
+import com.geekhub.utils.DirectoryWithRelations;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -35,7 +36,7 @@ public interface UserDirectoryService extends EntityService<UserDirectory, Long>
 
     void copy(Collection<UserDirectory> directories, String destinationDirectoryHash, User user);
 
-    void copy(Collection<UserDirectory> directories, UserDirectory destinationDirectory, User user);
+    void copy(Collection<UserDirectory> directories, DirectoryWithRelations destinationDirectory);
 
     void recover(Long[] removedDirIds);
 

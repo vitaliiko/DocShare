@@ -10,6 +10,7 @@ import java.util.Collection;
 import java.util.Set;
 
 import com.geekhub.entities.enums.DocumentStatus;
+import com.geekhub.utils.DirectoryWithRelations;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -32,7 +33,7 @@ public interface UserDocumentService extends EntityService<UserDocument, Long> {
 
     void copy(Collection<UserDocument> documents, String destinationDirectoryHash, User user);
 
-    void copy(Collection<UserDocument> documents, UserDirectory destinationDirectory, User user);
+    void copy(Collection<UserDocument> documents, DirectoryWithRelations destinationDirectory);
 
     UserDocument getByHashName(String hashName);
 

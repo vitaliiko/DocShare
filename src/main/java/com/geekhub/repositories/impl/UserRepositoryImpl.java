@@ -84,17 +84,10 @@ public class UserRepositoryImpl implements UserRepository {
     // TODO: 15.07.2016 with criteria or hql throw ClassCastException (trying cast User to Long, don't know why)
     @Override
     public List<User> getByIds(List<Long> userIds) {
-        String sql = "SELECT * FROM User u WHERE u.id IN (";
-        for (int i = 1; i <= userIds.size(); i++) {
-            sql += "?" + (i == userIds.size() ? ")" : ", ");
-        }
-        Session session = sessionFactory.getCurrentSession();
-        SQLQuery query = session.createSQLQuery(sql);
-        query.addEntity(User.class);
-        for (int i = 0; i < userIds.size(); i++) {
-            query.setParameter(i, userIds.get(i));
-        }
-        return query.list();
+        return sessionFactory.getCurrentSession()
+                .createCriteria(clazz)
+                .add(Restrictions.in("id", userIds))
+                .list();
     }
 
     @Override
