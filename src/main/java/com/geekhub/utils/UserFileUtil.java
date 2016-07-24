@@ -196,12 +196,15 @@ public class UserFileUtil {
         }
     }
 
-    public static int countFileNameIndex(List<String> similarDocNames, Pattern namePattern) {
+    public static <T> int countFileNameIndex(List<String> similarFileNames, T file) {
         List<Integer> indexes = new ArrayList<>();
-        for (String name : similarDocNames) {
+        Pattern namePattern = createPatternForName(file);
+        for (String name : similarFileNames) {
             Matcher match = namePattern.matcher(name);
             while (match.find()) {
-                indexes.add(Integer.valueOf(match.group(1)));
+                int groupCount = match.groupCount();
+                String group = match.group(groupCount);
+                indexes.add(Integer.valueOf(group));
             }
         }
         for (int i = 1; i <= indexes.size(); i++) {
@@ -210,6 +213,20 @@ public class UserFileUtil {
             }
         }
         return indexes.size() + 1;
+    }
+
+    public static <T> Pattern createPatternForName(T file) {
+        if (file instanceof UserDirectory) {
+            UserDirectory directory = (UserDirectory) file;
+            String regex = directory.getName().replace("(", "\\(").replace(")", "\\)") + " \\((\\d+)\\)";
+            return Pattern.compile(regex);
+        }
+        if (file instanceof UserDocument) {
+            UserDocument document = (UserDocument) file;
+            String regex = document.getNameWithoutExtension().replace("(", "\\(").replace(")", "\\)") + " \\((\\d+)\\)" + document.getExtension();
+            return Pattern.compile(regex);
+        }
+        return null;
     }
 
     public static String createNamesPattern(List<String> documentNames) {

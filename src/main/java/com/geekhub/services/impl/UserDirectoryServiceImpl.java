@@ -304,8 +304,7 @@ public class UserDirectoryServiceImpl implements UserDirectoryService {
     private Set<UserDirectory> setDirectoriesFullNames(String destinationDirectoryHash, Set<UserDirectory> directories) {
         List<String> similarDocNames = getSimilarDirectoryNamesInDirectory(destinationDirectoryHash, directories);
         directories.stream().filter(dir -> similarDocNames.contains(dir.getName())).forEach(dir -> {
-            Pattern namePattern = Pattern.compile(dir.getName().replace("(", "\\\\(").replace(")", "\\\\)") + " \\((\\d+)\\)");
-            int documentIndex = UserFileUtil.countFileNameIndex(similarDocNames, namePattern);
+            int documentIndex = UserFileUtil.countFileNameIndex(similarDocNames, dir);
             String newDirName = dir.getName() + " (" + documentIndex + ")";
             dir.setName(newDirName);
             similarDocNames.add(newDirName);

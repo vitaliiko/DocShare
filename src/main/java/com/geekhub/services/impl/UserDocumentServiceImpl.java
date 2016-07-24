@@ -270,8 +270,7 @@ public class UserDocumentServiceImpl implements UserDocumentService {
     private Set<UserDocument> setDocumentFullNames(String destinationDirectoryHash, Set<UserDocument> documents) {
         List<String> similarDocNames = getSimilarDocumentNamesInDirectory(destinationDirectoryHash, documents);
         documents.stream().filter(doc -> similarDocNames.contains(doc.getName())).forEach(doc -> {
-            Pattern namePattern = Pattern.compile(doc.getNameWithoutExtension() + " \\((\\d+)\\)" + doc.getExtension());
-            int documentIndex = UserFileUtil.countFileNameIndex(similarDocNames, namePattern);
+            int documentIndex = UserFileUtil.countFileNameIndex(similarDocNames, doc);
             String newDocName = doc.getNameWithoutExtension() + " (" + documentIndex + ")" + doc.getExtension();
             doc.setName(newDocName);
             similarDocNames.add(newDocName);
