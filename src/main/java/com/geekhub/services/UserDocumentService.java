@@ -11,6 +11,7 @@ import java.util.Set;
 
 import com.geekhub.entities.enums.DocumentStatus;
 import com.geekhub.utils.DirectoryWithRelations;
+import com.geekhub.utils.ReadersAndEditors;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -73,7 +74,7 @@ public interface UserDocumentService extends EntityService<UserDocument, Long> {
 
     UserDocument shareDocument(UserDocument document, SharedDto shared, User user);
 
-    void shareDocuments(List<UserDocument> documents, SharedDto sharedDto);
+    void createRelations(List<UserDocument> documents, ReadersAndEditors readersAndEditors);
 
     UserDocument recoverOldVersion(DocumentOldVersion oldVersion);
 

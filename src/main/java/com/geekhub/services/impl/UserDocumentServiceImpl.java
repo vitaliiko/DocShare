@@ -11,10 +11,7 @@ import com.geekhub.entities.enums.DocumentStatus;
 import com.geekhub.security.UserDocumentAccessService;
 import com.geekhub.services.*;
 import com.geekhub.services.enams.FileType;
-import com.geekhub.utils.DirectoryWithRelations;
-import com.geekhub.utils.DocumentVersionUtil;
-import com.geekhub.utils.CollectionTools;
-import com.geekhub.utils.UserFileUtil;
+import com.geekhub.utils.*;
 
 import java.io.IOException;
 import java.util.*;
@@ -439,8 +436,16 @@ public class UserDocumentServiceImpl implements UserDocumentService {
     }
 
     @Override
-    public void shareDocuments(List<UserDocument> documents, SharedDto shared) {
-        documents.forEach(d -> createRelations(d, shared));
+    public void createRelations(List<UserDocument> documents, ReadersAndEditors readersAndEditors) {
+        documents.forEach(d -> {
+            userToDocumentRelationService.deleteAllBesidesOwnerByDocument(d);
+            userToDocumentRelationService.create(d, readersAndEditors.getReaders(), FileRelationType.READ);
+            userToDocumentRelationService.create(d, readersAndEditors.getEditors(), FileRelationType.EDIT);
+
+            friendGroupToDocumentRelationService.deleteAllByDocument(d);
+            friendGroupToDocumentRelationService.create(d, readersAndEditors.getReaderGroups(), FileRelationType.READ);
+            friendGroupToDocumentRelationService.create(d, readersAndEditors.getEditorGroups(), FileRelationType.READ);
+        });
     }
 
     private void createRelations(UserDocument document, SharedDto shared) {
