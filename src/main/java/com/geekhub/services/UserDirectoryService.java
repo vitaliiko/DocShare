@@ -20,7 +20,7 @@ public interface UserDirectoryService extends EntityService<UserDirectory, Long>
 
     UserDirectory createDirectory(User owner, String parentDirHash, String dirName);
 
-    Set<UserDirectory> getAllByIds(List<Long> dirIds);
+    Set<UserDirectory> getAllByIds(Collection<Long> dirIds);
 
     Set<UserDirectory> getAllByIds(Long[] dirIds);
 

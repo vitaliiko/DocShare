@@ -17,7 +17,7 @@ public interface FriendGroupToDocumentRelationService extends EntityService<Frie
 
     FriendGroupToDocumentRelation create(UserDocument document, FriendsGroup group, FileRelationType relationType);
 
-    void deleteByDocument(UserDocument document);
+    void deleteAllByDocument(UserDocument document);
 
     List<FriendsGroup> getAllGroupsByDocumentId(Long documentId);
 

@@ -80,7 +80,7 @@ public class FriendGroupToDirectoryRelationRepositoryImpl implements FriendGroup
     }
 
     @Override
-    public void deleteByDirectoryBesidesOwner(UserDirectory directory) {
+    public void deleteAllByDirectory(UserDirectory directory) {
         sessionFactory.getCurrentSession()
                 .createQuery("DELETE FriendGroupToDirectoryRelation r WHERE r.directory = :directory")
                 .setParameter("directory", directory)

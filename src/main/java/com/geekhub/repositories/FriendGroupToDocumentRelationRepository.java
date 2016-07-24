@@ -7,7 +7,7 @@ import java.util.List;
 
 public interface FriendGroupToDocumentRelationRepository extends EntityRepository<FriendGroupToDocumentRelation, Long> {
 
-    void deleteByDocument(UserDocument document);
+    void deleteAllByDocument(UserDocument document);
 
     Long getCountByFriendGroup(FriendsGroup group);
 

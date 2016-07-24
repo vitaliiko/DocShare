@@ -74,8 +74,8 @@ public class FriendGroupToDocumentRelationServiceImpl implements FriendGroupToDo
     }
 
     @Override
-    public void deleteByDocument(UserDocument document) {
-        repository.deleteByDocument(document);
+    public void deleteAllByDocument(UserDocument document) {
+        repository.deleteAllByDocument(document);
     }
 
     @Override

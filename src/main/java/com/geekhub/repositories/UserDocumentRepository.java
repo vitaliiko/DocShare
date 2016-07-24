@@ -6,12 +6,13 @@ import com.geekhub.entities.UserDocument;
 import com.geekhub.entities.enums.DocumentAttribute;
 import com.geekhub.entities.enums.FileRelationType;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
 public interface UserDocumentRepository extends EntityRepository<UserDocument, Long> {
 
-    <T> List<UserDocument> getAll(String propertyName, List<T> values);
+    <T> List<UserDocument> getAll(String propertyName, Collection<T> values);
 
     List<UserDocument> getList(User owner, String propertyName, Object value);
 

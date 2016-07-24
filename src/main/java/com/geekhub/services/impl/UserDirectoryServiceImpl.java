@@ -207,23 +207,29 @@ public class UserDirectoryServiceImpl implements UserDirectoryService {
         DirectoryWithRelations directoryWithRelations = new DirectoryWithRelations();
         directoryWithRelations.setDirectory(directory);
         directoryWithRelations.setOwner(owner);
+        if (directory.getId() != null) {
+            userToDirectoryRelationService.deleteAllBesidesOwnerByDirectory(directory);
+            friendGroupToDirectoryRelationService.deleteAllByDirectory(directory);
+        }
         if (!parentDirHash.equals("root") && !parentDirHash.equals(owner.getLogin())) {
             UserDirectory parentDirectory = getByHashName(parentDirHash);
-            List<UserToDirectoryRelation> userRelations =
+            directoryWithRelations.addAllUserRelations(
                     userToDirectoryRelationService.getAllByDirectory(parentDirectory).stream()
                             .filter(r -> r.getFileRelationType() != FileRelationType.OWN)
-                            .collect(Collectors.toList());
-            List<FriendGroupToDirectoryRelation> friendGroupRelations =
-                    friendGroupToDirectoryRelationService.getAllByDirectory(parentDirectory);
-
-            friendGroupRelations.forEach(r -> {
-                FriendGroupToDirectoryRelation relation = friendGroupToDirectoryRelationService
-                        .create(directory, r.getFriendsGroup(), r.getFileRelationType());
-                directoryWithRelations.addRelation(relation);
-            });
-            userRelations.forEach(r -> {
+                            .collect(Collectors.toList())
+            );
+            directoryWithRelations.getUserRelations().forEach(r -> {
                 UserToDirectoryRelation relation = userToDirectoryRelationService
                         .create(directory, r.getUser(), r.getFileRelationType());
+                directoryWithRelations.addRelation(relation);
+            });
+
+            directoryWithRelations.addAllGroupRelations(
+                    friendGroupToDirectoryRelationService.getAllByDirectory(parentDirectory)
+            );
+            directoryWithRelations.getGroupRelations().forEach(r -> {
+                FriendGroupToDirectoryRelation relation = friendGroupToDirectoryRelationService
+                        .create(directory, r.getFriendsGroup(), r.getFileRelationType());
                 directoryWithRelations.addRelation(relation);
             });
         }
@@ -231,12 +237,19 @@ public class UserDirectoryServiceImpl implements UserDirectoryService {
     }
 
     @Override
-    public Set<UserDirectory> getAllByIds(List<Long> dirIds) {
-        return new HashSet<>(repository.getAll("id", dirIds));
+    public Set<UserDirectory> getAllByIds(Collection<Long> dirIds) {
+        HashSet<UserDirectory> directories = new HashSet<>();
+        if (!CollectionUtils.isEmpty(dirIds)) {
+            directories.addAll(repository.getAll("id", dirIds));
+        }
+        return directories;
     }
 
     @Override
     public Set<UserDirectory> getAllByIds(Long[] dirIds) {
+        if (dirIds == null) {
+            return new HashSet<>();
+        }
         return getAllByIds(Arrays.asList(dirIds));
     }
 
@@ -267,6 +280,9 @@ public class UserDirectoryServiceImpl implements UserDirectoryService {
 
     @Override
     public void replace(Set<UserDirectory> directories, String destinationDirectoryHash, User user) {
+        if (CollectionUtils.isEmpty(directories)) {
+            return;
+        }
         UserDirectory destinationDir = null;
         if (destinationDirectoryHash.equals("root")) {
             destinationDirectoryHash = user.getLogin();
@@ -278,12 +294,28 @@ public class UserDirectoryServiceImpl implements UserDirectoryService {
             dir.setDocumentAttribute(destinationDir == null ? DocumentAttribute.PRIVATE : destinationDir.getDocumentAttribute());
             update(dir);
             userToDirectoryRelationService.deleteAllBesidesOwnerByDirectory(dir);
-            createRelations(dir, destinationDirectoryHash, user);
+            DirectoryWithRelations relations = createRelations(dir, destinationDirectoryHash, user);
+            createRelationsForChilds(destinationDirectoryHash, relations);
         }
+    }
+
+    private void createRelationsForChilds(String dirHashName, DirectoryWithRelations relations) {
+        List<UserDirectory> childDirectories = getTreeByParentDirectoryHash(dirHashName);
+        List<String> parentDirHashList = new ArrayList<>();
+        if (!CollectionUtils.isEmpty(childDirectories)) {
+            childDirectories.forEach(d -> createRelations(d, relations));
+            parentDirHashList = childDirectories.stream().map(UserDirectory::getHashName).collect(Collectors.toList());
+        }
+        parentDirHashList.add(dirHashName);
+        List<UserDocument> childDocuments = userDocumentService.getAllByParentDirectoryHashes(parentDirHashList);
+        userDocumentService.createRelations(childDocuments, relations);
     }
 
     @Override
     public void copy(Collection<UserDirectory> directories, String destinationDirectoryHash, User user) {
+        if (CollectionUtils.isEmpty(directories)) {
+            return;
+        }
         UserDirectory destinationDir = null;
         if (destinationDirectoryHash.equals("root")) {
             destinationDirectoryHash = user.getLogin();
@@ -306,6 +338,7 @@ public class UserDirectoryServiceImpl implements UserDirectoryService {
         List<UserDocument> containedDocuments =
                 userDocumentService.getAllByParentDirectoryHashAndStatus(originalDir.getHashName(), DocumentStatus.ACTUAL);
         userDocumentService.copy(containedDocuments, destinationDir);
+
         List<UserDirectory> containedDirectories =
                 getAllByParentDirectoryHashAndStatus(originalDir.getHashName(), DocumentStatus.ACTUAL);
         copy(containedDirectories, destinationDir);
@@ -338,9 +371,11 @@ public class UserDirectoryServiceImpl implements UserDirectoryService {
     }
 
     private void createRelations(UserDirectory directory, DirectoryWithRelations parentDirectory) {
+        userToDirectoryRelationService.deleteAllBesidesOwnerByDirectory(directory);
         parentDirectory.getUserRelations().forEach(r -> userToDirectoryRelationService
                 .create(directory, r.getUser(), r.getFileRelationType()));
 
+        friendGroupToDirectoryRelationService.deleteAllByDirectory(directory);
         parentDirectory.getGroupRelations().forEach(r -> friendGroupToDirectoryRelationService
                 .create(directory, r.getFriendsGroup(), r.getFileRelationType()));
     }
@@ -413,7 +448,7 @@ public class UserDirectoryServiceImpl implements UserDirectoryService {
             userToDirectoryRelationService.create(directory, editors, FileRelationType.EDIT);
         }
 
-        friendGroupToDirectoryRelationService.deleteByDirectory(directory);
+        friendGroupToDirectoryRelationService.deleteAllByDirectory(directory);
         if (!CollectionUtils.isEmpty(sharedDto.getReaderGroups())) {
             List<FriendsGroup> readerGroups = friendGroupService.getByIds(sharedDto.getReaderGroups());
             friendGroupToDirectoryRelationService.create(directory, readerGroups, FileRelationType.READ);

@@ -19,7 +19,7 @@ import java.util.List;
 @Service
 public interface UserDocumentService extends EntityService<UserDocument, Long> {
 
-    Set<UserDocument> getAllByIds(List<Long> docIds);
+    Set<UserDocument> getAllByIds(Collection<Long> docIds);
 
     Set<UserDocument> getAllByIds(Long[] docIds);
 
@@ -86,4 +86,6 @@ public interface UserDocumentService extends EntityService<UserDocument, Long> {
     boolean isDocumentNameValid(String parentDirectoryHash, String docName, User owner);
 
     List<String> getSimilarDocumentNamesInDirectory(String directoryHash, Set<UserDocument> documents);
+
+    void createRelations(List<UserDocument> documents, DirectoryWithRelations parentDirectory);
 }

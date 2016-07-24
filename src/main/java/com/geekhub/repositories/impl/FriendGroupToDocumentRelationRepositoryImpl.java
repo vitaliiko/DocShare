@@ -77,7 +77,7 @@ public class FriendGroupToDocumentRelationRepositoryImpl implements FriendGroupT
     }
 
     @Override
-    public void deleteByDocument(UserDocument document) {
+    public void deleteAllByDocument(UserDocument document) {
         sessionFactory.getCurrentSession()
                 .createQuery("DELETE FriendGroupToDocumentRelation r WHERE r.document = :document")
                 .setParameter("document", document)

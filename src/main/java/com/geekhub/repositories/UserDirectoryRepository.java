@@ -1,17 +1,16 @@
 package com.geekhub.repositories;
 
-import com.geekhub.entities.FriendsGroup;
 import com.geekhub.entities.User;
 import com.geekhub.entities.UserDirectory;
-import com.geekhub.entities.UserDocument;
 import com.geekhub.entities.enums.DocumentAttribute;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
 public interface UserDirectoryRepository extends EntityRepository<UserDirectory, Long> {
 
-    <T> List<UserDirectory> getAll(String propertyName, List<T> values);
+    <T> List<UserDirectory> getAll(String propertyName, Collection<T> values);
 
     List<UserDirectory> getList(User owner, String propertyName, Object value);
 

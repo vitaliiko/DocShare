@@ -2,8 +2,9 @@ package com.geekhub.repositories.impl;
 
 import com.geekhub.entities.User;
 import com.geekhub.entities.UserDirectory;
-import com.geekhub.entities.UserDocument;
 import com.geekhub.entities.enums.DocumentAttribute;
+
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -35,7 +36,7 @@ public class UserDirectoryRepositoryImpl implements UserDirectoryRepository {
     }
 
     @Override
-    public <T> List<UserDirectory> getAll(String propertyName, List<T> values) {
+    public <T> List<UserDirectory> getAll(String propertyName, Collection<T> values) {
         return sessionFactory.getCurrentSession()
                 .createCriteria(clazz)
                 .add(Restrictions.in(propertyName, values))

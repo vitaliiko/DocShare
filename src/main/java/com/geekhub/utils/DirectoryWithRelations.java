@@ -34,7 +34,15 @@ public class DirectoryWithRelations {
         userRelations.add(relation);
     }
 
+    public void addAllUserRelations(List<UserToDirectoryRelation> relations) {
+        userRelations.addAll(relations);
+    }
+
     public void addRelation(FriendGroupToDirectoryRelation relation) {
         groupRelations.add(relation);
+    }
+
+    public void addAllGroupRelations(List<FriendGroupToDirectoryRelation> relations) {
+        groupRelations.addAll(relations);
     }
 }

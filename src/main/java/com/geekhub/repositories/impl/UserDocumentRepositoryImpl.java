@@ -5,7 +5,7 @@ import com.geekhub.entities.User;
 import com.geekhub.entities.UserDocument;
 import com.geekhub.entities.enums.DocumentAttribute;
 
-import java.util.Iterator;
+import java.util.Collection;
 import java.util.Map;
 
 import com.geekhub.entities.enums.FileRelationType;
@@ -37,7 +37,7 @@ public class UserDocumentRepositoryImpl implements UserDocumentRepository {
     }
 
     @Override
-    public <T> List<UserDocument> getAll(String propertyName, List<T> values) {
+    public <T> List<UserDocument> getAll(String propertyName, Collection<T> values) {
         return sessionFactory.getCurrentSession()
                 .createCriteria(clazz)
                 .add(Restrictions.in(propertyName, values))

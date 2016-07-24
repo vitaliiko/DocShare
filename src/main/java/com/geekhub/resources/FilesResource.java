@@ -5,11 +5,11 @@ import com.geekhub.entities.User;
 import com.geekhub.entities.UserDirectory;
 import com.geekhub.entities.UserDocument;
 import com.geekhub.dto.UserFileDto;
+import com.geekhub.resources.utils.FileControllersUtil;
 import com.geekhub.services.*;
 import com.geekhub.dto.convertors.EntityToDtoConverter;
 import com.geekhub.validators.FileValidator;
 
-import java.util.Arrays;
 import java.util.Set;
 import java.util.TreeSet;
 import javax.inject.Inject;
@@ -83,20 +83,17 @@ public class FilesResource {
                                        HttpSession session) {
 
         User user = getUserFromSession(session);
-        if (docIds != null) {
-            Set<UserDocument> documents = userDocumentService.getAllByIds(docIds);
-            if (documents.stream().anyMatch(d -> d.getParentDirectoryHash().equals(destinationDirHash))) {
-                return ResponseEntity.badRequest().build();
-            }
-            userDocumentService.replace(documents, destinationDirHash, user);
+        Set<UserDocument> documents = userDocumentService.getAllByIds(docIds);
+        if (FileControllersUtil.cannotReplaceDocuments(documents, destinationDirHash)) {
+            return ResponseEntity.badRequest().build();
         }
-        if (dirIds != null) {
-            Set<UserDirectory> directories = userDirectoryService.getAllByIds(dirIds);
-            if (directories.stream().anyMatch(d -> d.getParentDirectoryHash().equals(destinationDirHash))) {
-                return ResponseEntity.badRequest().build();
-            }
-            userDirectoryService.replace(directories, destinationDirHash, user);
+        userDocumentService.replace(documents, destinationDirHash, user);
+
+        Set<UserDirectory> directories = userDirectoryService.getAllByIds(dirIds);
+        if (FileControllersUtil.cannotReplaceDirectories(directories, destinationDirHash)) {
+            return ResponseEntity.badRequest().build();
         }
+        userDirectoryService.replace(directories, destinationDirHash, user);
         return ResponseEntity.ok().build();
     }
 
@@ -107,14 +104,11 @@ public class FilesResource {
                                           HttpSession session) {
 
         User user = getUserFromSession(session);
-        if (docIds != null) {
-            Set<UserDocument> documents = userDocumentService.getAllByIds(docIds);
-            userDocumentService.copy(documents, destinationDirHash, user);
-        }
-        if (dirIds != null) {
-            Set<UserDirectory> directories = userDirectoryService.getAllByIds(dirIds);
-            userDirectoryService.copy(directories, destinationDirHash, user);
-        }
+        Set<UserDocument> documents = userDocumentService.getAllByIds(docIds);
+        userDocumentService.copy(documents, destinationDirHash, user);
+
+        Set<UserDirectory> directories = userDirectoryService.getAllByIds(dirIds);
+        userDirectoryService.copy(directories, destinationDirHash, user);
         return ResponseEntity.ok().build();
     }
 

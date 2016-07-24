@@ -10,7 +10,7 @@ import java.util.List;
 
 public interface FriendGroupToDirectoryRelationRepository extends EntityRepository<FriendGroupToDirectoryRelation, Long> {
 
-    void deleteByDirectoryBesidesOwner(UserDirectory directory);
+    void deleteAllByDirectory(UserDirectory directory);
 
     Long getCountByFriendGroup(FriendsGroup group);
 

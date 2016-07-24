@@ -76,8 +76,8 @@ public class FriendGroupToDirectoryRelationServiceImpl implements FriendGroupToD
     }
 
     @Override
-    public void deleteByDirectory(UserDirectory directory) {
-        repository.deleteByDirectoryBesidesOwner(directory);
+    public void deleteAllByDirectory(UserDirectory directory) {
+        repository.deleteAllByDirectory(directory);
     }
 
     @Override
