@@ -232,17 +232,19 @@ public class UserDocumentServiceImpl implements UserDocumentService {
             return;
         }
         UserDirectory destinationDir = null;
+        DirectoryWithRelations relations = null;
         if (destinationDirectoryHash.equals("root")) {
             destinationDirectoryHash = user.getLogin();
         } else {
             destinationDir = userDirectoryService.getByHashName(destinationDirectoryHash);
+            relations = userDirectoryService.getAllDirectoryRelations(destinationDir);
         }
         documents = setDocumentFullNames(destinationDirectoryHash, documents);
         for (UserDocument doc : documents) {
             doc.setDocumentAttribute(destinationDir == null ? DocumentAttribute.PRIVATE
                     : destinationDir.getDocumentAttribute());
             update(doc);
-            createRelations(doc, destinationDir);
+            createRelations(doc, relations);
         }
     }
 
@@ -299,8 +301,12 @@ public class UserDocumentServiceImpl implements UserDocumentService {
     }
 
     @Override
-    public void createRelations(List<UserDocument> documents, DirectoryWithRelations parentDirectory) {
-        documents.forEach(d -> createRelations(d, parentDirectory));
+    public void createRelations(List<UserDocument> documents, DirectoryWithRelations relations) {
+        documents.forEach(d -> {
+            createRelations(d, relations);
+            d.setDocumentAttribute(relations.getDocumentAttribute());
+            update(d);
+        });
     }
 
     private void createRelations(UserDocument document, DirectoryWithRelations relations) {
@@ -445,17 +451,17 @@ public class UserDocumentServiceImpl implements UserDocumentService {
     }
 
     @Override
-    public void createRelations(List<UserDocument> documents, ReadersAndEditors readersAndEditors) {
+    public void createRelationsByReadersAndEditors(List<UserDocument> documents, DirectoryWithRelations relations) {
         documents.forEach(d -> {
             userToDocumentRelationService.deleteAllBesidesOwnerByDocument(d);
-            userToDocumentRelationService.create(d, readersAndEditors.getReaders(), FileRelationType.READ);
-            userToDocumentRelationService.create(d, readersAndEditors.getEditors(), FileRelationType.EDIT);
+            userToDocumentRelationService.create(d, relations.getReaders(), FileRelationType.READ);
+            userToDocumentRelationService.create(d, relations.getEditors(), FileRelationType.EDIT);
 
             friendGroupToDocumentRelationService.deleteAllByDocument(d);
-            friendGroupToDocumentRelationService.create(d, readersAndEditors.getReaderGroups(), FileRelationType.READ);
-            friendGroupToDocumentRelationService.create(d, readersAndEditors.getEditorGroups(), FileRelationType.READ);
+            friendGroupToDocumentRelationService.create(d, relations.getReaderGroups(), FileRelationType.READ);
+            friendGroupToDocumentRelationService.create(d, relations.getEditorGroups(), FileRelationType.READ);
 
-            d.setDocumentAttribute(readersAndEditors.getDocumentAttribute());
+            d.setDocumentAttribute(relations.getDocumentAttribute());
             update(d);
         });
     }
@@ -464,24 +470,20 @@ public class UserDocumentServiceImpl implements UserDocumentService {
         userToDocumentRelationService.deleteAllBesidesOwnerByDocument(document);
         List<User> users = userService.getByIds(CollectionTools.unionLists(shared.getReaders(), shared.getEditors()));
 
-        List<User> editors = users.stream()
-                .filter(u -> shared.getEditors().contains(u.getId())).collect(Collectors.toList());
+        List<User> editors = CollectionTools.filterUserList(users, shared.getEditors());
         userToDocumentRelationService.create(document, editors, FileRelationType.EDIT);
 
-        List<User> readers = users.stream()
-                .filter(u -> shared.getReaders().contains(u.getId())).collect(Collectors.toList());
+        List<User> readers = CollectionTools.filterUserList(users, shared.getReaders());
         userToDocumentRelationService.create(document, readers, FileRelationType.READ);
 
         friendGroupToDocumentRelationService.deleteAllByDocument(document);
         List<FriendsGroup> groups = friendGroupService
                 .getByIds(CollectionTools.unionLists(shared.getReaderGroups(), shared.getEditorGroups()));
 
-        List<FriendsGroup> editorGroups = groups.stream()
-                .filter(g -> shared.getEditorGroups().contains(g.getId())).collect(Collectors.toList());
+        List<FriendsGroup> editorGroups = CollectionTools.filterGroupList(groups, shared.getEditorGroups());
         friendGroupToDocumentRelationService.create(document, editorGroups, FileRelationType.EDIT);
 
-        List<FriendsGroup> readerGroups = groups.stream()
-                .filter(g -> shared.getReaderGroups().contains(g.getId())).collect(Collectors.toList());
+        List<FriendsGroup> readerGroups = CollectionTools.filterGroupList(groups, shared.getReaderGroups());
         friendGroupToDocumentRelationService.create(document, readerGroups, FileRelationType.READ);
 
     }

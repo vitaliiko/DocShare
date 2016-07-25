@@ -11,14 +11,12 @@ import com.geekhub.services.*;
 import com.geekhub.services.enams.FileType;
 import com.geekhub.utils.DirectoryWithRelations;
 import com.geekhub.utils.CollectionTools;
-import com.geekhub.utils.ReadersAndEditors;
 import com.geekhub.utils.UserFileUtil;
 
 import java.util.*;
 import java.util.stream.Collectors;
 import javax.inject.Inject;
 
-import org.apache.commons.collections.ListUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
@@ -301,17 +299,19 @@ public class UserDirectoryServiceImpl implements UserDirectoryService {
             return;
         }
         UserDirectory destinationDir = null;
+        DirectoryWithRelations relations = null;
         if (destinationDirectoryHash.equals("root")) {
             destinationDirectoryHash = user.getLogin();
         } else {
             destinationDir = getByHashName(destinationDirectoryHash);
+            relations = getAllDirectoryRelations(destinationDir);
         }
         directories = setDirectoriesFullNames(destinationDirectoryHash, directories);
         for (UserDirectory dir : directories) {
             dir.setDocumentAttribute(destinationDir == null ? DocumentAttribute.PRIVATE : destinationDir.getDocumentAttribute());
             update(dir);
             userToDirectoryRelationService.deleteAllBesidesOwnerByDirectory(dir);
-            DirectoryWithRelations relations = createRelations(dir, destinationDirectoryHash, user);
+            createRelations(dir, relations);
             createRelationsForChilds(destinationDirectoryHash, relations);
         }
     }
@@ -320,7 +320,11 @@ public class UserDirectoryServiceImpl implements UserDirectoryService {
         List<UserDirectory> childDirectories = getTreeByParentDirectoryHash(dirHashName);
         List<String> parentDirHashList = new ArrayList<>();
         if (!CollectionUtils.isEmpty(childDirectories)) {
-            childDirectories.forEach(d -> createRelations(d, relations));
+            childDirectories.forEach(d -> {
+                createRelations(d, relations);
+                d.setDocumentAttribute(relations.getDocumentAttribute());
+                update(d);
+            });
             parentDirHashList = childDirectories.stream().map(UserDirectory::getHashName).collect(Collectors.toList());
         }
         parentDirHashList.add(dirHashName);
@@ -387,14 +391,19 @@ public class UserDirectoryServiceImpl implements UserDirectoryService {
         }
     }
 
-    private void createRelations(UserDirectory directory, DirectoryWithRelations parentDirectory) {
-        userToDirectoryRelationService.deleteAllBesidesOwnerByDirectory(directory);
-        parentDirectory.getUserRelations().forEach(r -> userToDirectoryRelationService
-                .create(directory, r.getUser(), r.getFileRelationType()));
-
-        friendGroupToDirectoryRelationService.deleteAllByDirectory(directory);
-        parentDirectory.getGroupRelations().forEach(r -> friendGroupToDirectoryRelationService
-                .create(directory, r.getFriendsGroup(), r.getFileRelationType()));
+    private void createRelations(UserDirectory directory, DirectoryWithRelations relations) {
+        if (relations == null) {
+            return;
+        }
+        deleteRelations(directory);
+        if (!CollectionUtils.isEmpty(relations.getUserRelations())) {
+            relations.getUserRelations().forEach(r -> userToDirectoryRelationService
+                    .create(directory, r.getUser(), r.getFileRelationType()));
+        }
+        if (!CollectionUtils.isEmpty(relations.getGroupRelations())) {
+            relations.getGroupRelations().forEach(r -> friendGroupToDirectoryRelationService
+                    .create(directory, r.getFriendsGroup(), r.getFileRelationType()));
+        }
     }
 
     @Override
@@ -457,64 +466,42 @@ public class UserDirectoryServiceImpl implements UserDirectoryService {
         directory.setDocumentAttribute(DocumentAttribute.valueOf(sharedDto.getAccess()));
         update(directory);
 
-        ReadersAndEditors readersAndEditors = convertSharedDtoToUsers(sharedDto);
-        createRelations(directory, readersAndEditors);
-        createRelationsForChilds(directory.getHashName(), readersAndEditors);
+        DirectoryWithRelations relations = convertSharedDtoToRelations(sharedDto);
+        createRelationsByReadersAndEditors(directory, relations);
+        createRelationsForChilds(directory.getHashName(), relations);
 
         sendEvents(directory, user, currentReadersAndEditors);
         return directory;
     }
 
-    private ReadersAndEditors convertSharedDtoToUsers(SharedDto shared) {
-        ReadersAndEditors readersAndEditors = new ReadersAndEditors();
-        readersAndEditors.setDocumentAttribute(DocumentAttribute.getValue(shared.getAccess()));
+    private DirectoryWithRelations convertSharedDtoToRelations(SharedDto shared) {
+        DirectoryWithRelations relations = new DirectoryWithRelations();
+        relations.setDocumentAttribute(DocumentAttribute.getValue(shared.getAccess()));
         List<User> users = userService.getByIds(CollectionTools.unionLists(shared.getReaders(), shared.getEditors()));
 
-        List<User> editors = users.stream()
-                .filter(u -> shared.getEditors().contains(u.getId())).collect(Collectors.toList());
-        readersAndEditors.addAllEditors(editors);
+        List<User> editors = CollectionTools.filterUserList(users, shared.getEditors());
+        relations.addAllEditors(editors);
 
-        List<User> readers = users.stream()
-                .filter(u -> shared.getReaders().contains(u.getId())).collect(Collectors.toList());
-        readersAndEditors.addAllReaders(readers);
+        List<User> readers = CollectionTools.filterUserList(users, shared.getReaders());
+        relations.addAllReaders(readers);
 
         List<FriendsGroup> groups = friendGroupService
                 .getByIds(CollectionTools.unionLists(shared.getReaderGroups(), shared.getEditorGroups()));
 
-        List<FriendsGroup> editorGroups = groups.stream()
-                .filter(g -> shared.getEditorGroups().contains(g.getId())).collect(Collectors.toList());
-        readersAndEditors.addAllEditorGroups(editorGroups);
+        List<FriendsGroup> editorGroups = CollectionTools.filterGroupList(groups, shared.getEditorGroups());
+        relations.addAllEditorGroups(editorGroups);
 
-        List<FriendsGroup> readerGroups = groups.stream()
-                .filter(g -> shared.getReaderGroups().contains(g.getId())).collect(Collectors.toList());
-        readersAndEditors.addAllReaderGroups(readerGroups);
-        return readersAndEditors;
+        List<FriendsGroup> readerGroups = CollectionTools.filterGroupList(groups, shared.getReaderGroups());
+        relations.addAllReaderGroups(readerGroups);
+        return relations;
     }
 
-    private void createRelationsForChilds(String dirHashName, ReadersAndEditors readersAndEditors) {
-        List<UserDirectory> childDirectories = getTreeByParentDirectoryHash(dirHashName);
-        List<String> parentDirHashList = new ArrayList<>();
-        if (!CollectionUtils.isEmpty(childDirectories)) {
-            childDirectories.forEach(d -> {
-                createRelations(d, readersAndEditors);
-                d.setDocumentAttribute(readersAndEditors.getDocumentAttribute());
-                update(d);
-            });
-            parentDirHashList = childDirectories.stream().map(UserDirectory::getHashName).collect(Collectors.toList());
-        }
-        parentDirHashList.add(dirHashName);
-        List<UserDocument> childDocuments = userDocumentService.getAllByParentDirectoryHashes(parentDirHashList);
-        userDocumentService.createRelations(childDocuments, readersAndEditors);
-    }
-
-    private void createRelations(UserDirectory directory, ReadersAndEditors readersAndEditors) {
-        userToDirectoryRelationService.deleteAllBesidesOwnerByDirectory(directory);
-        userToDirectoryRelationService.create(directory, readersAndEditors.getEditors(), FileRelationType.EDIT);
-        userToDirectoryRelationService.create(directory, readersAndEditors.getReaders(), FileRelationType.READ);
-
-        friendGroupToDirectoryRelationService.deleteAllByDirectory(directory);
-        friendGroupToDirectoryRelationService.create(directory, readersAndEditors.getEditorGroups(), FileRelationType.EDIT);
-        friendGroupToDirectoryRelationService.create(directory, readersAndEditors.getReaderGroups(), FileRelationType.READ);
+    private void createRelationsByReadersAndEditors(UserDirectory directory, DirectoryWithRelations relations) {
+        deleteRelations(directory);
+        userToDirectoryRelationService.create(directory, relations.getEditors(), FileRelationType.EDIT);
+        userToDirectoryRelationService.create(directory, relations.getReaders(), FileRelationType.READ);
+        friendGroupToDirectoryRelationService.create(directory, relations.getEditorGroups(), FileRelationType.EDIT);
+        friendGroupToDirectoryRelationService.create(directory, relations.getReaderGroups(), FileRelationType.READ);
     }
 
     private void sendEvents(UserDirectory directory, User user, Set<User> currentReadersAndEditors) {
@@ -525,6 +512,13 @@ public class UserDirectoryServiceImpl implements UserDirectoryService {
         newReaderSet = getAllReadersAndEditors(directory.getId());
         currentReadersAndEditors.removeAll(newReaderSet);
         eventSendingService.sendProhibitAccessEvent(currentReadersAndEditors, FileType.DIRECTORY, directory.getName(), user);
+    }
+
+    private void deleteRelations(UserDirectory directory) {
+        if (directory.getId() != null) {
+            userToDirectoryRelationService.deleteAllBesidesOwnerByDirectory(directory);
+            friendGroupToDirectoryRelationService.deleteAllByDirectory(directory);
+        }
     }
 
     @Override
