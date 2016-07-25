@@ -8,7 +8,6 @@ import com.geekhub.repositories.UserDocumentRepository;
 import com.geekhub.entities.enums.AbilityToCommentDocument;
 import com.geekhub.entities.enums.DocumentAttribute;
 import com.geekhub.entities.enums.DocumentStatus;
-import com.geekhub.security.UserDocumentAccessService;
 import com.geekhub.services.*;
 import com.geekhub.services.enams.FileType;
 import com.geekhub.utils.*;
@@ -43,9 +42,6 @@ public class UserDocumentServiceImpl implements UserDocumentService {
 
     @Inject
     private UserDirectoryService userDirectoryService;
-
-    @Inject
-    private UserDocumentAccessService userDocumentAccessService;
 
     @Inject
     private EventSendingService eventSendingService;
@@ -246,7 +242,6 @@ public class UserDocumentServiceImpl implements UserDocumentService {
             doc.setDocumentAttribute(destinationDir == null ? DocumentAttribute.PRIVATE
                     : destinationDir.getDocumentAttribute());
             update(doc);
-            userToDocumentRelationService.deleteAllBesidesOwnerByDocument(doc);
             createRelations(doc, destinationDir);
         }
     }
@@ -308,14 +303,22 @@ public class UserDocumentServiceImpl implements UserDocumentService {
         documents.forEach(d -> createRelations(d, parentDirectory));
     }
 
-    private void createRelations(UserDocument document, DirectoryWithRelations parentDirectory) {
-        userToDocumentRelationService.deleteAllBesidesOwnerByDocument(document);
-        parentDirectory.getUserRelations().forEach(r -> userToDocumentRelationService
-                .create(document, r.getUser(), r.getFileRelationType()));
-
-        friendGroupToDocumentRelationService.deleteAllByDocument(document);
-        parentDirectory.getGroupRelations().forEach(r -> friendGroupToDocumentRelationService
-                .create(document, r.getFriendsGroup(), r.getFileRelationType()));
+    private void createRelations(UserDocument document, DirectoryWithRelations relations) {
+        if (relations == null) {
+            return;
+        }
+        if (document.getId() != null) {
+            userToDocumentRelationService.deleteAllBesidesOwnerByDocument(document);
+            friendGroupToDocumentRelationService.deleteAllByDocument(document);
+        }
+        if (!CollectionUtils.isEmpty(relations.getUserRelations())) {
+            relations.getUserRelations().forEach(r -> userToDocumentRelationService
+                    .create(document, r.getUser(), r.getFileRelationType()));
+        }
+        if (!CollectionUtils.isEmpty(relations.getGroupRelations())) {
+            relations.getGroupRelations().forEach(r -> friendGroupToDocumentRelationService
+                    .create(document, r.getFriendsGroup(), r.getFileRelationType()));
+        }
     }
 
     @Override
@@ -327,39 +330,44 @@ public class UserDocumentServiceImpl implements UserDocumentService {
     }
 
     @Override
-    public UserDocument saveOrUpdateDocument(MultipartFile multipartFile, String parentDirectoryHash, User user)
+    public List<UserDocument> saveOrUpdateDocument(MultipartFile[] files, String parentDirectoryHash, User user)
             throws IOException {
 
-        String docName = multipartFile.getOriginalFilename();
-        UserDirectory parentDirectory = null;
+        List<UserDocument> documents = new ArrayList<>();
+        UserDirectory parentDirectory;
+            DirectoryWithRelations relations = null;
         if (parentDirectoryHash.equals("root")) {
             parentDirectoryHash = user.getLogin();
         } else {
             parentDirectory = userDirectoryService.getByHashName(parentDirectoryHash);
-        }
-        UserDocument document = userToDocumentRelationService
-                .getDocumentByFullNameAndOwner(parentDirectoryHash, docName, user);
-
-        if (document == null) {
-            document = createDocument(multipartFile, parentDirectory, user);
-        } else if (document.getDocumentStatus() == DocumentStatus.REMOVED) {
-            document = recoverAndUpdate(multipartFile, user, document);
-        } else if (userDocumentAccessService.canEdit(document, user)) {
-            document = getDocumentWithOldVersions(document.getId());
-            updateDocument(document, user, multipartFile);
+            relations = userDirectoryService.getAllDirectoryRelations(parentDirectory);
         }
 
-        return document;
+        for (MultipartFile file : files) {
+            String docName = file.getOriginalFilename();
+            UserDocument existingDocument = userToDocumentRelationService
+                    .getDocumentByFullNameAndOwner(parentDirectoryHash, docName, user);
+
+            if (existingDocument == null) {
+                documents.add(createDocument(file, relations, user));
+            } else if (existingDocument.getDocumentStatus() == DocumentStatus.REMOVED) {
+                documents.add(recoverAndUpdate(file, user, existingDocument));
+            } else {
+                existingDocument = getDocumentWithOldVersions(existingDocument.getId());
+                documents.add(updateDocument(existingDocument, user, file));
+            }
+        }
+        return documents;
     }
 
-    private UserDocument createDocument(MultipartFile multipartFile, UserDirectory parentDirectory, User user)
+    private UserDocument createDocument(MultipartFile multipartFile, DirectoryWithRelations relations, User user)
             throws IOException {
 
-        UserDocument document = UserFileUtil.createUserDocument(multipartFile, parentDirectory, user);
+        UserDocument document = UserFileUtil.createUserDocument(multipartFile, relations.getDirectory(), user);
         multipartFile.transferTo(UserFileUtil.createFile(document.getHashName()));
         Long docId = save(document);
         document.setId(docId);
-        createRelations(document, parentDirectory);
+        createRelations(document, relations);
         userToDocumentRelationService.create(document, user, FileRelationType.OWN);
         return document;
     }
@@ -395,7 +403,7 @@ public class UserDocumentServiceImpl implements UserDocumentService {
     }
 
     @Override
-    public void updateDocument(UserDocument document, User user, MultipartFile multipartFile)
+    public UserDocument updateDocument(UserDocument document, User user, MultipartFile multipartFile)
             throws IOException {
 
         DocumentOldVersion oldVersion = DocumentVersionUtil.createOldVersion(document);
@@ -403,6 +411,7 @@ public class UserDocumentServiceImpl implements UserDocumentService {
         UserDocument updatedDocument = UserFileUtil.updateUserDocument(document, multipartFile, user);
         update(updatedDocument);
         eventSendingService.sendUpdateEvent(updatedDocument, user);
+        return updatedDocument;
     }
 
     @Override

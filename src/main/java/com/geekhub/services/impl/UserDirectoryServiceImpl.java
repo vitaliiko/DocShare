@@ -17,6 +17,8 @@ import com.geekhub.utils.UserFileUtil;
 import java.util.*;
 import java.util.stream.Collectors;
 import javax.inject.Inject;
+
+import org.apache.commons.collections.ListUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
@@ -405,6 +407,27 @@ public class UserDirectoryServiceImpl implements UserDirectoryService {
                 .collect(Collectors.toList());
         String pattern = UserFileUtil.createNamesPattern(documentNames);
         return repository.getSimilarDirectoryNamesInDirectory(directoryHash, pattern);
+    }
+
+    @Override
+    public DirectoryWithRelations getAllDirectoryRelations(UserDirectory directory) {
+        if (directory == null) {
+            return new DirectoryWithRelations();
+        }
+        DirectoryWithRelations directoryWithRelations = new DirectoryWithRelations();
+        directoryWithRelations.setDirectory(directory);
+
+        List<UserToDirectoryRelation> userRelations = userToDirectoryRelationService.getAllByDirectory(directory);
+        directoryWithRelations.addAllUserRelations(userRelations.stream()
+                        .filter(r -> r.getFileRelationType() != FileRelationType.OWN)
+                        .collect(Collectors.toList()));
+        User owner = CollectionTools.getDifferenceObject(userRelations, directoryWithRelations.getUserRelations()).getUser();
+        directoryWithRelations.setOwner(owner);
+
+        directoryWithRelations.addAllGroupRelations(
+                friendGroupToDirectoryRelationService.getAllByDirectory(directory)
+        );
+        return directoryWithRelations;
     }
 
     @Override

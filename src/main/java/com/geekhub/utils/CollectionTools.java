@@ -14,4 +14,9 @@ public class CollectionTools {
         Arrays.stream(lists).filter(list -> !CollectionUtils.isEmpty(list)).distinct().forEach(union::addAll);
         return union;
     }
+
+    public static <T> T getDifferenceObject(List<T> list1, List<T> list2) {
+        list1.removeAll(list2);
+        return list1.get(0);
+    }
 }

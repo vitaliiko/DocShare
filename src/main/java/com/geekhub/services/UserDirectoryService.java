@@ -77,4 +77,6 @@ public interface UserDirectoryService extends EntityService<UserDirectory, Long>
     boolean isDirectoryNameValid(String parentDirectoryHash, String dirName, User owner);
 
     List<String> getSimilarDirectoryNamesInDirectory(String directoryHash, Set<UserDirectory> directories);
+
+    DirectoryWithRelations getAllDirectoryRelations(UserDirectory directory);
 }

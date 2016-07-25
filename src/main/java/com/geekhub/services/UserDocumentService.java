@@ -64,9 +64,9 @@ public interface UserDocumentService extends EntityService<UserDocument, Long> {
 
     Set<UserDocument> searchByName(User owner, String name);
 
-    UserDocument saveOrUpdateDocument(MultipartFile multipartFile, String parentDirHashName, User user) throws IOException;
+    List<UserDocument> saveOrUpdateDocument(MultipartFile[] files, String parentDirHashName, User user) throws IOException;
 
-    void updateDocument(UserDocument document, User user, MultipartFile multipartFile) throws IOException;
+    UserDocument updateDocument(UserDocument document, User user, MultipartFile multipartFile) throws IOException;
 
     void changeAbilityToComment(Long documentId, boolean abilityToComment);
 

@@ -49,11 +49,8 @@ public class UserDirectoriesResource {
 
         User user = getUserFromSession(session);
         if (UserFileUtil.isValidFileUploading(files)) {
-            for (MultipartFile file : files) {
-                userDocumentService.saveOrUpdateDocument(file, parentDirectoryHash, user);
-            }
+            userDocumentService.saveOrUpdateDocument(files, parentDirectoryHash, user);
         }
-
         return new ModelAndView("redirect:/api/documents");
     }
 
