@@ -95,8 +95,8 @@ public class UserToDocumentRelationServiceImpl implements UserToDocumentRelation
     }
 
     @Override
-    public List<User> getAllByDocumentIdAndRelation(UserDocument document, FileRelationType relationType) {
-        return repository.getAllByDocumentIdAndRelation(document, relationType);
+    public List<User> getAllUsersByDocumentAndRelation(UserDocument document, FileRelationType relationType) {
+        return repository.getAllUsersByDocumentAndRelation(document, relationType);
     }
 
     @Override
@@ -110,7 +110,7 @@ public class UserToDocumentRelationServiceImpl implements UserToDocumentRelation
     }
 
     @Override
-    public Set<UserDocument> getAllAccessibleDocumentsInRoot(User user, List<String> directoryHashes) {
+    public Set<UserToDocumentRelation> getAllAccessibleInRoot(User user, List<String> directoryHashes) {
         if (CollectionUtils.isEmpty(directoryHashes)) {
             return new HashSet<>();
         }

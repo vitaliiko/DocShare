@@ -99,7 +99,7 @@ public class UserToDirectoryRelationRepositoryImpl implements UserToDirectoryRel
     }
 
     @Override
-    public List<User> getAllByDirectoryIdAndRelation(UserDirectory directory, FileRelationType relationType) {
+    public List<User> getAllUsersByDirectoryIdAndRelation(UserDirectory directory, FileRelationType relationType) {
         return sessionFactory.getCurrentSession()
                 .createCriteria(clazz)
                 .add(Restrictions.eq("directory", directory))
@@ -146,6 +146,17 @@ public class UserToDirectoryRelationRepositoryImpl implements UserToDirectoryRel
                              "WHERE rel.directory IN :dirs AND rel.user = :user")
                 .setParameter("user", user)
                 .setParameterList("dirs", directories)
+                .list();
+    }
+
+    @Override
+    public List<UserToDirectoryRelation> getAllAccessibleInRoot(User user, List<String> directoryHashes) {
+        return sessionFactory.getCurrentSession()
+                .createCriteria(clazz, "rel")
+                .createAlias("rel.directory", "dir")
+                .add(Restrictions.eq("user", user))
+                .add(Restrictions.ne("fileRelationType", FileRelationType.OWN))
+                .add(Restrictions.not(Restrictions.in("dir.parentDirectoryHash", directoryHashes)))
                 .list();
     }
 }

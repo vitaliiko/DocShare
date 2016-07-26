@@ -12,6 +12,7 @@ import org.hibernate.criterion.Restrictions;
 import org.springframework.stereotype.Repository;
 
 import javax.inject.Inject;
+import java.util.Collection;
 import java.util.List;
 
 @Repository
@@ -131,19 +132,18 @@ public class UserToDocumentRelationRepositoryImpl implements UserToDocumentRelat
     }
 
     @Override
-    public List<UserDocument> getAllAccessibleDocumentsInRoot(User user, List<String> directoryHashes) {
+    public List<UserToDocumentRelation> getAllAccessibleDocumentsInRoot(User user, List<String> directoryHashes) {
         return sessionFactory.getCurrentSession()
                 .createCriteria(clazz, "rel")
                 .createAlias("rel.document", "doc")
                 .add(Restrictions.eq("user", user))
                 .add(Restrictions.ne("fileRelationType", FileRelationType.OWN))
                 .add(Restrictions.not(Restrictions.in("doc.parentDirectoryHash", directoryHashes)))
-                .setProjection(Projections.property("document"))
                 .list();
     }
 
     @Override
-    public List<User> getAllByDocumentIdAndRelation(UserDocument document, FileRelationType relationType) {
+    public List<User> getAllUsersByDocumentAndRelation(UserDocument document, FileRelationType relationType) {
         return sessionFactory.getCurrentSession()
                 .createCriteria(clazz)
                 .add(Restrictions.eq("document", document))

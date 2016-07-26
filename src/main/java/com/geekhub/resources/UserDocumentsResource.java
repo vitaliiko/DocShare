@@ -99,6 +99,21 @@ public class UserDocumentsResource {
         return ResponseEntity.ok().build();
     }
 
+    private static void openOutputStream(UserDocument document, HttpServletResponse response) throws IOException {
+        openOutputStream(document.getHashName(), document.getType(), document.getName(), response);
+    }
+
+    private static void openOutputStream(String docHashName, String docType, String docName, HttpServletResponse response)
+            throws IOException {
+
+        File file = UserFileUtil.createFile(docHashName);
+        response.setContentType(docType);
+        response.setContentLength((int) file.length());
+        response.setHeader("Content-Disposition", "attachment; filename=\"" + docName + "\"");
+
+        FileCopyUtils.copy(Files.newInputStream(file.toPath()), response.getOutputStream());
+    }
+
     @RequestMapping(value = "/documents/{docId}/comment-ability", method = RequestMethod.POST)
     public ResponseEntity setCommentAbility(@PathVariable Long docId,
                                             @RequestParam boolean abilityToComment) {
@@ -206,49 +221,10 @@ public class UserDocumentsResource {
         return ResponseEntity.ok().build();
     }
 
-    @RequestMapping(value = "/documents/accessible", method = RequestMethod.GET)
-    public ModelAndView getAccessibleDocuments(HttpSession session) {
-        User user = getUserFromSession(session);
-
-        Set<UserDirectory> directories = userToDirectoryRelationService.getAllAccessibleDirectories(user);
-        List<String> directoryHashes = directories.stream().map(UserDirectory::getHashName).collect(Collectors.toList());
-        Set<UserDocument> documents = userToDocumentRelationService.getAllAccessibleDocumentsInRoot(user, directoryHashes);
-
-        return prepareModel(directories, documents);
-    }
-
-    private ModelAndView prepareModel(Set<UserDirectory> directories, Set<UserDocument> documents) {
-        Set<UserFileDto> documentDtos = documents.stream()
-                .map(EntityToDtoConverter::convert).collect(Collectors.toCollection(TreeSet::new));
-
-        Set<UserFileDto> directoryDtos = directories.stream()
-                .map(EntityToDtoConverter::convert).collect(Collectors.toCollection(TreeSet::new));
-
-        ModelAndView model = new ModelAndView("accessibleDocuments");
-        model.addObject("documents", documentDtos);
-        model.addObject("directories", directoryDtos);
-        return model;
-    }
-
     @RequestMapping(value = "/documents/{docId}/recover", method = RequestMethod.POST)
     public ModelAndView recoverDocument(@PathVariable Long docId, HttpSession session) {
         User user = getUserFromSession(session);
         userDocumentService.recoverRemovedDocument(docId, user);
         return new ModelAndView("redirect:/api/documents");
-    }
-
-    private static void openOutputStream(UserDocument document, HttpServletResponse response) throws IOException {
-        openOutputStream(document.getHashName(), document.getType(), document.getName(), response);
-    }
-
-    private static void openOutputStream(String docHashName, String docType, String docName, HttpServletResponse response)
-            throws IOException {
-
-        File file = UserFileUtil.createFile(docHashName);
-        response.setContentType(docType);
-        response.setContentLength((int) file.length());
-        response.setHeader("Content-Disposition", "attachment; filename=\"" + docName + "\"");
-
-        FileCopyUtils.copy(Files.newInputStream(file.toPath()), response.getOutputStream());
     }
 }

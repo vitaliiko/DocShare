@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import javax.inject.Inject;
 import javax.transaction.Transactional;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -98,5 +99,10 @@ public class FriendGroupToDirectoryRelationServiceImpl implements FriendGroupToD
     @Override
     public List<FileRelationType> getAllRelationsByDirectoryIdAndUser(Long directoryId, User user) {
         return repository.getAllRelationsByDirectoryIdAndUser(directoryId, user);
+    }
+
+    @Override
+    public Set<UserDirectory> getAllAccessibleDirectories(User user) {
+        return repository.getAllAccessibleDirectories(user).stream().collect(Collectors.toSet());
     }
 }

@@ -17,4 +17,6 @@ public interface FriendGroupToDirectoryRelationRepository extends EntityReposito
     List<FriendsGroup> getAllGroupsByDirectoryIdAndRelation(UserDirectory directory, FileRelationType relationType);
 
     List<FileRelationType> getAllRelationsByDirectoryIdAndUser(Long directoryId, User user);
+
+    List<UserDirectory> getAllAccessibleDirectories(User user);
 }

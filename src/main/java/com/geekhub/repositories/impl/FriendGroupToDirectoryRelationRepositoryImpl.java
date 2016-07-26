@@ -115,4 +115,13 @@ public class FriendGroupToDirectoryRelationRepositoryImpl implements FriendGroup
                 .setParameter("user", user)
                 .list();
     }
+
+    @Override
+    public List<UserDirectory> getAllAccessibleDirectories(User user) {
+        return sessionFactory.getCurrentSession()
+                .createQuery("SELECT rel.directory FROM FriendGroupToDirectoryRelation rel " +
+                             "WHERE :user IN ELEMENTS(rel.friendsGroup.friends)")
+                .setParameter("user", user)
+                .list();
+    }
 }

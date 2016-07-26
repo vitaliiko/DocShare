@@ -2,15 +2,7 @@ package com.geekhub.dto.convertors;
 
 import com.geekhub.dto.*;
 
-import com.geekhub.entities.Comment;
-import com.geekhub.entities.DocumentOldVersion;
-import com.geekhub.entities.Event;
-import com.geekhub.entities.FriendsGroup;
-import com.geekhub.entities.RemovedDirectory;
-import com.geekhub.entities.RemovedDocument;
-import com.geekhub.entities.User;
-import com.geekhub.entities.UserDirectory;
-import com.geekhub.entities.UserDocument;
+import com.geekhub.entities.*;
 import com.geekhub.entities.enums.EventStatus;
 import com.geekhub.services.enams.FileType;
 
@@ -123,6 +115,18 @@ public class EntityToDtoConverter {
         removedFileDto.setRemoverName(removerName);
         removedFileDto.setType(FileType.DIRECTORY);
         return removedFileDto;
+    }
+
+    public static UserFileDto convert(UserToDocumentRelation relation) {
+        UserFileDto fileDto = EntityToDtoConverter.convert(relation.getDocument());
+        fileDto.setOwnerName(relation.getUser().getFullName());
+        return fileDto;
+    }
+
+    public static UserFileDto convert(UserToDirectoryRelation relation) {
+        UserFileDto fileDto = EntityToDtoConverter.convert(relation.getDirectory());
+        fileDto.setOwnerName(relation.getUser().getFullName());
+        return fileDto;
     }
 
     public static Map<UserDto, List<FriendGroupDto>> convertMap(Map<User, List<FriendsGroup>> friendsMap) {

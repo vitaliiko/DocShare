@@ -1,17 +1,17 @@
 package com.geekhub.resources;
 
 import com.geekhub.dto.RemovedFileDto;
-import com.geekhub.entities.User;
-import com.geekhub.entities.UserDirectory;
-import com.geekhub.entities.UserDocument;
+import com.geekhub.entities.*;
 import com.geekhub.dto.UserFileDto;
 import com.geekhub.resources.utils.FileControllersUtil;
 import com.geekhub.services.*;
 import com.geekhub.dto.convertors.EntityToDtoConverter;
 import com.geekhub.validators.FileValidator;
 
+import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.stream.Collectors;
 import javax.inject.Inject;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.WebDataBinder;
@@ -45,6 +45,18 @@ public class FilesResource {
 
     @Inject
     private RemovedDirectoryService removedDirectoryService;
+
+    @Inject
+    private UserToDocumentRelationService userToDocumentRelationService;
+
+    @Inject
+    private UserToDirectoryRelationService userToDirectoryRelationService;
+
+    @Inject
+    private FriendGroupToDocumentRelationService friendGroupToDocumentRelationService;
+
+    @Inject
+    private FriendGroupToDirectoryRelationService friendGroupToDirectoryRelationService;
 
     private User getUserFromSession(HttpSession session) {
         return userService.getById((Long) session.getAttribute("userId"));
@@ -146,6 +158,35 @@ public class FilesResource {
 
         model.addObject("documents", documents);
         model.addObject("directories", directories);
+        return model;
+    }
+
+    @RequestMapping(value = "/files/accessible", method = RequestMethod.GET)
+    public ModelAndView getAccessibleDocuments(HttpSession session) {
+        User user = getUserFromSession(session);
+
+        Set<UserDirectory> accessibleDirectories = userToDirectoryRelationService.getAllAccessibleDirectories(user);
+        accessibleDirectories.addAll(friendGroupToDirectoryRelationService.getAllAccessibleDirectories(user));
+        List<String> directoryHashes = accessibleDirectories.stream().map(UserDirectory::getHashName).collect(Collectors.toList());
+
+        Set<UserToDocumentRelation> documentRelations = userToDocumentRelationService.getAllAccessibleInRoot(user, directoryHashes);
+        Set<UserToDirectoryRelation> directoryRelations = userToDirectoryRelationService.getAllAccessibleInRoot(user, directoryHashes);
+
+        return prepareModel(directoryRelations, documentRelations);
+    }
+
+    private ModelAndView prepareModel(Set<UserToDirectoryRelation> directoryRelations, Set<UserToDocumentRelation> documentRelations) {
+        Set<UserFileDto> documentDtos = documentRelations.stream()
+                .map(EntityToDtoConverter::convert)
+                .collect(Collectors.toCollection(TreeSet::new));
+
+        Set<UserFileDto> directoryDtos = directoryRelations.stream()
+                .map(EntityToDtoConverter::convert)
+                .collect(Collectors.toCollection(TreeSet::new));
+
+        ModelAndView model = new ModelAndView("accessibleDocuments");
+        model.addObject("documents", documentDtos);
+        model.addObject("directories", directoryDtos);
         return model;
     }
 }

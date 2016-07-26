@@ -24,13 +24,13 @@ public interface UserToDocumentRelationService extends EntityService<UserToDocum
 
     User getDocumentOwner(UserDocument document);
 
-    List<User> getAllByDocumentIdAndRelation(UserDocument document, FileRelationType relationType);
+    List<User> getAllUsersByDocumentAndRelation(UserDocument document, FileRelationType relationType);
 
     List<String> getAllDocumentHashNamesByOwner(User owner);
 
     Set<UserDocument> getAllAccessibleDocuments(User user);
 
-    Set<UserDocument> getAllAccessibleDocumentsInRoot(User user, List<String> directoryHashes);
+    Set<UserToDocumentRelation> getAllAccessibleInRoot(User user, List<String> directoryHashes);
 
     UserDocument getDocumentByFullNameAndOwner(String parentDirHash, String docName, User owner);
 

@@ -511,8 +511,10 @@ public class UserDocumentServiceImpl implements UserDocumentService {
     @Override
     public FileAccessDto findAllRelations(Long documentId) {
         UserDocument document = getById(documentId);
-        List<User> editors = userToDocumentRelationService.getAllByDocumentIdAndRelation(document, FileRelationType.EDIT);
-        List<User> readers = userToDocumentRelationService.getAllByDocumentIdAndRelation(document, FileRelationType.READ);
+        List<User> editors = userToDocumentRelationService
+                .getAllUsersByDocumentAndRelation(document, FileRelationType.EDIT);
+        List<User> readers = userToDocumentRelationService
+                .getAllUsersByDocumentAndRelation(document, FileRelationType.READ);
 
         List<FriendsGroup> editorGroups = friendGroupToDocumentRelationService
                 .getAllGroupsByDocumentIdAndRelation(document, FileRelationType.EDIT);

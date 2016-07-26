@@ -13,7 +13,7 @@ public interface UserToDirectoryRelationRepository extends EntityRepository<User
 
     List<UserDirectory> getAllAccessibleDirectories(User user);
 
-    List<User> getAllByDirectoryIdAndRelation(UserDirectory directory, FileRelationType relationType);
+    List<User> getAllUsersByDirectoryIdAndRelation(UserDirectory directory, FileRelationType relationType);
 
     UserToDirectoryRelation getByDirectoryAndUser(UserDirectory directory, User user);
 
@@ -22,4 +22,6 @@ public interface UserToDirectoryRelationRepository extends EntityRepository<User
     User getDirectoryOwner(UserDirectory directory);
 
     List<FileRelationType> getAllRelationsByDirectoriesAndUser(List<UserDirectory> directories, User user);
+
+    List<UserToDirectoryRelation> getAllAccessibleInRoot(User user, List<String> directoryHashes);
 }

@@ -529,8 +529,8 @@ public class UserDirectoryServiceImpl implements UserDirectoryService {
     @Override
     public FileAccessDto findAllRelations(Long directoryId) {
         UserDirectory directory = getById(directoryId);
-        List<User> editors = userToDirectoryRelationService.getAllByDirectoryIdAndRelation(directory, FileRelationType.EDIT);
-        List<User> readers = userToDirectoryRelationService.getAllByDirectoryIdAndRelation(directory, FileRelationType.READ);
+        List<User> editors = userToDirectoryRelationService.getAllUsersByDirectoryIdAndRelation(directory, FileRelationType.EDIT);
+        List<User> readers = userToDirectoryRelationService.getAllUsersByDirectoryIdAndRelation(directory, FileRelationType.READ);
 
         List<FriendsGroup> editorGroups = friendGroupToDirectoryRelationService
                 .getAllGroupsByDirectoryIdAndRelation(directory, FileRelationType.EDIT);

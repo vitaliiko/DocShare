@@ -1,5 +1,5 @@
 $(document).ready(function() {
-    var accessibleFilesUrl = '/api/documents/accessible';
+    var accessibleFilesUrl = '/api/files/accessible';
     var friendsUrl = '/api/friends';
     var eventsUrl = '/api/events';
     var recoverUrl = '/api/files/removed';

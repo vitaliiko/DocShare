@@ -74,7 +74,7 @@ public class WebAppConfig extends WebMvcConfigurerAdapter {
 
         registry.addInterceptor(documentAccessInterceptor)
                 .addPathPatterns("/api/documents/**")
-                .excludePathPatterns("/api/documents", "/api/documents/accessible");
+                .excludePathPatterns("/api/documents");
 
         registry.addInterceptor(directoryAccessInterceptor)
                 .addPathPatterns("/api/directories/**");
@@ -82,7 +82,8 @@ public class WebAppConfig extends WebMvcConfigurerAdapter {
         registry.addInterceptor(filesAccessInterceptor)
                 .addPathPatterns("/api/files/**")
                 .excludePathPatterns("/api/files/search")
-                .excludePathPatterns("/api/files/removed");
+                .excludePathPatterns("/api/files/removed")
+                .excludePathPatterns("/api/files/accessible");
     }
 
     @Bean(name = "multipartResolver")

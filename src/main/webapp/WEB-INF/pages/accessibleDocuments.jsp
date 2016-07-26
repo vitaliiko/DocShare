@@ -17,22 +17,34 @@
         <table class="table table-hover tbody tr:hover td doc-table ${tableName}">
             <tr class="table-head">
                 <th id="file-name">Name</th>
-                <th>Upload by</th>
+                <th>Shared by</th>
                 <th>Size</th>
                 <th>Changed</th>
                 <th width="15"></th>
             </tr>
-        <c:forEach items="${documents}" var="doc">
-            <tr>
-                <td><a href="/api/documents/${doc.id}">${doc.name}</a></td>
-                <td>${doc.ownerName}</td>
-                <td>${doc.size}</td>
-                <td>${doc.lastModifyTime}</td>
-                <td>
-                    <a href="/api/documents/${doc.id}/download" class="btn btn-default btn-sm custom-width">Download</a>
-                </td>
-            </tr>
-        </c:forEach>
+            <c:forEach items="${directories}" var="dir">
+                <tr>
+                    <td><a href="/api/directories/${dir.id}/content">${dir.name}</a></td>
+                    <td>${dir.ownerName}</td>
+                    <td>--</td>
+                    <td>--</td>
+                    <td align="right">
+
+                    </td>
+                </tr>
+            </c:forEach>
+
+            <c:forEach items="${documents}" var="doc">
+                <tr>
+                    <td><a href="/api/documents/${doc.id}">${doc.name}</a></td>
+                    <td>${doc.ownerName}</td>
+                    <td>${doc.size}</td>
+                    <td>${doc.lastModifyTime}</td>
+                    <td align="right">
+                        <a href="/api/documents/${doc.id}/download" class="btn btn-default btn-sm custom-width">Download</a>
+                    </td>
+                </tr>
+            </c:forEach>
         </table>
     </div>
 </div>

@@ -7,10 +7,12 @@ import com.geekhub.entities.enums.FileRelationType;
 import com.geekhub.repositories.UserToDirectoryRelationRepository;
 import com.geekhub.services.UserToDirectoryRelationService;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import javax.inject.Inject;
 import javax.transaction.Transactional;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -88,8 +90,16 @@ public class UserToDirectoryRelationServiceImpl implements UserToDirectoryRelati
     }
 
     @Override
-    public List<User> getAllByDirectoryIdAndRelation(UserDirectory directory, FileRelationType relationType) {
-        return repository.getAllByDirectoryIdAndRelation(directory, relationType);
+    public Set<UserToDirectoryRelation> getAllAccessibleInRoot(User user, List<String> directoryHashes) {
+        if (CollectionUtils.isEmpty(directoryHashes)) {
+            return new HashSet<>();
+        }
+        return repository.getAllAccessibleInRoot(user, directoryHashes).stream().collect(Collectors.toSet());
+    }
+
+    @Override
+    public List<User> getAllUsersByDirectoryIdAndRelation(UserDirectory directory, FileRelationType relationType) {
+        return repository.getAllUsersByDirectoryIdAndRelation(directory, relationType);
     }
 
     @Override

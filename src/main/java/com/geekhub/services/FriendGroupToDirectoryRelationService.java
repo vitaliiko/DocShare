@@ -8,6 +8,7 @@ import com.geekhub.entities.enums.FileRelationType;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Set;
 
 @Service
 public interface FriendGroupToDirectoryRelationService extends EntityService<FriendGroupToDirectoryRelation, Long> {
@@ -26,4 +27,6 @@ public interface FriendGroupToDirectoryRelationService extends EntityService<Fri
     List<FriendsGroup> getAllGroupsByDirectoryIdAndRelation(UserDirectory directory, FileRelationType relationType);
 
     List<FileRelationType> getAllRelationsByDirectoryIdAndUser(Long directoryId, User user);
+
+    Set<UserDirectory> getAllAccessibleDirectories(User user);
 }
