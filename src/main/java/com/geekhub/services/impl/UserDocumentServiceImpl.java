@@ -253,24 +253,25 @@ public class UserDocumentServiceImpl implements UserDocumentService {
         if (CollectionUtils.isEmpty(documents)) {
             return;
         }
-        UserDirectory destinationDir = null;
+        UserDirectory destinationDir;
+        DirectoryWithRelations relations = null;
         if (destinationDirectoryHash.equals("root")) {
             destinationDirectoryHash = user.getLogin();
         } else {
             destinationDir = userDirectoryService.getByHashName(destinationDirectoryHash);
+            relations = userDirectoryService.getAllDirectoryRelations(destinationDir);
         }
         documents = setDocumentFullNames(destinationDirectoryHash, documents.stream().collect(Collectors.toSet()));
         for (UserDocument doc : documents) {
-            createCopy(user, destinationDir, doc);
+            createCopy(user, relations, doc);
         }
     }
 
-    private void createCopy(User user, UserDirectory destinationDir, UserDocument doc) {
+    private void createCopy(User user, DirectoryWithRelations relations, UserDocument doc) {
         UserDocument copiedDoc = UserFileUtil.copyDocument(doc);
-        copiedDoc.setDocumentAttribute(destinationDir == null ? DocumentAttribute.PRIVATE
-                : destinationDir.getDocumentAttribute());
+        copiedDoc.setDocumentAttribute(relations.getDocumentAttribute());
         save(copiedDoc);
-        createRelations(copiedDoc, destinationDir);
+        createRelations(copiedDoc, relations);
         userToDocumentRelationService.create(copiedDoc, user, FileRelationType.OWN);
         UserFileUtil.copyFile(doc.getHashName(), copiedDoc.getHashName());
     }

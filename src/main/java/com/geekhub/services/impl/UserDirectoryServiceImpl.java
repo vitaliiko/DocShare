@@ -308,9 +308,9 @@ public class UserDirectoryServiceImpl implements UserDirectoryService {
         }
         directories = setDirectoriesFullNames(destinationDirectoryHash, directories);
         for (UserDirectory dir : directories) {
-            dir.setDocumentAttribute(destinationDir == null ? DocumentAttribute.PRIVATE : destinationDir.getDocumentAttribute());
+            dir.setDocumentAttribute(destinationDir == null ? DocumentAttribute.PRIVATE
+                    : destinationDir.getDocumentAttribute());
             update(dir);
-            userToDirectoryRelationService.deleteAllBesidesOwnerByDirectory(dir);
             createRelations(dir, relations);
             createRelationsForChilds(destinationDirectoryHash, relations);
         }
