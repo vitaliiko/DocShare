@@ -7,8 +7,6 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
-import java.io.Serializable;
-import java.util.Collection;
 import java.util.List;
 import java.util.function.BiPredicate;
 
@@ -40,8 +38,10 @@ public class FileAccessService {
         staticFriendGroupToDirectoryRelationService = friendGroupToDirectoryRelationService;
     }
 
-    public <T> boolean permitAccess(T document, User user, BiPredicate<User, T> predicate) {
-        return predicate.test(user, document);
+    public <T> boolean permitAccess(T file, User user, BiPredicate<User, T> predicate) {
+        return file != null
+                && user != null
+                && predicate.test(user, file);
     }
 
 

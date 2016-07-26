@@ -7,6 +7,7 @@ import com.geekhub.security.AccessPredicates;
 import com.geekhub.security.FileAccessService;
 import com.geekhub.services.UserDirectoryService;
 import com.geekhub.services.UserService;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -51,15 +52,21 @@ public class DirectoryAccessInterceptor extends AccessInterceptor<UserDirectory>
             String dirId = pathVariables.get("dirId");
             String dirHashName = pathVariables.get("dirHashName");
             String url = InterceptorUtil.removeVariablesFromURI(req, pathVariables);
-            if (dirId != null && permitAccess(Long.valueOf(dirId), userId, url)) {
-                return true;
-            }
-            if (dirHashName != null && permitAccess(dirHashName, userId, url)) {
+            if (isDirectoryAvailable(userId, dirHashName, url)
+                    || (StringUtils.isNumeric(dirId) && isDirectoryAvailable(userId, Long.valueOf(dirId), url))) {
                 return true;
             }
         }
         resp.setStatus(HttpStatus.BAD_REQUEST.value());
         return false;
+    }
+
+    private boolean isDirectoryAvailable(Long userId, String dirHashName, String url) {
+        return dirHashName != null && permitAccess(dirHashName, userId, url);
+    }
+
+    private boolean isDirectoryAvailable(Long userId, Long dirId, String url) {
+        return dirId != null &&  permitAccess(dirId, userId, url);
     }
 
     @Override

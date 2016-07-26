@@ -9,6 +9,7 @@ import com.geekhub.services.UserDirectoryService;
 import com.geekhub.services.UserDocumentService;
 import com.geekhub.services.UserService;
 import com.geekhub.services.enams.FileType;
+import com.geekhub.utils.CollectionTools;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -42,16 +43,23 @@ public class FilesAccessInterceptor extends AccessInterceptor {
             String[] dirIds = parameterMap.get("dirIds[]");
             String[] docIds = parameterMap.get("docIds[]");
             String[] destinationDirHash = parameterMap.get("destinationDirHash");
-            if ((dirIds != null && permitAccess(dirIds, FileType.DIRECTORY, userId))
-                    || (docIds != null && permitAccess(docIds, FileType.DOCUMENT, userId))
-                    && (destinationDirHash == null || (destinationDirHash.length == 1
-                    && permitAccess(destinationDirHash[0], userId)))) {
+            if (areFilesAvailable(dirIds, docIds, userId) && isDirectoryAvailable(destinationDirHash, userId)) {
                 return true;
             }
-            return true;
         }
         resp.setStatus(HttpStatus.BAD_REQUEST.value());
         return false;
+    }
+
+    private boolean areFilesAvailable(String[] dirIds, String[] docIds, Long userId) {
+        return CollectionTools.isAllNumeric(dirIds, docIds)
+                && (dirIds != null && permitAccess(dirIds, FileType.DIRECTORY, userId)
+                || docIds != null && permitAccess(docIds, FileType.DOCUMENT, userId));
+    }
+
+    private boolean isDirectoryAvailable(String[] destinationDirHash, Long userId) {
+        return destinationDirHash == null
+                || (destinationDirHash.length == 1 && permitAccess(destinationDirHash[0], userId));
     }
 
     @Override

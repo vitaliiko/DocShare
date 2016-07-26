@@ -7,6 +7,7 @@ import com.geekhub.security.AccessPredicates;
 import com.geekhub.security.FileAccessService;
 import com.geekhub.services.UserDocumentService;
 import com.geekhub.services.UserService;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -52,7 +53,7 @@ public class DocumentAccessInterceptor extends AccessInterceptor<UserDocument> {
         if (userId != null && !CollectionUtils.isEmpty(pathVariables)) {
             String docId = pathVariables.get("docId");
             String url = InterceptorUtil.removeVariablesFromURI(req, pathVariables);
-            if (docId != null && permitAccess(Long.valueOf(docId), userId, url)) {
+            if (docId != null && StringUtils.isNumeric(docId) && permitAccess(Long.valueOf(docId), userId, url)) {
                 return true;
             }
         }
