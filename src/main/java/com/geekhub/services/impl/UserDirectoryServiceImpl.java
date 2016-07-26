@@ -213,42 +213,11 @@ public class UserDirectoryServiceImpl implements UserDirectoryService {
         long dirId = save(directory);
         directory.setId(dirId);
 
-        createRelations(directory, parentDirHash, owner);
+        UserDirectory parentDirectory = getByHashName(parentDirHash);
+        DirectoryWithRelations relations = getAllDirectoryRelations(parentDirectory);
+        createRelations(directory, relations);
         userToDirectoryRelationService.create(directory, owner, FileRelationType.OWN);
         return directory;
-    }
-
-    private DirectoryWithRelations createRelations(UserDirectory directory, String parentDirHash, User owner) {
-        DirectoryWithRelations directoryWithRelations = new DirectoryWithRelations();
-        directoryWithRelations.setDirectory(directory);
-        directoryWithRelations.setOwner(owner);
-        if (directory.getId() != null) {
-            userToDirectoryRelationService.deleteAllBesidesOwnerByDirectory(directory);
-            friendGroupToDirectoryRelationService.deleteAllByDirectory(directory);
-        }
-        if (!parentDirHash.equals("root") && !parentDirHash.equals(owner.getLogin())) {
-            UserDirectory parentDirectory = getByHashName(parentDirHash);
-            directoryWithRelations.addAllUserRelations(
-                    userToDirectoryRelationService.getAllByDirectory(parentDirectory).stream()
-                            .filter(r -> r.getFileRelationType() != FileRelationType.OWN)
-                            .collect(Collectors.toList())
-            );
-            directoryWithRelations.getUserRelations().forEach(r -> {
-                UserToDirectoryRelation relation = userToDirectoryRelationService
-                        .create(directory, r.getUser(), r.getFileRelationType());
-                directoryWithRelations.addRelation(relation);
-            });
-
-            directoryWithRelations.addAllGroupRelations(
-                    friendGroupToDirectoryRelationService.getAllByDirectory(parentDirectory)
-            );
-            directoryWithRelations.getGroupRelations().forEach(r -> {
-                FriendGroupToDirectoryRelation relation = friendGroupToDirectoryRelationService
-                        .create(directory, r.getFriendsGroup(), r.getFileRelationType());
-                directoryWithRelations.addRelation(relation);
-            });
-        }
-        return directoryWithRelations;
     }
 
     @Override

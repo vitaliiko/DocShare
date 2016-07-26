@@ -53,13 +53,7 @@ public class UserDocumentServiceImpl implements UserDocumentService {
     private UserToDocumentRelationService userToDocumentRelationService;
 
     @Inject
-    private UserToDirectoryRelationService userToDirectoryRelationService;
-
-    @Inject
     private FriendGroupToDocumentRelationService friendGroupToDocumentRelationService;
-
-    @Inject
-    private FriendGroupToDirectoryRelationService friendGroupToDirectoryRelationService;
 
     @Override
     public List<UserDocument> getAll(String orderParameter) {
@@ -395,23 +389,6 @@ public class UserDocumentServiceImpl implements UserDocumentService {
         return document;
     }
 
-    private void createRelations(UserDocument document, UserDirectory parentDirectory) {
-        deleteRelations(document);
-        if (parentDirectory != null) {
-            List<UserToDirectoryRelation> userRelations =
-                    userToDirectoryRelationService.getAllByDirectory(parentDirectory).stream()
-                            .filter(r -> r.getFileRelationType() != FileRelationType.OWN)
-                            .collect(Collectors.toList());
-            userRelations.forEach(r -> userToDocumentRelationService
-                    .create(document, r.getUser(), r.getFileRelationType()));
-
-            List<FriendGroupToDirectoryRelation> friendGroupRelations =
-                    friendGroupToDirectoryRelationService.getAllByDirectory(parentDirectory);
-            friendGroupRelations.forEach(r -> friendGroupToDocumentRelationService
-                    .create(document, r.getFriendsGroup(), r.getFileRelationType()));
-        }
-    }
-
     private UserDocument recoverAndUpdate(MultipartFile multipartFile, User user, UserDocument document)
             throws IOException {
 
@@ -462,22 +439,6 @@ public class UserDocumentServiceImpl implements UserDocumentService {
 
         sendEvents(document, shared, user, currentReadersAndEditors);
         return document;
-    }
-
-    @Override
-    public void createRelationsByReadersAndEditors(List<UserDocument> documents, DirectoryWithRelations relations) {
-        documents.forEach(d -> {
-            userToDocumentRelationService.deleteAllBesidesOwnerByDocument(d);
-            userToDocumentRelationService.create(d, relations.getReaders(), FileRelationType.READ);
-            userToDocumentRelationService.create(d, relations.getEditors(), FileRelationType.EDIT);
-
-            friendGroupToDocumentRelationService.deleteAllByDocument(d);
-            friendGroupToDocumentRelationService.create(d, relations.getReaderGroups(), FileRelationType.READ);
-            friendGroupToDocumentRelationService.create(d, relations.getEditorGroups(), FileRelationType.READ);
-
-            d.setDocumentAttribute(relations.getDocumentAttribute());
-            update(d);
-        });
     }
 
     private void createRelations(UserDocument document, SharedDto shared) {
