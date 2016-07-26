@@ -313,10 +313,7 @@ public class UserDocumentServiceImpl implements UserDocumentService {
         if (relations == null) {
             return;
         }
-        if (document.getId() != null) {
-            userToDocumentRelationService.deleteAllBesidesOwnerByDocument(document);
-            friendGroupToDocumentRelationService.deleteAllByDocument(document);
-        }
+        deleteRelations(document);
         if (!CollectionUtils.isEmpty(relations.getUserRelations())) {
             relations.getUserRelations().forEach(r -> userToDocumentRelationService
                     .create(document, r.getUser(), r.getFileRelationType()));
@@ -324,6 +321,25 @@ public class UserDocumentServiceImpl implements UserDocumentService {
         if (!CollectionUtils.isEmpty(relations.getGroupRelations())) {
             relations.getGroupRelations().forEach(r -> friendGroupToDocumentRelationService
                     .create(document, r.getFriendsGroup(), r.getFileRelationType()));
+        }
+        if (!CollectionUtils.isEmpty(relations.getReaders())) {
+            userToDocumentRelationService.create(document, relations.getReaders(), FileRelationType.READ);
+        }
+        if (!CollectionUtils.isEmpty(relations.getEditors())) {
+            userToDocumentRelationService.create(document, relations.getEditors(), FileRelationType.EDIT);
+        }
+        if (!CollectionUtils.isEmpty(relations.getReaderGroups())) {
+            friendGroupToDocumentRelationService.create(document, relations.getReaderGroups(), FileRelationType.READ);
+        }
+        if (!CollectionUtils.isEmpty(relations.getEditorGroups())) {
+            friendGroupToDocumentRelationService.create(document, relations.getEditorGroups(), FileRelationType.READ);
+        }
+    }
+
+    private void deleteRelations(UserDocument document) {
+        if (document.getId() != null) {
+            userToDocumentRelationService.deleteAllBesidesOwnerByDocument(document);
+            friendGroupToDocumentRelationService.deleteAllByDocument(document);
         }
     }
 
@@ -379,10 +395,7 @@ public class UserDocumentServiceImpl implements UserDocumentService {
     }
 
     private void createRelations(UserDocument document, UserDirectory parentDirectory) {
-        if (document.getId() != null) {
-            userToDocumentRelationService.deleteAllBesidesOwnerByDocument(document);
-            friendGroupToDocumentRelationService.deleteAllByDocument(document);
-        }
+        deleteRelations(document);
         if (parentDirectory != null) {
             List<UserToDirectoryRelation> userRelations =
                     userToDirectoryRelationService.getAllByDirectory(parentDirectory).stream()

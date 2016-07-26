@@ -404,6 +404,25 @@ public class UserDirectoryServiceImpl implements UserDirectoryService {
             relations.getGroupRelations().forEach(r -> friendGroupToDirectoryRelationService
                     .create(directory, r.getFriendsGroup(), r.getFileRelationType()));
         }
+        if (!CollectionUtils.isEmpty(relations.getEditors())) {
+            userToDirectoryRelationService.create(directory, relations.getEditors(), FileRelationType.EDIT);
+        }
+        if (!CollectionUtils.isEmpty(relations.getReaders())) {
+            userToDirectoryRelationService.create(directory, relations.getReaders(), FileRelationType.READ);
+        }
+        if (!CollectionUtils.isEmpty(relations.getEditorGroups())) {
+            friendGroupToDirectoryRelationService.create(directory, relations.getEditorGroups(), FileRelationType.EDIT);
+        }
+        if (!CollectionUtils.isEmpty(relations.getReaderGroups())) {
+            friendGroupToDirectoryRelationService.create(directory, relations.getReaderGroups(), FileRelationType.READ);
+        }
+    }
+
+    private void deleteRelations(UserDirectory directory) {
+        if (directory.getId() != null) {
+            userToDirectoryRelationService.deleteAllBesidesOwnerByDirectory(directory);
+            friendGroupToDirectoryRelationService.deleteAllByDirectory(directory);
+        }
     }
 
     @Override
@@ -467,7 +486,7 @@ public class UserDirectoryServiceImpl implements UserDirectoryService {
         update(directory);
 
         DirectoryWithRelations relations = convertSharedDtoToRelations(sharedDto);
-        createRelationsByReadersAndEditors(directory, relations);
+        createRelations(directory, relations);
         createRelationsForChilds(directory.getHashName(), relations);
 
         sendEvents(directory, user, currentReadersAndEditors);
@@ -496,14 +515,6 @@ public class UserDirectoryServiceImpl implements UserDirectoryService {
         return relations;
     }
 
-    private void createRelationsByReadersAndEditors(UserDirectory directory, DirectoryWithRelations relations) {
-        deleteRelations(directory);
-        userToDirectoryRelationService.create(directory, relations.getEditors(), FileRelationType.EDIT);
-        userToDirectoryRelationService.create(directory, relations.getReaders(), FileRelationType.READ);
-        friendGroupToDirectoryRelationService.create(directory, relations.getEditorGroups(), FileRelationType.EDIT);
-        friendGroupToDirectoryRelationService.create(directory, relations.getReaderGroups(), FileRelationType.READ);
-    }
-
     private void sendEvents(UserDirectory directory, User user, Set<User> currentReadersAndEditors) {
         Set<User> newReaderSet = getAllReadersAndEditors(directory.getId());
         newReaderSet.removeAll(currentReadersAndEditors);
@@ -512,13 +523,6 @@ public class UserDirectoryServiceImpl implements UserDirectoryService {
         newReaderSet = getAllReadersAndEditors(directory.getId());
         currentReadersAndEditors.removeAll(newReaderSet);
         eventSendingService.sendProhibitAccessEvent(currentReadersAndEditors, FileType.DIRECTORY, directory.getName(), user);
-    }
-
-    private void deleteRelations(UserDirectory directory) {
-        if (directory.getId() != null) {
-            userToDirectoryRelationService.deleteAllBesidesOwnerByDirectory(directory);
-            friendGroupToDirectoryRelationService.deleteAllByDirectory(directory);
-        }
     }
 
     @Override
