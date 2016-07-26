@@ -338,10 +338,12 @@ public class UserDirectoryServiceImpl implements UserDirectoryService {
             return;
         }
         UserDirectory destinationDir = null;
+        DirectoryWithRelations relations = new DirectoryWithRelations();
         if (destinationDirectoryHash.equals("root")) {
             destinationDirectoryHash = user.getLogin();
         } else {
             destinationDir = getByHashName(destinationDirectoryHash);
+            relations = getAllDirectoryRelations(destinationDir);
         }
         directories = setDirectoriesFullNames(destinationDirectoryHash, directories.stream().collect(Collectors.toSet()));
         for (UserDirectory dir : directories) {
@@ -349,20 +351,21 @@ public class UserDirectoryServiceImpl implements UserDirectoryService {
             copiedDir.setDocumentAttribute(destinationDir == null ? DocumentAttribute.PRIVATE
                     : destinationDir.getDocumentAttribute());
             save(copiedDir);
-            DirectoryWithRelations directoryWithRelations = createRelations(copiedDir, destinationDirectoryHash, user);
+            createRelations(copiedDir, relations);
             userToDirectoryRelationService.create(copiedDir, user, FileRelationType.OWN);
-            copyContent(dir, directoryWithRelations);
+            relations.setDirectory(copiedDir);
+            copyContent(dir, relations);
         }
     }
 
-    private void copyContent(UserDirectory originalDir, DirectoryWithRelations destinationDir) {
+    private void copyContent(UserDirectory originalDir, DirectoryWithRelations relations) {
         List<UserDocument> containedDocuments =
                 userDocumentService.getAllByParentDirectoryHashAndStatus(originalDir.getHashName(), DocumentStatus.ACTUAL);
-        userDocumentService.copy(containedDocuments, destinationDir);
+        userDocumentService.copy(containedDocuments, relations);
 
         List<UserDirectory> containedDirectories =
                 getAllByParentDirectoryHashAndStatus(originalDir.getHashName(), DocumentStatus.ACTUAL);
-        copy(containedDirectories, destinationDir);
+        copy(containedDirectories, relations);
     }
 
     private Set<UserDirectory> setDirectoriesFullNames(String destinationDirectoryHash, Set<UserDirectory> directories) {
