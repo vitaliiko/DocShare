@@ -3,6 +3,7 @@ package com.geekhub.security;
 import com.geekhub.entities.User;
 import com.geekhub.entities.UserDirectory;
 import com.geekhub.entities.UserDocument;
+import com.geekhub.entities.enums.DocumentAttribute;
 import com.geekhub.entities.enums.DocumentStatus;
 import com.geekhub.entities.enums.FileRelationType;
 
@@ -28,7 +29,10 @@ public class AccessPredicates {
     public static final BiPredicate<User, UserDocument> DOCUMENT_READER = (u, d) -> {
         FileRelationType relationType = FileAccessService.getUserToDocumentRelationType(d, u);
         return d.getDocumentStatus() == DocumentStatus.ACTUAL
-                && (relationType != null || FileAccessService.isInReaderOrEditorGroups(u, d));
+                && (relationType != null
+                || d.getDocumentAttribute() == DocumentAttribute.PUBLIC
+                || (d.getDocumentAttribute() == DocumentAttribute.FOR_FRIENDS && FileAccessService.isOwnerFriend(u, d))
+                || FileAccessService.isInReaderOrEditorGroups(u, d));
     };
 
     public static final BiPredicate<User, UserDocument> DOCUMENT_EDITOR = (u, d) -> {
@@ -48,7 +52,10 @@ public class AccessPredicates {
     public static final BiPredicate<User, UserDirectory> DIRECTORY_READER = (u, d) -> {
         FileRelationType relationType = FileAccessService.getUserToDirectoryRelationType(d, u);
         return d.getDocumentStatus() == DocumentStatus.ACTUAL
-                && (relationType != null || FileAccessService.isInReaderOrEditorGroups(u, d));
+                && (relationType != null
+                || d.getDocumentAttribute() == DocumentAttribute.PUBLIC
+                || (d.getDocumentAttribute() == DocumentAttribute.FOR_FRIENDS && FileAccessService.isOwnerFriend(u, d))
+                || FileAccessService.isInReaderOrEditorGroups(u, d));
     };
 
     public static final BiPredicate<User, UserDirectory> DIRECTORY_EDITOR = (u, d) -> {

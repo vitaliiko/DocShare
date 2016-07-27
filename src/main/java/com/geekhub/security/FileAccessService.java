@@ -13,6 +13,7 @@ import java.util.function.BiPredicate;
 @Service
 public class FileAccessService {
 
+    private static UserService staticUserService;
     private static UserToDocumentRelationService staticUserToDocumentRelationService;
     private static UserToDirectoryRelationService staticUserToDirectoryRelationService;
     private static FriendGroupToDocumentRelationService staticFriendGroupToDocumentRelationService;
@@ -30,8 +31,12 @@ public class FileAccessService {
     @Inject
     private FriendGroupToDirectoryRelationService friendGroupToDirectoryRelationService;
 
+    @Inject
+    private UserService userService;
+
     @PostConstruct
     public void init() {
+        staticUserService = userService;
         staticUserToDocumentRelationService = userToDocumentRelationService;
         staticUserToDirectoryRelationService = userToDirectoryRelationService;
         staticFriendGroupToDocumentRelationService = friendGroupToDocumentRelationService;
@@ -91,5 +96,15 @@ public class FileAccessService {
         List<FileRelationType> relations = staticFriendGroupToDirectoryRelationService
                 .getAllRelationsByDirectoryIdAndUser(directory.getId(), user);
         return relations.contains(FileRelationType.EDIT);
+    }
+
+    protected static boolean isOwnerFriend(User user, UserDocument document) {
+        User owner = staticUserToDocumentRelationService.getDocumentOwner(document);
+        return staticUserService.areFriends(owner.getId(), user);
+    }
+
+    protected static boolean isOwnerFriend(User user, UserDirectory directory) {
+        User owner = staticUserToDirectoryRelationService.getDirectoryOwner(directory);
+        return staticUserService.areFriends(owner.getId(), user);
     }
 }
