@@ -1,9 +1,6 @@
 package com.geekhub.configuration;
 
-import com.geekhub.interceptors.DirectoryAccessInterceptor;
-import com.geekhub.interceptors.DocumentAccessInterceptor;
-import com.geekhub.interceptors.FilesAccessInterceptor;
-import com.geekhub.interceptors.MainInterceptor;
+import com.geekhub.interceptors.*;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -11,6 +8,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.context.support.ResourceBundleMessageSource;
+import org.springframework.web.WebApplicationInitializer;
 import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 import org.springframework.web.servlet.ViewResolver;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
@@ -21,6 +19,8 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter
 import org.springframework.web.servlet.view.InternalResourceViewResolver;
 
 import javax.inject.Inject;
+import javax.servlet.ServletContext;
+import javax.servlet.ServletException;
 import javax.servlet.annotation.MultipartConfig;
 import java.io.IOException;
 
@@ -29,7 +29,7 @@ import java.io.IOException;
 @PropertySource("classpath:database.properties")
 @EnableWebMvc
 @MultipartConfig
-public class WebAppConfig extends WebMvcConfigurerAdapter {
+public class WebAppConfig extends WebMvcConfigurerAdapter implements WebApplicationInitializer {
 
     @Inject
     private MainInterceptor mainInterceptor;
@@ -101,5 +101,11 @@ public class WebAppConfig extends WebMvcConfigurerAdapter {
     @Override
     public void configurePathMatch(PathMatchConfigurer matcher) {
         matcher.setUseRegisteredSuffixPatternMatch(true);
+    }
+
+    @Override
+    public void onStartup(ServletContext servletContext) throws ServletException {
+        servletContext.addFilter("FilesRequestFilter", FilesRequestFilter.class)
+                .addMappingForUrlPatterns(null, false, "/api/files/*");
     }
 }

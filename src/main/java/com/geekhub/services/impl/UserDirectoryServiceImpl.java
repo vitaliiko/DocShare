@@ -291,7 +291,7 @@ public class UserDirectoryServiceImpl implements UserDirectoryService {
         if (!CollectionUtils.isEmpty(childDirectories)) {
             childDirectories.forEach(d -> {
                 createRelations(d, relations);
-                d.setDocumentAttribute(relations.getDocumentAttribute());
+                d.setDocumentAttribute(relations == null ? DocumentAttribute.PRIVATE : relations.getDocumentAttribute());
                 update(d);
             });
             parentDirHashList = childDirectories.stream().map(UserDirectory::getHashName).collect(Collectors.toList());
@@ -411,10 +411,13 @@ public class UserDirectoryServiceImpl implements UserDirectoryService {
 
     @Override
     public DirectoryWithRelations getAllDirectoryRelations(UserDirectory directory) {
+        DirectoryWithRelations directoryWithRelations;
         if (directory == null) {
-            return new DirectoryWithRelations();
+            directoryWithRelations = new DirectoryWithRelations();
+            directoryWithRelations.setDocumentAttribute(DocumentAttribute.PRIVATE);
+            return directoryWithRelations;
         }
-        DirectoryWithRelations directoryWithRelations = new DirectoryWithRelations();
+        directoryWithRelations = new DirectoryWithRelations();
         directoryWithRelations.setDirectory(directory);
 
         List<UserToDirectoryRelation> userRelations = userToDirectoryRelationService.getAllByDirectory(directory);
