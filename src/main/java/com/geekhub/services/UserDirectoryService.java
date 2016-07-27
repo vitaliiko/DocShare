@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Set;
 
 import com.geekhub.entities.enums.DocumentStatus;
-import com.geekhub.utils.DirectoryWithRelations;
+import com.geekhub.utils.DirectoryWrapper;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -29,6 +29,8 @@ public interface UserDirectoryService extends EntityService<UserDirectory, Long>
     void moveToTrash(Long dirIds, Long removerId);
 
     void moveToTrash(Long[] dirIds, Long removerId);
+
+    DirectoryWrapper createDirectoryWrapper(String directoryHash, User user);
 
     void replace(Set<UserDirectory> directories, String destinationDirectoryHash, User user);
 
@@ -76,5 +78,5 @@ public interface UserDirectoryService extends EntityService<UserDirectory, Long>
 
     List<String> getSimilarDirectoryNamesInDirectory(String directoryHash, Set<UserDirectory> directories);
 
-    DirectoryWithRelations getAllDirectoryRelations(UserDirectory directory);
+    DirectoryWrapper getAllDirectoryRelations(UserDirectory directory);
 }

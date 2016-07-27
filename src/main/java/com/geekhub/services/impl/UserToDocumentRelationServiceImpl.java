@@ -124,6 +124,9 @@ public class UserToDocumentRelationServiceImpl implements UserToDocumentRelation
 
     @Override
     public List<UserDocument> getAllDocumentsByFullNamesAndOwner(String parentDirHash, List<String> docNames, User owner) {
+        if (CollectionUtils.isEmpty(docNames)) {
+            return new ArrayList<>();
+        }
         return repository.getAllDocumentsByFullNamesAndOwner(parentDirHash, docNames, owner);
     }
 
@@ -135,11 +138,17 @@ public class UserToDocumentRelationServiceImpl implements UserToDocumentRelation
     @Override
     public Long getDocumentsCountByOwnerAndDocumentIds(User owner, Long[] documentIds) {
         List<Long> idList = Arrays.stream(documentIds).collect(Collectors.toList());
+        if (CollectionUtils.isEmpty(idList)) {
+            return 0L;
+        }
         return repository.getCountByOwnerAndDocumentIds(owner, idList);
     }
 
     @Override
     public List<FileRelationType> getAllRelationsByDocumentsAndUser(List<UserDocument> documents, User user) {
+        if (CollectionUtils.isEmpty(documents)) {
+            return new ArrayList<>();
+        }
         return repository.getAllRelationsByDocumentsAndUser(documents, user);
     }
 }

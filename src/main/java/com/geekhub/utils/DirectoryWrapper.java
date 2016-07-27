@@ -8,10 +8,13 @@ import lombok.Setter;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DirectoryWithRelations {
+public class DirectoryWrapper {
 
     @Getter
     private UserDirectory directory;
+
+    @Setter
+    private String hashName;
 
     @Getter @Setter
     private User owner;
@@ -22,7 +25,7 @@ public class DirectoryWithRelations {
     @Getter
     private List<FriendGroupToDirectoryRelation> groupRelations = new ArrayList<>();
 
-    @Getter @Setter
+    @Setter
     private DocumentAttribute documentAttribute;
 
     @Getter
@@ -42,8 +45,18 @@ public class DirectoryWithRelations {
         documentAttribute = directory == null ? DocumentAttribute.PRIVATE : directory.getDocumentAttribute();
     }
 
+    public DocumentAttribute getDocumentAttribute() {
+        return documentAttribute == null ? DocumentAttribute.PRIVATE : documentAttribute;
+    }
+
     public String getHashName() {
-        return directory.getHashName();
+        if (hashName == null && directory != null) {
+            return directory.getHashName();
+        }
+        if (hashName != null) {
+            return hashName;
+        }
+        return null;
     }
 
     public void addRelation(UserToDirectoryRelation relation) {

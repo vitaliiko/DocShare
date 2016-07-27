@@ -11,10 +11,7 @@ import org.springframework.util.CollectionUtils;
 
 import javax.inject.Inject;
 import javax.transaction.Transactional;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -109,6 +106,9 @@ public class UserToDirectoryRelationServiceImpl implements UserToDirectoryRelati
 
     @Override
     public List<FileRelationType> getAllRelationsByDirectoriesAndUser(List<UserDirectory> directories, User user) {
+        if (CollectionUtils.isEmpty(directories)) {
+            return new ArrayList<>();
+        }
         return repository.getAllRelationsByDirectoriesAndUser(directories, user);
     }
 

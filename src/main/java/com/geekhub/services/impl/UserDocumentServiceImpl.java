@@ -225,20 +225,12 @@ public class UserDocumentServiceImpl implements UserDocumentService {
         if (CollectionUtils.isEmpty(documents)) {
             return;
         }
-        UserDirectory destinationDir = null;
-        DirectoryWithRelations relations = null;
-        if (destinationDirectoryHash.equals("root")) {
-            destinationDirectoryHash = user.getLogin();
-        } else {
-            destinationDir = userDirectoryService.getByHashName(destinationDirectoryHash);
-            relations = userDirectoryService.getAllDirectoryRelations(destinationDir);
-        }
+        DirectoryWrapper directory = userDirectoryService.createDirectoryWrapper(destinationDirectoryHash, user);
         documents = setDocumentFullNames(destinationDirectoryHash, documents);
         for (UserDocument doc : documents) {
-            doc.setDocumentAttribute(destinationDir == null ? DocumentAttribute.PRIVATE
-                    : destinationDir.getDocumentAttribute());
+            doc.setDocumentAttribute(directory.getDocumentAttribute());
             update(doc);
-            createRelations(doc, relations);
+            createRelations(doc, directory);
         }
     }
 
@@ -247,21 +239,14 @@ public class UserDocumentServiceImpl implements UserDocumentService {
         if (CollectionUtils.isEmpty(documents)) {
             return;
         }
-        UserDirectory destinationDir;
-        DirectoryWithRelations relations = null;
-        if (destinationDirectoryHash.equals("root")) {
-            destinationDirectoryHash = user.getLogin();
-        } else {
-            destinationDir = userDirectoryService.getByHashName(destinationDirectoryHash);
-            relations = userDirectoryService.getAllDirectoryRelations(destinationDir);
-        }
+        DirectoryWrapper directory = userDirectoryService.createDirectoryWrapper(destinationDirectoryHash, user);
         documents = setDocumentFullNames(destinationDirectoryHash, documents.stream().collect(Collectors.toSet()));
         for (UserDocument doc : documents) {
-            createCopy(user, relations, doc);
+            createCopy(user, directory, doc);
         }
     }
 
-    private void createCopy(User user, DirectoryWithRelations relations, UserDocument doc) {
+    private void createCopy(User user, DirectoryWrapper relations, UserDocument doc) {
         UserDocument copiedDoc = UserFileUtil.copyDocument(doc);
         copiedDoc.setDocumentAttribute(relations.getDocumentAttribute());
         save(copiedDoc);
@@ -283,7 +268,7 @@ public class UserDocumentServiceImpl implements UserDocumentService {
     }
 
     @Override
-    public void copy(Collection<UserDocument> documents, DirectoryWithRelations destinationDirectory) {
+    public void copy(Collection<UserDocument> documents, DirectoryWrapper destinationDirectory) {
         for (UserDocument doc : documents) {
             UserDocument copiedDoc = UserFileUtil.copyDocument(doc);
             copiedDoc.setDocumentAttribute(destinationDirectory.getDocumentAttribute());
@@ -296,7 +281,7 @@ public class UserDocumentServiceImpl implements UserDocumentService {
     }
 
     @Override
-    public void createRelations(List<UserDocument> documents, DirectoryWithRelations relations) {
+    public void createRelations(List<UserDocument> documents, DirectoryWrapper relations) {
         documents.forEach(d -> {
             createRelations(d, relations);
             d.setDocumentAttribute(relations.getDocumentAttribute());
@@ -304,7 +289,7 @@ public class UserDocumentServiceImpl implements UserDocumentService {
         });
     }
 
-    private void createRelations(UserDocument document, DirectoryWithRelations relations) {
+    private void createRelations(UserDocument document, DirectoryWrapper relations) {
         if (relations == null) {
             return;
         }
@@ -351,14 +336,7 @@ public class UserDocumentServiceImpl implements UserDocumentService {
             throws IOException {
 
         List<UserDocument> documents = new ArrayList<>();
-        UserDirectory parentDirectory;
-            DirectoryWithRelations relations = null;
-        if (parentDirectoryHash.equals("root")) {
-            parentDirectoryHash = user.getLogin();
-        } else {
-            parentDirectory = userDirectoryService.getByHashName(parentDirectoryHash);
-            relations = userDirectoryService.getAllDirectoryRelations(parentDirectory);
-        }
+        DirectoryWrapper directory = userDirectoryService.createDirectoryWrapper(parentDirectoryHash, user);
 
         for (MultipartFile file : files) {
             String docName = file.getOriginalFilename();
@@ -366,7 +344,7 @@ public class UserDocumentServiceImpl implements UserDocumentService {
                     .getDocumentByFullNameAndOwner(parentDirectoryHash, docName, user);
 
             if (existingDocument == null) {
-                documents.add(createDocument(file, relations, user));
+                documents.add(createDocument(file, directory, user));
             } else if (existingDocument.getDocumentStatus() == DocumentStatus.REMOVED) {
                 documents.add(recoverAndUpdate(file, user, existingDocument));
             } else {
@@ -377,7 +355,7 @@ public class UserDocumentServiceImpl implements UserDocumentService {
         return documents;
     }
 
-    private UserDocument createDocument(MultipartFile multipartFile, DirectoryWithRelations relations, User user)
+    private UserDocument createDocument(MultipartFile multipartFile, DirectoryWrapper relations, User user)
             throws IOException {
 
         UserDocument document = UserFileUtil.createUserDocument(multipartFile, relations.getDirectory(), user);

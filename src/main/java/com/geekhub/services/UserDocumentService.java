@@ -10,7 +10,7 @@ import java.util.Collection;
 import java.util.Set;
 
 import com.geekhub.entities.enums.DocumentStatus;
-import com.geekhub.utils.DirectoryWithRelations;
+import com.geekhub.utils.DirectoryWrapper;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -33,7 +33,7 @@ public interface UserDocumentService extends EntityService<UserDocument, Long> {
 
     void copy(Collection<UserDocument> documents, String destinationDirectoryHash, User user);
 
-    void copy(Collection<UserDocument> documents, DirectoryWithRelations destinationDirectory);
+    void copy(Collection<UserDocument> documents, DirectoryWrapper destinationDirectory);
 
     UserDocument getByHashName(String hashName);
 
@@ -85,5 +85,5 @@ public interface UserDocumentService extends EntityService<UserDocument, Long> {
 
     List<String> getSimilarDocumentNamesInDirectory(String directoryHash, Set<UserDocument> documents);
 
-    void createRelations(List<UserDocument> documents, DirectoryWithRelations parentDirectory);
+    void createRelations(List<UserDocument> documents, DirectoryWrapper parentDirectory);
 }
