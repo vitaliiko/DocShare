@@ -30,4 +30,8 @@ public class FileControllersUtil {
                 || d.getHashName().equals(destinationDirHash)
         );
     }
+
+    public static boolean cannotCopyDirectories(Set<UserDirectory> directories, String destinationDirHash) {
+        return directories.stream().anyMatch(d -> d.getHashName().equals(destinationDirHash));
+    }
 }

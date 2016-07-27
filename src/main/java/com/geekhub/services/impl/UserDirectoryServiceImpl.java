@@ -3,7 +3,7 @@ package com.geekhub.services.impl;
 import com.geekhub.dto.*;
 import com.geekhub.entities.*;
 import com.geekhub.entities.enums.FileRelationType;
-import com.geekhub.exceptions.FileReplaceException;
+import com.geekhub.exceptions.FileOperationException;
 import com.geekhub.repositories.UserDirectoryRepository;
 import com.geekhub.dto.convertors.EntityToDtoConverter;
 import com.geekhub.entities.enums.DocumentAttribute;
@@ -264,7 +264,9 @@ public class UserDirectoryServiceImpl implements UserDirectoryService {
     }
 
     @Override
-    public void replace(Set<UserDirectory> directories, String destinationDirectoryHash, User user) throws FileReplaceException {
+    public void replace(Set<UserDirectory> directories, String destinationDirectoryHash, User user)
+            throws FileOperationException {
+
         if (CollectionUtils.isEmpty(directories)) {
             return;
         }
@@ -279,10 +281,7 @@ public class UserDirectoryServiceImpl implements UserDirectoryService {
         directories = setDirectoriesFullNames(destinationDirectoryHash, directories);
         for (UserDirectory dir : directories) {
             List<UserDirectory> childDirectories = getTreeByParentDirectoryHash(dir.getHashName());
-            List<String> childHashes = childDirectories.stream().map(UserDirectory::getHashName).collect(Collectors.toList());
-            if (childHashes.contains(destinationDirectoryHash)) {
-                throw new FileReplaceException("You cannot replace directory to itself");
-            }
+            canCopyOrReplace(destinationDirectoryHash, dir, childDirectories);
             dir.setDocumentAttribute(destinationDir == null ? DocumentAttribute.PRIVATE
                     : destinationDir.getDocumentAttribute());
             update(dir);
@@ -312,7 +311,9 @@ public class UserDirectoryServiceImpl implements UserDirectoryService {
     }
 
     @Override
-    public void copy(Collection<UserDirectory> directories, String destinationDirectoryHash, User user) {
+    public void copy(Collection<UserDirectory> directories, String destinationDirectoryHash, User user)
+            throws FileOperationException {
+
         if (CollectionUtils.isEmpty(directories)) {
             return;
         }
@@ -326,6 +327,8 @@ public class UserDirectoryServiceImpl implements UserDirectoryService {
         }
         directories = setDirectoriesFullNames(destinationDirectoryHash, directories.stream().collect(Collectors.toSet()));
         for (UserDirectory dir : directories) {
+            List<UserDirectory> childDirectories = getTreeByParentDirectoryHash(dir.getHashName());
+            canCopyOrReplace(destinationDirectoryHash, dir, childDirectories);
             UserDirectory copiedDir = UserFileUtil.copyDirectory(dir);
             copiedDir.setDocumentAttribute(destinationDir == null ? DocumentAttribute.PRIVATE
                     : destinationDir.getDocumentAttribute());
@@ -337,14 +340,14 @@ public class UserDirectoryServiceImpl implements UserDirectoryService {
         }
     }
 
-    private void copyContent(UserDirectory originalDir, DirectoryWithRelations relations) {
-        List<UserDocument> containedDocuments =
-                userDocumentService.getAllByParentDirectoryHashAndStatus(originalDir.getHashName(), DocumentStatus.ACTUAL);
-        userDocumentService.copy(containedDocuments, relations);
+    private void canCopyOrReplace(String destinationDirectoryHash, UserDirectory dir, List<UserDirectory> childDirectories)
+            throws FileOperationException {
 
-        List<UserDirectory> containedDirectories =
-                getAllByParentDirectoryHashAndStatus(originalDir.getHashName(), DocumentStatus.ACTUAL);
-        copy(containedDirectories, relations);
+        List<String> childHashes = childDirectories.stream().map(UserDirectory::getHashName).collect(Collectors.toList());
+        childHashes.add(dir.getHashName());
+        if (childHashes.contains(destinationDirectoryHash)) {
+            throw new FileOperationException("You cannot copy/replace directory to itself");
+        }
     }
 
     private Set<UserDirectory> setDirectoriesFullNames(String destinationDirectoryHash, Set<UserDirectory> directories) {
@@ -359,7 +362,16 @@ public class UserDirectoryServiceImpl implements UserDirectoryService {
         return directories;
     }
 
-    @Override
+    private void copyContent(UserDirectory originalDir, DirectoryWithRelations relations) {
+        List<UserDocument> containedDocuments =
+                userDocumentService.getAllByParentDirectoryHashAndStatus(originalDir.getHashName(), DocumentStatus.ACTUAL);
+        userDocumentService.copy(containedDocuments, relations);
+
+        List<UserDirectory> containedDirectories =
+                getAllByParentDirectoryHashAndStatus(originalDir.getHashName(), DocumentStatus.ACTUAL);
+        copy(containedDirectories, relations);
+    }
+
     public void copy(Collection<UserDirectory> directories, DirectoryWithRelations destinationDir) {
         for (UserDirectory dir : directories) {
             UserDirectory copiedDir = UserFileUtil.copyDirectory(dir);

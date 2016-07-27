@@ -4,6 +4,7 @@ import com.geekhub.dto.FileIdsDto;
 import com.geekhub.dto.RemovedFileDto;
 import com.geekhub.entities.*;
 import com.geekhub.dto.UserFileDto;
+import com.geekhub.exceptions.FileOperationException;
 import com.geekhub.resources.utils.FileControllersUtil;
 import com.geekhub.services.*;
 import com.geekhub.dto.convertors.EntityToDtoConverter;
@@ -87,7 +88,9 @@ public class FilesResource {
     }
 
     @RequestMapping(value = "/files/replace", method = RequestMethod.POST)
-    public ResponseEntity replaceFiles(@Valid @RequestBody FileIdsDto filesDto, HttpSession session) {
+    public ResponseEntity replaceFiles(@Valid @RequestBody FileIdsDto filesDto, HttpSession session)
+            throws FileOperationException {
+
         User user = getUserFromSession(session);
         Set<UserDocument> documents = userDocumentService.getAllByIds(filesDto.getDocIds());
         if (FileControllersUtil.cannotReplaceDocuments(documents, filesDto.getDestinationDirHash())) {
@@ -104,12 +107,17 @@ public class FilesResource {
     }
 
     @RequestMapping(value = "/files/copy", method = RequestMethod.POST)
-    public ResponseEntity<Void> copyFiles(@Valid @RequestBody FileIdsDto filesDto, HttpSession session) {
+    public ResponseEntity<Void> copyFiles(@Valid @RequestBody FileIdsDto filesDto, HttpSession session)
+            throws FileOperationException {
+
         User user = getUserFromSession(session);
         Set<UserDocument> documents = userDocumentService.getAllByIds(filesDto.getDocIds());
         userDocumentService.copy(documents, filesDto.getDestinationDirHash(), user);
 
         Set<UserDirectory> directories = userDirectoryService.getAllByIds(filesDto.getDirIds());
+        if (FileControllersUtil.cannotCopyDirectories(directories, filesDto.getDestinationDirHash())) {
+            return ResponseEntity.badRequest().build();
+        }
         userDirectoryService.copy(directories, filesDto.getDestinationDirHash(), user);
         return ResponseEntity.ok().build();
     }
@@ -178,5 +186,10 @@ public class FilesResource {
         model.addObject("documents", documentDtos);
         model.addObject("directories", directoryDtos);
         return model;
+    }
+
+    @ExceptionHandler(FileOperationException.class)
+    public ResponseEntity<String> fileOperationExceptionHandler(FileOperationException e) {
+        return ResponseEntity.badRequest().body(e.getMessage());
     }
 }
