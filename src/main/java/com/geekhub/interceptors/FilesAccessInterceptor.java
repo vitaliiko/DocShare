@@ -1,5 +1,6 @@
 package com.geekhub.interceptors;
 
+import com.geekhub.interceptors.utils.RequestURL;
 import org.json.JSONObject;
 import com.geekhub.entities.User;
 import com.geekhub.entities.UserDirectory;
@@ -64,7 +65,7 @@ public class FilesAccessInterceptor extends AccessInterceptor {
     }
 
     @Override
-    public boolean permitAccess(Long dirId, Long userId, String url) {
+    public boolean permitAccess(Long dirId, Long userId, RequestURL url) {
         return true;
     }
 

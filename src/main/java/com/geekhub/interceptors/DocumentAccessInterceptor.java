@@ -3,6 +3,7 @@ package com.geekhub.interceptors;
 import com.geekhub.entities.User;
 import com.geekhub.entities.UserDocument;
 import com.geekhub.interceptors.utils.InterceptorUtil;
+import com.geekhub.interceptors.utils.RequestURL;
 import com.geekhub.security.AccessPredicates;
 import com.geekhub.security.FileAccessService;
 import com.geekhub.services.UserDocumentService;
@@ -34,16 +35,16 @@ public class DocumentAccessInterceptor extends AccessInterceptor<UserDocument> {
 
     @PostConstruct
     public void init() {
-        addPredicate("/api/documents/*", AccessPredicates.DOCUMENT_READER);
-        addPredicate("/api/documents/*/share", AccessPredicates.DOCUMENT_OWNER);
-        addPredicate("/api/documents/*/access", AccessPredicates.DOCUMENT_OWNER);
-        addPredicate("/api/documents/*/rename", AccessPredicates.DOCUMENT_OWNER);
-        addPredicate("/api/documents/*/history", AccessPredicates.DOCUMENT_OWNER);
-        addPredicate("/api/documents/*/download", AccessPredicates.DOCUMENT_READER);
-        addPredicate("/api/documents/*/recover", AccessPredicates.REMOVED_DOCUMENT_OWNER);
-        addPredicate("/api/documents/*/comment-ability", AccessPredicates.DOCUMENT_OWNER);
-        addPredicate("/api/documents/*/versions/*/recover", AccessPredicates.DOCUMENT_OWNER);
-        addPredicate("/api/documents/*/versions/*/download", AccessPredicates.DOCUMENT_OWNER);
+        addPredicate(RequestURL.get("/api/documents/*"), AccessPredicates.DOCUMENT_READER);
+        addPredicate(RequestURL.post("/api/documents/*/share"), AccessPredicates.DOCUMENT_OWNER);
+        addPredicate(RequestURL.get("/api/documents/*/access"), AccessPredicates.DOCUMENT_OWNER);
+        addPredicate(RequestURL.post("/api/documents/*/rename"), AccessPredicates.DOCUMENT_OWNER);
+        addPredicate(RequestURL.get("/api/documents/*/history"), AccessPredicates.DOCUMENT_OWNER);
+        addPredicate(RequestURL.get("/api/documents/*/download"), AccessPredicates.DOCUMENT_READER);
+        addPredicate(RequestURL.post("/api/documents/*/recover"), AccessPredicates.REMOVED_DOCUMENT_OWNER);
+        addPredicate(RequestURL.post("/api/documents/*/comment-ability"), AccessPredicates.DOCUMENT_OWNER);
+        addPredicate(RequestURL.post("/api/documents/*/versions/*/recover"), AccessPredicates.DOCUMENT_OWNER);
+        addPredicate(RequestURL.get("/api/documents/*/versions/*/download"), AccessPredicates.DOCUMENT_OWNER);
     }
 
     @Override
@@ -52,7 +53,7 @@ public class DocumentAccessInterceptor extends AccessInterceptor<UserDocument> {
         Map<String, String> pathVariables = (Map) req.getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);
         if (userId != null && !CollectionUtils.isEmpty(pathVariables)) {
             String docId = pathVariables.get("docId");
-            String url = InterceptorUtil.removeVariablesFromURI(req, pathVariables);
+            RequestURL url = InterceptorUtil.createRequestURL(req, pathVariables);
             if (docId != null && StringUtils.isNumeric(docId) && permitAccess(Long.valueOf(docId), userId, url)) {
                 return true;
             }
@@ -62,7 +63,7 @@ public class DocumentAccessInterceptor extends AccessInterceptor<UserDocument> {
     }
 
     @Override
-    public boolean permitAccess(Long docId, Long userId, String url) {
+    public boolean permitAccess(Long docId, Long userId, RequestURL url) {
         BiPredicate<User, UserDocument> predicate = getPredicate(url);
         User user = userService.getById(userId);
         UserDocument document = userDocumentService.getById(docId);

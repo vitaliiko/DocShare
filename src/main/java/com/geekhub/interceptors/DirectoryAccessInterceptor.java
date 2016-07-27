@@ -3,6 +3,7 @@ package com.geekhub.interceptors;
 import com.geekhub.entities.User;
 import com.geekhub.entities.UserDirectory;
 import com.geekhub.interceptors.utils.InterceptorUtil;
+import com.geekhub.interceptors.utils.RequestURL;
 import com.geekhub.security.AccessPredicates;
 import com.geekhub.security.FileAccessService;
 import com.geekhub.services.UserDirectoryService;
@@ -34,14 +35,12 @@ public class DirectoryAccessInterceptor extends AccessInterceptor<UserDirectory>
 
     @PostConstruct
     public void init() {
-        addPredicate("/api/directories/*/documents/upload", AccessPredicates.DIRECTORY_OWNER);
-        addPredicate("/api/directories/*/parent/content", AccessPredicates.DIRECTORY_READER);
-        addPredicate("/api/directories/*/make-dir", AccessPredicates.DIRECTORY_OWNER);
-        addPredicate("/api/directories/*/content", AccessPredicates.DIRECTORY_READER);
-        addPredicate("/api/directories/*/recover", AccessPredicates.DIRECTORY_OWNER);
-        addPredicate("/api/directories/*/rename", AccessPredicates.DIRECTORY_OWNER);
-        addPredicate("/api/directories/*/share", AccessPredicates.DIRECTORY_OWNER);
-        addPredicate("/api/directories/*", AccessPredicates.DIRECTORY_OWNER);
+        addPredicate(RequestURL.post("/api/directories/*/documents/upload"), AccessPredicates.DIRECTORY_OWNER);
+        addPredicate(RequestURL.post("/api/directories/*/make-dir"), AccessPredicates.DIRECTORY_OWNER);
+        addPredicate(RequestURL.get("/api/directories/*/content"), AccessPredicates.DIRECTORY_READER);
+        addPredicate(RequestURL.post("/api/directories/*/recover"), AccessPredicates.DIRECTORY_OWNER);
+        addPredicate(RequestURL.post("/api/directories/*/rename"), AccessPredicates.DIRECTORY_OWNER);
+        addPredicate(RequestURL.post("/api/directories/*/share"), AccessPredicates.DIRECTORY_OWNER);
     }
 
     @Override
@@ -51,7 +50,7 @@ public class DirectoryAccessInterceptor extends AccessInterceptor<UserDirectory>
         if (userId != null && !CollectionUtils.isEmpty(pathVariables)) {
             String dirId = pathVariables.get("dirId");
             String dirHashName = pathVariables.get("dirHashName");
-            String url = InterceptorUtil.removeVariablesFromURI(req, pathVariables);
+            RequestURL url = InterceptorUtil.createRequestURL(req, pathVariables);
             if (isDirectoryAvailable(userId, dirHashName, url)
                     || (StringUtils.isNumeric(dirId) && isDirectoryAvailable(userId, Long.valueOf(dirId), url))) {
                 return true;
@@ -61,23 +60,23 @@ public class DirectoryAccessInterceptor extends AccessInterceptor<UserDirectory>
         return false;
     }
 
-    private boolean isDirectoryAvailable(Long userId, String dirHashName, String url) {
+    private boolean isDirectoryAvailable(Long userId, String dirHashName, RequestURL url) {
         return dirHashName != null && permitAccess(dirHashName, userId, url);
     }
 
-    private boolean isDirectoryAvailable(Long userId, Long dirId, String url) {
+    private boolean isDirectoryAvailable(Long userId, Long dirId, RequestURL url) {
         return dirId != null &&  permitAccess(dirId, userId, url);
     }
 
     @Override
-    public boolean permitAccess(Long dirId, Long userId, String url) {
+    public boolean permitAccess(Long dirId, Long userId, RequestURL url) {
         BiPredicate<User, UserDirectory> predicate = getPredicate(url);
         User user = userService.getById(userId);
         UserDirectory directory = userDirectoryService.getById(dirId);
         return predicate == null || fileAccessService.permitAccess(directory, user, predicate);
     }
 
-    private boolean permitAccess(String dirHashName, Long userId, String url) {
+    private boolean permitAccess(String dirHashName, Long userId, RequestURL url) {
         BiPredicate<User, UserDirectory> predicate = getPredicate(url);
         User user = userService.getById(userId);
         UserDirectory directory = userDirectoryService.getByHashName(dirHashName);
