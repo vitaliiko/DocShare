@@ -96,7 +96,7 @@ public class FilesResource {
         userDocumentService.replace(documents, filesDto.getDestinationDirHash(), user);
 
         Set<UserDirectory> directories = userDirectoryService.getAllByIds(filesDto.getDirIds());
-        if (FileControllersUtil.cannotReplaceDirectories(directories, filesDto.getDestinationDirHash())) {
+        if (FileControllersUtil.cannotReplaceDirectories(directories, filesDto.getDestinationDirHash(), user)) {
             return ResponseEntity.badRequest().build();
         }
         userDirectoryService.replace(directories, filesDto.getDestinationDirHash(), user);

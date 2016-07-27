@@ -3,6 +3,7 @@ package com.geekhub.services.impl;
 import com.geekhub.dto.*;
 import com.geekhub.entities.*;
 import com.geekhub.entities.enums.FileRelationType;
+import com.geekhub.exceptions.FileReplaceException;
 import com.geekhub.repositories.UserDirectoryRepository;
 import com.geekhub.dto.convertors.EntityToDtoConverter;
 import com.geekhub.entities.enums.DocumentAttribute;
@@ -263,7 +264,7 @@ public class UserDirectoryServiceImpl implements UserDirectoryService {
     }
 
     @Override
-    public void replace(Set<UserDirectory> directories, String destinationDirectoryHash, User user) {
+    public void replace(Set<UserDirectory> directories, String destinationDirectoryHash, User user) throws FileReplaceException {
         if (CollectionUtils.isEmpty(directories)) {
             return;
         }
@@ -277,16 +278,25 @@ public class UserDirectoryServiceImpl implements UserDirectoryService {
         }
         directories = setDirectoriesFullNames(destinationDirectoryHash, directories);
         for (UserDirectory dir : directories) {
+            List<UserDirectory> childDirectories = getTreeByParentDirectoryHash(dir.getHashName());
+            List<String> childHashes = childDirectories.stream().map(UserDirectory::getHashName).collect(Collectors.toList());
+            if (childHashes.contains(destinationDirectoryHash)) {
+                throw new FileReplaceException("You cannot replace directory to itself");
+            }
             dir.setDocumentAttribute(destinationDir == null ? DocumentAttribute.PRIVATE
                     : destinationDir.getDocumentAttribute());
             update(dir);
             createRelations(dir, relations);
-            createRelationsForChilds(destinationDirectoryHash, relations);
+            createRelationsForChilds(childDirectories, destinationDirectoryHash, relations);
         }
     }
 
     private void createRelationsForChilds(String dirHashName, DirectoryWithRelations relations) {
         List<UserDirectory> childDirectories = getTreeByParentDirectoryHash(dirHashName);
+        createRelationsForChilds(childDirectories, dirHashName, relations);
+    }
+
+    private void createRelationsForChilds(List<UserDirectory> childDirectories, String dirHashName, DirectoryWithRelations relations) {
         List<String> parentDirHashList = new ArrayList<>();
         if (!CollectionUtils.isEmpty(childDirectories)) {
             childDirectories.forEach(d -> {
