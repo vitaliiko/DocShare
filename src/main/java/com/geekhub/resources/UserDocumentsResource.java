@@ -5,7 +5,8 @@ import com.geekhub.dto.*;
 import com.geekhub.dto.convertors.EntityToDtoConverter;
 import com.geekhub.entities.*;
 import com.geekhub.entities.enums.AbilityToCommentDocument;
-import com.geekhub.security.UserDocumentAccessService;
+import com.geekhub.security.AccessPredicates;
+import com.geekhub.security.FileAccessService;
 import com.geekhub.services.*;
 import com.geekhub.utils.UserFileUtil;
 import com.geekhub.validators.FileValidator;
@@ -48,7 +49,7 @@ public class UserDocumentsResource {
     private DocumentOldVersionService documentOldVersionService;
 
     @Inject
-    private UserDocumentAccessService documentAccessService;
+    private FileAccessService fileAccessService;
 
     @Inject
     private UserToDirectoryRelationService userToDirectoryRelationService;
@@ -135,15 +136,16 @@ public class UserDocumentsResource {
     }
 
     private ModelAndView prepareModel(UserFileDto fileDto, User user, UserDocument document) {
-
         boolean abilityToComment = AbilityToCommentDocument.getBoolean(document.getAbilityToComment());
+        boolean isOwner = fileAccessService.permitAccess(document, user, AccessPredicates.DOCUMENT_OWNER);
+
         ModelAndView model = new ModelAndView();
         model.setViewName("document");
         model.addObject("doc", fileDto);
         model.addObject("location", userDocumentService.getLocation(document));
-        model.addObject("renderSettings", documentAccessService.isOwner(document, user) || abilityToComment);
+        model.addObject("renderSettings", isOwner || abilityToComment);
         model.addObject("renderComments", abilityToComment);
-        if (documentAccessService.isOwner(document, user)) {
+        if (isOwner) {
             model.addObject("historyLink", "/api/documents/" + document.getId() + "/history");
             model.addObject("abilityToComment", abilityToComment);
         }
