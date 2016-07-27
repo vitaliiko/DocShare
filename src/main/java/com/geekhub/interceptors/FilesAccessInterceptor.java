@@ -1,8 +1,10 @@
 package com.geekhub.interceptors;
 
+import org.json.JSONObject;
 import com.geekhub.entities.User;
 import com.geekhub.entities.UserDirectory;
 import com.geekhub.entities.UserDocument;
+import com.geekhub.interceptors.utils.InterceptorUtil;
 import com.geekhub.security.AccessPredicates;
 import com.geekhub.security.FileAccessService;
 import com.geekhub.services.UserDirectoryService;
@@ -12,7 +14,6 @@ import com.geekhub.services.enams.FileType;
 import com.geekhub.utils.CollectionTools;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.util.CollectionUtils;
 
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
@@ -38,28 +39,28 @@ public class FilesAccessInterceptor extends AccessInterceptor {
     @Override
     public boolean preHandle(HttpServletRequest req, HttpServletResponse resp, Object handler) throws Exception {
         Long userId = (Long) req.getSession().getAttribute("userId");
-        Map<String, String[]> parameterMap = req.getParameterMap();
-        if (userId != null && !CollectionUtils.isEmpty(parameterMap)) {
-            String[] dirIds = parameterMap.get("dirIds[]");
-            String[] docIds = parameterMap.get("docIds[]");
-            String[] destinationDirHash = parameterMap.get("destinationDirHash");
+        String requestBody = InterceptorUtil.getRequestBody(req);
+        if (userId != null && requestBody.length() > 0) {
+            JSONObject requestObject = new JSONObject(requestBody);
+            List<String> dirIds = InterceptorUtil.getStringList(requestObject, "dirIds");
+            List<String> docIds = InterceptorUtil.getStringList(requestObject, "docIds");
+            String destinationDirHash = requestObject.getString("destinationDirHash");
             if (areFilesAvailable(dirIds, docIds, userId) && isDirectoryAvailable(destinationDirHash, userId)) {
                 return true;
             }
         }
         resp.setStatus(HttpStatus.BAD_REQUEST.value());
-        return false;
+        return true;
     }
 
-    private boolean areFilesAvailable(String[] dirIds, String[] docIds, Long userId) {
+    private boolean areFilesAvailable(List<String> dirIds, List<String> docIds, Long userId) {
         return CollectionTools.isAllNumeric(dirIds, docIds)
                 && (dirIds != null && permitAccess(dirIds, FileType.DIRECTORY, userId)
                 || docIds != null && permitAccess(docIds, FileType.DOCUMENT, userId));
     }
 
-    private boolean isDirectoryAvailable(String[] destinationDirHash, Long userId) {
-        return destinationDirHash == null
-                || (destinationDirHash.length == 1 && permitAccess(destinationDirHash[0], userId));
+    private boolean isDirectoryAvailable(String destinationDirHash, Long userId) {
+        return destinationDirHash == null || permitAccess(destinationDirHash, userId);
     }
 
     @Override
@@ -67,8 +68,8 @@ public class FilesAccessInterceptor extends AccessInterceptor {
         return true;
     }
 
-    private boolean permitAccess(String[] fileIds, FileType fileType, Long userId) {
-        List<Long> idsInLong = Arrays.stream(fileIds).map(Long::valueOf).collect(Collectors.toList());
+    private boolean permitAccess(List<String> fileIds, FileType fileType, Long userId) {
+        List<Long> idsInLong = fileIds.stream().map(Long::valueOf).collect(Collectors.toList());
         User user = userService.getById(userId);
         if (fileType == FileType.DOCUMENT) {
             List<UserDocument> documents = new ArrayList<>(userDocumentService.getAllByIds(idsInLong));

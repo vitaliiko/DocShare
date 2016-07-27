@@ -8,6 +8,7 @@ import org.springframework.util.CollectionUtils;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -56,11 +57,12 @@ public class CollectionTools {
                 .collect(Collectors.toList());
     }
 
-    public static boolean isAllNumeric(String[]... numericArray) {
+    @SafeVarargs
+    public static boolean isAllNumeric(List<String>... numericArray) {
         return numericArray != null
                 && Arrays.stream(numericArray)
                 .filter(arr -> arr != null)
-                .flatMap(Arrays::stream)
+                .flatMap(Collection::stream)
                 .allMatch(StringUtils::isNumeric);
     }
 }

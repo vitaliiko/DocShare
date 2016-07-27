@@ -1,5 +1,6 @@
 package com.geekhub.resources;
 
+import com.geekhub.dto.FileIdsDto;
 import com.geekhub.dto.RemovedFileDto;
 import com.geekhub.entities.*;
 import com.geekhub.dto.UserFileDto;
@@ -15,14 +16,11 @@ import java.util.stream.Collectors;
 import javax.inject.Inject;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.WebDataBinder;
-import org.springframework.web.bind.annotation.InitBinder;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpSession;
+import javax.validation.Valid;
 
 @RestController
 @RequestMapping("/api")
@@ -89,38 +87,30 @@ public class FilesResource {
     }
 
     @RequestMapping(value = "/files/replace", method = RequestMethod.POST)
-    public ResponseEntity replaceFiles(@RequestParam(value = "docIds[]", required = false) Long[] docIds,
-                                       @RequestParam(value = "dirIds[]", required = false) Long[] dirIds,
-                                       @RequestParam String destinationDirHash,
-                                       HttpSession session) {
-
+    public ResponseEntity replaceFiles(@Valid @RequestBody FileIdsDto filesDto, HttpSession session) {
         User user = getUserFromSession(session);
-        Set<UserDocument> documents = userDocumentService.getAllByIds(docIds);
-        if (FileControllersUtil.cannotReplaceDocuments(documents, destinationDirHash)) {
+        Set<UserDocument> documents = userDocumentService.getAllByIds(filesDto.getDocIds());
+        if (FileControllersUtil.cannotReplaceDocuments(documents, filesDto.getDestinationDirHash())) {
             return ResponseEntity.badRequest().build();
         }
-        userDocumentService.replace(documents, destinationDirHash, user);
+        userDocumentService.replace(documents, filesDto.getDestinationDirHash(), user);
 
-        Set<UserDirectory> directories = userDirectoryService.getAllByIds(dirIds);
-        if (FileControllersUtil.cannotReplaceDirectories(directories, destinationDirHash)) {
+        Set<UserDirectory> directories = userDirectoryService.getAllByIds(filesDto.getDirIds());
+        if (FileControllersUtil.cannotReplaceDirectories(directories, filesDto.getDestinationDirHash())) {
             return ResponseEntity.badRequest().build();
         }
-        userDirectoryService.replace(directories, destinationDirHash, user);
+        userDirectoryService.replace(directories, filesDto.getDestinationDirHash(), user);
         return ResponseEntity.ok().build();
     }
 
     @RequestMapping(value = "/files/copy", method = RequestMethod.POST)
-    public ResponseEntity<Void> copyFiles(@RequestParam(value = "docIds[]", required = false) Long[] docIds,
-                                          @RequestParam(value = "dirIds[]", required = false) Long[] dirIds,
-                                          @RequestParam String destinationDirHash,
-                                          HttpSession session) {
-
+    public ResponseEntity<Void> copyFiles(@Valid @RequestBody FileIdsDto filesDto, HttpSession session) {
         User user = getUserFromSession(session);
-        Set<UserDocument> documents = userDocumentService.getAllByIds(docIds);
-        userDocumentService.copy(documents, destinationDirHash, user);
+        Set<UserDocument> documents = userDocumentService.getAllByIds(filesDto.getDocIds());
+        userDocumentService.copy(documents, filesDto.getDestinationDirHash(), user);
 
-        Set<UserDirectory> directories = userDirectoryService.getAllByIds(dirIds);
-        userDirectoryService.copy(directories, destinationDirHash, user);
+        Set<UserDirectory> directories = userDirectoryService.getAllByIds(filesDto.getDirIds());
+        userDirectoryService.copy(directories, filesDto.getDestinationDirHash(), user);
         return ResponseEntity.ok().build();
     }
 

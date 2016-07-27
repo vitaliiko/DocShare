@@ -421,7 +421,8 @@ $(document).ready(function() {
         $.ajax({
             url: '/api/files/replace',
             type: 'POST',
-            data: {'docIds[]': docIds, 'dirIds[]': dirIds, "destinationDirHash": dirHashName},
+            contentType: 'application/json',
+            data: JSON.stringify({docIds: docIds, dirIds: dirIds, destinationDirHash: dirHashName}),
             success: function() {
                 location.reload();
             }
@@ -432,7 +433,8 @@ $(document).ready(function() {
         $.ajax({
             url: '/api/files/copy',
             type: 'POST',
-            data: {'docIds[]': docIds, 'dirIds[]': dirIds, "destinationDirHash": dirHashName},
+            contentType: 'application/json',
+            data: JSON.stringify({docIds: docIds, dirIds: dirIds, destinationDirHash: dirHashName}),
             success: function() {
                 location.reload();
             }
