@@ -24,6 +24,8 @@ import org.springframework.web.servlet.ModelAndView;
 import javax.inject.Inject;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/api")
@@ -112,7 +114,9 @@ public class UserDirectoriesResource {
     }
 
     @RequestMapping(value = "/directories/{dirId}/add-to-my-files", method = RequestMethod.POST)
-    public void addDocumentToMyFiles(@PathVariable Long dirId, HttpSession session) {
-
+    public ResponseEntity addDocumentToMyFiles(@PathVariable Long dirId, HttpSession session) {
+        User user = getUserFromSession(session);
+        userDirectoryService.add(dirId, user);
+        return ResponseEntity.ok().build();
     }
 }

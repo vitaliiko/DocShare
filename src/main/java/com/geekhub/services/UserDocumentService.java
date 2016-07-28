@@ -85,7 +85,7 @@ public interface UserDocumentService extends EntityService<UserDocument, Long> {
 
     boolean isDocumentNameValid(String parentDirectoryHash, String docName, User owner);
 
-    List<String> getSimilarDocumentNamesInDirectory(String directoryHash, Set<UserDocument> documents);
+    List<String> getSimilarDocumentNamesInDirectory(String directoryHash, Collection<UserDocument> documents);
 
     void createRelations(List<UserDocument> documents, DirectoryWrapper parentDirectory);
 }

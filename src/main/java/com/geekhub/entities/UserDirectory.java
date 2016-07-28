@@ -33,12 +33,12 @@ public class UserDirectory implements Comparable<UserDirectory>, Serializable {
     private String hashName;
 
     @Column(name = "documentAttribute")
-    @Enumerated(EnumType.STRING)
+    @Enumerated
     @Getter @Setter
     private DocumentAttribute documentAttribute = DocumentAttribute.PRIVATE;
 
     @Column(name = "documentStatus")
-    @Enumerated(EnumType.STRING)
+    @Enumerated
     @Getter @Setter
     private DocumentStatus documentStatus = DocumentStatus.ACTUAL;
 

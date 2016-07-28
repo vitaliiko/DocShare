@@ -25,7 +25,7 @@ import javax.validation.Valid;
 
 @RestController
 @RequestMapping("/api")
-public class FilesResource {
+public class UserFilesResource {
 
     @Inject
     private UserService userService;

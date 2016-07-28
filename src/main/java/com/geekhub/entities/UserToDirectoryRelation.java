@@ -27,7 +27,7 @@ public class UserToDirectoryRelation {
     private User user;
 
     @Column(name = "relation")
-    @Enumerated(EnumType.STRING)
+    @Enumerated
     @Getter @Setter
     private FileRelationType fileRelationType;
 

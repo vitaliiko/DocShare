@@ -288,10 +288,13 @@ public class UserDirectoryServiceImpl implements UserDirectoryService {
         if (destinationDirectoryHash.equals("root")) {
             destinationDirectoryHash = user.getLogin();
             directory.setHashName(destinationDirectoryHash);
+        } else if (destinationDirectoryHash.endsWith(user.getLogin())) {
+            directory.setHashName(destinationDirectoryHash);
         } else {
             UserDirectory destinationDir = getByHashName(destinationDirectoryHash);
             directory = getAllDirectoryRelations(destinationDir);
         }
+        directory.setOwner(user);
         return directory;
     }
 
@@ -327,9 +330,11 @@ public class UserDirectoryServiceImpl implements UserDirectoryService {
         for (UserDirectory dir : directories) {
             List<UserDirectory> childDirectories = getTreeByParentDirectoryHash(dir.getHashName());
             canCopyOrReplace(directory.getHashName(), dir, childDirectories);
+
             UserDirectory copiedDir = UserFileUtil.copyDirectory(dir);
             copiedDir.setDocumentAttribute(directory.getDocumentAttribute());
             save(copiedDir);
+
             createRelations(copiedDir, directory);
             userToDirectoryRelationService.create(copiedDir, user, FileRelationType.OWN);
             directory.setDirectory(copiedDir);
@@ -339,7 +344,28 @@ public class UserDirectoryServiceImpl implements UserDirectoryService {
 
     @Override
     public void add(Long directoryId, User user) {
+        DirectoryWrapper directory = createDirectoryWrapper("root", user);
+        UserDirectory originalDir = getById(directoryId);
+        originalDir = setDirectoryFullName(directory.getHashName(), originalDir);
 
+        UserDirectory copiedDir = UserFileUtil.copyDirectory(originalDir);
+        copiedDir.setDocumentAttribute(directory.getDocumentAttribute());
+        save(copiedDir);
+
+        userToDirectoryRelationService.create(copiedDir, user, FileRelationType.OWN);
+        directory.setDirectory(copiedDir);
+        copyContent(originalDir, directory);
+    }
+
+    private UserDirectory setDirectoryFullName(String destinationDirectoryHash, UserDirectory directory) {
+        List<String> similarDocNames = getSimilarDirectoryNamesInDirectory(destinationDirectoryHash, directory);
+        if (similarDocNames.contains(directory.getName())) {
+            int documentIndex = UserFileUtil.countFileNameIndex(similarDocNames, directory);
+            String newDirName = directory.getName() + " (" + documentIndex + ")";
+            directory.setName(newDirName);
+        }
+        directory.setParentDirectoryHash(destinationDirectoryHash);
+        return directory;
     }
 
     private void canCopyOrReplace(String destinationDirectoryHash, UserDirectory dir, List<UserDirectory> childDirectories)
@@ -421,8 +447,14 @@ public class UserDirectoryServiceImpl implements UserDirectoryService {
         }
     }
 
+    private List<String> getSimilarDirectoryNamesInDirectory(String directoryHash, UserDirectory directory) {
+        List<UserDirectory> directories = new ArrayList<>();
+        directories.add(directory);
+        return getSimilarDirectoryNamesInDirectory(directoryHash, directories);
+    }
+
     @Override
-    public List<String> getSimilarDirectoryNamesInDirectory(String directoryHash, Set<UserDirectory> directories) {
+    public List<String> getSimilarDirectoryNamesInDirectory(String directoryHash, Collection<UserDirectory> directories) {
         if (CollectionUtils.isEmpty(directories)) {
             return new ArrayList<>();
         }
@@ -556,8 +588,10 @@ public class UserDirectoryServiceImpl implements UserDirectoryService {
     @Override
     public FileAccessDto findAllRelations(Long directoryId) {
         UserDirectory directory = getById(directoryId);
-        List<User> editors = userToDirectoryRelationService.getAllUsersByDirectoryIdAndRelation(directory, FileRelationType.EDIT);
-        List<User> readers = userToDirectoryRelationService.getAllUsersByDirectoryIdAndRelation(directory, FileRelationType.READ);
+        List<User> editors = userToDirectoryRelationService
+                .getAllUsersByDirectoryIdAndRelation(directory, FileRelationType.EDIT);
+        List<User> readers = userToDirectoryRelationService
+                .getAllUsersByDirectoryIdAndRelation(directory, FileRelationType.READ);
 
         List<FriendsGroup> editorGroups = friendGroupToDirectoryRelationService
                 .getAllGroupsByDirectoryIdAndRelation(directory, FileRelationType.EDIT);

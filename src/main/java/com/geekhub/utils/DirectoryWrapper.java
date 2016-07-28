@@ -50,7 +50,7 @@ public class DirectoryWrapper {
     }
 
     public String getHashName() {
-        if (hashName == null && directory != null) {
+        if (directory != null) {
             return directory.getHashName();
         }
         return hashName;

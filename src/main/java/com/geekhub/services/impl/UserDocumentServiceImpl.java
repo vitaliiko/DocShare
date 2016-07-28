@@ -240,7 +240,7 @@ public class UserDocumentServiceImpl implements UserDocumentService {
             return;
         }
         DirectoryWrapper directory = userDirectoryService.createDirectoryWrapper(destinationDirectoryHash, user);
-        documents = setDocumentFullNames(destinationDirectoryHash, documents.stream().collect(Collectors.toSet()));
+        documents = setDocumentFullNames(directory.getHashName(), documents.stream().collect(Collectors.toSet()));
         for (UserDocument doc : documents) {
             createCopy(user, directory, doc);
         }
@@ -285,10 +285,21 @@ public class UserDocumentServiceImpl implements UserDocumentService {
         UserDocument document = getById(documentId);
         UserDocument copiedDocument = UserFileUtil.copyDocument(document);
         copiedDocument.setDocumentAttribute(DocumentAttribute.PRIVATE);
-        copiedDocument.setParentDirectoryHash(user.getLogin());
+        copiedDocument = setDocumentFullName(user.getLogin(), copiedDocument);
         save(copiedDocument);
         userToDocumentRelationService.create(copiedDocument, user, FileRelationType.OWN);
         UserFileUtil.copyFile(document.getHashName(), copiedDocument.getHashName());
+    }
+
+    private UserDocument setDocumentFullName(String destinationDirectoryHash, UserDocument document) {
+        List<String> similarDocNames = getSimilarDocumentNamesInDirectory(destinationDirectoryHash, document);
+        if (similarDocNames.contains(document.getName())) {
+            int documentIndex = UserFileUtil.countFileNameIndex(similarDocNames, document);
+            String newDocName = document.getNameWithoutExtension() + " (" + documentIndex + ")" + document.getExtension();
+            document.setName(newDocName);
+        }
+        document.setParentDirectoryHash(destinationDirectoryHash);
+        return document;
     }
 
     @Override
@@ -526,8 +537,14 @@ public class UserDocumentServiceImpl implements UserDocumentService {
         return existingDocument == null && UserFileUtil.validateDocumentNameWithoutExtension(docName);
     }
 
+    private List<String> getSimilarDocumentNamesInDirectory(String directoryHash, UserDocument document) {
+        List<UserDocument> documents = new ArrayList<>();
+        documents.add(document);
+        return getSimilarDocumentNamesInDirectory(directoryHash, documents);
+    }
+
     @Override
-    public List<String> getSimilarDocumentNamesInDirectory(String directoryHash, Set<UserDocument> documents) {
+    public List<String> getSimilarDocumentNamesInDirectory(String directoryHash, Collection<UserDocument> documents) {
         if (CollectionUtils.isEmpty(documents)) {
             return new ArrayList<>();
         }

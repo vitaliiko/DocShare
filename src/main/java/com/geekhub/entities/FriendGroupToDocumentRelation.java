@@ -27,7 +27,7 @@ public class FriendGroupToDocumentRelation {
     private FriendsGroup friendsGroup;
 
     @Column(name = "relation")
-    @Enumerated(EnumType.STRING)
+    @Enumerated
     @Getter @Setter
     private FileRelationType fileRelationType;
 

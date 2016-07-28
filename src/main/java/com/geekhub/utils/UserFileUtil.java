@@ -45,32 +45,34 @@ public class UserFileUtil {
                 && Arrays.stream(files).map(MultipartFile::getOriginalFilename).allMatch(UserFileUtil::validateDocumentName);
     }
 
-    public static UserDocument createUserDocument(MultipartFile multipartFile,
+    public static UserDocument createUserDocument(MultipartFile file,
                                                   UserDirectory directory,
                                                   User user) throws IOException {
 
         UserDocument document = new UserDocument();
-        document.setNameWithExtension(multipartFile.getOriginalFilename());
+        document.setNameWithExtension(file.getOriginalFilename());
         document.setParentDirectoryHash(directory == null ? user.getLogin() : directory.getHashName());
         document.setLastModifyTime(Calendar.getInstance().getTime());
-        document.setType(multipartFile.getContentType());
-        document.setSize(convertDocumentSize(multipartFile.getSize()));
+        document.setType(file.getContentType());
+        document.setSize(convertDocumentSize(file.getSize()));
         document.setModifiedBy(user.getFullName());
-        document.setHashName(generateHashName());
+
+        String parentDirectoryHash = directory == null ? user.getLogin() : directory.getHashName();
+        document.setHashName(generateHashName(file.getOriginalFilename(), parentDirectoryHash));
         document.setDocumentAttribute(directory == null ? DocumentAttribute.PRIVATE : directory.getDocumentAttribute());
         return document;
     }
 
     public static UserDocument updateUserDocument(UserDocument document,
-                                                  MultipartFile multipartFile,
+                                                  MultipartFile file,
                                                   User user) throws IOException {
 
-        String hashName = UserFileUtil.generateHashName();
+        String hashName = UserFileUtil.generateHashName(document.getName(), document.getParentDirectoryHash());
         document.setLastModifyTime(Calendar.getInstance().getTime());
         document.setModifiedBy(user.getFullName());
-        document.setSize(convertDocumentSize(multipartFile.getSize()));
+        document.setSize(convertDocumentSize(file.getSize()));
         document.setHashName(hashName);
-        multipartFile.transferTo(UserFileUtil.createFile(hashName));
+        file.transferTo(UserFileUtil.createFile(hashName));
         return document;
     }
 
@@ -109,14 +111,8 @@ public class UserFileUtil {
         return removedDirectory;
     }
 
-    public static String generateHashName() {
-        return DigestUtils.md5Hex("" + new Date().getTime());
-    }
-
-    public static String generateHashName(long... parameters) {
-        StringBuilder preparedHashName = new StringBuilder("");
-        Arrays.stream(parameters).forEach(preparedHashName::append);
-        return DigestUtils.md5Hex(preparedHashName.toString());
+    public static String generateHashName(String name, String parentDirectoryHash) {
+        return DigestUtils.md5Hex(name + parentDirectoryHash + new Date().getTime());
     }
 
     public static File createFile(String fileName) {
@@ -130,7 +126,7 @@ public class UserFileUtil {
         UserDirectory directory = new UserDirectory();
         directory.setName(dirName);
         directory.setParentDirectoryHash(parentDirHash.equals("root") ? owner.getLogin() : parentDirHash);
-        directory.setHashName(generateHashName());
+        directory.setHashName(generateHashName(dirName, parentDirHash));
         directory.setDocumentAttribute(DocumentAttribute.PRIVATE);
         return directory;
     }
@@ -159,7 +155,7 @@ public class UserFileUtil {
         };
         UserDocument copy = new UserDocument();
         BeanUtils.copyProperties(original, copy, ignoredProperties);
-        copy.setHashName(UserFileUtil.generateHashName());
+        copy.setHashName(UserFileUtil.generateHashName(original.getName(), original.getParentDirectoryHash()));
         return copy;
     }
 
@@ -169,7 +165,7 @@ public class UserFileUtil {
         };
         UserDirectory copy = new UserDirectory();
         BeanUtils.copyProperties(original, copy, ignoredProperties);
-        copy.setHashName(UserFileUtil.generateHashName());
+        copy.setHashName(UserFileUtil.generateHashName(original.getName(), original.getParentDirectoryHash()));
         return copy;
     }
 

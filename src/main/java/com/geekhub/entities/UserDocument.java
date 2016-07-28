@@ -57,17 +57,17 @@ public class UserDocument implements Comparable<UserDocument>, Serializable {
     private String hashName;
 
     @Column(name = "documentAttribute")
-    @Enumerated(EnumType.STRING)
+    @Enumerated
     @Getter @Setter
     private DocumentAttribute documentAttribute = DocumentAttribute.PRIVATE;
 
     @Column(name = "documentStatus")
-    @Enumerated(EnumType.STRING)
+    @Enumerated
     @Getter @Setter
     private DocumentStatus documentStatus = DocumentStatus.ACTUAL;
 
     @Column(name = "abilityToComment")
-    @Enumerated(EnumType.STRING)
+    @Enumerated
     @Getter @Setter
     private AbilityToCommentDocument abilityToComment = AbilityToCommentDocument.ENABLE;
 
