@@ -270,15 +270,15 @@ public class UserDirectoryServiceImpl implements UserDirectoryService {
         if (CollectionUtils.isEmpty(directories)) {
             return;
         }
-        DirectoryWrapper directory = createDirectoryWrapper(destinationDirectoryHash, user);
-        directories = setDirectoriesFullNames(directory.getHashName(), directories);
+        DirectoryWrapper destinationDirWrapper = createDirectoryWrapper(destinationDirectoryHash, user);
+        directories = setDirectoriesFullNames(destinationDirWrapper.getHashName(), directories);
         for (UserDirectory dir : directories) {
             List<UserDirectory> childDirectories = getTreeByParentDirectoryHash(dir.getHashName());
-            canCopyOrReplace(directory.getHashName(), dir, childDirectories);
-            dir.setDocumentAttribute(directory.getDocumentAttribute());
+            canCopyOrReplace(destinationDirWrapper.getHashName(), dir, childDirectories);
+            dir.setDocumentAttribute(destinationDirWrapper.getDocumentAttribute());
             update(dir);
-            createRelations(dir, directory);
-            createRelationsForChilds(childDirectories, directory.getHashName(), directory);
+            createRelations(dir, destinationDirWrapper);
+            createRelationsForChilds(childDirectories, destinationDirWrapper.getHashName(), destinationDirWrapper);
         }
     }
 
@@ -319,53 +319,36 @@ public class UserDirectoryServiceImpl implements UserDirectoryService {
     }
 
     @Override
+    public void copyToRoot(Long directoryId, User user) {
+        UserDirectory directory = getById(directoryId);
+        List<UserDirectory> directories = new ArrayList<>();
+        directories.add(directory);
+        copy(directories, "root", user);
+    }
+
+    @Override
     public void copy(Collection<UserDirectory> directories, String destinationDirectoryHash, User user)
             throws FileOperationException {
 
         if (CollectionUtils.isEmpty(directories)) {
             return;
         }
-        DirectoryWrapper directory = createDirectoryWrapper(destinationDirectoryHash, user);
-        directories = setDirectoriesFullNames(directory.getHashName(), directories.stream().collect(Collectors.toSet()));
+        DirectoryWrapper destinationDirWrapper = createDirectoryWrapper(destinationDirectoryHash, user);
+        Set<UserDirectory> directorySet = directories.stream().collect(Collectors.toSet());
+        directories = setDirectoriesFullNames(destinationDirWrapper.getHashName(), directorySet);
         for (UserDirectory dir : directories) {
             List<UserDirectory> childDirectories = getTreeByParentDirectoryHash(dir.getHashName());
-            canCopyOrReplace(directory.getHashName(), dir, childDirectories);
+            canCopyOrReplace(destinationDirWrapper.getHashName(), dir, childDirectories);
 
             UserDirectory copiedDir = UserFileUtil.copyDirectory(dir);
-            copiedDir.setDocumentAttribute(directory.getDocumentAttribute());
+            copiedDir.setDocumentAttribute(destinationDirWrapper.getDocumentAttribute());
             save(copiedDir);
 
-            createRelations(copiedDir, directory);
+            createRelations(copiedDir, destinationDirWrapper);
             userToDirectoryRelationService.create(copiedDir, user, FileRelationType.OWN);
-            directory.setDirectory(copiedDir);
-            copyContent(dir, directory);
+            destinationDirWrapper.setDirectory(copiedDir);
+            copyContent(dir, destinationDirWrapper);
         }
-    }
-
-    @Override
-    public void add(Long directoryId, User user) {
-        DirectoryWrapper directory = createDirectoryWrapper("root", user);
-        UserDirectory originalDir = getById(directoryId);
-        originalDir = setDirectoryFullName(directory.getHashName(), originalDir);
-
-        UserDirectory copiedDir = UserFileUtil.copyDirectory(originalDir);
-        copiedDir.setDocumentAttribute(directory.getDocumentAttribute());
-        save(copiedDir);
-
-        userToDirectoryRelationService.create(copiedDir, user, FileRelationType.OWN);
-        directory.setDirectory(copiedDir);
-        copyContent(originalDir, directory);
-    }
-
-    private UserDirectory setDirectoryFullName(String destinationDirectoryHash, UserDirectory directory) {
-        List<String> similarDocNames = getSimilarDirectoryNamesInDirectory(destinationDirectoryHash, directory);
-        if (similarDocNames.contains(directory.getName())) {
-            int documentIndex = UserFileUtil.countFileNameIndex(similarDocNames, directory);
-            String newDirName = directory.getName() + " (" + documentIndex + ")";
-            directory.setName(newDirName);
-        }
-        directory.setParentDirectoryHash(destinationDirectoryHash);
-        return directory;
     }
 
     private void canCopyOrReplace(String destinationDirectoryHash, UserDirectory dir, List<UserDirectory> childDirectories)
@@ -390,14 +373,14 @@ public class UserDirectoryServiceImpl implements UserDirectoryService {
         return directories;
     }
 
-    private void copyContent(UserDirectory originalDir, DirectoryWrapper directory) {
-        List<UserDocument> containedDocuments =
-                userDocumentService.getAllByParentDirectoryHashAndStatus(originalDir.getHashName(), DocumentStatus.ACTUAL);
-        userDocumentService.copy(containedDocuments, directory);
+    private void copyContent(UserDirectory originalDir, DirectoryWrapper destinationDirWrapper) {
+        List<UserDocument> containedDocuments = userDocumentService
+                .getAllByParentDirectoryHashAndStatus(originalDir.getHashName(), DocumentStatus.ACTUAL);
+        userDocumentService.copy(containedDocuments, destinationDirWrapper);
 
         List<UserDirectory> containedDirectories =
                 getAllByParentDirectoryHashAndStatus(originalDir.getHashName(), DocumentStatus.ACTUAL);
-        copyContainedDirectories(containedDirectories, directory);
+        copyContainedDirectories(containedDirectories, destinationDirWrapper);
     }
 
     public void copyContainedDirectories(Collection<UserDirectory> directories, DirectoryWrapper destinationDir) {

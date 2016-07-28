@@ -116,7 +116,7 @@ public class UserDirectoriesResource {
     @RequestMapping(value = "/directories/{dirId}/add-to-my-files", method = RequestMethod.POST)
     public ResponseEntity addDocumentToMyFiles(@PathVariable Long dirId, HttpSession session) {
         User user = getUserFromSession(session);
-        userDirectoryService.add(dirId, user);
+        userDirectoryService.copyToRoot(dirId, user);
         return ResponseEntity.ok().build();
     }
 }

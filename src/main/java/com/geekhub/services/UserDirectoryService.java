@@ -36,9 +36,9 @@ public interface UserDirectoryService extends EntityService<UserDirectory, Long>
 
     Long recover(Long removedDirId);
 
-    void copy(Collection<UserDirectory> directories, String destinationDirectoryHash, User user);
+    void copyToRoot(Long directoryId, User user);
 
-    void add(Long directoryId, User user);
+    void copy(Collection<UserDirectory> directories, String destinationDirectoryHash, User user);
 
     void recover(Long[] removedDirIds);
 
