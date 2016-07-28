@@ -41,6 +41,7 @@ public class DirectoryAccessInterceptor extends AccessInterceptor<UserDirectory>
         addPredicate(RequestURL.post("/api/directories/*/recover"), AccessPredicates.DIRECTORY_OWNER);
         addPredicate(RequestURL.post("/api/directories/*/rename"), AccessPredicates.DIRECTORY_OWNER);
         addPredicate(RequestURL.post("/api/directories/*/share"), AccessPredicates.DIRECTORY_OWNER);
+        addPredicate(RequestURL.post("/api/directories/*/add-to-my-files"), AccessPredicates.DIRECTORY_OWNER);
     }
 
     @Override
@@ -71,17 +72,22 @@ public class DirectoryAccessInterceptor extends AccessInterceptor<UserDirectory>
     @Override
     public boolean permitAccess(Long dirId, Long userId, RequestURL url) {
         BiPredicate<User, UserDirectory> predicate = getPredicate(url);
+        if (predicate == null) {
+            return true;
+        }
         User user = userService.getById(userId);
         UserDirectory directory = userDirectoryService.getById(dirId);
-        return predicate == null || fileAccessService.permitAccess(directory, user, predicate);
+        return fileAccessService.permitAccess(directory, user, predicate);
     }
 
     private boolean permitAccess(String dirHashName, Long userId, RequestURL url) {
         BiPredicate<User, UserDirectory> predicate = getPredicate(url);
+        if (predicate == null) {
+            return true;
+        }
         User user = userService.getById(userId);
         UserDirectory directory = userDirectoryService.getByHashName(dirHashName);
-        return predicate == null
-                || dirHashName.equals("root")
+        return dirHashName.equals("root")
                 || dirHashName.equals(user.getLogin())
                 || fileAccessService.permitAccess(directory, user, predicate);
     }

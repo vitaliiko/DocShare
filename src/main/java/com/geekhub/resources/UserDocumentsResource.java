@@ -229,4 +229,9 @@ public class UserDocumentsResource {
         userDocumentService.recoverRemovedDocument(docId, user);
         return new ModelAndView("redirect:/api/documents");
     }
+
+    @RequestMapping(value = "/documents/{docId}/add-to-my-files", method = RequestMethod.POST)
+    public void addDocumentToMyFiles(@PathVariable Long docId, HttpSession session) {
+
+    }
 }

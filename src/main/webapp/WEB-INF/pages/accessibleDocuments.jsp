@@ -5,6 +5,7 @@
     <title>Friends documents</title>
     <jsp:include page="../include/include.jsp"/>
     <script src="${pageContext.request.contextPath}/resources/js/sidebar.js"></script>
+    <script src="${pageContext.request.contextPath}/resources/js/accessibleDocuments.js"></script>
 </head>
 
 <body style="padding-top: 65px;">
@@ -29,7 +30,10 @@
                     <td>--</td>
                     <td>--</td>
                     <td align="right">
-
+                        <button type="button" class="btn btn-default btn-sm custom-width add-to-my-files add-dir"
+                                value="${dir.id}">
+                            Add
+                        </button>
                     </td>
                 </tr>
             </c:forEach>
@@ -42,6 +46,10 @@
                     <td>${doc.lastModifyTime}</td>
                     <td align="right">
                         <a href="/api/documents/${doc.id}/download" class="btn btn-default btn-sm custom-width">Download</a>
+                        <button type="button" class="btn btn-default btn-sm custom-width add-to-my-files add-doc"
+                                value="${doc.id}">
+                            Add
+                        </button>
                     </td>
                 </tr>
             </c:forEach>

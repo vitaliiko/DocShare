@@ -48,6 +48,7 @@ public class DocumentAccessInterceptor extends AccessInterceptor<UserDocument> {
         addPredicate(RequestURL.get("/api/documents/*/comment"), AccessPredicates.DOCUMENT_COMMENTER);
         addPredicate(RequestURL.post("/api/documents/*/comment"), AccessPredicates.DOCUMENT_COMMENTER);
         addPredicate(RequestURL.delete("/api/documents/*/comment"), AccessPredicates.DOCUMENT_OWNER);
+        addPredicate(RequestURL.post("/api/documents/*/add-to-my-files"), AccessPredicates.DOCUMENT_OWNER);
     }
 
     @Override
@@ -68,8 +69,11 @@ public class DocumentAccessInterceptor extends AccessInterceptor<UserDocument> {
     @Override
     public boolean permitAccess(Long docId, Long userId, RequestURL url) {
         BiPredicate<User, UserDocument> predicate = getPredicate(url);
+        if (predicate == null) {
+            return true;
+        }
         User user = userService.getById(userId);
         UserDocument document = userDocumentService.getById(docId);
-        return predicate == null || fileAccessService.permitAccess(document, user, predicate);
+        return fileAccessService.permitAccess(document, user, predicate);
     }
 }
