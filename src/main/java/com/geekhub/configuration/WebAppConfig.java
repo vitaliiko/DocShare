@@ -35,6 +35,9 @@ public class WebAppConfig extends WebMvcConfigurerAdapter implements WebApplicat
     private MainInterceptor mainInterceptor;
 
     @Inject
+    private LoggedInterceptor loggedInterceptor;
+
+    @Inject
     private DocumentAccessInterceptor documentAccessInterceptor;
 
     @Inject
@@ -71,6 +74,7 @@ public class WebAppConfig extends WebMvcConfigurerAdapter implements WebApplicat
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(mainInterceptor);
+        registry.addInterceptor(loggedInterceptor);
 
         registry.addInterceptor(documentAccessInterceptor)
                 .addPathPatterns("/api/documents/**")
