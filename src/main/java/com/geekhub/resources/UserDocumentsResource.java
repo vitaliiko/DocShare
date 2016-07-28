@@ -231,7 +231,9 @@ public class UserDocumentsResource {
     }
 
     @RequestMapping(value = "/documents/{docId}/add-to-my-files", method = RequestMethod.POST)
-    public void addDocumentToMyFiles(@PathVariable Long docId, HttpSession session) {
-
+    public ResponseEntity addDocumentToMyFiles(@PathVariable Long docId, HttpSession session) {
+        User user = getUserFromSession(session);
+        userDocumentService.add(docId, user);
+        return ResponseEntity.ok().build();
     }
 }

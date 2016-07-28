@@ -41,7 +41,7 @@ public class DirectoryAccessInterceptor extends AccessInterceptor<UserDirectory>
         addPredicate(RequestURL.post("/api/directories/*/recover"), AccessPredicates.DIRECTORY_OWNER);
         addPredicate(RequestURL.post("/api/directories/*/rename"), AccessPredicates.DIRECTORY_OWNER);
         addPredicate(RequestURL.post("/api/directories/*/share"), AccessPredicates.DIRECTORY_OWNER);
-        addPredicate(RequestURL.post("/api/directories/*/add-to-my-files"), AccessPredicates.DIRECTORY_OWNER);
+        addPredicate(RequestURL.post("/api/directories/*/add-to-my-files"), AccessPredicates.NOT_DIRECTORY_OWNER);
     }
 
     @Override

@@ -20,6 +20,15 @@ public class AccessPredicates {
                 && d.getDocumentStatus() == DocumentStatus.ACTUAL;
     };
 
+    public static final BiPredicate<User, UserDocument> NOT_DOCUMENT_OWNER = (u, d) -> {
+        FileRelationType relationType = FileAccessService.getUserToDocumentRelationType(d, u);
+        return d.getDocumentStatus() == DocumentStatus.ACTUAL
+                && ((relationType != null && relationType != FileRelationType.OWN)
+                || d.getDocumentAttribute() == DocumentAttribute.PUBLIC
+                || (d.getDocumentAttribute() == DocumentAttribute.FOR_FRIENDS && FileAccessService.isOwnerFriend(u, d))
+                || FileAccessService.isInReaderOrEditorGroups(u, d));
+    };
+
     public static final BiPredicate<User, UserDocument> REMOVED_DOCUMENT_OWNER = (u, d) -> {
         FileRelationType relationType = FileAccessService.getUserToDocumentRelationType(d, u);
         return relationType != null
@@ -72,6 +81,15 @@ public class AccessPredicates {
         List<FileRelationType> relationTypes = FileAccessService.getUserToDirectoriesRelationTypes(directories, u);
         return directories.stream().map(UserDirectory::getDocumentStatus).allMatch(s -> s == DocumentStatus.ACTUAL)
                 && relationTypes.stream().allMatch(r -> r == FileRelationType.OWN);
+    };
+
+    public static final BiPredicate<User, UserDirectory> NOT_DIRECTORY_OWNER = (u, d) -> {
+        FileRelationType relationType = FileAccessService.getUserToDirectoryRelationType(d, u);
+        return d.getDocumentStatus() == DocumentStatus.ACTUAL
+                && ((relationType != null && relationType != FileRelationType.OWN)
+                || d.getDocumentAttribute() == DocumentAttribute.PUBLIC
+                || (d.getDocumentAttribute() == DocumentAttribute.FOR_FRIENDS && FileAccessService.isOwnerFriend(u, d))
+                || FileAccessService.isInReaderOrEditorGroups(u, d));
     };
 
     public static final BiPredicate<User, List<UserDocument>> DOCUMENTS_OWNER = (u, documents) -> {

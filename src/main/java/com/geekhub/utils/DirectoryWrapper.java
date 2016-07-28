@@ -53,10 +53,7 @@ public class DirectoryWrapper {
         if (hashName == null && directory != null) {
             return directory.getHashName();
         }
-        if (hashName != null) {
-            return hashName;
-        }
-        return null;
+        return hashName;
     }
 
     public void addRelation(UserToDirectoryRelation relation) {

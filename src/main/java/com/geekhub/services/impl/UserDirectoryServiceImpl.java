@@ -337,6 +337,11 @@ public class UserDirectoryServiceImpl implements UserDirectoryService {
         }
     }
 
+    @Override
+    public void add(Long directoryId, User user) {
+
+    }
+
     private void canCopyOrReplace(String destinationDirectoryHash, UserDirectory dir, List<UserDirectory> childDirectories)
             throws FileOperationException {
 

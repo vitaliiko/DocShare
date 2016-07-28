@@ -281,6 +281,17 @@ public class UserDocumentServiceImpl implements UserDocumentService {
     }
 
     @Override
+    public void add(Long documentId, User user) {
+        UserDocument document = getById(documentId);
+        UserDocument copiedDocument = UserFileUtil.copyDocument(document);
+        copiedDocument.setDocumentAttribute(DocumentAttribute.PRIVATE);
+        copiedDocument.setParentDirectoryHash(user.getLogin());
+        save(copiedDocument);
+        userToDocumentRelationService.create(copiedDocument, user, FileRelationType.OWN);
+        UserFileUtil.copyFile(document.getHashName(), copiedDocument.getHashName());
+    }
+
+    @Override
     public void createRelations(List<UserDocument> documents, DirectoryWrapper relations) {
         documents.forEach(d -> {
             createRelations(d, relations);

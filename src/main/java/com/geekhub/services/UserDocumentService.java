@@ -35,6 +35,8 @@ public interface UserDocumentService extends EntityService<UserDocument, Long> {
 
     void copy(Collection<UserDocument> documents, DirectoryWrapper destinationDirectory);
 
+    void add(Long documentId, User user);
+
     UserDocument getByHashName(String hashName);
 
     UserDocument getByNameAndOwnerId(Long ownerId, String name);
