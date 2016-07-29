@@ -5,5 +5,9 @@ import com.geekhub.entities.FileSharedLink;
 
 public interface FileSharedLinkService extends EntityService<FileSharedLink, Long> {
 
-    FileSharedLink create(FileSharedLinkDto linkDto, Long userId);
+    FileSharedLink createOrUpdate(FileSharedLinkDto linkDto, Long userId);
+
+    FileSharedLink getByFileHashName(String fileHashName);
+
+    FileSharedLink getByLinkHash(String linkHash);
 }

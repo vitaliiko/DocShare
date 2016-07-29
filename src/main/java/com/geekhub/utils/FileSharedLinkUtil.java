@@ -9,12 +9,12 @@ public class FileSharedLinkUtil {
     public static final String BASE_DOCUMENT_URL = "http://127.0.0.1:8888/api/documents/link/";
     public static final String BASE_DIRECTORY_URL = "http://127.0.0.1:8888/api/directories/link/";
 
-    public static String generateLinkHash(Long fileId, Long userId) {
-        return DigestUtils.md5Hex("" + fileId + userId);
+    public static String generateLinkHash(Long fileId, FileType fileType, Long userId) {
+        return DigestUtils.md5Hex(fileType.toString() + fileId + userId);
     }
 
     public static String createFileShareURL(Long fileId, FileType fileType, Long userId) {
-        String linkHash = generateLinkHash(fileId, userId);
+        String linkHash = generateLinkHash(fileId, fileType, userId);
         if (fileType == FileType.DOCUMENT) {
             return BASE_DOCUMENT_URL + linkHash;
         }

@@ -1,7 +1,6 @@
 package com.geekhub.entities;
 
 import com.geekhub.entities.enums.FileRelationType;
-import com.geekhub.services.enams.FileType;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -17,19 +16,19 @@ public class FileSharedLink {
     @Getter @Setter
     private Long id;
 
-    @Column
+    @Column(nullable = false)
     @Getter @Setter
     private Long fileId;
 
-    @Column(unique = true)
+    @Column(unique = true, nullable = false)
     @Getter @Setter
     private String fileHashName;
 
-    @Column(unique = true)
+    @Column(unique = true, nullable = false)
     @Getter @Setter
     private String hash;
 
-    @Column(name = "relation_type")
+    @Column(name = "relation_type", nullable = false)
     @Enumerated
     @Getter @Setter
     private FileRelationType relationType;

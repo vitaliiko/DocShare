@@ -1,9 +1,8 @@
 package com.geekhub.resources;
 
 import com.geekhub.dto.FileSharedLinkDto;
-import com.geekhub.entities.User;
+import com.geekhub.entities.FileSharedLink;
 import com.geekhub.services.FileSharedLinkService;
-import com.geekhub.services.UserService;
 import com.geekhub.services.enams.FileType;
 import com.geekhub.utils.FileSharedLinkUtil;
 import org.springframework.http.ResponseEntity;
@@ -18,9 +17,6 @@ import javax.validation.Valid;
 public class FileSharedLinksResource {
 
     @Inject
-    private UserService userService;
-
-    @Inject
     private FileSharedLinkService fileSharedLinkService;
 
     @RequestMapping(value = "/links/generate-hash/{fileId}", method = RequestMethod.GET)
@@ -33,9 +29,15 @@ public class FileSharedLinksResource {
     }
 
     @RequestMapping(value = "/links", method = RequestMethod.POST)
-    public ResponseEntity createLink(@RequestBody FileSharedLinkDto linkDto, HttpSession session) {
+    public ResponseEntity createLink(@Valid @RequestBody FileSharedLinkDto linkDto, HttpSession session) {
         Long userId = (Long) session.getAttribute("userId");
-        fileSharedLinkService.create(linkDto, userId);
+        fileSharedLinkService.createOrUpdate(linkDto, userId);
         return ResponseEntity.ok().build();
+    }
+
+    @RequestMapping(value = "/links/{fileHash}", method = RequestMethod.GET)
+    public ResponseEntity<FileSharedLink> getLink(@PathVariable String fileHash) {
+        FileSharedLink sharedLink = fileSharedLinkService.getByFileHashName(fileHash);
+        return ResponseEntity.ok().body(sharedLink);
     }
 }
