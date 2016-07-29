@@ -23,11 +23,12 @@ public class FileSharedLink {
 
     @Column
     @Getter @Setter
-    private FileType fileType;
+    private String fileHashName;
 
     @Column
+    @Enumerated
     @Getter @Setter
-    private String baseUrl;
+    private FileType fileType;
 
     @Column
     @Getter @Setter
