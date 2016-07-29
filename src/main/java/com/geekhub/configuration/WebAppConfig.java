@@ -38,13 +38,16 @@ public class WebAppConfig extends WebMvcConfigurerAdapter implements WebApplicat
     private LoggedInterceptor loggedInterceptor;
 
     @Inject
-    private DocumentAccessInterceptor documentAccessInterceptor;
+    private UserDocumentAccessInterceptor documentAccessInterceptor;
 
     @Inject
-    private DirectoryAccessInterceptor directoryAccessInterceptor;
+    private UserDirectoryAccessInterceptor directoryAccessInterceptor;
 
     @Inject
-    private FilesAccessInterceptor filesAccessInterceptor;
+    private UserFilesAccessInterceptor filesAccessInterceptor;
+
+    @Inject
+    private FileSharedLinkInterceptor fileSharedLinkInterceptor;
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
@@ -88,6 +91,9 @@ public class WebAppConfig extends WebMvcConfigurerAdapter implements WebApplicat
                 .excludePathPatterns("/api/files/search")
                 .excludePathPatterns("/api/files/removed")
                 .excludePathPatterns("/api/files/accessible");
+
+        registry.addInterceptor(fileSharedLinkInterceptor)
+                .addPathPatterns("/api/links/**");
     }
 
     @Bean(name = "multipartResolver")

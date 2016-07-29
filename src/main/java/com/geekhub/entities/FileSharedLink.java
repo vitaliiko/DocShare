@@ -20,7 +20,7 @@ public class FileSharedLink {
     @Getter @Setter
     private Long fileId;
 
-    @Column(unique = true, nullable = false)
+    @Column(name = "file_hash_name", unique = true, nullable = false)
     @Getter @Setter
     private String fileHashName;
 
@@ -44,4 +44,8 @@ public class FileSharedLink {
     @Column(name = "click_number")
     @Getter @Setter
     private Integer clickNumber;
+
+    @Column(nullable = false)
+    @Getter @Setter
+    private Long userId;
 }

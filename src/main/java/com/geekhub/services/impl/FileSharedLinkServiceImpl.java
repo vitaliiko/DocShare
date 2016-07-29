@@ -3,12 +3,14 @@ package com.geekhub.services.impl;
 import com.geekhub.dto.FileSharedLinkDto;
 import com.geekhub.dto.convertors.DtoToEntityConverter;
 import com.geekhub.entities.FileSharedLink;
+import com.geekhub.entities.User;
 import com.geekhub.entities.UserDirectory;
 import com.geekhub.entities.UserDocument;
 import com.geekhub.repositories.FileSharedLinkRepository;
 import com.geekhub.services.FileSharedLinkService;
 import com.geekhub.services.UserDirectoryService;
 import com.geekhub.services.UserDocumentService;
+import com.geekhub.services.UserService;
 import com.geekhub.services.enams.FileType;
 import com.geekhub.utils.FileSharedLinkUtil;
 import org.springframework.stereotype.Service;
@@ -70,7 +72,7 @@ public class FileSharedLinkServiceImpl implements FileSharedLinkService {
         String linkHash = FileSharedLinkUtil.generateLinkHash(linkDto.getFileId(), linkDto.getFileType(), userId);
         FileSharedLink existingLink = getByLinkHash(linkHash);
         if (existingLink == null) {
-            return create(linkDto, linkHash);
+            return create(linkDto, linkHash, userId);
         }
         return update(linkDto, existingLink);
     }
@@ -86,7 +88,7 @@ public class FileSharedLinkServiceImpl implements FileSharedLinkService {
         return existingLink;
     }
 
-    private FileSharedLink create(FileSharedLinkDto linkDto, String linkHash) {
+    private FileSharedLink create(FileSharedLinkDto linkDto, String linkHash, Long userId) {
         FileSharedLink newLink;
         newLink = DtoToEntityConverter.convert(linkDto);
         newLink.setHash(linkHash);
@@ -97,6 +99,7 @@ public class FileSharedLinkServiceImpl implements FileSharedLinkService {
             UserDirectory directory = userDirectoryService.getById(linkDto.getFileId());
             newLink.setFileHashName(directory.getHashName());
         }
+        newLink.setUserId(userId);
         save(newLink);
         return newLink;
     }
