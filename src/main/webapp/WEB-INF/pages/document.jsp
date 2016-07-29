@@ -120,14 +120,14 @@
             </div>
             <div class="modal-body">
                 <h4 id="delete-dialog-text">
-                    Are you sure you wand to move to trash ${doc.name} file?
+                    Are you sure you wand to move to trash ${doc.name}?
                 </h4>
             </div>
             <div class="modal-footer">
                 <form action="/api/documents/${doc.id}/move-to-trash" method="post">
-                    <button type="submit" id="deleteDocument" class="btn btn-success" data-dismiss="modal">YES</button>
+                    <input type="submit" class="btn btn-success" value="YES"/>
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">NO</button>
                 </form>
-                <button type="button" class="btn btn-danger" data-dismiss="modal">NO</button>
             </div>
         </div>
 

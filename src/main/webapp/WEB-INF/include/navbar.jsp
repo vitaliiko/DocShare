@@ -3,10 +3,10 @@
 <nav class="navbar navbar-default navbar-fixed-top">
     <div class="container-fluid">
         <div class="navbar-header">
-            <a class="navbar-brand" href="/api/documents">DocShare</a>
+            <a class="navbar-brand" href="/api/home">DocShare</a>
         </div>
         <ul class="nav navbar-nav">
-            <li id="documentUpload"><a href="/api/documents">Home</a></li>
+            <li id="documentUpload"><a href="/api/home">Home</a></li>
             <li id="search"><a href="/api/search/page">Search Friends</a></li>
             <li id="profile"><a href="/api/profile/">Profile</a></li>
 

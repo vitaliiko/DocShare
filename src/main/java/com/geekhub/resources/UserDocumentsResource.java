@@ -5,6 +5,7 @@ import com.geekhub.dto.*;
 import com.geekhub.dto.convertors.EntityToDtoConverter;
 import com.geekhub.entities.*;
 import com.geekhub.entities.enums.AbilityToCommentDocument;
+import com.geekhub.resources.utils.ModelUtil;
 import com.geekhub.security.AccessPredicates;
 import com.geekhub.security.FileAccessService;
 import com.geekhub.services.*;
@@ -66,57 +67,34 @@ public class UserDocumentsResource {
         binder.setValidator(fileValidator);
     }
 
-    @RequestMapping(value = "/documents", method = RequestMethod.GET)
-    public ModelAndView createUploadDocumentPageModel(HttpSession session) {
-        User user = getUserFromSession(session);
-        return prepareModelWithShareTable(user, new ModelAndView("home"));
-    }
-
-    private ModelAndView prepareModelWithShareTable(User user, ModelAndView model) {
-        List<FriendsGroup> friendsGroups = userService.getAllFriendsGroups(user.getId());
-        Set<FriendGroupDto> friendGroupDtoSet = friendsGroups.stream()
-                .map(EntityToDtoConverter::convert)
-                .collect(Collectors.toSet());
-
-        List<User> friends = userService.getAllFriends(user.getId());
-        Set<UserDto> friendsDtoSet = friends.stream()
-                .map(EntityToDtoConverter::convert)
-                .collect(Collectors.toSet());
-
-        model.addObject("tableNames", FileControllersUtil.ACCESS_ATTRIBUTES);
-        model.addObject("friendsGroups", friendGroupDtoSet);
-        model.addObject("friends", friendsDtoSet);
-        model.addObject("userLogin", user.getLogin());
-        return model;
-    }
-
     @RequestMapping(value = "/documents/{docId}", method = RequestMethod.GET)
     public ModelAndView browseDocument(@PathVariable Long docId, HttpSession session) {
         User user = getUserFromSession(session);
         UserDocument document = userDocumentService.getById(docId);
-
         UserFileDto fileDto = EntityToDtoConverter.convert(document);
+        fileDto.setLocation(userDocumentService.getLocation(document));
+
+        return prepareBrowseDocumentModel(user, document, fileDto);
+    }
+
+    private ModelAndView prepareBrowseDocumentModel(User user, UserDocument document, UserFileDto fileDto) {
+        boolean abilityToComment = AbilityToCommentDocument.getBoolean(document.getAbilityToComment());
+        boolean isOwner = fileAccessService.permitAccess(document, user, AccessPredicates.DOCUMENT_OWNER);
+
         if (fileDto.getModifiedBy().equals(user.getFullName())) {
             fileDto.setModifiedBy("Me");
         }
-        return prepareModel(fileDto, user, document);
-    }
-
-    private ModelAndView prepareModel(UserFileDto fileDto, User user, UserDocument document) {
-        boolean abilityToComment = AbilityToCommentDocument.getBoolean(document.getAbilityToComment());
-        boolean isOwner = fileAccessService.permitAccess(document, user, AccessPredicates.DOCUMENT_OWNER);
 
         ModelAndView model = new ModelAndView();
         model.setViewName("document");
         model.addObject("doc", fileDto);
-        model.addObject("location", userDocumentService.getLocation(document));
         model.addObject("renderSettings", isOwner || abilityToComment);
         model.addObject("renderComments", abilityToComment);
         model.addObject("isOwner", isOwner);
         if (isOwner) {
             model.addObject("historyLink", "/api/documents/" + document.getId() + "/history");
             model.addObject("abilityToComment", abilityToComment);
-            model = prepareModelWithShareTable(user, model);
+            model = ModelUtil.prepareModelWithShareTable(user, userService, model);
         }
         return model;
     }
@@ -210,7 +188,7 @@ public class UserDocumentsResource {
 
         DocumentOldVersion oldVersion = documentOldVersionService.getById(oldVersionId);
         userDocumentService.recoverOldVersion(oldVersion);
-        return new ModelAndView("redirect:/api/documents");
+        return new ModelAndView("redirect:/api/home");
     }
 
     @RequestMapping(value = "/documents/{docId}/versions/{versionId}/download", method = RequestMethod.GET)
@@ -228,7 +206,7 @@ public class UserDocumentsResource {
     public ModelAndView recoverDocument(@PathVariable Long docId, HttpSession session) {
         User user = getUserFromSession(session);
         userDocumentService.recoverRemovedDocument(docId, user);
-        return new ModelAndView("redirect:/api/documents");
+        return new ModelAndView("redirect:/api/home");
     }
 
     @RequestMapping(value = "/documents/{docId}/add-to-my-files", method = RequestMethod.POST)

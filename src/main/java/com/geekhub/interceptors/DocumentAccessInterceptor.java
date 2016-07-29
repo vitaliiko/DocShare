@@ -45,8 +45,9 @@ public class DocumentAccessInterceptor extends AccessInterceptor<UserDocument> {
         addPredicate(RequestURL.post("/api/documents/*/comment-ability"), AccessPredicates.DOCUMENT_OWNER);
         addPredicate(RequestURL.post("/api/documents/*/versions/*/recover"), AccessPredicates.DOCUMENT_OWNER);
         addPredicate(RequestURL.get("/api/documents/*/versions/*/download"), AccessPredicates.DOCUMENT_OWNER);
-        addPredicate(RequestURL.post("/api/documents/*//move-to-trash"), AccessPredicates.DOCUMENT_OWNER);
+        addPredicate(RequestURL.post("/api/documents/*/move-to-trash"), AccessPredicates.DOCUMENT_OWNER);
         addPredicate(RequestURL.post("/api/documents/*/add-to-my-files"), AccessPredicates.NOT_DOCUMENT_OWNER);
+
         addPredicate(RequestURL.get("/api/documents/*/comment"), AccessPredicates.DOCUMENT_COMMENTER);
         addPredicate(RequestURL.post("/api/documents/*/comment"), AccessPredicates.DOCUMENT_COMMENTER);
         addPredicate(RequestURL.delete("/api/documents/*/comment"), AccessPredicates.DOCUMENT_OWNER);

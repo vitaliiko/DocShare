@@ -17,6 +17,9 @@ public class UserFileDto implements Comparable<UserFileDto> {
     private FileType type;
 
     @Getter @Setter
+    private String location;
+
+    @Getter @Setter
     private String name;
 
     @Getter @Setter

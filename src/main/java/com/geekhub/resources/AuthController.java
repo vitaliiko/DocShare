@@ -35,7 +35,7 @@ public class AuthController {
         session.setAttribute("userId", user.getId());
         session.setAttribute("parentDirectoryHash", user.getLogin());
         session.setAttribute("currentLocation", user.getLogin());
-        model.setViewName("redirect:/api/documents");
+        model.setViewName("redirect:/api/home");
         return model;
     }
 

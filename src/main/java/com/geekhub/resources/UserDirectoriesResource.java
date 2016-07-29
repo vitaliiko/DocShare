@@ -53,13 +53,13 @@ public class UserDirectoriesResource {
         if (UserFileUtil.isValidFileUploading(files)) {
             userDocumentService.saveOrUpdateDocument(files, parentDirectoryHash, user);
         }
-        return new ModelAndView("redirect:/api/documents");
+        return new ModelAndView("redirect:/api/home");
     }
 
     @RequestMapping(value = "/directories/{dirId}/recover", method = RequestMethod.POST)
     public ModelAndView recoverDirectory(@PathVariable("dirId") Long removedDirId) {
         userDirectoryService.recover(removedDirId);
-        return new ModelAndView("redirect:/api/documents");
+        return new ModelAndView("redirect:/api/home");
     }
 
     @RequestMapping(value = "/directories/{dirHashName}/make-dir", method = RequestMethod.POST)
