@@ -14,17 +14,41 @@
 <jsp:include page="../include/navbar.jsp"/>
 <jsp:include page="../include/sidebar.jsp"/>
 
+<c:if test="${isOwner}">
+    <jsp:include page="../include/shareDialog.jsp"/>
+</c:if>
+
 <div class="container col-md-10" style="width: 900px;">
     <input type="hidden" class="doc-id" value="${doc.id}">
     <h4>
         ${location}${doc.name}
-        <a href="<c:url value='/api/documents/${doc.id}/download' />" class="btn btn-default custom-width">Download (${doc.size})</a>
+        <a href="<c:url value='/api/documents/${doc.id}/download' />" class="btn btn-default custom-width">
+            Download (${doc.size})
+        </a>
+
         <c:if test="${historyLink != null}">
             <a href="${historyLink}" class="btn btn-default custom-width">
                 Previous versions
             </a>
         </c:if>
         <a href="#" class="btn btn-default custom-width">Upload new version</a>
+
+        <c:if test="${isOwner}">
+            <button type="button" class="btn btn-default btn-sm share-doc-btn table-btn"
+                    data-toggle="modal" data-target="#shareDialog" value="${doc.id}">
+                Share
+            </button>
+
+            <button class="btn btn-default rename-btn action-btn single-selection"
+                    data-toggle="modal" data-target="#renameDialog">
+                Rename
+            </button>
+
+            <button class="btn btn-default delete-btn action-btn"
+                    data-toggle="modal" data-target="#deleteDialog">
+                Delete
+            </button>
+        </c:if>
     </h4>
     <h5>
          Changed: ${doc.lastModifyTime} by ${doc.modifiedBy}
@@ -52,6 +76,52 @@
             </div>
         </div>
     </c:if>
+</div>
+
+<div id="renameDialog" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title rename-modal-title">Rename ${doc.name}</h4>
+            </div>
+            <form action="/api/documents/${doc.id}/rename" method="post">
+                <div class="modal-body">
+                    <p>Input new name: </p>
+                        <input type="text" id="newFileName" class="form-control group-name-input" autofocus="">
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" id="renameFile" class="btn btn-default" data-dismiss="modal">OK</button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                </div>
+            </form>
+        </div>
+
+    </div>
+</div>
+
+<div id="deleteDialog" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title delete-modal-title">Removal</h4>
+            </div>
+            <div class="modal-body">
+                <h4 id="delete-dialog-text">
+                    Are you sure you wand to move to trash ${doc.name} file?
+                </h4>
+            </div>
+            <div class="modal-footer">
+                <form action="/api/documents/${doc.id}/move-to-trash" method="post">
+                    <button type="submit" id="deleteDocument" class="btn btn-success" data-dismiss="modal">YES</button>
+                </form>
+                <button type="button" class="btn btn-danger" data-dismiss="modal">NO</button>
+            </div>
+        </div>
+
+    </div>
 </div>
 
 </body>

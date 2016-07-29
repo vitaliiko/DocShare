@@ -5,7 +5,7 @@ $(document).ready(function() {
 
     checkUnreadEvents();
 
-    setInterval(checkUnreadEvents, 5000);
+    setInterval(checkUnreadEvents, 60 * 1000);
 
     function checkUnreadEvents() {
         $.ajax({

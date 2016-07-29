@@ -32,9 +32,6 @@ public class UserServiceImpl implements UserService {
     private EventSendingService eventSendingService;
 
     @Inject
-    private UserDocumentService userDocumentService;
-
-    @Inject
     private UserToDocumentRelationService userToDocumentRelationService;
 
     @Override

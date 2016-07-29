@@ -69,11 +69,10 @@ public class UserDocumentsResource {
     @RequestMapping(value = "/documents", method = RequestMethod.GET)
     public ModelAndView createUploadDocumentPageModel(HttpSession session) {
         User user = getUserFromSession(session);
-        return prepareModel(user);
+        return prepareModelWithShareTable(user, new ModelAndView("home"));
     }
 
-    private ModelAndView prepareModel(User user) {
-        ModelAndView model = new ModelAndView("home");
+    private ModelAndView prepareModelWithShareTable(User user, ModelAndView model) {
         List<FriendsGroup> friendsGroups = userService.getAllFriendsGroups(user.getId());
         Set<FriendGroupDto> friendGroupDtoSet = friendsGroups.stream()
                 .map(EntityToDtoConverter::convert)
@@ -88,6 +87,37 @@ public class UserDocumentsResource {
         model.addObject("friendsGroups", friendGroupDtoSet);
         model.addObject("friends", friendsDtoSet);
         model.addObject("userLogin", user.getLogin());
+        return model;
+    }
+
+    @RequestMapping(value = "/documents/{docId}", method = RequestMethod.GET)
+    public ModelAndView browseDocument(@PathVariable Long docId, HttpSession session) {
+        User user = getUserFromSession(session);
+        UserDocument document = userDocumentService.getById(docId);
+
+        UserFileDto fileDto = EntityToDtoConverter.convert(document);
+        if (fileDto.getModifiedBy().equals(user.getFullName())) {
+            fileDto.setModifiedBy("Me");
+        }
+        return prepareModel(fileDto, user, document);
+    }
+
+    private ModelAndView prepareModel(UserFileDto fileDto, User user, UserDocument document) {
+        boolean abilityToComment = AbilityToCommentDocument.getBoolean(document.getAbilityToComment());
+        boolean isOwner = fileAccessService.permitAccess(document, user, AccessPredicates.DOCUMENT_OWNER);
+
+        ModelAndView model = new ModelAndView();
+        model.setViewName("document");
+        model.addObject("doc", fileDto);
+        model.addObject("location", userDocumentService.getLocation(document));
+        model.addObject("renderSettings", isOwner || abilityToComment);
+        model.addObject("renderComments", abilityToComment);
+        model.addObject("isOwner", isOwner);
+        if (isOwner) {
+            model.addObject("historyLink", "/api/documents/" + document.getId() + "/history");
+            model.addObject("abilityToComment", abilityToComment);
+            model = prepareModelWithShareTable(user, model);
+        }
         return model;
     }
 
@@ -121,35 +151,6 @@ public class UserDocumentsResource {
 
         userDocumentService.changeAbilityToComment(docId, abilityToComment);
         return ResponseEntity.ok().build();
-    }
-
-    @RequestMapping(value = "/documents/{docId}", method = RequestMethod.GET)
-    public ModelAndView browseDocument(@PathVariable Long docId, HttpSession session) {
-        User user = getUserFromSession(session);
-        UserDocument document = userDocumentService.getById(docId);
-
-        UserFileDto fileDto = EntityToDtoConverter.convert(document);
-        if (fileDto.getModifiedBy().equals(user.getFullName())) {
-            fileDto.setModifiedBy("Me");
-        }
-        return prepareModel(fileDto, user, document);
-    }
-
-    private ModelAndView prepareModel(UserFileDto fileDto, User user, UserDocument document) {
-        boolean abilityToComment = AbilityToCommentDocument.getBoolean(document.getAbilityToComment());
-        boolean isOwner = fileAccessService.permitAccess(document, user, AccessPredicates.DOCUMENT_OWNER);
-
-        ModelAndView model = new ModelAndView();
-        model.setViewName("document");
-        model.addObject("doc", fileDto);
-        model.addObject("location", userDocumentService.getLocation(document));
-        model.addObject("renderSettings", isOwner || abilityToComment);
-        model.addObject("renderComments", abilityToComment);
-        if (isOwner) {
-            model.addObject("historyLink", "/api/documents/" + document.getId() + "/history");
-            model.addObject("abilityToComment", abilityToComment);
-        }
-        return model;
     }
 
     @RequestMapping(value = "/documents/{docId}/access", method = RequestMethod.GET)
@@ -235,5 +236,11 @@ public class UserDocumentsResource {
         User user = getUserFromSession(session);
         userDocumentService.add(docId, user);
         return ResponseEntity.ok().build();
+    }
+
+    @RequestMapping(value = "/documents/{docId}/move-to-trash", method = RequestMethod.POST)
+    public ModelAndView removeDocument(@PathVariable Long docId, HttpSession session) {
+        userDocumentService.moveToTrash(docId, (Long) session.getAttribute("userId"));
+        return new ModelAndView("redirect:/api/home");
     }
 }
