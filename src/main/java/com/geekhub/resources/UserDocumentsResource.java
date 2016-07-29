@@ -1,6 +1,5 @@
 package com.geekhub.resources;
 
-import com.geekhub.resources.utils.FileControllersUtil;
 import com.geekhub.dto.*;
 import com.geekhub.dto.convertors.EntityToDtoConverter;
 import com.geekhub.entities.*;
@@ -9,6 +8,8 @@ import com.geekhub.resources.utils.ModelUtil;
 import com.geekhub.security.AccessPredicates;
 import com.geekhub.security.FileAccessService;
 import com.geekhub.services.*;
+import com.geekhub.services.enams.FileType;
+import com.geekhub.utils.FileSharedLinkUtil;
 import com.geekhub.utils.UserFileUtil;
 import com.geekhub.validators.FileValidator;
 import org.springframework.http.ResponseEntity;
@@ -31,7 +32,6 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api")
@@ -51,12 +51,6 @@ public class UserDocumentsResource {
 
     @Inject
     private FileAccessService fileAccessService;
-
-    @Inject
-    private UserToDirectoryRelationService userToDirectoryRelationService;
-
-    @Inject
-    private UserToDocumentRelationService userToDocumentRelationService;
 
     private User getUserFromSession(HttpSession session) {
         return userService.getById((Long) session.getAttribute("userId"));

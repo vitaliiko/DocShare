@@ -21,16 +21,11 @@ public class FileSharedLink {
     @Getter @Setter
     private Long fileId;
 
-    @Column
+    @Column(unique = true)
     @Getter @Setter
     private String fileHashName;
 
-    @Column
-    @Enumerated
-    @Getter @Setter
-    private FileType fileType;
-
-    @Column
+    @Column(unique = true)
     @Getter @Setter
     private String hash;
 
