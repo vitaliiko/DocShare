@@ -7,6 +7,7 @@
     <jsp:include page="../include/include.jsp"/>
     <link href="${pageContext.request.contextPath}/resources/bootstrap/css/comment-box.css" rel="stylesheet">
     <script src="${pageContext.request.contextPath}/resources/js/document.js"></script>
+    <script src="${pageContext.request.contextPath}/resources/js/comments.js"></script>
     <script src="${pageContext.request.contextPath}/resources/js/templateHandler.js"></script>
 </head>
 
@@ -19,9 +20,20 @@
 </c:if>
 
 <div class="container col-md-10" style="width: 900px;">
+
+    <div class='alert alert-danger' hidden>
+        <a href='#' class='close' data-dismiss='alert'>&times;</a>
+        <strong>Error!</strong> <p class="alert-text"></p>
+    </div>
+
+    <div class='alert alert-success' hidden>
+        <a href='#' class='close' data-dismiss='alert'>&times;</a>
+        <p class="alert-text"></p>
+    </div>
+
     <input type="hidden" class="doc-id" value="${doc.id}">
-    <h4>
-        ${location}${doc.name}
+    <p>
+        <p id="docName">${location}${doc.name}</p>
         <a href="<c:url value='/api/documents/${doc.id}/download' />" class="btn btn-default custom-width">
             Download (${doc.size})
         </a>
@@ -85,16 +97,14 @@
                 <button type="button" class="close" data-dismiss="modal">&times;</button>
                 <h4 class="modal-title rename-modal-title">Rename ${doc.name}</h4>
             </div>
-            <form action="/api/documents/${doc.id}/rename" method="post">
-                <div class="modal-body">
-                    <p>Input new name: </p>
-                        <input type="text" id="newFileName" class="form-control group-name-input" autofocus="">
-                </div>
-                <div class="modal-footer">
-                    <button type="submit" id="renameFile" class="btn btn-default" data-dismiss="modal">OK</button>
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-                </div>
-            </form>
+            <div class="modal-body">
+                <p>Input new name: </p>
+                <input type="text" id="newFileName" class="form-control group-name-input" autofocus="">
+            </div>
+            <div class="modal-footer">
+                <button type="submit" id="renameFile" class="btn btn-default" data-dismiss="modal">OK</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+            </div>
         </div>
 
     </div>
