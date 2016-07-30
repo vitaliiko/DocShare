@@ -55,6 +55,9 @@ public class UserDocumentServiceImpl implements UserDocumentService {
     @Inject
     private FriendGroupToDocumentRelationService friendGroupToDocumentRelationService;
 
+    @Inject
+    private FileSharedLinkService fileSharedLinkService;
+
     @Override
     public List<UserDocument> getAll(String orderParameter) {
         return repository.getAll(orderParameter);
@@ -309,6 +312,17 @@ public class UserDocumentServiceImpl implements UserDocumentService {
             d.setDocumentAttribute(relations.getDocumentAttribute());
             update(d);
         });
+    }
+
+    @Override
+    public DocumentWithLinkDto getBySharedLinkHash(String linkHash) {
+        FileSharedLink sharedLink = fileSharedLinkService.getByLinkHash(linkHash);
+        UserDocument document = getById(sharedLink.getFileId());
+        DocumentWithLinkDto documentDto = EntityToDtoConverter.convertWithLink(document);
+        documentDto.setLinkHash(linkHash);
+        documentDto.setRelationType(sharedLink.getRelationType());
+        documentDto.setAbilityToCommentDocument(document.getAbilityToComment());
+        return documentDto;
     }
 
     private void createRelations(UserDocument document, DirectoryWrapper relations) {

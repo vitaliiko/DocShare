@@ -35,6 +35,18 @@ public class EntityToDtoConverter {
         return documentDto;
     }
 
+    public static DocumentWithLinkDto convertWithLink(UserDocument document) {
+        DocumentWithLinkDto documentDto = new DocumentWithLinkDto();
+        documentDto.setId(document.getId());
+        documentDto.setType(FileType.DOCUMENT);
+        documentDto.setSize(document.getSize());
+        documentDto.setLastModifyTime(document.getLastModifyTime());
+        documentDto.setModifiedBy(document.getModifiedBy());
+        documentDto.setName(document.getName());
+        documentDto.setAccess(document.getDocumentAttribute().toString());
+        return documentDto;
+    }
+
     public static UserFileDto convert(UserDirectory directory) {
         UserFileDto directoryDto = new UserFileDto();
         directoryDto.setId(directory.getId());

@@ -33,7 +33,7 @@
 
     <input type="hidden" class="doc-id" value="${doc.id}">
     <p>
-        <p id="docName">${location}${doc.name}</p>
+        <h4 id="docName">${location}${doc.name}</h4>
         <a href="<c:url value='/api/documents/${doc.id}/download' />" class="btn btn-default custom-width">
             Download (${doc.size})
         </a>
@@ -43,7 +43,10 @@
                 Previous versions
             </a>
         </c:if>
-        <a href="#" class="btn btn-default custom-width">Upload new version</a>
+
+        <c:if test="${canUpload}">
+            <a href="#" class="btn btn-default custom-width">Upload new version</a>
+        </c:if>
 
         <c:if test="${isOwner}">
             <button type="button" class="btn btn-default btn-sm share-doc-btn table-btn"

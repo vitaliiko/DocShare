@@ -1,5 +1,6 @@
 package com.geekhub.services;
 
+import com.geekhub.dto.DocumentWithLinkDto;
 import com.geekhub.dto.FileAccessDto;
 import com.geekhub.dto.SharedDto;
 import com.geekhub.entities.*;
@@ -88,4 +89,6 @@ public interface UserDocumentService extends EntityService<UserDocument, Long> {
     List<String> getSimilarDocumentNamesInDirectory(String directoryHash, Collection<UserDocument> documents);
 
     void createRelations(List<UserDocument> documents, DirectoryWrapper parentDirectory);
+
+    DocumentWithLinkDto getBySharedLinkHash(String linkHash);
 }

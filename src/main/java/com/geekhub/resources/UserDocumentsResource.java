@@ -4,6 +4,7 @@ import com.geekhub.dto.*;
 import com.geekhub.dto.convertors.EntityToDtoConverter;
 import com.geekhub.entities.*;
 import com.geekhub.entities.enums.AbilityToCommentDocument;
+import com.geekhub.entities.enums.FileRelationType;
 import com.geekhub.resources.utils.ModelUtil;
 import com.geekhub.security.AccessPredicates;
 import com.geekhub.security.FileAccessService;
@@ -25,6 +26,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.inject.Inject;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
@@ -74,6 +76,10 @@ public class UserDocumentsResource {
     private ModelAndView prepareBrowseDocumentModel(User user, UserDocument document, UserFileDto fileDto) {
         boolean abilityToComment = AbilityToCommentDocument.getBoolean(document.getAbilityToComment());
         boolean isOwner = fileAccessService.permitAccess(document, user, AccessPredicates.DOCUMENT_OWNER);
+        boolean isEditor = isOwner;
+        if (!isOwner) {
+            isEditor = fileAccessService.permitAccess(document, user, AccessPredicates.DOCUMENT_EDITOR);
+        }
 
         if (fileDto.getModifiedBy().equals(user.getFullName())) {
             fileDto.setModifiedBy("Me");
@@ -82,7 +88,7 @@ public class UserDocumentsResource {
         ModelAndView model = new ModelAndView();
         model.setViewName("document");
         model.addObject("doc", fileDto);
-        model.addObject("renderSettings", isOwner || abilityToComment);
+        model.addObject("canUpload", isEditor);
         model.addObject("renderComments", abilityToComment);
         model.addObject("isOwner", isOwner);
         if (isOwner) {
@@ -214,5 +220,20 @@ public class UserDocumentsResource {
     public ModelAndView removeDocument(@PathVariable Long docId, HttpSession session) {
         userDocumentService.moveToTrash(docId, (Long) session.getAttribute("userId"));
         return new ModelAndView("redirect:/api/home");
+    }
+
+    @RequestMapping(value = "/documents/link/{linkHash}", method = RequestMethod.GET)
+    public ModelAndView browseDocumentByLink(@PathVariable String linkHash, HttpServletResponse response) {
+        DocumentWithLinkDto documentDto = userDocumentService.getBySharedLinkHash(linkHash);
+        boolean abilityToComment = documentDto.getAbilityToCommentDocument() == AbilityToCommentDocument.ENABLE;
+
+        ModelAndView model = new ModelAndView();
+        model.setViewName("document");
+        model.addObject("doc", documentDto);
+        model.addObject("renderComments", abilityToComment && documentDto.getRelationType() != FileRelationType.READ);
+        model.addObject("canUpload", documentDto.getRelationType() == FileRelationType.EDIT);
+
+        response.addCookie(new Cookie("linkHash", linkHash));
+        return model;
     }
 }

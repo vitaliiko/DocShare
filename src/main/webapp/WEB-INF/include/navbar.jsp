@@ -10,16 +10,14 @@
             <li id="search"><a href="/api/search/page">Search Friends</a></li>
             <li id="profile"><a href="/api/profile/">Profile</a></li>
 
-            <c:if test="${renderSettings}">
+            <c:if test="${renderComments}">
                 <li class="dropdown">
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
                        aria-expanded="false">Settings<span class="caret"></span></a>
                     <ul class="dropdown-menu">
-                        <c:if test="${renderComments}">
-                            <li class="showCommentLi">
-                                <a href="#" class="comment-box-visible">Hide comment box</a>
-                            </li>
-                        </c:if>
+                        <li class="showCommentLi">
+                            <a href="#" class="comment-box-visible">Hide comment box</a>
+                        </li>
                         <c:if test="${abilityToComment != null}">
                             <c:if test="${abilityToComment}">
                                 <li>

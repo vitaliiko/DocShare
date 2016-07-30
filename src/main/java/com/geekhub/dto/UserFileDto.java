@@ -40,6 +40,9 @@ public class UserFileDto implements Comparable<UserFileDto> {
     @Getter @Setter
     private String modifiedBy;
 
+    @Getter @Setter
+    private String linkHash;
+
     @Override
     public int compareTo(UserFileDto o) {
         return this.getName().compareTo(o.getName());
