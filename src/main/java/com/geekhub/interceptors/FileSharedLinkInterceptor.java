@@ -24,6 +24,7 @@ import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.util.Map;
 import java.util.Objects;
 
@@ -52,30 +53,41 @@ public class FileSharedLinkInterceptor extends AccessInterceptor<FileSharedLink>
 
     @Override
     public boolean preHandle(HttpServletRequest req, HttpServletResponse resp, Object handler) throws Exception {
-        Long userId = (Long) req.getSession().getAttribute("userId");
-        RequestURL requestURL = new RequestURL(req.getRequestURI(), req.getMethod());
-        if (isRequestWithJSON(requestURL)) {
-            String requestBody = InterceptorUtil.getRequestBody(req);
-            if (userId != null && requestBody.length() > 0) {
-                JSONObject requestObject = new JSONObject(requestBody);
-                Long fileId = requestObject.getLong("fileId");
-                String fileType = requestObject.getString("fileType");
-                if (fileType != null && permitAccess(fileId, FileType.valueOf(fileType), userId)) {
-                    return true;
-                }
+        try {
+            Long userId = (Long) req.getSession().getAttribute("userId");
+            RequestURL requestURL = new RequestURL(req.getRequestURI(), req.getMethod());
+            if (isRequestWithJSON(requestURL) && preHandle(req, userId)) {
+                return true;
             }
-        }
 
-        Map<String, String> pathVariables = (Map) req.getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);
-        if (userId != null && !CollectionUtils.isEmpty(pathVariables)) {
-            String fileId = pathVariables.get("fileId");
-            String fileHash = pathVariables.get("fileHash");
-            if ((fileHash != null && permitAccess(fileHash, userId))
-                    || (StringUtils.isNumeric(fileId) && isFileAvailable(userId, Long.valueOf(fileId), req))) {
+            Map<String, String> pathVariables = (Map) req.getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);
+            if (userId != null && !CollectionUtils.isEmpty(pathVariables) && preHandle(req, userId, pathVariables)) {
+                return true;
+            }
+        } catch (IllegalArgumentException e) {
+            throw new IOException(e);
+        }
+        resp.setStatus(HttpStatus.BAD_REQUEST.value());
+        return false;
+    }
+
+    private boolean preHandle(HttpServletRequest req, Long userId, Map<String, String> pathVariables) {
+        String fileId = pathVariables.get("fileId");
+        String fileHash = pathVariables.get("fileHash");
+        return (fileHash != null && permitAccess(fileHash, userId))
+                || (StringUtils.isNumeric(fileId) && isFileAvailable(userId, Long.valueOf(fileId), req));
+    }
+
+    private boolean preHandle(HttpServletRequest req, Long userId) {
+        String requestBody = InterceptorUtil.getRequestBody(req);
+        if (userId != null && requestBody.length() > 0) {
+            JSONObject requestObject = new JSONObject(requestBody);
+            Long fileId = requestObject.getLong("fileId");
+            String fileType = requestObject.getString("fileType");
+            if (fileType != null && permitAccess(fileId, FileType.valueOf(fileType), userId)) {
                 return true;
             }
         }
-        resp.setStatus(HttpStatus.BAD_REQUEST.value());
         return false;
     }
 

@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
 import javax.servlet.http.HttpSession;
-import javax.validation.Valid;
+import java.io.IOException;
 
 @RestController
 @RequestMapping("/api")
@@ -29,7 +29,9 @@ public class FileSharedLinksResource {
     }
 
     @RequestMapping(value = "/links", method = RequestMethod.POST)
-    public ResponseEntity createLink(@Valid @RequestBody FileSharedLinkDto linkDto, HttpSession session) {
+    public ResponseEntity createLink(@RequestBody FileSharedLinkDto linkDto, HttpSession session)
+            throws IOException {
+
         Long userId = (Long) session.getAttribute("userId");
         fileSharedLinkService.createOrUpdate(linkDto, userId);
         return ResponseEntity.ok().build();

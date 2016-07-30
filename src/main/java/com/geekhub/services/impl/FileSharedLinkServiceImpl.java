@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
+import java.io.IOException;
 import java.util.List;
 
 @Service
@@ -68,11 +69,19 @@ public class FileSharedLinkServiceImpl implements FileSharedLinkService {
     }
 
     @Override
-    public FileSharedLink createOrUpdate(FileSharedLinkDto linkDto, Long userId) {
-        String linkHash = FileSharedLinkUtil.generateLinkHash(linkDto.getFileId(), linkDto.getFileType(), userId);
-        FileSharedLink existingLink = getByLinkHash(linkHash);
-        if (existingLink == null) {
-            return create(linkDto, linkHash, userId);
+    public FileSharedLink createOrUpdate(FileSharedLinkDto linkDto, Long userId) throws IOException {
+        FileSharedLink existingLink;
+        try {
+            if (linkDto.getMaxClickNumber() < 0 || linkDto.getMaxClickNumber() > 1024) {
+                throw new IllegalArgumentException("Max click number must be in range from 0 to 1024");
+            }
+            String linkHash = FileSharedLinkUtil.generateLinkHash(linkDto.getFileId(), linkDto.getFileType(), userId);
+            existingLink = getByLinkHash(linkHash);
+            if (existingLink == null) {
+                return create(linkDto, linkHash, userId);
+            }
+        } catch (IllegalArgumentException e) {
+            throw new IOException(e);
         }
         return update(linkDto, existingLink);
     }
