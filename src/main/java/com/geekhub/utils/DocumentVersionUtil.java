@@ -10,7 +10,8 @@ public class DocumentVersionUtil {
         oldVersion.setName(document.getName());
         oldVersion.setSize(document.getSize());
         oldVersion.setHashName(document.getHashName());
-        oldVersion.setModifiedBy(document.getModifiedBy());
+        oldVersion.setModifierName(document.getModifierName());
+        oldVersion.setModifierId(document.getModifierId());
         oldVersion.setLastModifyTime(document.getLastModifyTime());
         return oldVersion;
     }
@@ -19,7 +20,8 @@ public class DocumentVersionUtil {
         UserDocument document = oldVersion.getUserDocument();
         document.setHashName(oldVersion.getHashName());
         document.setLastModifyTime(oldVersion.getLastModifyTime());
-        document.setModifiedBy(oldVersion.getModifiedBy());
+        document.setModifierName(oldVersion.getModifierName());
+        document.setModifierId(oldVersion.getModifierId());
         document.setSize(oldVersion.getSize());
         return document;
     }

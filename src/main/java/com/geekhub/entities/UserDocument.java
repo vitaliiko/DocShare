@@ -34,7 +34,11 @@ public class UserDocument implements Comparable<UserDocument>, Serializable {
 
     @Column
     @Getter @Setter
-    private String modifiedBy;
+    private String modifierName;
+
+    @Column
+    @Getter @Setter
+    private Long modifierId;
 
     @Column
     @Getter @Setter

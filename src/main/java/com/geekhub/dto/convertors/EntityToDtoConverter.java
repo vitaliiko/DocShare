@@ -17,7 +17,7 @@ public class EntityToDtoConverter {
         DocumentOldVersionDto oldVersionDto = new DocumentOldVersionDto();
         oldVersionDto.setId(oldVersion.getId());
         oldVersionDto.setName(oldVersion.getUserDocument().getName());
-        oldVersionDto.setChangedBy(oldVersion.getModifiedBy());
+        oldVersionDto.setChangedBy(oldVersion.getModifierName());
         oldVersionDto.setLastModifyTime(oldVersion.getLastModifyTime());
         oldVersionDto.setSize(oldVersion.getSize());
         return oldVersionDto;
@@ -29,7 +29,8 @@ public class EntityToDtoConverter {
         documentDto.setType(FileType.DOCUMENT);
         documentDto.setSize(document.getSize());
         documentDto.setLastModifyTime(document.getLastModifyTime());
-        documentDto.setModifiedBy(document.getModifiedBy());
+        documentDto.setModifiedBy(document.getModifierName());
+        documentDto.setModifiedById(document.getModifierId());
         documentDto.setName(document.getName());
         documentDto.setAccess(document.getDocumentAttribute().toString());
         return documentDto;
@@ -41,7 +42,8 @@ public class EntityToDtoConverter {
         documentDto.setType(FileType.DOCUMENT);
         documentDto.setSize(document.getSize());
         documentDto.setLastModifyTime(document.getLastModifyTime());
-        documentDto.setModifiedBy(document.getModifiedBy());
+        documentDto.setModifiedBy(document.getModifierName());
+        documentDto.setModifiedById(document.getModifierId());
         documentDto.setName(document.getName());
         documentDto.setAccess(document.getDocumentAttribute().toString());
         return documentDto;

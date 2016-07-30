@@ -42,7 +42,11 @@ public class DocumentOldVersion implements Serializable {
 
     @Column
     @Getter @Setter
-    private String modifiedBy;
+    private String modifierName;
+
+    @Column
+    @Getter @Setter
+    private Long modifierId;
 
     @ManyToOne
     @JoinColumn(name = "userdocument_id")

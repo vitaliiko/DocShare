@@ -41,6 +41,9 @@ public class UserFileDto implements Comparable<UserFileDto> {
     private String modifiedBy;
 
     @Getter @Setter
+    private long modifiedById;
+
+    @Getter @Setter
     private String linkHash;
 
     @Override

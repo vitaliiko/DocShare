@@ -31,24 +31,34 @@
         <p class="alert-text"></p>
     </div>
 
+    <c:choose>
+        <c:when test="${linkHash != null}">
+            <c:set var='downloadLink' value='/api/documents/link/${linkHash}/download'/>
+            <c:set var='uploadLink' value='/api/documents/link/${linkHash}/upload'/>
+        </c:when>
+        <c:otherwise>
+            <c:set var='downloadLink' value='/api/documents/${doc.id}/download'/>
+            <c:set var='uploadLink' value='/api/documents/${doc.id}/upload'/>
+        </c:otherwise>
+    </c:choose>
+
     <input type="hidden" class="doc-id" value="${doc.id}">
+    <input type="hidden" class="link-hash" value="${linkHash}">
     <p>
         <h4 id="docName">${location}${doc.name}</h4>
-        <a href="<c:url value='/api/documents/${doc.id}/download' />" class="btn btn-default custom-width">
+        <a href="${downloadLink}" class="btn btn-default custom-width">
             Download (${doc.size})
         </a>
 
-        <c:if test="${historyLink != null}">
-            <a href="${historyLink}" class="btn btn-default custom-width">
-                Previous versions
-            </a>
-        </c:if>
-
         <c:if test="${canUpload}">
-            <a href="#" class="btn btn-default custom-width">Upload new version</a>
+            <a href="${uploadLink}" class="btn btn-default custom-width">Upload new version</a>
         </c:if>
 
         <c:if test="${isOwner}">
+            <a href="/api/documents/${doc.id}/history" class="btn btn-default custom-width">
+                Previous versions
+            </a>
+
             <button type="button" class="btn btn-default btn-sm share-doc-btn table-btn"
                     data-toggle="modal" data-target="#shareDialog" value="${doc.id}">
                 Share
@@ -64,9 +74,9 @@
                 Delete
             </button>
         </c:if>
-    </h4>
+
     <h5>
-         Changed: ${doc.lastModifyTime} by ${doc.modifiedBy}
+         Changed: ${doc.lastModifyTime} by <a href="/api/profile/${doc.modifiedById}">${doc.modifiedBy}</a>
     </h5>
     <br>
     <br>

@@ -5,6 +5,7 @@ import com.geekhub.dto.convertors.EntityToDtoConverter;
 import com.geekhub.entities.*;
 import com.geekhub.entities.enums.AbilityToCommentDocument;
 import com.geekhub.entities.enums.FileRelationType;
+import com.geekhub.exceptions.ResourceNotFoundException;
 import com.geekhub.resources.utils.ModelUtil;
 import com.geekhub.security.AccessPredicates;
 import com.geekhub.security.FileAccessService;
@@ -13,6 +14,8 @@ import com.geekhub.services.enams.FileType;
 import com.geekhub.utils.FileSharedLinkUtil;
 import com.geekhub.utils.UserFileUtil;
 import com.geekhub.validators.FileValidator;
+import javassist.NotFoundException;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.FileCopyUtils;
 import org.springframework.web.bind.WebDataBinder;
@@ -54,6 +57,9 @@ public class UserDocumentsResource {
     @Inject
     private FileAccessService fileAccessService;
 
+    @Inject
+    private FileSharedLinkService fileSharedLinkService;
+
     private User getUserFromSession(HttpSession session) {
         return userService.getById((Long) session.getAttribute("userId"));
     }
@@ -92,7 +98,6 @@ public class UserDocumentsResource {
         model.addObject("renderComments", abilityToComment);
         model.addObject("isOwner", isOwner);
         if (isOwner) {
-            model.addObject("historyLink", "/api/documents/" + document.getId() + "/history");
             model.addObject("abilityToComment", abilityToComment);
             model = ModelUtil.prepareModelWithShareTable(user, userService, model);
         }
@@ -232,6 +237,7 @@ public class UserDocumentsResource {
         model.addObject("doc", documentDto);
         model.addObject("renderComments", abilityToComment && documentDto.getRelationType() != FileRelationType.READ);
         model.addObject("canUpload", documentDto.getRelationType() == FileRelationType.EDIT);
+        model.addObject("linkHash", linkHash);
 
         response.addCookie(new Cookie("linkHash", linkHash));
         return model;

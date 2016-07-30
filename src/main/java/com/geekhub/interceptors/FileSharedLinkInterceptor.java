@@ -74,8 +74,10 @@ public class FileSharedLinkInterceptor extends AccessInterceptor<FileSharedLink>
     private boolean preHandle(HttpServletRequest req, Long userId, Map<String, String> pathVariables) {
         String fileId = pathVariables.get("fileId");
         String fileHash = pathVariables.get("fileHash");
-        return (fileHash != null && permitAccess(fileHash, userId))
-                || (StringUtils.isNumeric(fileId) && isFileAvailable(userId, Long.valueOf(fileId), req));
+        String linkHash = pathVariables.get("linkHash");
+        return (fileHash != null && permitAccessByFileHash(fileHash, userId))
+                || (StringUtils.isNumeric(fileId) && isFileAvailable(userId, Long.valueOf(fileId), req))
+                || permitAccessByLinkHash(linkHash);
     }
 
     private boolean preHandle(HttpServletRequest req, Long userId) {
@@ -84,7 +86,7 @@ public class FileSharedLinkInterceptor extends AccessInterceptor<FileSharedLink>
             JSONObject requestObject = new JSONObject(requestBody);
             Long fileId = requestObject.getLong("fileId");
             String fileType = requestObject.getString("fileType");
-            if (fileType != null && permitAccess(fileId, FileType.valueOf(fileType), userId)) {
+            if (fileType != null && permitAccessByFileId(fileId, FileType.valueOf(fileType), userId)) {
                 return true;
             }
         }
@@ -96,7 +98,7 @@ public class FileSharedLinkInterceptor extends AccessInterceptor<FileSharedLink>
             return false;
         }
         FileType fileType = FileType.valueOf(request.getParameter("fileType"));
-        return permitAccess(fileId, fileType, userId);
+        return permitAccessByFileId(fileId, fileType, userId);
     }
 
     @Override
@@ -104,7 +106,7 @@ public class FileSharedLinkInterceptor extends AccessInterceptor<FileSharedLink>
         return false;
     }
 
-    private boolean permitAccess(Long fileId, FileType fileType, Long userId) {
+    private boolean permitAccessByFileId(Long fileId, FileType fileType, Long userId) {
         User user = userService.getById(userId);
         if (fileType == FileType.DOCUMENT) {
             UserDocument document = userDocumentService.getById(fileId);
@@ -114,8 +116,16 @@ public class FileSharedLinkInterceptor extends AccessInterceptor<FileSharedLink>
         return fileAccessService.permitAccess(directory, user, AccessPredicates.DIRECTORY_OWNER);
     }
 
-    private boolean permitAccess(String fileHash, Long userId) {
+    private boolean permitAccessByFileHash(String fileHash, Long userId) {
         FileSharedLink sharedLink = fileSharedLinkService.getByFileHashName(fileHash);
         return Objects.equals(sharedLink.getUserId(), userId);
+    }
+
+    private boolean permitAccessByLinkHash(String linkHash) {
+        if (linkHash == null) {
+            return false;
+        }
+        FileSharedLink sharedLink = fileSharedLinkService.getByLinkHash(linkHash);
+        return sharedLink != null;
     }
 }

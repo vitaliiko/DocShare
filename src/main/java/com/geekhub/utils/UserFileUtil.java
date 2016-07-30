@@ -55,7 +55,8 @@ public class UserFileUtil {
         document.setLastModifyTime(Calendar.getInstance().getTime());
         document.setType(file.getContentType());
         document.setSize(convertDocumentSize(file.getSize()));
-        document.setModifiedBy(user.getFullName());
+        document.setModifierName(user.getFullName());
+        document.setModifierId(user.getId());
 
         String parentDirectoryHash = directory == null ? user.getLogin() : directory.getHashName();
         document.setHashName(generateHashName(file.getOriginalFilename(), parentDirectoryHash));
@@ -69,7 +70,8 @@ public class UserFileUtil {
 
         String hashName = UserFileUtil.generateHashName(document.getName(), document.getParentDirectoryHash());
         document.setLastModifyTime(Calendar.getInstance().getTime());
-        document.setModifiedBy(user.getFullName());
+        document.setModifierName(user.getFullName());
+        document.setModifierId(user.getId());
         document.setSize(convertDocumentSize(file.getSize()));
         document.setHashName(hashName);
         file.transferTo(UserFileUtil.createFile(hashName));
