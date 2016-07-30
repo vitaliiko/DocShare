@@ -14,6 +14,7 @@ import com.geekhub.services.UserDocumentService;
 import com.geekhub.services.UserService;
 import com.geekhub.services.enams.FileType;
 import org.apache.commons.lang3.StringUtils;
+import org.json.JSONObject;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -54,7 +55,15 @@ public class FileSharedLinkInterceptor extends AccessInterceptor<FileSharedLink>
         Long userId = (Long) req.getSession().getAttribute("userId");
         RequestURL requestURL = new RequestURL(req.getRequestURI(), req.getMethod());
         if (isRequestWithJSON(requestURL)) {
-
+            String requestBody = InterceptorUtil.getRequestBody(req);
+            if (userId != null && requestBody.length() > 0) {
+                JSONObject requestObject = new JSONObject(requestBody);
+                Long fileId = requestObject.getLong("fileId");
+                String fileType = requestObject.getString("fileType");
+                if (fileType != null && permitAccess(fileId, FileType.valueOf(fileType), userId)) {
+                    return true;
+                }
+            }
         }
 
         Map<String, String> pathVariables = (Map) req.getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);

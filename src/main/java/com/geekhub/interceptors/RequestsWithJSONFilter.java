@@ -6,7 +6,7 @@ import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 
-public class FilesRequestFilter implements Filter {
+public class RequestsWithJSONFilter implements Filter {
 
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {

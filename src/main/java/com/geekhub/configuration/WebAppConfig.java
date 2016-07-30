@@ -31,6 +31,10 @@ import java.io.IOException;
 @MultipartConfig
 public class WebAppConfig extends WebMvcConfigurerAdapter implements WebApplicationInitializer {
 
+    private static final String[] FILTER_URL_PATTERNS = new String[] {
+            "/api/files/*", "/api/links"
+    };
+
     @Inject
     private MainInterceptor mainInterceptor;
 
@@ -115,7 +119,7 @@ public class WebAppConfig extends WebMvcConfigurerAdapter implements WebApplicat
 
     @Override
     public void onStartup(ServletContext servletContext) throws ServletException {
-        servletContext.addFilter("FilesRequestFilter", FilesRequestFilter.class)
-                .addMappingForUrlPatterns(null, false, "/api/files/*");
+        servletContext.addFilter("FilesRequestFilter", RequestsWithJSONFilter.class)
+                .addMappingForUrlPatterns(null, false, FILTER_URL_PATTERNS);
     }
 }

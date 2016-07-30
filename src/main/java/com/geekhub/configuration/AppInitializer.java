@@ -1,6 +1,6 @@
 package com.geekhub.configuration;
 
-import com.geekhub.interceptors.FilesRequestFilter;
+import com.geekhub.interceptors.RequestsWithJSONFilter;
 import org.springframework.orm.jpa.support.OpenEntityManagerInViewFilter;
 import org.springframework.web.filter.HiddenHttpMethodFilter;
 import org.springframework.web.multipart.support.MultipartFilter;
@@ -39,7 +39,7 @@ public class AppInitializer extends AbstractAnnotationConfigDispatcherServletIni
                 new HiddenHttpMethodFilter(),
                 new MultipartFilter(),
                 new OpenEntityManagerInViewFilter(),
-                new FilesRequestFilter()
+                new RequestsWithJSONFilter()
         };
     }
 
