@@ -90,5 +90,7 @@ public interface UserDocumentService extends EntityService<UserDocument, Long> {
 
     void createRelations(List<UserDocument> documents, DirectoryWrapper parentDirectory);
 
-    DocumentWithLinkDto getBySharedLinkHash(String linkHash);
+    DocumentWithLinkDto getDtoBySharedLinkHash(String linkHash);
+
+    UserDocument getBySharedLinkHash(String linkHash);
 }

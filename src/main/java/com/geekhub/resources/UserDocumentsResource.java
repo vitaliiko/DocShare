@@ -5,17 +5,12 @@ import com.geekhub.dto.convertors.EntityToDtoConverter;
 import com.geekhub.entities.*;
 import com.geekhub.entities.enums.AbilityToCommentDocument;
 import com.geekhub.entities.enums.FileRelationType;
-import com.geekhub.exceptions.ResourceNotFoundException;
 import com.geekhub.resources.utils.ModelUtil;
 import com.geekhub.security.AccessPredicates;
 import com.geekhub.security.FileAccessService;
 import com.geekhub.services.*;
-import com.geekhub.services.enams.FileType;
-import com.geekhub.utils.FileSharedLinkUtil;
 import com.geekhub.utils.UserFileUtil;
 import com.geekhub.validators.FileValidator;
-import javassist.NotFoundException;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.FileCopyUtils;
 import org.springframework.web.bind.WebDataBinder;
@@ -229,7 +224,7 @@ public class UserDocumentsResource {
 
     @RequestMapping(value = "/documents/link/{linkHash}", method = RequestMethod.GET)
     public ModelAndView browseDocumentByLink(@PathVariable String linkHash, HttpServletResponse response) {
-        DocumentWithLinkDto documentDto = userDocumentService.getBySharedLinkHash(linkHash);
+        DocumentWithLinkDto documentDto = userDocumentService.getDtoBySharedLinkHash(linkHash);
         boolean abilityToComment = documentDto.getAbilityToCommentDocument() == AbilityToCommentDocument.ENABLE;
 
         ModelAndView model = new ModelAndView();
@@ -241,5 +236,14 @@ public class UserDocumentsResource {
 
         response.addCookie(new Cookie("linkHash", linkHash));
         return model;
+    }
+
+    @RequestMapping(value = "/documents/link/{linkHash}/download", method = RequestMethod.GET)
+    public ResponseEntity downloadDocumentByLink(@PathVariable String linkHash,
+                                                 HttpServletResponse response) throws IOException {
+
+        UserDocument document = userDocumentService.getBySharedLinkHash(linkHash);
+        openOutputStream(document, response);
+        return ResponseEntity.ok().build();
     }
 }

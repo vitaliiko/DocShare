@@ -76,7 +76,11 @@
         </c:if>
 
     <h5>
-         Changed: ${doc.lastModifyTime} by <a href="/api/profile/${doc.modifiedById}">${doc.modifiedBy}</a>
+        Changed: ${doc.lastModifyTime} by
+        <c:if test="${!isOwner}">
+            <a href="/api/userpage/${doc.modifiedById}">
+        </c:if>
+        ${doc.modifiedBy}</a>
     </h5>
     <br>
     <br>

@@ -61,7 +61,7 @@ public class FileSharedLinkInterceptor extends AccessInterceptor<FileSharedLink>
             }
 
             Map<String, String> pathVariables = (Map) req.getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);
-            if (userId != null && !CollectionUtils.isEmpty(pathVariables) && preHandle(req, userId, pathVariables)) {
+            if (!CollectionUtils.isEmpty(pathVariables) && preHandle(req, userId, pathVariables)) {
                 return true;
             }
         } catch (IllegalArgumentException e) {
@@ -75,7 +75,7 @@ public class FileSharedLinkInterceptor extends AccessInterceptor<FileSharedLink>
         String fileId = pathVariables.get("fileId");
         String fileHash = pathVariables.get("fileHash");
         String linkHash = pathVariables.get("linkHash");
-        return (fileHash != null && permitAccessByFileHash(fileHash, userId))
+        return (permitAccessByFileHash(fileHash, userId))
                 || (StringUtils.isNumeric(fileId) && isFileAvailable(userId, Long.valueOf(fileId), req))
                 || permitAccessByLinkHash(linkHash);
     }
@@ -107,6 +107,9 @@ public class FileSharedLinkInterceptor extends AccessInterceptor<FileSharedLink>
     }
 
     private boolean permitAccessByFileId(Long fileId, FileType fileType, Long userId) {
+        if (fileId == null) {
+            return false;
+        }
         User user = userService.getById(userId);
         if (fileType == FileType.DOCUMENT) {
             UserDocument document = userDocumentService.getById(fileId);
@@ -117,6 +120,9 @@ public class FileSharedLinkInterceptor extends AccessInterceptor<FileSharedLink>
     }
 
     private boolean permitAccessByFileHash(String fileHash, Long userId) {
+        if (fileHash == null && userId == null) {
+            return false;
+        }
         FileSharedLink sharedLink = fileSharedLinkService.getByFileHashName(fileHash);
         return Objects.equals(sharedLink.getUserId(), userId);
     }

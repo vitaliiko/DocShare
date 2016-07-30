@@ -315,7 +315,7 @@ public class UserDocumentServiceImpl implements UserDocumentService {
     }
 
     @Override
-    public DocumentWithLinkDto getBySharedLinkHash(String linkHash) {
+    public DocumentWithLinkDto getDtoBySharedLinkHash(String linkHash) {
         FileSharedLink sharedLink = fileSharedLinkService.getByLinkHash(linkHash);
         UserDocument document = getById(sharedLink.getFileId());
         DocumentWithLinkDto documentDto = EntityToDtoConverter.convertWithLink(document);
@@ -323,6 +323,12 @@ public class UserDocumentServiceImpl implements UserDocumentService {
         documentDto.setRelationType(sharedLink.getRelationType());
         documentDto.setAbilityToCommentDocument(document.getAbilityToComment());
         return documentDto;
+    }
+
+    @Override
+    public UserDocument getBySharedLinkHash(String linkHash) {
+        FileSharedLink sharedLink = fileSharedLinkService.getByLinkHash(linkHash);
+        return getById(sharedLink.getFileId());
     }
 
     private void createRelations(UserDocument document, DirectoryWrapper relations) {
