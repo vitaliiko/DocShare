@@ -1,6 +1,7 @@
 package com.geekhub.resources;
 
 import com.geekhub.dto.CommentDto;
+import com.geekhub.dto.CommentTextDto;
 import com.geekhub.dto.convertors.EntityToDtoConverter;
 import com.geekhub.entities.Comment;
 import com.geekhub.entities.User;
@@ -37,23 +38,44 @@ public class CommentsResource {
     @RequestMapping(value = "/documents/{docId}/comments", method = RequestMethod.GET)
     public ResponseEntity<Set<CommentDto>> getComments(@PathVariable Long docId) {
         UserDocument document = userDocumentService.getDocumentWithComments(docId);
-        Set<Comment> commentSet = document.getComments();
-        Set<CommentDto> commentDtos = commentSet.stream()
-                .map(EntityToDtoConverter::convert)
-                .collect(Collectors.toCollection(TreeSet::new));
+        Set<CommentDto> commentDtos = getCommentDtos(document);
         return ResponseEntity.ok(commentDtos);
     }
 
+    @RequestMapping(value = "/documents/link/{linkHash}/comments", method = RequestMethod.GET)
+    public ResponseEntity<Set<CommentDto>> getCommentsByLink(@PathVariable String linkHash) {
+        UserDocument document = userDocumentService.getWithCommentsBySharedLinkHash(linkHash);
+        Set<CommentDto> commentDtos = getCommentDtos(document);
+        return ResponseEntity.ok(commentDtos);
+    }
+
+    private Set<CommentDto> getCommentDtos(UserDocument document) {
+        Set<Comment> commentSet = document.getComments();
+        return commentSet.stream()
+                .map(EntityToDtoConverter::convert)
+                .collect(Collectors.toCollection(TreeSet::new));
+    }
+
     @RequestMapping(value = "/documents/{docId}/comments", method = RequestMethod.POST)
-    public ResponseEntity<CommentDto> addComment(@PathVariable long docId, @RequestParam String text, HttpSession session) {
+    public ResponseEntity<CommentDto> addComment(@PathVariable Long docId, @RequestBody CommentTextDto text,
+                                                 HttpSession session) {
+
         User user = getUserFromSession(session);
         UserDocument document = userDocumentService.getById(docId);
-        Comment comment = commentService.create(text, user, document);
+        Comment comment = commentService.create(text.getText(), user, document);
+        return ResponseEntity.ok(EntityToDtoConverter.convert(comment));
+    }
+
+    @RequestMapping(value = "/documents/link/{linkHash}/comments", method = RequestMethod.POST)
+    public ResponseEntity<CommentDto> addCommentByLink(@PathVariable String linkHash, @RequestBody CommentTextDto text) {
+
+        UserDocument document = userDocumentService.getBySharedLinkHash(linkHash);
+        Comment comment = commentService.create(text.getText(), document);
         return ResponseEntity.ok(EntityToDtoConverter.convert(comment));
     }
 
     @RequestMapping(value = "/documents/{docId}/comments", method = RequestMethod.DELETE)
-    public ResponseEntity clearComments(@PathVariable long docId) {
+    public ResponseEntity clearComments(@PathVariable Long docId) {
         UserDocument document = userDocumentService.getDocumentWithComments(docId);
         commentService.deleteCommentsFoDocument(document);
         return ResponseEntity.ok().build();

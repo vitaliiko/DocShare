@@ -2,13 +2,21 @@
 $(document).ready(function() {
     var handlebarsPath = '/resources/js/templates/comment.html';
     var docId = $('.doc-id').val();
+    var linkHash = $('.link-hash').val();
     var commentBox = $('.commentBox');
+    var commentsResourceURL;
+
+    if (linkHash === '') {
+        commentsResourceURL = '/api/documents/' + docId + '/comments';
+    } else {
+        commentsResourceURL = '/api/documents/link/' + linkHash + '/comments';
+    }
 
     $('.dropdown-toggle').dropdown().click(function(e) {
         e.preventDefault()
     });
 
-    $.getJSON('/api/documents/' + docId + '/comments', function(comments) {
+    $.getJSON(commentsResourceURL, function(comments) {
         $.each(comments, function(k, v) {
             loadTemplate(handlebarsPath, function (template) {
                 $('.commentList').prepend(template(v));
@@ -19,11 +27,19 @@ $(document).ready(function() {
     $('.add-comment').click(function() {
         var text = $('.comment-text').val();
         if (text != '') {
-            $.post('/api/documents/' + docId + '/comments', {text: text}, function(comment) {
-                loadTemplate(handlebarsPath, function (template) {
-                    $('.commentList').prepend(template(comment));
-                });
-                $('.comment-text').val('');
+            $.ajax({
+                url: commentsResourceURL,
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({
+                    text: text
+                }),
+                success: function(comment) {
+                    loadTemplate(handlebarsPath, function (template) {
+                        $('.commentList').prepend(template(comment));
+                    });
+                    $('.comment-text').val('');
+                }
             });
         }
     });

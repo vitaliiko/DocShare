@@ -97,7 +97,11 @@ public class EntityToDtoConverter {
         CommentDto commentDto = new CommentDto();
         commentDto.setText(comment.getText());
         commentDto.setDate(df.format(comment.getDate()));
-        commentDto.setSenderName(comment.getOwner().getFullName());
+        if (comment.getOwner() == null) {
+            commentDto.setSenderName("Guest");
+        } else {
+            commentDto.setSenderName(comment.getOwner().getFullName());
+        }
         return commentDto;
     }
 

@@ -10,6 +10,8 @@ public interface CommentService extends EntityService<Comment, Long> {
 
     Comment create(String text, User user, UserDocument document);
 
+    Comment create(String text, UserDocument document);
+
     void deleteCommentsFoDocument(UserDocument document);
 
 }

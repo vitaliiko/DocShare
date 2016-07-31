@@ -77,7 +77,7 @@
 
     <h5>
         Changed: ${doc.lastModifyTime} by
-        <c:if test="${!isOwner}">
+        <c:if test="${!isOwner && linkHash == null}">
             <a href="/api/userpage/${doc.modifiedById}">
         </c:if>
         ${doc.modifiedBy}</a>

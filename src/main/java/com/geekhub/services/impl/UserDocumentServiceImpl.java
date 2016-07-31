@@ -331,6 +331,14 @@ public class UserDocumentServiceImpl implements UserDocumentService {
         return getById(sharedLink.getFileId());
     }
 
+    @Override
+    public UserDocument getWithCommentsBySharedLinkHash(String linkHash) {
+        FileSharedLink sharedLink = fileSharedLinkService.getByLinkHash(linkHash);
+        UserDocument document = getById(sharedLink.getFileId());
+        Hibernate.initialize(document.getComments());
+        return document;
+    }
+
     private void createRelations(UserDocument document, DirectoryWrapper relations) {
         if (relations == null) {
             return;

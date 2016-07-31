@@ -120,7 +120,7 @@ public class FileSharedLinkInterceptor extends AccessInterceptor<FileSharedLink>
     }
 
     private boolean permitAccessByFileHash(String fileHash, Long userId) {
-        if (fileHash == null && userId == null) {
+        if (fileHash == null || userId == null) {
             return false;
         }
         FileSharedLink sharedLink = fileSharedLinkService.getByFileHashName(fileHash);

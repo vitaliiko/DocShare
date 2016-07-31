@@ -72,6 +72,16 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
+    public Comment create(String text, UserDocument document) {
+        Comment comment = new Comment();
+        comment.setText(text);
+        comment.setUserDocument(document);
+        comment.setDate(Calendar.getInstance().getTime());
+        save(comment);
+        return comment;
+    }
+
+    @Override
     public void deleteCommentsFoDocument(UserDocument document) {
         document.getComments().clear();
         userDocumentService.update(document);

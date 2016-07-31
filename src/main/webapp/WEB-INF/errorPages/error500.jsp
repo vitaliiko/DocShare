@@ -8,7 +8,9 @@
 <jsp:include page="../include/navbar.jsp"/>
 <jsp:include page="../include/sidebar.jsp"/>
 
-<div class="container" style="width: 400px">
+<body style="padding-top: 65px;">
+
+<div class="container col-md-10" style="width: 400px">
     <h1>500</h1>
     <h3>Oops! Internal Server Error</h3>
 </div>
