@@ -84,8 +84,6 @@
     </h5>
     <br>
     <br>
-    <br>
-    <br>
     <c:if test="${renderComments}">
         <div class="detailBox commentBox">
             <div class="titleBox">

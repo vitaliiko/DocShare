@@ -12,6 +12,7 @@ import com.geekhub.services.CommentService;
 import javax.inject.Inject;
 
 import com.geekhub.services.UserDocumentService;
+import com.geekhub.utils.CommentsUtil;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -63,7 +64,7 @@ public class CommentServiceImpl implements CommentService {
     @Override
     public Comment create(String text, User user, UserDocument document) {
         Comment comment = new Comment();
-        comment.setText(text);
+        comment.setText(CommentsUtil.detectURLs(text));
         comment.setOwner(user);
         comment.setUserDocument(document);
         comment.setDate(Calendar.getInstance().getTime());
@@ -74,7 +75,7 @@ public class CommentServiceImpl implements CommentService {
     @Override
     public Comment create(String text, UserDocument document) {
         Comment comment = new Comment();
-        comment.setText(text);
+        comment.setText(CommentsUtil.detectURLs(text));
         comment.setUserDocument(document);
         comment.setDate(Calendar.getInstance().getTime());
         save(comment);
