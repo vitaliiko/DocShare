@@ -9,6 +9,8 @@ import com.geekhub.entities.UserDocument;
 import com.geekhub.services.CommentService;
 import com.geekhub.services.UserDocumentService;
 import com.geekhub.services.UserService;
+
+import java.io.IOException;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
@@ -58,7 +60,7 @@ public class CommentsResource {
 
     @RequestMapping(value = "/documents/{docId}/comments", method = RequestMethod.POST)
     public ResponseEntity<CommentDto> addComment(@PathVariable Long docId, @RequestBody CommentTextDto text,
-                                                 HttpSession session) {
+                                                 HttpSession session) throws IOException {
 
         User user = getUserFromSession(session);
         UserDocument document = userDocumentService.getById(docId);
@@ -67,10 +69,21 @@ public class CommentsResource {
     }
 
     @RequestMapping(value = "/documents/link/{linkHash}/comments", method = RequestMethod.POST)
-    public ResponseEntity<CommentDto> addCommentByLink(@PathVariable String linkHash, @RequestBody CommentTextDto text) {
+    public ResponseEntity<CommentDto> addCommentByLink(@PathVariable String linkHash, @RequestBody CommentTextDto text,
+                                                       HttpSession session) throws IOException {
 
         UserDocument document = userDocumentService.getBySharedLinkHash(linkHash);
-        Comment comment = commentService.create(text.getText(), document);
+        Long userId = (Long) session.getAttribute("userId");
+        Comment comment;
+        if (text.getText().length() > 512) {
+            throw new IOException("Message is too long");
+        }
+        if (userId == null) {
+            comment = commentService.create(text.getText(), document);
+        } else {
+            User user = getUserFromSession(session);
+            comment = commentService.create(text.getText(), user, document);
+        }
         return ResponseEntity.ok(EntityToDtoConverter.convert(comment));
     }
 

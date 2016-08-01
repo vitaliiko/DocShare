@@ -26,7 +26,7 @@ public class Comment implements Serializable {
     @Getter @Setter
     private Long id;
 
-    @Column
+    @Column(nullable = false, length = 1024)
     @Getter @Setter
     private String text;
 
@@ -35,7 +35,7 @@ public class Comment implements Serializable {
     @Getter @Setter
     private User owner;
 
-    @Column
+    @Column(nullable = false)
     @Getter @Setter
     private Date date;
 
