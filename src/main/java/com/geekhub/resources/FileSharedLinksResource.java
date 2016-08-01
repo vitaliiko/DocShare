@@ -1,6 +1,7 @@
 package com.geekhub.resources;
 
 import com.geekhub.dto.FileSharedLinkDto;
+import com.geekhub.dto.convertors.EntityToDtoConverter;
 import com.geekhub.entities.FileSharedLink;
 import com.geekhub.services.FileSharedLinkService;
 import com.geekhub.services.enams.FileType;
@@ -38,8 +39,8 @@ public class FileSharedLinksResource {
     }
 
     @RequestMapping(value = "/links/{fileHash}", method = RequestMethod.GET)
-    public ResponseEntity<FileSharedLink> getLink(@PathVariable String fileHash) {
+    public ResponseEntity<FileSharedLinkDto> getLink(@PathVariable String fileHash) {
         FileSharedLink sharedLink = fileSharedLinkService.getByFileHashName(fileHash);
-        return ResponseEntity.ok().body(sharedLink);
+        return ResponseEntity.ok().body(EntityToDtoConverter.convert(sharedLink));
     }
 }

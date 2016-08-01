@@ -5,6 +5,8 @@ import com.geekhub.dto.*;
 import com.geekhub.entities.*;
 import com.geekhub.entities.enums.EventStatus;
 import com.geekhub.services.enams.FileType;
+import com.geekhub.utils.FileSharedLinkUtil;
+import org.springframework.beans.BeanUtils;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -145,6 +147,18 @@ public class EntityToDtoConverter {
         UserFileDto fileDto = EntityToDtoConverter.convert(relation.getDirectory());
         fileDto.setOwnerName(relation.getUser().getFullName());
         return fileDto;
+    }
+
+    public static FileSharedLinkDto convert(FileSharedLink fileSharedLink) {
+        String[] ignoredProperties = new String[] {
+            "id", "fileHashName", "userId", "hash"
+        };
+        FileSharedLinkDto linkDto = new FileSharedLinkDto();
+        BeanUtils.copyProperties(linkDto, fileSharedLink, ignoredProperties);
+        String baseURL = linkDto.getFileType() == FileType.DOCUMENT ? FileSharedLinkUtil.BASE_DOCUMENT_URL
+                : FileSharedLinkUtil.BASE_DIRECTORY_URL;
+        linkDto.setUrl(baseURL + fileSharedLink.getHash());
+        return linkDto;
     }
 
     public static Map<UserDto, List<FriendGroupDto>> convertMap(Map<User, List<FriendsGroup>> friendsMap) {
