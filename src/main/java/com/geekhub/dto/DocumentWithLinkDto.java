@@ -8,7 +8,7 @@ import lombok.Setter;
 public class DocumentWithLinkDto extends UserFileDto {
     
     @Getter @Setter
-    private String hash;
+    private String token;
 
     @Getter @Setter
     private FileRelationType relationType;

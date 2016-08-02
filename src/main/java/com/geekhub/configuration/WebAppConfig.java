@@ -84,11 +84,11 @@ public class WebAppConfig extends WebMvcConfigurerAdapter implements WebApplicat
         registry.addInterceptor(loggedInterceptor);
 
         registry.addInterceptor(fileSharedLinkInterceptor)
-                .addPathPatterns("/api/links/**", "/api/documents/link/**");
+                .addPathPatterns("/api/links/**");
 
         registry.addInterceptor(documentAccessInterceptor)
                 .addPathPatterns("/api/documents/**")
-                .excludePathPatterns("/api/documents", "/api/documents/link/**");
+                .excludePathPatterns("/api/documents");
 
         registry.addInterceptor(directoryAccessInterceptor)
                 .addPathPatterns("/api/directories/**");

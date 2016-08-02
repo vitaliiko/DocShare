@@ -1,12 +1,19 @@
 package com.geekhub.services.impl;
 
+import com.geekhub.entities.FileSharedLink;
 import com.geekhub.entities.FileSharedLinkToken;
 import com.geekhub.repositories.FileSharedLinkTokenRepository;
 import com.geekhub.services.FileSharedLinkTokenService;
+import com.geekhub.utils.FileSharedLinkUtil;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
+import java.util.Calendar;
 import java.util.List;
 
+@Service
+@Transactional
 public class FileSharedLinkTokenServiceImpl implements FileSharedLinkTokenService {
 
     @Inject
@@ -45,5 +52,27 @@ public class FileSharedLinkTokenServiceImpl implements FileSharedLinkTokenServic
     @Override
     public void deleteById(Long entityId) {
         repository.deleteById(entityId);
+    }
+
+    @Override
+    public FileSharedLinkToken create(FileSharedLink sharedLink) {
+        FileSharedLinkToken linkToken = new FileSharedLinkToken();
+        String token = FileSharedLinkUtil.generateToken(sharedLink.getHash());
+        linkToken.setToken(token);
+        linkToken.setCreationDate(Calendar.getInstance().getTime());
+        linkToken.setFileSharedLink(sharedLink);
+        save(linkToken);
+        return linkToken;
+    }
+
+    @Override
+    public FileSharedLink getSharedLinkByToken(String token) {
+        FileSharedLinkToken sharedLinkToken = repository.get("token", token);
+        return sharedLinkToken.getFileSharedLink();
+    }
+
+    @Override
+    public FileSharedLinkToken getByToken(String token) {
+        return repository.get("token", token);
     }
 }

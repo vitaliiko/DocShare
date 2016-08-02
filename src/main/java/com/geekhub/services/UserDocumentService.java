@@ -92,7 +92,7 @@ public interface UserDocumentService extends EntityService<UserDocument, Long> {
 
     DocumentWithLinkDto getDtoBySharedLinkHash(String linkHash);
 
-    UserDocument getBySharedLinkHash(String linkHash);
+    UserDocument getDocumentBySharedToken(String token);
 
-    UserDocument getWithCommentsBySharedLinkHash(String linkHash);
+    UserDocument getDocumentWithCommentsByToken(String token);
 }

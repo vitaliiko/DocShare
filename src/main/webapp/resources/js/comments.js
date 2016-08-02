@@ -2,26 +2,32 @@
 $(document).ready(function() {
     var handlebarsPath = '/resources/js/templates/comment.html';
     var docId = $('.doc-id').val();
-    var linkHash = $('.link-hash').val();
+    var token = $('.token').val();
     var commentBox = $('.commentBox');
     var commentsResourceURL;
 
-    if (linkHash === '') {
+    if (token === '') {
         commentsResourceURL = '/api/documents/' + docId + '/comments';
+        $.getJSON(commentsResourceURL, function(comments) {
+            renderComments(comments);
+        });
     } else {
-        commentsResourceURL = '/api/documents/link/' + linkHash + '/comments';
+        commentsResourceURL = '/api/links/documents/comments';
+        $.getJSON(commentsResourceURL + '?token=' + token, function(comments) {
+            renderComments(comments);
+        });
     }
 
-    $('.dropdown-toggle').dropdown().click(function(e) {
-        e.preventDefault()
-    });
-
-    $.getJSON(commentsResourceURL, function(comments) {
+    function renderComments(comments) {
         $.each(comments, function(k, v) {
             loadTemplate(handlebarsPath, function (template) {
                 $('.commentList').prepend(template(v));
             });
         });
+    }
+
+    $('.dropdown-toggle').dropdown().click(function(e) {
+        e.preventDefault()
     });
 
     $('.add-comment').click(function() {
@@ -32,7 +38,8 @@ $(document).ready(function() {
                 type: 'POST',
                 contentType: 'application/json',
                 data: JSON.stringify({
-                    text: text
+                    text: text,
+                    token: token
                 }),
                 success: function(comment) {
                     loadTemplate(handlebarsPath, function (template) {

@@ -21,7 +21,7 @@ public class DtoToEntityConverter {
 
     public static FileSharedLink convert(FileSharedLinkDto linkDto) {
         String[] ignoredProperties = new String[] {
-                "url", "clickNumber"
+                "url", "clickNumber", "token"
         };
         FileSharedLink fileSharedLink = new FileSharedLink();
         BeanUtils.copyProperties(linkDto, fileSharedLink, ignoredProperties);

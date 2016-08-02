@@ -16,7 +16,7 @@ public class MainInterceptor extends HandlerInterceptorAdapter {
     );
 
     private final List<String> EXCLUSIONS_BY_START = Arrays.asList(
-            "/api/documents/link", "/api/directories/link"
+            "/api/links"
     );
 
     @Override
