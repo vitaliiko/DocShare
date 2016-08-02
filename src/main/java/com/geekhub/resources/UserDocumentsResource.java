@@ -24,7 +24,6 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.inject.Inject;
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
@@ -51,9 +50,6 @@ public class UserDocumentsResource {
 
     @Inject
     private FileAccessService fileAccessService;
-
-    @Inject
-    private FileSharedLinkService fileSharedLinkService;
 
     private User getUserFromSession(HttpSession session) {
         return userService.getById((Long) session.getAttribute("userId"));
@@ -222,8 +218,8 @@ public class UserDocumentsResource {
         return new ModelAndView("redirect:/api/home");
     }
 
-    @RequestMapping(value = "/documents/link/{linkHash}", method = RequestMethod.GET)
-    public ModelAndView browseDocumentByLink(@PathVariable String linkHash, HttpServletResponse response) {
+    @RequestMapping(value = "/links/{linkHash}/documents", method = RequestMethod.GET)
+    public ModelAndView browseDocumentByLink(@PathVariable String linkHash) {
         DocumentWithLinkDto documentDto = userDocumentService.getDtoBySharedLinkHash(linkHash);
         boolean abilityToComment = documentDto.getAbilityToCommentDocument() == AbilityToCommentDocument.ENABLE;
 
@@ -232,17 +228,14 @@ public class UserDocumentsResource {
         model.addObject("doc", documentDto);
         model.addObject("renderComments", abilityToComment && documentDto.getRelationType() != FileRelationType.READ);
         model.addObject("canUpload", documentDto.getRelationType() == FileRelationType.EDIT);
-        model.addObject("linkHash", linkHash);
-
-        response.addCookie(new Cookie("linkHash", linkHash));
         return model;
     }
 
-    @RequestMapping(value = "/documents/link/{linkHash}/download", method = RequestMethod.GET)
-    public ResponseEntity downloadDocumentByLink(@PathVariable String linkHash,
+    @RequestMapping(value = "/links/documents/download", method = RequestMethod.GET)
+    public ResponseEntity downloadDocumentByLink(@RequestParam String token,
                                                  HttpServletResponse response) throws IOException {
 
-        UserDocument document = userDocumentService.getBySharedLinkHash(linkHash);
+        UserDocument document = userDocumentService.getDocumentBySharedToken(token);
         openOutputStream(document, response);
         return ResponseEntity.ok().build();
     }

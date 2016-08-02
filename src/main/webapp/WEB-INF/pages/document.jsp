@@ -32,9 +32,9 @@
     </div>
 
     <c:choose>
-        <c:when test="${linkHash != null}">
-            <c:set var='downloadLink' value='/api/documents/link/${linkHash}/download'/>
-            <c:set var='uploadLink' value='/api/documents/link/${linkHash}/upload'/>
+        <c:when test="${doc.token != null}">
+            <c:set var='downloadLink' value='/api/links/documents/download?token=${doc.token}'/>
+            <c:set var='uploadLink' value='/api/links/documents/upload'/>
         </c:when>
         <c:otherwise>
             <c:set var='downloadLink' value='/api/documents/${doc.id}/download'/>
@@ -43,7 +43,7 @@
     </c:choose>
 
     <input type="hidden" class="doc-id" value="${doc.id}">
-    <input type="hidden" class="link-hash" value="${linkHash}">
+    <input type="hidden" class="token" value="${doc.token}">
     <p>
         <h4 id="docName">${location}${doc.name}</h4>
         <a href="${downloadLink}" class="btn btn-default custom-width">
@@ -77,7 +77,7 @@
 
     <h5>
         Changed: ${doc.lastModifyTime} by
-        <c:if test="${!isOwner && linkHash == null}">
+        <c:if test="${!isOwner && doc.token == null}">
             <a href="/api/userpage/${doc.modifiedById}">
         </c:if>
         ${doc.modifiedBy}</a>

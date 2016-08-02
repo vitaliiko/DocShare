@@ -1,17 +1,11 @@
 package com.geekhub.interceptors;
 
-import com.geekhub.entities.FileSharedLink;
-import com.geekhub.entities.User;
-import com.geekhub.entities.UserDirectory;
-import com.geekhub.entities.UserDocument;
+import com.geekhub.entities.*;
 import com.geekhub.interceptors.utils.InterceptorUtil;
 import com.geekhub.interceptors.utils.RequestURL;
 import com.geekhub.security.AccessPredicates;
 import com.geekhub.security.FileAccessService;
-import com.geekhub.services.FileSharedLinkService;
-import com.geekhub.services.UserDirectoryService;
-import com.geekhub.services.UserDocumentService;
-import com.geekhub.services.UserService;
+import com.geekhub.services.*;
 import com.geekhub.services.enams.FileType;
 import org.apache.commons.lang3.StringUtils;
 import org.json.JSONObject;
@@ -46,9 +40,13 @@ public class FileSharedLinkInterceptor extends AccessInterceptor<FileSharedLink>
     @Inject
     private FileSharedLinkService fileSharedLinkService;
 
+    @Inject
+    private FileSharedLinkTokenService fileSharedLinkTokenService;
+
     @PostConstruct
     public void init() {
         addRequestWithJSON(RequestURL.post("/api/links"));
+        addRequestWithJSON(RequestURL.post("/links/documents/comments"));
     }
 
     @Override
@@ -56,12 +54,11 @@ public class FileSharedLinkInterceptor extends AccessInterceptor<FileSharedLink>
         try {
             Long userId = (Long) req.getSession().getAttribute("userId");
             RequestURL requestURL = new RequestURL(req.getRequestURI(), req.getMethod());
-            if (isRequestWithJSON(requestURL) && preHandle(req, userId)) {
+            if (isRequestWithJSON(requestURL) && preHandleWithJSON(req, userId)) {
                 return true;
             }
 
-            Map<String, String> pathVariables = (Map) req.getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);
-            if (!CollectionUtils.isEmpty(pathVariables) && preHandle(req, userId, pathVariables)) {
+            if (preHandle(req, userId)) {
                 return true;
             }
         } catch (IllegalArgumentException e) {
@@ -71,7 +68,12 @@ public class FileSharedLinkInterceptor extends AccessInterceptor<FileSharedLink>
         return false;
     }
 
-    private boolean preHandle(HttpServletRequest req, Long userId, Map<String, String> pathVariables) {
+    private boolean preHandle(HttpServletRequest req, Long userId) {
+        Map<String, String> pathVariables = (Map) req.getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);
+        if (CollectionUtils.isEmpty(pathVariables)) {
+            String token = req.getParameter("token");
+            return permitAccessByToken(token);
+        }
         String fileId = pathVariables.get("fileId");
         String fileHash = pathVariables.get("fileHash");
         String linkHash = pathVariables.get("linkHash");
@@ -80,13 +82,15 @@ public class FileSharedLinkInterceptor extends AccessInterceptor<FileSharedLink>
                 || permitAccessByLinkHash(linkHash);
     }
 
-    private boolean preHandle(HttpServletRequest req, Long userId) {
+    private boolean preHandleWithJSON(HttpServletRequest req, Long userId) {
         String requestBody = InterceptorUtil.getRequestBody(req);
         if (userId != null && requestBody.length() > 0) {
             JSONObject requestObject = new JSONObject(requestBody);
             Long fileId = requestObject.getLong("fileId");
             String fileType = requestObject.getString("fileType");
-            if (fileType != null && permitAccessByFileId(fileId, FileType.valueOf(fileType), userId)) {
+            String token = requestObject.getString("token");
+            if (permitAccessByFileId(fileId, FileType.valueOf(fileType), userId)
+                    || permitAccessByToken(token)) {
                 return true;
             }
         }
@@ -133,5 +137,13 @@ public class FileSharedLinkInterceptor extends AccessInterceptor<FileSharedLink>
         }
         FileSharedLink sharedLink = fileSharedLinkService.getByLinkHash(linkHash);
         return sharedLink != null;
+    }
+
+    private boolean permitAccessByToken(String token) {
+        if (token == null) {
+            return false;
+        }
+        FileSharedLinkToken sharedLinkToken = fileSharedLinkTokenService.getByToken(token);
+        return sharedLinkToken != null;
     }
 }

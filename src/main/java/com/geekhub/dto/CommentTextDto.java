@@ -7,4 +7,7 @@ public class CommentTextDto {
 
     @Getter @Setter
     private String text;
+
+    @Getter @Setter
+    private String token;
 }

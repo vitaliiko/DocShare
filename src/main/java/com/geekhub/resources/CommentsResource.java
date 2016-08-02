@@ -44,9 +44,9 @@ public class CommentsResource {
         return ResponseEntity.ok(commentDtos);
     }
 
-    @RequestMapping(value = "/documents/link/{linkHash}/comments", method = RequestMethod.GET)
-    public ResponseEntity<Set<CommentDto>> getCommentsByLink(@PathVariable String linkHash) {
-        UserDocument document = userDocumentService.getWithCommentsBySharedLinkHash(linkHash);
+    @RequestMapping(value = "/links/documents/comments", method = RequestMethod.GET)
+    public ResponseEntity<Set<CommentDto>> getCommentsByLink(@RequestParam String token) {
+        UserDocument document = userDocumentService.getDocumentWithCommentsByToken(token);
         Set<CommentDto> commentDtos = getCommentDtos(document);
         return ResponseEntity.ok(commentDtos);
     }
@@ -68,21 +68,21 @@ public class CommentsResource {
         return ResponseEntity.ok(EntityToDtoConverter.convert(comment));
     }
 
-    @RequestMapping(value = "/documents/link/{linkHash}/comments", method = RequestMethod.POST)
-    public ResponseEntity<CommentDto> addCommentByLink(@PathVariable String linkHash, @RequestBody CommentTextDto text,
+    @RequestMapping(value = "/links/documents/comments", method = RequestMethod.POST)
+    public ResponseEntity<CommentDto> addCommentByLink(@RequestBody CommentTextDto textDto,
                                                        HttpSession session) throws IOException {
 
-        UserDocument document = userDocumentService.getBySharedLinkHash(linkHash);
-        Long userId = (Long) session.getAttribute("userId");
-        Comment comment;
-        if (text.getText().length() > 512) {
+        if (textDto.getText().length() > 512) {
             throw new IOException("Message is too long");
         }
+        Long userId = (Long) session.getAttribute("userId");
+        UserDocument document = userDocumentService.getDocumentWithCommentsByToken(textDto.getToken());
+        Comment comment;
         if (userId == null) {
-            comment = commentService.create(text.getText(), document);
+            comment = commentService.create(textDto.getText(), document);
         } else {
             User user = getUserFromSession(session);
-            comment = commentService.create(text.getText(), user, document);
+            comment = commentService.create(textDto.getText(), user, document);
         }
         return ResponseEntity.ok(EntityToDtoConverter.convert(comment));
     }

@@ -58,6 +58,9 @@ public class UserDocumentServiceImpl implements UserDocumentService {
     @Inject
     private FileSharedLinkService fileSharedLinkService;
 
+    @Inject
+    private FileSharedLinkTokenService fileSharedLinkTokenService;
+
     @Override
     public List<UserDocument> getAll(String orderParameter) {
         return repository.getAll(orderParameter);
@@ -317,24 +320,26 @@ public class UserDocumentServiceImpl implements UserDocumentService {
     @Override
     public DocumentWithLinkDto getDtoBySharedLinkHash(String linkHash) {
         FileSharedLink sharedLink = fileSharedLinkService.getByLinkHash(linkHash);
+        FileSharedLinkToken linkToken = fileSharedLinkTokenService.create(sharedLink);
         UserDocument document = getById(sharedLink.getFileId());
+
         DocumentWithLinkDto documentDto = EntityToDtoConverter.convertWithLink(document);
-        documentDto.setLinkHash(linkHash);
+        documentDto.setToken(linkToken.getToken());
         documentDto.setRelationType(sharedLink.getRelationType());
         documentDto.setAbilityToCommentDocument(document.getAbilityToComment());
         return documentDto;
     }
 
     @Override
-    public UserDocument getBySharedLinkHash(String linkHash) {
-        FileSharedLink sharedLink = fileSharedLinkService.getByLinkHash(linkHash);
+    public UserDocument getDocumentBySharedToken(String token) {
+        FileSharedLink sharedLink = fileSharedLinkTokenService.getSharedLinkByToken(token);
         return getById(sharedLink.getFileId());
     }
 
     @Override
-    public UserDocument getWithCommentsBySharedLinkHash(String linkHash) {
-        FileSharedLink sharedLink = fileSharedLinkService.getByLinkHash(linkHash);
-        UserDocument document = getById(sharedLink.getFileId());
+    public UserDocument getDocumentWithCommentsByToken(String token) {
+        FileSharedLink linkByToken = fileSharedLinkTokenService.getSharedLinkByToken(token);
+        UserDocument document = getById(linkByToken.getFileId());
         Hibernate.initialize(document.getComments());
         return document;
     }
