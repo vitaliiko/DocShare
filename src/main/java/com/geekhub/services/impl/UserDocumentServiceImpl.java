@@ -327,6 +327,9 @@ public class UserDocumentServiceImpl implements UserDocumentService {
         documentDto.setToken(linkToken.getToken());
         documentDto.setRelationType(sharedLink.getRelationType());
         documentDto.setAbilityToCommentDocument(document.getAbilityToComment());
+
+        sharedLink.setClickNumber(sharedLink.getClickNumber() + 1);
+        fileSharedLinkService.update(sharedLink);
         return documentDto;
     }
 

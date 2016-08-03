@@ -5,6 +5,7 @@ import com.geekhub.dto.convertors.DtoToEntityConverter;
 import com.geekhub.entities.FileSharedLink;
 import com.geekhub.entities.UserDirectory;
 import com.geekhub.entities.UserDocument;
+import com.geekhub.entities.enums.FileRelationType;
 import com.geekhub.repositories.FileSharedLinkRepository;
 import com.geekhub.services.FileSharedLinkService;
 import com.geekhub.services.UserDirectoryService;
@@ -72,6 +73,9 @@ public class FileSharedLinkServiceImpl implements FileSharedLinkService {
         try {
             if (linkDto.getMaxClickNumber() < 0 || linkDto.getMaxClickNumber() > 1024) {
                 throw new IllegalArgumentException("Max click number must be in range from 0 to 1024");
+            }
+            if (linkDto.getRelationType() == FileRelationType.OWN) {
+                throw new IllegalArgumentException("Wrong relation type");
             }
             String linkHash = FileSharedLinkUtil.generateLinkHash(linkDto.getFileId(), linkDto.getFileType(), userId);
             existingLink = getByLinkHash(linkHash);
