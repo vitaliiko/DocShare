@@ -38,7 +38,7 @@ public class RemovedDirectory {
     @Getter @Setter
     private Long removerId;
 
-    @Column
+    @Column(columnDefinition = "DATETIME")
     @Getter @Setter
     private LocalDateTime removalDate;
 

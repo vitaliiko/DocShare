@@ -28,7 +28,7 @@ public class UserDocument implements Comparable<UserDocument>, Serializable {
     @Getter @Setter
     private String type;
 
-    @Column
+    @Column(columnDefinition = "DATETIME")
     @Getter @Setter
     private LocalDateTime lastModifyTime;
 

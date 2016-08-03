@@ -40,7 +40,7 @@ public class FileSharedLink {
     @Getter @Setter
     private FileRelationType relationType;
 
-    @Column(name = "last_date")
+    @Column(name = "last_date", columnDefinition = "DATETIME")
     @Getter @Setter
     private LocalDateTime lastDate;
 

@@ -36,7 +36,7 @@ public class Comment implements Serializable {
     @Getter @Setter
     private User owner;
 
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "DATETIME")
     @Getter @Setter
     private LocalDateTime date;
 

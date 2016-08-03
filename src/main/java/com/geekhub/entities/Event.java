@@ -55,7 +55,7 @@ public class Event implements Comparable<Event> {
     @Getter @Setter
     private String linkUrl;
 
-    @Column
+    @Column(columnDefinition = "DATETIME")
     @Getter @Setter
     private LocalDateTime date;
 

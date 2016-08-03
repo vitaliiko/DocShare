@@ -36,7 +36,7 @@ public class DocumentOldVersion implements Serializable {
     @Getter @Setter
     private String size;
     
-    @Column
+    @Column(columnDefinition = "DATETIME")
     @Getter @Setter
     private LocalDateTime lastModifyTime;
 

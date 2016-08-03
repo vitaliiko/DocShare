@@ -19,7 +19,7 @@ public class FileSharedLinkToken {
     @Getter @Setter
     private String token;
 
-    @Column(name = "creation_date", nullable = false)
+    @Column(name = "creation_date", nullable = false, columnDefinition = "DATETIME")
     @Getter @Setter
     private LocalDateTime creationDate;
 
