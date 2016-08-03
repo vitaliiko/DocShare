@@ -5,8 +5,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.time.LocalDateTime;
-
 @NoArgsConstructor
 @EqualsAndHashCode
 public class DocumentOldVersionDto implements Comparable<DocumentOldVersionDto> {
@@ -21,7 +19,7 @@ public class DocumentOldVersionDto implements Comparable<DocumentOldVersionDto> 
     private String changedBy;
 
     @Getter @Setter
-    private LocalDateTime lastModifyTime;
+    private String lastModifyTime;
 
     @Getter @Setter
     private String size;

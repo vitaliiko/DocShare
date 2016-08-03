@@ -8,8 +8,8 @@ import com.geekhub.services.enams.FileType;
 import com.geekhub.utils.FileSharedLinkUtil;
 import org.springframework.beans.BeanUtils;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -20,7 +20,7 @@ public class EntityToDtoConverter {
         oldVersionDto.setId(oldVersion.getId());
         oldVersionDto.setName(oldVersion.getUserDocument().getName());
         oldVersionDto.setChangedBy(oldVersion.getModifierName());
-        oldVersionDto.setLastModifyTime(oldVersion.getLastModifyTime());
+        oldVersionDto.setLastModifyTime(formatDate(oldVersion.getLastModifyTime()));
         oldVersionDto.setSize(oldVersion.getSize());
         return oldVersionDto;
     }
@@ -30,7 +30,7 @@ public class EntityToDtoConverter {
         documentDto.setId(document.getId());
         documentDto.setType(FileType.DOCUMENT);
         documentDto.setSize(document.getSize());
-        documentDto.setLastModifyTime(document.getLastModifyTime());
+        documentDto.setLastModifyTime(formatDate(document.getLastModifyTime()));
         documentDto.setModifiedBy(document.getModifierName());
         documentDto.setModifiedById(document.getModifierId());
         documentDto.setName(document.getName());
@@ -43,7 +43,7 @@ public class EntityToDtoConverter {
         documentDto.setId(document.getId());
         documentDto.setType(FileType.DOCUMENT);
         documentDto.setSize(document.getSize());
-        documentDto.setLastModifyTime(document.getLastModifyTime());
+        documentDto.setLastModifyTime(formatDate(document.getLastModifyTime()));
         documentDto.setModifiedBy(document.getModifierName());
         documentDto.setModifiedById(document.getModifierId());
         documentDto.setName(document.getName());
@@ -95,10 +95,9 @@ public class EntityToDtoConverter {
     }
 
     public static CommentDto convert(Comment comment) {
-        DateFormat df = new SimpleDateFormat("MM.dd.yy hh:mm:ss");
         CommentDto commentDto = new CommentDto();
         commentDto.setText(comment.getText());
-        commentDto.setDate(df.format(comment.getDate()));
+        commentDto.setDate(formatDate(comment.getDate()));
         if (comment.getOwner() == null) {
             commentDto.setSenderName("Guest");
         } else {
@@ -112,7 +111,7 @@ public class EntityToDtoConverter {
         eventDto.setText(event.getText());
         eventDto.setLinkText(event.getLinkText());
         eventDto.setLinkUrl(event.getLinkUrl());
-        eventDto.setDate(event.getDate());
+        eventDto.setDate(formatDate(event.getDate()));
         eventDto.setStatus(event.getEventStatus() == EventStatus.UNREAD ? "New" : "");
         return eventDto;
     }
@@ -121,7 +120,7 @@ public class EntityToDtoConverter {
         RemovedFileDto removedFileDto = new RemovedFileDto();
         removedFileDto.setFileId(document.getUserDocument().getId());
         removedFileDto.setName(document.getUserDocument().getName());
-        removedFileDto.setRemovalDate(document.getRemovalDate());
+        removedFileDto.setRemovalDate(formatDate(document.getRemovalDate()));
         removedFileDto.setRemoverName(removerName);
         removedFileDto.setType(FileType.DOCUMENT);
         return removedFileDto;
@@ -131,7 +130,7 @@ public class EntityToDtoConverter {
         RemovedFileDto removedFileDto = new RemovedFileDto();
         removedFileDto.setFileId(directory.getUserDirectory().getId());
         removedFileDto.setName(directory.getUserDirectory().getName());
-        removedFileDto.setRemovalDate(directory.getRemovalDate());
+        removedFileDto.setRemovalDate(formatDate(directory.getRemovalDate()));
         removedFileDto.setRemoverName(removerName);
         removedFileDto.setType(FileType.DIRECTORY);
         return removedFileDto;
@@ -188,5 +187,10 @@ public class EntityToDtoConverter {
                 .filter(dto -> dto.getChangedBy().equals(user.getFullName()))
                 .forEachOrdered(dto -> dto.setChangedBy("Me"));
         return versions;
+    }
+
+    private static String formatDate(LocalDateTime dateTime) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM.dd.yy hh:mm:ss");
+        return formatter.format(dateTime);
     }
 }

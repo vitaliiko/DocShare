@@ -4,9 +4,6 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.time.LocalDateTime;
-import java.util.Date;
-
 @EqualsAndHashCode(of = {"text", "date"})
 public class EventDto implements Comparable<EventDto> {
 
@@ -20,7 +17,7 @@ public class EventDto implements Comparable<EventDto> {
     private String linkUrl;
 
     @Getter @Setter
-    private LocalDateTime date;
+    private String date;
 
     @Getter @Setter
     private String status;

@@ -36,7 +36,7 @@ public class UserFileDto implements Comparable<UserFileDto> {
     private String size;
 
     @Getter @Setter
-    private LocalDateTime lastModifyTime;
+    private String lastModifyTime;
 
     @Getter @Setter
     private String modifiedBy;
