@@ -7,6 +7,7 @@ import com.geekhub.entities.UserDirectory;
 import com.geekhub.entities.UserDocument;
 import com.geekhub.entities.enums.DocumentAttribute;
 import java.io.File;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -52,7 +53,7 @@ public class UserFileUtil {
         UserDocument document = new UserDocument();
         document.setNameWithExtension(file.getOriginalFilename());
         document.setParentDirectoryHash(directory == null ? user.getLogin() : directory.getHashName());
-        document.setLastModifyTime(Calendar.getInstance().getTime());
+        document.setLastModifyTime(LocalDateTime.now());
         document.setType(file.getContentType());
         document.setSize(convertDocumentSize(file.getSize()));
         document.setModifierName(user.getFullName());
@@ -69,7 +70,7 @@ public class UserFileUtil {
                                                   User user) throws IOException {
 
         String hashName = UserFileUtil.generateHashName(document.getName(), document.getParentDirectoryHash());
-        document.setLastModifyTime(Calendar.getInstance().getTime());
+        document.setLastModifyTime(LocalDateTime.now());
         document.setModifierName(user.getFullName());
         document.setModifierId(user.getId());
         document.setSize(convertDocumentSize(file.getSize()));
@@ -99,7 +100,7 @@ public class UserFileUtil {
         RemovedDocument removedDocument = new RemovedDocument();
 //        removedDocument.setOwner(document.getOwner());
         removedDocument.setRemoverId(removerId);
-        removedDocument.setRemovalDate(Calendar.getInstance().getTime());
+        removedDocument.setRemovalDate(LocalDateTime.now());
         removedDocument.setUserDocument(document);
         return removedDocument;
     }
@@ -108,7 +109,7 @@ public class UserFileUtil {
         RemovedDirectory removedDirectory = new RemovedDirectory();
 //        removedDirectory.setOwner(directory.getOwner());
         removedDirectory.setRemoverId(removerId);
-        removedDirectory.setRemovalDate(Calendar.getInstance().getTime());
+        removedDirectory.setRemovalDate(LocalDateTime.now());
         removedDirectory.setUserDirectory(directory);
         return removedDirectory;
     }

@@ -5,7 +5,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -57,7 +57,7 @@ public class Event implements Comparable<Event> {
 
     @Column
     @Getter @Setter
-    private Date date;
+    private LocalDateTime date;
 
     @Column(name = "eventStatus")
     @Enumerated(EnumType.ORDINAL)

@@ -3,6 +3,7 @@ package com.geekhub.services.impl;
 import com.geekhub.repositories.CommentRepository;
 import com.geekhub.entities.Comment;
 
+import java.time.LocalDateTime;
 import java.util.Calendar;
 import java.util.List;
 
@@ -67,7 +68,7 @@ public class CommentServiceImpl implements CommentService {
         comment.setText(CommentsUtil.detectURLs(text));
         comment.setOwner(user);
         comment.setUserDocument(document);
-        comment.setDate(Calendar.getInstance().getTime());
+        comment.setDate(LocalDateTime.now());
         save(comment);
         return comment;
     }
@@ -77,7 +78,7 @@ public class CommentServiceImpl implements CommentService {
         Comment comment = new Comment();
         comment.setText(CommentsUtil.detectURLs(text));
         comment.setUserDocument(document);
-        comment.setDate(Calendar.getInstance().getTime());
+        comment.setDate(LocalDateTime.now());
         save(comment);
         return comment;
     }

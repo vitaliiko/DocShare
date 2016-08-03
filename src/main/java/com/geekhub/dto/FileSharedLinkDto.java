@@ -5,7 +5,7 @@ import com.geekhub.services.enams.FileType;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 public class FileSharedLinkDto {
 
@@ -22,7 +22,7 @@ public class FileSharedLinkDto {
     private FileRelationType relationType;
 
     @Getter @Setter
-    private Date lastDate;
+    private LocalDateTime lastDate;
 
     @Getter @Setter
     private int maxClickNumber;

@@ -4,9 +4,10 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+import org.hibernate.annotations.Type;
 
 import java.io.Serializable;
-import java.util.Date;
+import java.time.LocalDateTime;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -37,7 +38,7 @@ public class Comment implements Serializable {
 
     @Column(nullable = false)
     @Getter @Setter
-    private Date date;
+    private LocalDateTime date;
 
     @ManyToOne
     @JoinColumn(name = "doc_id")

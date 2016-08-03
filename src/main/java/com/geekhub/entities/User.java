@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 
 import java.io.Serializable;
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.TreeSet;
 import javax.persistence.Basic;
@@ -72,7 +73,7 @@ public class User implements Serializable, Comparable<User> {
 
     @Column
     @Getter @Setter
-    private Date registrationDate;
+    private LocalDate registrationDate;
 
     @JsonIgnore
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)

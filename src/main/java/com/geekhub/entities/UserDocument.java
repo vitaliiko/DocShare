@@ -8,7 +8,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.io.Serializable;
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 import javax.persistence.*;
@@ -30,7 +30,7 @@ public class UserDocument implements Comparable<UserDocument>, Serializable {
 
     @Column
     @Getter @Setter
-    private Date lastModifyTime;
+    private LocalDateTime lastModifyTime;
 
     @Column
     @Getter @Setter

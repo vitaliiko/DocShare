@@ -4,7 +4,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -40,7 +40,7 @@ public class RemovedDocument {
 
     @Column
     @Getter @Setter
-    private Date removalDate;
+    private LocalDateTime removalDate;
 
     @Column
     @Getter @Setter

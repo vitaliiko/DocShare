@@ -6,7 +6,7 @@ import lombok.Setter;
 import lombok.ToString;
 
 import java.io.Serializable;
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 import javax.persistence.Basic;
@@ -46,7 +46,7 @@ public class Organization implements Serializable {
 
     @Column
     @Getter @Setter
-    private Date creationDate;
+    private LocalDateTime creationDate;
 
     @ManyToOne
     @JoinColumn(name = "creator_id")

@@ -2,6 +2,7 @@ package com.geekhub.services.impl;
 
 import com.geekhub.entities.*;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -162,7 +163,7 @@ public class EventSendingServiceImpl implements EventSendingService {
         event.setText(text);
         event.setLinkText(linkText);
         event.setLinkUrl(linkUtl);
-        event.setDate(Calendar.getInstance().getTime());
+        event.setDate(LocalDateTime.now());
         event.setSenderId(sender.getId());
         event.setSenderName(sender.getFullName());
         event.setRecipient(recipient);

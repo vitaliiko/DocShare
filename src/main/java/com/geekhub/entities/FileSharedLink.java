@@ -7,7 +7,7 @@ import lombok.Setter;
 import org.hibernate.annotations.ColumnDefault;
 
 import javax.persistence.*;
-import java.util.Date;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "file_shared_link")
@@ -42,7 +42,7 @@ public class FileSharedLink {
 
     @Column(name = "last_date")
     @Getter @Setter
-    private Date lastDate;
+    private LocalDateTime lastDate;
 
     @Column(name = "max_click_number")
     @Getter @Setter

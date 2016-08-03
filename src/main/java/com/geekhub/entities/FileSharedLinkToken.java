@@ -4,7 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
-import java.util.Date;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "file_shared_link_token")
@@ -21,7 +21,7 @@ public class FileSharedLinkToken {
 
     @Column(name = "creation_date", nullable = false)
     @Getter @Setter
-    private Date creationDate;
+    private LocalDateTime creationDate;
 
     @OneToOne
     @Getter @Setter

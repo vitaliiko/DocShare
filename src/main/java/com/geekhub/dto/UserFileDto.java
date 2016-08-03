@@ -5,6 +5,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @EqualsAndHashCode(of = "id")
@@ -35,7 +36,7 @@ public class UserFileDto implements Comparable<UserFileDto> {
     private String size;
 
     @Getter @Setter
-    private Date lastModifyTime;
+    private LocalDateTime lastModifyTime;
 
     @Getter @Setter
     private String modifiedBy;

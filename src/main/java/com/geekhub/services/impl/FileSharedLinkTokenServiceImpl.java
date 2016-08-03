@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
+import java.time.LocalDateTime;
 import java.util.Calendar;
 import java.util.List;
 
@@ -59,7 +60,7 @@ public class FileSharedLinkTokenServiceImpl implements FileSharedLinkTokenServic
         FileSharedLinkToken linkToken = new FileSharedLinkToken();
         String token = FileSharedLinkUtil.generateToken(sharedLink.getHash());
         linkToken.setToken(token);
-        linkToken.setCreationDate(Calendar.getInstance().getTime());
+        linkToken.setCreationDate(LocalDateTime.now());
         linkToken.setFileSharedLink(sharedLink);
         save(linkToken);
         return linkToken;

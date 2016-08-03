@@ -5,7 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.io.Serializable;
-import java.util.Date;
+import java.time.LocalDateTime;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -38,7 +38,7 @@ public class DocumentOldVersion implements Serializable {
     
     @Column
     @Getter @Setter
-    private Date lastModifyTime;
+    private LocalDateTime lastModifyTime;
 
     @Column
     @Getter @Setter

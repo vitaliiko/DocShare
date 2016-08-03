@@ -5,6 +5,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @EqualsAndHashCode(of = "fileId")
@@ -20,7 +21,7 @@ public class RemovedFileDto implements Comparable<RemovedFileDto> {
     private FileType type;
 
     @Getter @Setter
-    private Date removalDate;
+    private LocalDateTime removalDate;
 
     @Getter @Setter
     private String removerName;
