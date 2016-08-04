@@ -13,7 +13,8 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(IOException.class)
     public ResponseEntity<String> handleIOException(IOException e) {
-        return ResponseEntity.badRequest().body(e.getMessage());
+        String message = e.getCause() == null ? e.getMessage() : e.getCause().getMessage();
+        return ResponseEntity.badRequest().body(message);
     }
 
     @ExceptionHandler(ResourceNotFoundException.class)

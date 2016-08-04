@@ -4,6 +4,7 @@ import com.geekhub.dto.FileSharedLinkDto;
 import com.geekhub.dto.convertors.EntityToDtoConverter;
 import com.geekhub.entities.FileSharedLink;
 import com.geekhub.services.FileSharedLinkService;
+import com.geekhub.utils.FileSharedLinkUtil;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,6 +23,7 @@ public class FileSharedLinksResource {
     public ResponseEntity<FileSharedLinkDto> createLink(@RequestBody FileSharedLinkDto linkDto, HttpSession session)
             throws IOException {
 
+        FileSharedLinkUtil.checkSharedLinkDto(linkDto);
         Long userId = (Long) session.getAttribute("userId");
         FileSharedLink sharedLink = fileSharedLinkService.createOrUpdate(linkDto, userId);
         return ResponseEntity.ok().body(EntityToDtoConverter.convert(sharedLink));

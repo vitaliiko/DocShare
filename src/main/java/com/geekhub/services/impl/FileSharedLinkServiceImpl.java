@@ -17,7 +17,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
-import java.io.IOException;
 import java.util.List;
 
 @Service
@@ -69,23 +68,14 @@ public class FileSharedLinkServiceImpl implements FileSharedLinkService {
     }
 
     @Override
-    public FileSharedLink createOrUpdate(FileSharedLinkDto linkDto, Long userId) throws IOException {
+    public FileSharedLink createOrUpdate(FileSharedLinkDto linkDto, Long userId) {
         FileSharedLink existingLink;
-        try {
-            if (linkDto.getMaxClickNumber() < 0 || linkDto.getMaxClickNumber() > 1024) {
-                throw new IllegalArgumentException("Max click number must be in range from 0 to 1024");
-            }
-            if (linkDto.getRelationType() == FileRelationType.OWN) {
-                throw new IllegalArgumentException("Wrong relation type");
-            }
-            existingLink = getByFileHashName(linkDto.getFileHashName());
-            if (existingLink == null) {
-                return create(linkDto, userId);
-            }
-            return update(linkDto, existingLink);
-        } catch (IllegalArgumentException e) {
-            throw new IOException(e);
+        existingLink = getByFileHashName(linkDto.getFileHashName());
+        if (existingLink == null) {
+            return create(linkDto, userId);
         }
+        return update(linkDto, existingLink);
+
     }
 
     private FileSharedLink update(FileSharedLinkDto linkDto, FileSharedLink existingLink) {
@@ -94,7 +84,7 @@ public class FileSharedLinkServiceImpl implements FileSharedLinkService {
             existingLink.setClickNumber(0);
         }
         existingLink.setMaxClickNumber(linkDto.getMaxClickNumber());
-        existingLink.setRelationType(linkDto.getRelationType());
+        existingLink.setRelationType(linkDto.getRelationType() == null ? FileRelationType.READ : linkDto.getRelationType());
         update(existingLink);
         return existingLink;
     }

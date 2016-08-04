@@ -17,7 +17,7 @@ public class LoggedInterceptor extends HandlerInterceptorAdapter {
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         String uri = request.getRequestURI();
         String method = request.getMethod();
-        logger.info("*** " + method + ": " + uri);
+        logger.info("*** Request: " + method + ": " + uri);
         return true;
     }
 
@@ -28,6 +28,6 @@ public class LoggedInterceptor extends HandlerInterceptorAdapter {
         String uri = request.getRequestURI();
         int status = response.getStatus();
         String method = request.getMethod();
-        logger.info("*** " + method + ": " + uri + ", STATUS: " + status);
+        logger.info("*** Response: " + method + ": " + uri + ", STATUS: " + status);
     }
 }

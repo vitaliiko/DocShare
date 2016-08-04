@@ -86,12 +86,18 @@ public class FileSharedLinkInterceptor extends AccessInterceptor<FileSharedLink>
         String requestBody = InterceptorUtil.getRequestBody(req);
         if (requestBody.length() > 0) {
             JSONObject requestObject = new JSONObject(requestBody);
-            String fileHashName = requestObject.getString("fileHashName");
-            String fileType = requestObject.getString("fileType");
-            String token = requestObject.getString("token");
-            if (permitAccessByFileHashName(fileHashName, FileType.valueOf(fileType), userId)
-                    || permitAccessByToken(token)) {
-                return true;
+            if (requestObject.has("fileHashName") && requestObject.has("fileType")) {
+                String fileHashName = requestObject.getString("fileHashName");
+                String fileType = requestObject.getString("fileType");
+                if (permitAccessByFileHashName(fileHashName, FileType.valueOf(fileType), userId)) {
+                    return true;
+                }
+            }
+            if (requestObject.has("token")) {
+                String token = requestObject.getString("token");
+                if (permitAccessByToken(token)) {
+                    return true;
+                }
             }
         }
         return false;
