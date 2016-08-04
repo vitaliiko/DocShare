@@ -5,9 +5,6 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.time.LocalDateTime;
-import java.util.Date;
-
 @EqualsAndHashCode(of = "id")
 public class UserFileDto implements Comparable<UserFileDto> {
 

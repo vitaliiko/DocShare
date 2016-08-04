@@ -234,7 +234,7 @@ public class UserDocumentsResource {
 
     @RequestMapping(value = "/links/documents/download", method = RequestMethod.GET)
     public ResponseEntity downloadDocumentByLink(@RequestParam String token,
-                                                 HttpServletResponse response) throws IOException {
+                                                 HttpServletResponse response) throws IOException, FileAccessException {
 
         UserDocument document = userDocumentService.getDocumentBySharedToken(token);
         openOutputStream(document, response);

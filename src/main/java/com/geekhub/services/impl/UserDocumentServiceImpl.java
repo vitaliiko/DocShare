@@ -336,15 +336,19 @@ public class UserDocumentServiceImpl implements UserDocumentService {
     }
 
     @Override
-    public UserDocument getDocumentBySharedToken(String token) {
-        FileSharedLink sharedLink = fileSharedLinkTokenService.getSharedLinkByToken(token);
+    public UserDocument getDocumentBySharedToken(String token) throws FileAccessException {
+        FileSharedLinkToken sharedToken = fileSharedLinkTokenService.getByToken(token);
+        FileSharedLinkUtil.checkToken(sharedToken);
+        FileSharedLink sharedLink = sharedToken.getFileSharedLink();
         return getById(sharedLink.getFileId());
     }
 
     @Override
-    public UserDocument getDocumentWithCommentsByToken(String token) {
-        FileSharedLink linkByToken = fileSharedLinkTokenService.getSharedLinkByToken(token);
-        UserDocument document = getById(linkByToken.getFileId());
+    public UserDocument getDocumentWithCommentsByToken(String token) throws FileAccessException {
+        FileSharedLinkToken sharedToken = fileSharedLinkTokenService.getByToken(token);
+        FileSharedLinkUtil.checkToken(sharedToken);
+        FileSharedLink sharedLink = sharedToken.getFileSharedLink();
+        UserDocument document = getById(sharedLink.getFileId());
         Hibernate.initialize(document.getComments());
         return document;
     }

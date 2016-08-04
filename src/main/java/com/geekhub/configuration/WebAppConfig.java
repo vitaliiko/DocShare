@@ -32,7 +32,7 @@ import java.io.IOException;
 public class WebAppConfig extends WebMvcConfigurerAdapter implements WebApplicationInitializer {
 
     private static final String[] FILTER_URL_PATTERNS = new String[] {
-            "/api/files/*", "/api/links"
+            "/api/files/*", "/api/links", "/api/links/documents/comments"
     };
 
     @Inject

@@ -2,6 +2,7 @@ package com.geekhub.utils;
 
 import com.geekhub.dto.FileSharedLinkDto;
 import com.geekhub.entities.FileSharedLink;
+import com.geekhub.entities.FileSharedLinkToken;
 import com.geekhub.entities.enums.FileRelationType;
 import com.geekhub.exceptions.FileAccessException;
 import com.geekhub.services.enams.FileType;
@@ -17,6 +18,7 @@ import java.util.Objects;
 public class FileSharedLinkUtil {
 
     public static final String BASE_URL = "http://127.0.0.1:8888/api/links/";
+    public static final int TOKEN_LIFE_MINUTES = 2 * 60;
 
     public static String generateLinkHash(String fileHashName, FileType fileType, Long userId) {
         return DigestUtils.sha256Hex(fileType.toString() + fileHashName + userId + LocalDateTime.now());
@@ -62,6 +64,14 @@ public class FileSharedLinkUtil {
             if (nowInstant.isAfter(lastDateInstant)) {
                 throw new FileAccessException();
             }
+        }
+    }
+
+    public static void checkToken(FileSharedLinkToken token) throws FileAccessException {
+        Instant tokenInstant = token.getCreationDate().plusMinutes(TOKEN_LIFE_MINUTES).toInstant(ZoneOffset.MAX);
+        Instant nowInstant = LocalDateTime.now().toInstant(ZoneOffset.MAX);
+        if (nowInstant.isAfter(tokenInstant)) {
+            throw new FileAccessException();
         }
     }
 }

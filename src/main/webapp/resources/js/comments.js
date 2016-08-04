@@ -3,10 +3,11 @@ $(document).ready(function() {
     var handlebarsPath = '/resources/js/templates/comment.html';
     var docId = $('.doc-id').val();
     var token = $('.token').val();
+    var location = $('.doc-location').val();
     var commentBox = $('.commentBox');
     var commentsResourceURL;
 
-    if (token === '') {
+    if (location !== undefined) {
         commentsResourceURL = '/api/documents/' + docId + '/comments';
         $.getJSON(commentsResourceURL, function(comments) {
             renderComments(comments);

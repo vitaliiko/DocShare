@@ -6,6 +6,7 @@ import com.geekhub.dto.convertors.EntityToDtoConverter;
 import com.geekhub.entities.Comment;
 import com.geekhub.entities.User;
 import com.geekhub.entities.UserDocument;
+import com.geekhub.exceptions.FileAccessException;
 import com.geekhub.services.CommentService;
 import com.geekhub.services.UserDocumentService;
 import com.geekhub.services.UserService;
@@ -45,7 +46,7 @@ public class CommentsResource {
     }
 
     @RequestMapping(value = "/links/documents/comments", method = RequestMethod.GET)
-    public ResponseEntity<Set<CommentDto>> getCommentsByLink(@RequestParam String token) {
+    public ResponseEntity<Set<CommentDto>> getCommentsByLink(@RequestParam String token) throws FileAccessException {
         UserDocument document = userDocumentService.getDocumentWithCommentsByToken(token);
         Set<CommentDto> commentDtos = getCommentDtos(document);
         return ResponseEntity.ok(commentDtos);
@@ -70,7 +71,7 @@ public class CommentsResource {
 
     @RequestMapping(value = "/links/documents/comments", method = RequestMethod.POST)
     public ResponseEntity<CommentDto> addCommentByLink(@RequestBody CommentTextDto textDto,
-                                                       HttpSession session) throws IOException {
+                                                       HttpSession session) throws IOException, FileAccessException {
 
         if (textDto.getText().length() > 512) {
             throw new IOException("Message is too long");
