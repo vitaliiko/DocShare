@@ -29,7 +29,4 @@ public class FileSharedLinkDto {
 
     @Getter @Setter
     private int clickNumber;
-
-    @Getter @Setter
-    private String token;
 }

@@ -82,10 +82,10 @@ public class FileSharedLinkServiceImpl implements FileSharedLinkService {
             if (existingLink == null) {
                 return create(linkDto, userId);
             }
+            return update(linkDto, existingLink);
         } catch (IllegalArgumentException e) {
             throw new IOException(e);
         }
-        return update(linkDto, existingLink);
     }
 
     private FileSharedLink update(FileSharedLinkDto linkDto, FileSharedLink existingLink) {

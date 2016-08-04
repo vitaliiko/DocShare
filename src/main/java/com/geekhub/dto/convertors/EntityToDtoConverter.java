@@ -150,13 +150,12 @@ public class EntityToDtoConverter {
     }
 
     public static FileSharedLinkDto convert(FileSharedLink fileSharedLink) {
-        String[] ignoredProperties = new String[] {
-            "id", "fileId", "userId", "hash", "lastDate"
-        };
         FileSharedLinkDto linkDto = new FileSharedLinkDto();
-        BeanUtils.copyProperties(linkDto, fileSharedLink, ignoredProperties);
+        linkDto.setRelationType(fileSharedLink.getRelationType());
         linkDto.setUrl(FileSharedLinkUtil.generateURL(fileSharedLink));
         linkDto.setLastDate(DateTimeUtils.convertLocalDateTime(fileSharedLink.getLastDate()));
+        linkDto.setClickNumber(fileSharedLink.getClickNumber());
+        linkDto.setMaxClickNumber(fileSharedLink.getMaxClickNumber());
         return linkDto;
     }
 
