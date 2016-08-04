@@ -5,6 +5,7 @@ import com.geekhub.dto.*;
 import com.geekhub.entities.*;
 import com.geekhub.entities.enums.EventStatus;
 import com.geekhub.services.enams.FileType;
+import com.geekhub.utils.DateTimeUtils;
 import com.geekhub.utils.FileSharedLinkUtil;
 import org.springframework.beans.BeanUtils;
 
@@ -150,13 +151,12 @@ public class EntityToDtoConverter {
 
     public static FileSharedLinkDto convert(FileSharedLink fileSharedLink) {
         String[] ignoredProperties = new String[] {
-            "id", "fileHashName", "userId", "hash"
+            "id", "fileId", "userId", "hash", "lastDate"
         };
         FileSharedLinkDto linkDto = new FileSharedLinkDto();
         BeanUtils.copyProperties(linkDto, fileSharedLink, ignoredProperties);
-        String baseURL = linkDto.getFileType() == FileType.DOCUMENT ? FileSharedLinkUtil.BASE_DOCUMENT_URL
-                : FileSharedLinkUtil.BASE_DIRECTORY_URL;
-        linkDto.setUrl(baseURL + fileSharedLink.getHash());
+        linkDto.setUrl(FileSharedLinkUtil.generateURL(fileSharedLink));
+        linkDto.setLastDate(DateTimeUtils.convertLocalDateTime(fileSharedLink.getLastDate()));
         return linkDto;
     }
 

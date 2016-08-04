@@ -1,9 +1,11 @@
 package com.geekhub.entities.utils;
 
+import com.geekhub.utils.DateTimeUtils;
+
 import javax.persistence.AttributeConverter;
 import javax.persistence.Converter;
 
-import java.time.*;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @Converter(autoApply = true)
@@ -11,15 +13,11 @@ public class LocalDateTimeConverter implements AttributeConverter<LocalDateTime,
 
     @Override
     public Date convertToDatabaseColumn(LocalDateTime dateTime) {
-        if (dateTime == null) {
-            return null;
-        }
-        Instant instant = dateTime.atZone(ZoneId.systemDefault()).toInstant();
-        return Date.from(instant);
+        return DateTimeUtils.convertLocalDateTime(dateTime);
     }
 
     @Override
     public LocalDateTime convertToEntityAttribute(Date date) {
-        return date == null ? null : LocalDateTime.ofInstant(date.toInstant(), ZoneId.systemDefault());
+        return DateTimeUtils.convertDate(date);
     }
 }

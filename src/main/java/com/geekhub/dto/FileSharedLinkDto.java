@@ -5,15 +5,15 @@ import com.geekhub.services.enams.FileType;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.time.LocalDateTime;
+import java.util.Date;
 
 public class FileSharedLinkDto {
 
     @Getter @Setter
-    private long fileId;
+    private String url;
 
     @Getter @Setter
-    private String url;
+    private String fileHashName;
 
     @Getter @Setter
     private FileType fileType;
@@ -22,7 +22,7 @@ public class FileSharedLinkDto {
     private FileRelationType relationType;
 
     @Getter @Setter
-    private LocalDateTime lastDate;
+    private Date lastDate;
 
     @Getter @Setter
     private int maxClickNumber;

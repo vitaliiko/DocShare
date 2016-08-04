@@ -115,7 +115,7 @@ public class UserFileUtil {
     }
 
     public static String generateHashName(String name, String parentDirectoryHash) {
-        return DigestUtils.md5Hex(name + parentDirectoryHash + new Date().getTime());
+        return DigestUtils.sha256Hex(name + parentDirectoryHash + LocalDateTime.now());
     }
 
     public static File createFile(String fileName) {

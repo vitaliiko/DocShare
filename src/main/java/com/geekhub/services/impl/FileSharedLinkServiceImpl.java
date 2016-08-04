@@ -11,6 +11,7 @@ import com.geekhub.services.FileSharedLinkService;
 import com.geekhub.services.UserDirectoryService;
 import com.geekhub.services.UserDocumentService;
 import com.geekhub.services.enams.FileType;
+import com.geekhub.utils.DateTimeUtils;
 import com.geekhub.utils.FileSharedLinkUtil;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -77,10 +78,9 @@ public class FileSharedLinkServiceImpl implements FileSharedLinkService {
             if (linkDto.getRelationType() == FileRelationType.OWN) {
                 throw new IllegalArgumentException("Wrong relation type");
             }
-            String linkHash = FileSharedLinkUtil.generateLinkHash(linkDto.getFileId(), linkDto.getFileType(), userId);
-            existingLink = getByLinkHash(linkHash);
+            existingLink = getByFileHashName(linkDto.getFileHashName());
             if (existingLink == null) {
-                return create(linkDto, linkHash, userId);
+                return create(linkDto, userId);
             }
         } catch (IllegalArgumentException e) {
             throw new IOException(e);
@@ -89,7 +89,7 @@ public class FileSharedLinkServiceImpl implements FileSharedLinkService {
     }
 
     private FileSharedLink update(FileSharedLinkDto linkDto, FileSharedLink existingLink) {
-        existingLink.setLastDate(linkDto.getLastDate());
+        existingLink.setLastDate(DateTimeUtils.convertDate(linkDto.getLastDate()));
         if (existingLink.getMaxClickNumber() == 0 && linkDto.getMaxClickNumber() > 0) {
             existingLink.setClickNumber(0);
         }
@@ -99,15 +99,16 @@ public class FileSharedLinkServiceImpl implements FileSharedLinkService {
         return existingLink;
     }
 
-    private FileSharedLink create(FileSharedLinkDto linkDto, String linkHash, Long userId) {
+    private FileSharedLink create(FileSharedLinkDto linkDto, Long userId) {
         FileSharedLink newLink;
         newLink = DtoToEntityConverter.convert(linkDto);
+        String linkHash = FileSharedLinkUtil.generateLinkHash(linkDto.getFileHashName(), linkDto.getFileType(), userId);
         newLink.setHash(linkHash);
         if (linkDto.getFileType() == FileType.DOCUMENT) {
-            UserDocument document = userDocumentService.getById(linkDto.getFileId());
+            UserDocument document = userDocumentService.getByHashName(linkDto.getFileHashName());
             newLink.setFileHashName(document.getHashName());
         } else {
-            UserDirectory directory = userDirectoryService.getById(linkDto.getFileId());
+            UserDirectory directory = userDirectoryService.getByHashName(linkDto.getFileHashName());
             newLink.setFileHashName(directory.getHashName());
         }
         newLink.setUserId(userId);

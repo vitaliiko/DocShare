@@ -86,10 +86,10 @@ public class FileSharedLinkInterceptor extends AccessInterceptor<FileSharedLink>
         String requestBody = InterceptorUtil.getRequestBody(req);
         if (requestBody.length() > 0) {
             JSONObject requestObject = new JSONObject(requestBody);
-            Long fileId = requestObject.getLong("fileId");
+            String fileHashName = requestObject.getString("fileHashName");
             String fileType = requestObject.getString("fileType");
             String token = requestObject.getString("token");
-            if (permitAccessByFileId(fileId, FileType.valueOf(fileType), userId)
+            if (permitAccessByFileHashName(fileHashName, FileType.valueOf(fileType), userId)
                     || permitAccessByToken(token)) {
                 return true;
             }
@@ -108,6 +108,19 @@ public class FileSharedLinkInterceptor extends AccessInterceptor<FileSharedLink>
     @Override
     public boolean permitAccess(Long objectId, Long userId, RequestURL url) {
         return false;
+    }
+
+    private boolean permitAccessByFileHashName(String fileHashName, FileType fileType, Long userId) {
+        if (fileHashName == null || userId == null) {
+            return false;
+        }
+        User user = userService.getById(userId);
+        if (fileType == FileType.DOCUMENT) {
+            UserDocument document = userDocumentService.getByHashName(fileHashName);
+            return fileAccessService.permitAccess(document, user, AccessPredicates.DOCUMENT_OWNER);
+        }
+        UserDirectory directory = userDirectoryService.getByHashName(fileHashName);
+        return fileAccessService.permitAccess(directory, user, AccessPredicates.DIRECTORY_OWNER);
     }
 
     private boolean permitAccessByFileId(Long fileId, FileType fileType, Long userId) {

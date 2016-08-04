@@ -32,9 +32,10 @@
     </div>
 
     <c:choose>
-        <c:when test="${doc.token != null}">
+        <c:when test="${doc.location != null}">
             <c:set var='downloadLink' value='/api/links/documents/download?token=${doc.token}'/>
-            <c:set var='uploadLink' value='/api/links/documents/upload'/>
+            <c:set var='uploadLink' value='/api/links/documents/upload?token=${doc.token}'/>
+            <input type="hidden" class="token" value="${doc.token}">
         </c:when>
         <c:otherwise>
             <c:set var='downloadLink' value='/api/documents/${doc.id}/download'/>
@@ -43,7 +44,6 @@
     </c:choose>
 
     <input type="hidden" class="doc-id" value="${doc.id}">
-    <input type="hidden" class="token" value="${doc.token}">
     <p>
         <h4 id="docName">${location}${doc.name}</h4>
         <a href="${downloadLink}" class="btn btn-default custom-width">

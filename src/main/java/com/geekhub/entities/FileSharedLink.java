@@ -4,7 +4,6 @@ import com.geekhub.entities.enums.FileRelationType;
 import com.geekhub.services.enams.FileType;
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.annotations.ColumnDefault;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -48,8 +47,7 @@ public class FileSharedLink {
     @Getter @Setter
     private Integer maxClickNumber;
 
-    @Column(name = "click_number")
-    @ColumnDefault("0")
+    @Column(name = "click_number", columnDefinition = "default 0")
     @Getter @Setter
     private Integer clickNumber;
 
