@@ -4,6 +4,7 @@ import com.geekhub.dto.*;
 import com.geekhub.dto.convertors.EntityToDtoConverter;
 import com.geekhub.entities.*;
 import com.geekhub.entities.enums.FileRelationType;
+import com.geekhub.exceptions.FileAccessException;
 import com.geekhub.repositories.UserDocumentRepository;
 import com.geekhub.entities.enums.AbilityToCommentDocument;
 import com.geekhub.entities.enums.DocumentAttribute;
@@ -318,8 +319,9 @@ public class UserDocumentServiceImpl implements UserDocumentService {
     }
 
     @Override
-    public DocumentWithLinkDto getDtoBySharedLinkHash(String linkHash) {
+    public DocumentWithLinkDto getDtoBySharedLinkHash(String linkHash) throws FileAccessException {
         FileSharedLink sharedLink = fileSharedLinkService.getByLinkHash(linkHash);
+        FileSharedLinkUtil.checkPermitAccess(sharedLink);
         FileSharedLinkToken linkToken = fileSharedLinkTokenService.create(sharedLink);
         UserDocument document = getById(sharedLink.getFileId());
 

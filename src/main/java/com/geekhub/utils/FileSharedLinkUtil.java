@@ -3,13 +3,16 @@ package com.geekhub.utils;
 import com.geekhub.dto.FileSharedLinkDto;
 import com.geekhub.entities.FileSharedLink;
 import com.geekhub.entities.enums.FileRelationType;
+import com.geekhub.exceptions.FileAccessException;
 import com.geekhub.services.enams.FileType;
 import org.apache.commons.codec.digest.DigestUtils;
 
 import java.io.IOException;
 import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
+import java.util.Objects;
 
 public class FileSharedLinkUtil {
 
@@ -45,6 +48,20 @@ public class FileSharedLinkUtil {
             }
         } catch (IllegalArgumentException e) {
             throw new IOException(e.getMessage());
+        }
+    }
+
+    public static void checkPermitAccess(FileSharedLink sharedLink) throws FileAccessException {
+        if (sharedLink.getMaxClickNumber() > 0
+                && Objects.equals(sharedLink.getClickNumber(), sharedLink.getMaxClickNumber())) {
+            throw new FileAccessException();
+        }
+        if (sharedLink.getLastDate() != null) {
+            Instant nowInstant = LocalDateTime.now().toInstant(ZoneOffset.MAX);
+            Instant lastDateInstant = sharedLink.getLastDate().toInstant(ZoneOffset.MAX);
+            if (nowInstant.isAfter(lastDateInstant)) {
+                throw new FileAccessException();
+            }
         }
     }
 }

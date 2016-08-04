@@ -5,6 +5,7 @@ import com.geekhub.dto.convertors.EntityToDtoConverter;
 import com.geekhub.entities.*;
 import com.geekhub.entities.enums.AbilityToCommentDocument;
 import com.geekhub.entities.enums.FileRelationType;
+import com.geekhub.exceptions.FileAccessException;
 import com.geekhub.resources.utils.ModelUtil;
 import com.geekhub.security.AccessPredicates;
 import com.geekhub.security.FileAccessService;
@@ -219,7 +220,7 @@ public class UserDocumentsResource {
     }
 
     @RequestMapping(value = "/links/{linkHash}/documents", method = RequestMethod.GET)
-    public ModelAndView browseDocumentByLink(@PathVariable String linkHash) {
+    public ModelAndView browseDocumentByLink(@PathVariable String linkHash) throws FileAccessException {
         DocumentWithLinkDto documentDto = userDocumentService.getDtoBySharedLinkHash(linkHash);
         boolean abilityToComment = documentDto.getAbilityToCommentDocument() == AbilityToCommentDocument.ENABLE;
 

@@ -11,6 +11,7 @@ import java.util.Collection;
 import java.util.Set;
 
 import com.geekhub.entities.enums.DocumentStatus;
+import com.geekhub.exceptions.FileAccessException;
 import com.geekhub.utils.DirectoryWrapper;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -90,7 +91,7 @@ public interface UserDocumentService extends EntityService<UserDocument, Long> {
 
     void createRelations(List<UserDocument> documents, DirectoryWrapper parentDirectory);
 
-    DocumentWithLinkDto getDtoBySharedLinkHash(String linkHash);
+    DocumentWithLinkDto getDtoBySharedLinkHash(String linkHash) throws FileAccessException;
 
     UserDocument getDocumentBySharedToken(String token);
 

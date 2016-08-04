@@ -1,5 +1,6 @@
 package com.geekhub.interceptors;
 
+import com.geekhub.exceptions.FileAccessException;
 import com.geekhub.exceptions.ResourceNotFoundException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -17,7 +18,7 @@ public class GlobalExceptionHandler {
         return ResponseEntity.badRequest().body(message);
     }
 
-    @ExceptionHandler(ResourceNotFoundException.class)
+    @ExceptionHandler({ResourceNotFoundException.class, FileAccessException.class})
     public ModelAndView handleResourceNotFoundException() {
         return new ModelAndView("../errorPages/error404");
     }
