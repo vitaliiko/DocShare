@@ -147,7 +147,7 @@ public class FileSharedLinkInterceptor extends AccessInterceptor<FileSharedLink>
             return false;
         }
         FileSharedLink sharedLink = fileSharedLinkService.getByFileHashName(fileHash);
-        return Objects.equals(sharedLink.getUserId(), userId);
+        return sharedLink != null && Objects.equals(sharedLink.getUserId(), userId);
     }
 
     private boolean permitAccessByLinkHash(String linkHash) {

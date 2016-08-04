@@ -34,4 +34,10 @@ public class FileSharedLinksResource {
         FileSharedLink sharedLink = fileSharedLinkService.getByFileHashName(fileHash);
         return ResponseEntity.ok().body(EntityToDtoConverter.convert(sharedLink));
     }
+
+    @RequestMapping(value = "/links/{fileHash}", method = RequestMethod.DELETE)
+    public ResponseEntity deleteLink(@PathVariable String fileHash) {
+        fileSharedLinkService.deleteByFileHashName(fileHash);
+        return ResponseEntity.ok().build();
+    }
 }

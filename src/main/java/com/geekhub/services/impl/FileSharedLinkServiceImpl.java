@@ -115,4 +115,10 @@ public class FileSharedLinkServiceImpl implements FileSharedLinkService {
     public FileSharedLink getByLinkHash(String linkHash) {
         return repository.get("hash", linkHash);
     }
+
+    @Override
+    public void deleteByFileHashName(String fileHash) {
+        FileSharedLink fileSharedLink = getByFileHashName(fileHash);
+        delete(fileSharedLink);
+    }
 }

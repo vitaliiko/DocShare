@@ -10,4 +10,6 @@ public interface FileSharedLinkService extends EntityService<FileSharedLink, Lon
     FileSharedLink getByFileHashName(String fileHashName);
 
     FileSharedLink getByLinkHash(String linkHash);
+
+    void deleteByFileHashName(String fileHash);
 }
