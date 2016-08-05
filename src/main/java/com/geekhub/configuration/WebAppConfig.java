@@ -1,11 +1,9 @@
 package com.geekhub.configuration;
 
 import com.geekhub.interceptors.*;
+import com.geekhub.loggin.LoggedInterceptor;
 import org.springframework.context.MessageSource;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.PropertySource;
+import org.springframework.context.annotation.*;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.web.WebApplicationInitializer;
@@ -29,6 +27,7 @@ import java.io.IOException;
 @PropertySource("classpath:database.properties")
 @EnableWebMvc
 @MultipartConfig
+@EnableAspectJAutoProxy
 public class WebAppConfig extends WebMvcConfigurerAdapter implements WebApplicationInitializer {
 
     private static final String[] FILTER_URL_PATTERNS = new String[] {
