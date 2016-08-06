@@ -3,6 +3,7 @@ package com.geekhub.services;
 import com.geekhub.dto.DocumentWithLinkDto;
 import com.geekhub.dto.FileAccessDto;
 import com.geekhub.dto.SharedDto;
+import com.geekhub.dto.ZipDto;
 import com.geekhub.entities.*;
 import com.geekhub.entities.enums.DocumentAttribute;
 
@@ -97,5 +98,5 @@ public interface UserDocumentService extends EntityService<UserDocument, Long> {
 
     UserDocument getDocumentWithCommentsByToken(String token) throws FileAccessException;
 
-    byte[] packDocumentsToZIP(List<Long> docIds);
+    ZipDto packDocumentsToZIP(List<Long> docIds);
 }

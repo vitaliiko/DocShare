@@ -2,19 +2,17 @@ package com.geekhub.resources;
 
 import com.geekhub.dto.FileIdsDto;
 import com.geekhub.dto.RemovedFileDto;
+import com.geekhub.dto.ZipDto;
 import com.geekhub.entities.*;
 import com.geekhub.dto.UserFileDto;
 import com.geekhub.exceptions.FileOperationException;
 import com.geekhub.resources.utils.FileControllersUtil;
 import com.geekhub.services.*;
 import com.geekhub.dto.convertors.EntityToDtoConverter;
-import com.geekhub.utils.UserFileUtil;
 import com.geekhub.validators.FileValidator;
 
 import java.io.ByteArrayInputStream;
-import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
@@ -134,19 +132,19 @@ public class UserFilesResource {
                                              @RequestParam(value = "docIds[]", required = false) List<Long> docIds,
                                              HttpServletResponse response) throws IOException {
 
-        byte[] zip = userDocumentService.packDocumentsToZIP(docIds);
-        openOutputStream(zip, "zip.zip", response);
+        ZipDto zip = userDocumentService.packDocumentsToZIP(docIds);
+        openOutputStream(zip, response);
         return ResponseEntity.ok().build();
     }
 
-    private static void openOutputStream(byte[] zip, String zipName, HttpServletResponse response)
+    private static void openOutputStream(ZipDto zip, HttpServletResponse response)
             throws IOException {
 
         response.setContentType("application/zip");
-        response.setContentLength(zip.length);
-        response.setHeader("Content-Disposition", "attachment; filename=\"" + zipName + "\"");
+        response.setContentLength(zip.getContentLength());
+        response.setHeader("Content-Disposition", "attachment; filename=\"" + zip.getZipName() + "\"");
 
-        ByteArrayInputStream in = new ByteArrayInputStream(zip);
+        ByteArrayInputStream in = new ByteArrayInputStream(zip.getZipFile());
 
         FileCopyUtils.copy(in, response.getOutputStream());
     }
