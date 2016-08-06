@@ -15,7 +15,9 @@ import com.geekhub.services.enams.FileType;
 import com.geekhub.utils.CollectionTools;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
+import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -37,9 +39,27 @@ public class UserFilesAccessInterceptor extends AccessInterceptor {
     @Inject
     private FileAccessService fileAccessService;
 
+    @PostConstruct
+    public void init() {
+        addRequestWithJSON(RequestURL.post("/api/files/copy"));
+        addRequestWithJSON(RequestURL.post("/api/files/replace"));
+    }
+
     @Override
     public boolean preHandle(HttpServletRequest req, HttpServletResponse resp, Object handler) throws Exception {
         Long userId = (Long) req.getSession().getAttribute("userId");
+        RequestURL requestURL = new RequestURL(req.getRequestURI(), req.getMethod());
+        if (isRequestWithJSON(requestURL) && preHandleWithJSON(req, userId)) {
+            return true;
+        }
+        if (preHandle(req, userId)) {
+            return true;
+        }
+        resp.setStatus(HttpStatus.BAD_REQUEST.value());
+        return false;
+    }
+
+    private boolean preHandleWithJSON(HttpServletRequest req, Long userId) {
         String requestBody = InterceptorUtil.getRequestBody(req);
         if (userId != null && requestBody.length() > 0) {
             JSONObject requestObject = new JSONObject(requestBody);
@@ -50,14 +70,27 @@ public class UserFilesAccessInterceptor extends AccessInterceptor {
                 return true;
             }
         }
-        resp.setStatus(HttpStatus.BAD_REQUEST.value());
         return false;
+    }
+
+    private boolean preHandle(HttpServletRequest req, Long userId) {
+        String dirIds = req.getParameter("dirIds[]");
+        String docIds = req.getParameter("docIds[]");
+        return areFilesAvailable(parseIdArray(dirIds), parseIdArray(docIds), userId);
+    }
+
+    private List<String> parseIdArray(String arrayInLine) {
+        if (arrayInLine == null) {
+            return new ArrayList<>();
+        }
+        String[] ids = arrayInLine.split(",");
+        return Arrays.asList(ids);
     }
 
     private boolean areFilesAvailable(List<String> dirIds, List<String> docIds, Long userId) {
         return CollectionTools.isAllNumeric(dirIds, docIds)
-                && (dirIds != null && permitAccess(dirIds, FileType.DIRECTORY, userId)
-                || docIds != null && permitAccess(docIds, FileType.DOCUMENT, userId));
+                && (!CollectionUtils.isEmpty(dirIds) && permitAccess(dirIds, FileType.DIRECTORY, userId)
+                || !CollectionUtils.isEmpty(docIds) && permitAccess(docIds, FileType.DOCUMENT, userId));
     }
 
     private boolean isDirectoryAvailable(String destinationDirHash, Long userId) {

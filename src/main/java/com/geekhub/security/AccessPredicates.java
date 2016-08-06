@@ -10,7 +10,6 @@ import com.geekhub.entities.enums.FileRelationType;
 
 import java.util.List;
 import java.util.function.BiPredicate;
-import java.util.function.Predicate;
 
 public class AccessPredicates {
 

@@ -94,7 +94,7 @@ public class WebAppConfig extends WebMvcConfigurerAdapter implements WebApplicat
 
         registry.addInterceptor(filesAccessInterceptor)
                 .addPathPatterns("/api/files/**")
-                .excludePathPatterns("/api/files/search", "/api/files/removed", "/api/files/accessible", "/api/files/download");
+                .excludePathPatterns("/api/files/search", "/api/files/removed", "/api/files/accessible");
     }
 
     @Bean(name = "multipartResolver")
