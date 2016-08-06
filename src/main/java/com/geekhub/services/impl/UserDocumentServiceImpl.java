@@ -358,7 +358,8 @@ public class UserDocumentServiceImpl implements UserDocumentService {
         List<UserDocument> documents = getAllByIds(docIds).stream().collect(Collectors.toList());
         UserDirectory directory = userDirectoryService.getByHashName(documents.get(0).getParentDirectoryHash());
         byte[] zipFile = ZIPUtil.createZIP(documents);
-        return new ZipDto(zipFile, directory.getName() + ".zip");
+        String zipName = directory == null ? ZIPUtil.DEFAULT_ZIP_NAME : directory.getName();
+        return new ZipDto(zipFile, zipName);
     }
 
     private void createRelations(UserDocument document, DirectoryWrapper relations) {

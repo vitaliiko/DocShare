@@ -36,17 +36,38 @@ $(document).ready(function() {
         $(element).css('font-weight', 'bold');
     }
 
+    content.on('click', '.select, .select-all', function () {
+        saveSelectedFilesIds();
+        var url = createDownloadZipURL();
+        $('.zip-btn').prop('href', url);
+    });
+
     function saveSelectedFilesIds() {
+        docIds = [];
         $('.select-doc:visible:checked').each(function() {
             var id = $(this).val();
             docIds.push(id);
             tableRows.push($('.tr-doc' + id));
         });
+        dirIds = [];
         $('.select-dir:visible:checked').each(function() {
             var id = $(this).val();
             dirIds.push(id);
             tableRows.push($('.tr-dir' + id));
         });
+    }
+
+    function createDownloadZipURL() {
+        var url = '/api/files/download';
+        if (docIds.length > 0 && dirIds.length > 0) {
+            url += '?docIds[]=' + docIds + '&dirIds[]=' + dirIds;
+        } else
+            if (docIds.length > 0) {
+            url += '?docIds[]=' + docIds;
+        } else if (dirIds.length > 0) {
+            url += '?dirIds[]=' + dirIds;
+        }
+        return url;
     }
 
     changeTab();
@@ -133,21 +154,10 @@ $(document).ready(function() {
     });
 
     $('.delete-btn').click(function() {
-        var docCount = 0;
-        var dirCount = 0;
+        var docCount = docIds.length;
+        var dirCount = dirIds.length;
         var message = 'Are you sure you want to move ';
-        $('.select-doc:visible:checked').each(function() {
-            docCount++;
-            var id = $(this).val();
-            docIds.push(id);
-            tableRows.push($('.tr-doc' + id));
-        });
-        $('.select-dir:visible:checked').each(function() {
-            dirCount++;
-            var id = $(this).val();
-            dirIds.push(id);
-            tableRows.push($('.tr-dir' + id));
-        });
+
         if (docCount == 1) {
             message += docCount + ' document ';
         }
@@ -402,7 +412,6 @@ $(document).ready(function() {
     }
 
     $('.replace-btn').click(function() {
-        saveSelectedFilesIds();
         makeBoxesUnchecked();
         copyReplaceMode();
         $('.replace-message').show(true);
@@ -410,7 +419,6 @@ $(document).ready(function() {
     });
 
     $('.copy-btn').click(function() {
-        saveSelectedFilesIds();
         makeBoxesUnchecked();
         copyReplaceMode();
         $('.copy-message').show(true);

@@ -46,9 +46,6 @@
 
             <button type="button" class="btn btn-default btn-sm make-dir-btn"
                     data-toggle="modal" data-target="#makeDirDialog">Make dir</button>
-
-            <a href="/api/files/download?docIds%5B%5D=1%2C2"
-               class="btn btn-default btn-sm custom-width download-btn table-btn">Download</a>
         </div>
     </form>
 
@@ -70,6 +67,8 @@
                     <a href="#" class="switch-btn public-href">Public &nbsp</a>
                     <a href="#" class="switch-btn for-friends-href">For Friends &nbsp</a>
                     <a href="#" class="switch-btn private-href">Private</a>
+
+                    <a href="" class="btn btn-default zip-btn action-btn">Download .zip</a>
 
                     <button class="btn btn-default delete-btn action-btn"
                             data-toggle="modal" data-target="#deleteDialog">Delete</button>

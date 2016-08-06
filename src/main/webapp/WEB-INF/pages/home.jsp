@@ -68,6 +68,8 @@
                     <a href="#" class="switch-btn for-friends-href">For Friends &nbsp</a>
                     <a href="#" class="switch-btn private-href">Private</a>
 
+                    <a href="" class="btn btn-default zip-btn action-btn">Download .zip</a>
+
                     <button class="btn btn-default delete-btn action-btn"
                             data-toggle="modal" data-target="#deleteDialog">Delete</button>
 

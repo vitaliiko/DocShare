@@ -11,6 +11,8 @@ public class ZIPUtil {
 
     private static byte[] buffer = new byte[1024];
 
+    public static final String DEFAULT_ZIP_NAME = "DocShare.zip";
+
     public static byte[] createZIP(List<UserDocument> documents) {
         try (ByteArrayOutputStream byteArrayOut = new ByteArrayOutputStream();
              ZipOutputStream zipOut = new ZipOutputStream(byteArrayOut)) {
