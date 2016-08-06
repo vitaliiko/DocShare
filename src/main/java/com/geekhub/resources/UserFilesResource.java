@@ -8,18 +8,25 @@ import com.geekhub.exceptions.FileOperationException;
 import com.geekhub.resources.utils.FileControllersUtil;
 import com.geekhub.services.*;
 import com.geekhub.dto.convertors.EntityToDtoConverter;
+import com.geekhub.utils.UserFileUtil;
 import com.geekhub.validators.FileValidator;
 
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
 import javax.inject.Inject;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.FileCopyUtils;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 
@@ -122,6 +129,28 @@ public class UserFilesResource {
         return ResponseEntity.ok().build();
     }
 
+    @RequestMapping(value = "/files/download", method = RequestMethod.GET)
+    public ResponseEntity downloadFilesInZIP(@RequestParam(value = "dirIds[]", required = false) List<Long> dirIds,
+                                             @RequestParam(value = "docIds[]", required = false) List<Long> docIds,
+                                             HttpServletResponse response) throws IOException {
+
+        byte[] zip = userDocumentService.packDocumentsToZIP(docIds);
+        openOutputStream(zip, "zip.zip", response);
+        return ResponseEntity.ok().build();
+    }
+
+    private static void openOutputStream(byte[] zip, String zipName, HttpServletResponse response)
+            throws IOException {
+
+        response.setContentType("application/zip");
+        response.setContentLength(zip.length);
+        response.setHeader("Content-Disposition", "attachment; filename=\"" + zipName + "\"");
+
+        ByteArrayInputStream in = new ByteArrayInputStream(zip);
+
+        FileCopyUtils.copy(in, response.getOutputStream());
+    }
+
     @RequestMapping(value = "/files/move-to-trash", method = RequestMethod.POST)
     public ResponseEntity moveFilesToTrash(@RequestParam(value = "docIds[]", required = false) Long[] docIds,
                                            @RequestParam(value = "dirIds[]", required = false) Long[] dirIds,
@@ -165,15 +194,20 @@ public class UserFilesResource {
 
         Set<UserDirectory> accessibleDirectories = userToDirectoryRelationService.getAllAccessibleDirectories(user);
         accessibleDirectories.addAll(friendGroupToDirectoryRelationService.getAllAccessibleDirectories(user));
-        List<String> directoryHashes = accessibleDirectories.stream().map(UserDirectory::getHashName).collect(Collectors.toList());
+        List<String> directoryHashes = accessibleDirectories.stream()
+                .map(UserDirectory::getHashName).collect(Collectors.toList());
 
-        Set<UserToDocumentRelation> documentRelations = userToDocumentRelationService.getAllAccessibleInRoot(user, directoryHashes);
-        Set<UserToDirectoryRelation> directoryRelations = userToDirectoryRelationService.getAllAccessibleInRoot(user, directoryHashes);
+        Set<UserToDocumentRelation> documentRelations =
+                userToDocumentRelationService.getAllAccessibleInRoot(user, directoryHashes);
+        Set<UserToDirectoryRelation> directoryRelations =
+                userToDirectoryRelationService.getAllAccessibleInRoot(user, directoryHashes);
 
         return prepareModel(directoryRelations, documentRelations);
     }
 
-    private ModelAndView prepareModel(Set<UserToDirectoryRelation> directoryRelations, Set<UserToDocumentRelation> documentRelations) {
+    private ModelAndView prepareModel(Set<UserToDirectoryRelation> directoryRelations,
+                                      Set<UserToDocumentRelation> documentRelations) {
+
         Set<UserFileDto> documentDtos = documentRelations.stream()
                 .map(EntityToDtoConverter::convert)
                 .collect(Collectors.toCollection(TreeSet::new));

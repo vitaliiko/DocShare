@@ -21,10 +21,10 @@ import java.text.DecimalFormat;
 
 public class UserFileUtil {
 
-    private static final String ROOT_LOCATION = "C:\\spring_docs\\";
-    private static final String SYSTEM_EXTENSION = ".ud";
-    private static final Pattern DIRECTORY_NAME_PATTERN = Pattern.compile("^[\\w,\\s,\\.\\-/)/(]+$");
-    private static final Pattern DOCUMENT_NAME_PATTERN = Pattern.compile("^[\\w,\\s,\\.\\-/)/(]+\\.[A-Za-z0-9]{1,5}");
+    public static final String ROOT_LOCATION = "C:\\spring_docs\\";
+    public static final String SYSTEM_EXTENSION = ".ud";
+    public static final Pattern DIRECTORY_NAME_PATTERN = Pattern.compile("^[\\w,\\s,\\.\\-/)/(]+$");
+    public static final Pattern DOCUMENT_NAME_PATTERN = Pattern.compile("^[\\w,\\s,\\.\\-/)/(]+\\.[A-Za-z0-9]{1,5}");
 
     private final static List<String> IMAGE_TYPES = Arrays.asList(
             "image/bmp", "image/png", "image/jpeg", "image/gif"

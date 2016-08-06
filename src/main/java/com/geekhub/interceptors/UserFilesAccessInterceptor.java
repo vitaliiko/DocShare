@@ -51,7 +51,7 @@ public class UserFilesAccessInterceptor extends AccessInterceptor {
             }
         }
         resp.setStatus(HttpStatus.BAD_REQUEST.value());
-        return true;
+        return false;
     }
 
     private boolean areFilesAvailable(List<String> dirIds, List<String> docIds, Long userId) {

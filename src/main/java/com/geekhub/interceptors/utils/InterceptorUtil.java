@@ -34,10 +34,13 @@ public class InterceptorUtil {
     }
 
     public static List<String> getStringList(JSONObject jsonObject, String arrayName) {
-        JSONArray array = jsonObject.getJSONArray(arrayName);
         List<String> list = new ArrayList<>();
-        for (int i = 0; i < array.length(); i++){
-            list.add(array.getString(i));
+        if (jsonObject.has(arrayName)) {
+
+            JSONArray array = jsonObject.getJSONArray(arrayName);
+            for (int i = 0; i < array.length(); i++) {
+                list.add(array.getString(i));
+            }
         }
         return list;
     }

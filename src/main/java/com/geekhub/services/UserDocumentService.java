@@ -96,4 +96,6 @@ public interface UserDocumentService extends EntityService<UserDocument, Long> {
     UserDocument getDocumentBySharedToken(String token) throws FileAccessException;
 
     UserDocument getDocumentWithCommentsByToken(String token) throws FileAccessException;
+
+    byte[] packDocumentsToZIP(List<Long> docIds);
 }

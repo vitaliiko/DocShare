@@ -353,6 +353,12 @@ public class UserDocumentServiceImpl implements UserDocumentService {
         return document;
     }
 
+    @Override
+    public byte[] packDocumentsToZIP(List<Long> docIds) {
+        List<UserDocument> documents = getAllByIds(docIds).stream().collect(Collectors.toList());
+        return ZIPUtil.createZIP(documents);
+    }
+
     private void createRelations(UserDocument document, DirectoryWrapper relations) {
         if (relations == null) {
             return;
