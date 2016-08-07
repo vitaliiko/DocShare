@@ -212,19 +212,18 @@ public class UserDocumentServiceImpl implements UserDocumentService {
     }
 
     @Override
-    public String getLocation(UserDocument document) {
+    public LocationObject getLocation(UserDocument document) {
         User owner = userToDocumentRelationService.getDocumentOwner(document);
         return getLocation(document, owner.getLogin());
     }
 
     @Override
-    public String getLocation(UserDocument document, String rootDirectoryHashName) {
-        String location = "";
+    public LocationObject getLocation(UserDocument document, String rootDirectoryHashName) {
         String patentDirectoryHash = document.getParentDirectoryHash();
-
+        LocationObject location = new LocationObject();
         while(!patentDirectoryHash.equals(rootDirectoryHashName)) {
             UserDirectory directory = userDirectoryService.getByHashName(patentDirectoryHash);
-            location = directory.getName() + "/" + location;
+            location.addDirectory(directory);
             patentDirectoryHash = directory.getParentDirectoryHash();
         }
 

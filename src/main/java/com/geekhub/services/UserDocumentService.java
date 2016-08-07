@@ -14,6 +14,7 @@ import java.util.Set;
 import com.geekhub.entities.enums.DocumentStatus;
 import com.geekhub.exceptions.FileAccessException;
 import com.geekhub.utils.DirectoryWrapper;
+import com.geekhub.utils.LocationObject;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -62,9 +63,9 @@ public interface UserDocumentService extends EntityService<UserDocument, Long> {
 
     List<Object> getActualIdsByParentDirectoryHash(String parentDirectoryHash);
 
-    String getLocation(UserDocument document);
+    LocationObject getLocation(UserDocument document);
 
-    String getLocation(UserDocument document, String rootDirectoryHashName);
+    LocationObject getLocation(UserDocument document, String rootDirectoryHashName);
 
     Set<UserDocument> getAllByOwnerAndAttribute(User owner, DocumentAttribute attribute);
 

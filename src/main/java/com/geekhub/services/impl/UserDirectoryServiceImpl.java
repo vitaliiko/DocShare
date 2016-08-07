@@ -500,7 +500,7 @@ public class UserDirectoryServiceImpl implements UserDirectoryService {
             List<UserDocument> docInSameDir = childDocuments.stream()
                     .filter(d -> d.getParentDirectoryHash().equals(doc.getParentDirectoryHash()))
                     .collect(Collectors.toList());
-            String location = userDocumentService.getLocation(doc);
+            String location = userDocumentService.getLocation(doc).getLocation();
 
             documentMap.put(location, docInSameDir);
             childDocuments.removeAll(docInSameDir);

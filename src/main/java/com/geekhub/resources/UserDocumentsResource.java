@@ -66,7 +66,7 @@ public class UserDocumentsResource {
         User user = getUserFromSession(session);
         UserDocument document = userDocumentService.getById(docId);
         UserFileDto fileDto = EntityToDtoConverter.convert(document);
-        fileDto.setLocation(userDocumentService.getLocation(document));
+        fileDto.setLocation(userDocumentService.getLocation(document).getLocation());
 
         return prepareBrowseDocumentModel(user, document, fileDto);
     }
