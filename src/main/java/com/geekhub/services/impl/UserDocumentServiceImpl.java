@@ -5,6 +5,7 @@ import com.geekhub.dto.convertors.EntityToDtoConverter;
 import com.geekhub.entities.*;
 import com.geekhub.entities.enums.FileRelationType;
 import com.geekhub.exceptions.FileAccessException;
+import com.geekhub.exceptions.FileOperationException;
 import com.geekhub.repositories.UserDocumentRepository;
 import com.geekhub.entities.enums.AbilityToCommentDocument;
 import com.geekhub.entities.enums.DocumentAttribute;
@@ -170,7 +171,10 @@ public class UserDocumentServiceImpl implements UserDocumentService {
     }
 
     @Override
-    public List<UserDocument> getAllByParentDirectoryHashes(List<String> parentDirectoryHashList) {
+    public List<UserDocument> getAllByParentDirectoryHashes(Collection<String> parentDirectoryHashList) {
+        if (CollectionUtils.isEmpty(parentDirectoryHashList)) {
+            return new ArrayList<>();
+        }
         return repository.getList("parentDirectoryHash", parentDirectoryHashList);
     }
 
@@ -209,11 +213,16 @@ public class UserDocumentServiceImpl implements UserDocumentService {
 
     @Override
     public String getLocation(UserDocument document) {
+        User owner = userToDocumentRelationService.getDocumentOwner(document);
+        return getLocation(document, owner.getLogin());
+    }
+
+    @Override
+    public String getLocation(UserDocument document, String rootDirectoryHashName) {
         String location = "";
         String patentDirectoryHash = document.getParentDirectoryHash();
-        User owner = userToDocumentRelationService.getDocumentOwner(document);
 
-        while(!patentDirectoryHash.equals(owner.getLogin())) {
+        while(!patentDirectoryHash.equals(rootDirectoryHashName)) {
             UserDirectory directory = userDirectoryService.getByHashName(patentDirectoryHash);
             location = directory.getName() + "/" + location;
             patentDirectoryHash = directory.getParentDirectoryHash();
@@ -356,10 +365,18 @@ public class UserDocumentServiceImpl implements UserDocumentService {
     @Override
     public ZipDto packDocumentsToZIP(List<Long> docIds) {
         List<UserDocument> documents = getAllByIds(docIds).stream().collect(Collectors.toList());
+        checkDocumentsDownloadOperation(documents);
         UserDirectory directory = userDirectoryService.getByHashName(documents.get(0).getParentDirectoryHash());
         byte[] zipFile = ZIPUtil.createZIP(documents);
         String zipName = directory == null ? ZIPUtil.DEFAULT_ZIP_NAME : directory.getName();
         return new ZipDto(zipFile, zipName);
+    }
+
+    private void checkDocumentsDownloadOperation(List<UserDocument> documents) {
+        String parentDirectoryHash = documents.get(0).getParentDirectoryHash();
+        if (!documents.stream().allMatch(d -> d.getParentDirectoryHash().equals(parentDirectoryHash))) {
+            throw new FileOperationException("Files must be in one folder");
+        }
     }
 
     private void createRelations(UserDocument document, DirectoryWrapper relations) {

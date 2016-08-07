@@ -56,13 +56,15 @@ public interface UserDocumentService extends EntityService<UserDocument, Long> {
 
     List<UserDocument> getAllByParentDirectoryHash(String parentDirectoryHash);
 
-    List<UserDocument> getAllByParentDirectoryHashes(List<String> parentDirectoryHashList);
+    List<UserDocument> getAllByParentDirectoryHashes(Collection<String> parentDirectoryHashList);
 
     List<UserDocument> getAllByParentDirectoryHashAndStatus(String parentDirectoryHash, DocumentStatus status);
 
     List<Object> getActualIdsByParentDirectoryHash(String parentDirectoryHash);
 
     String getLocation(UserDocument document);
+
+    String getLocation(UserDocument document, String rootDirectoryHashName);
 
     Set<UserDocument> getAllByOwnerAndAttribute(User owner, DocumentAttribute attribute);
 

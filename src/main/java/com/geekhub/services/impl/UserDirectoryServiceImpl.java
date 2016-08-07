@@ -178,16 +178,25 @@ public class UserDirectoryServiceImpl implements UserDirectoryService {
     }
 
     @Override
-    public List<UserDirectory> getTreeByParentDirectoryHash(String parentDirectoryHash) {
+    public List<UserDirectory> getTreeByParentDirectoryHash(String parentDirectoryHashes) {
+        List<String> hashes = Collections.singletonList(parentDirectoryHashes);
+        return getAllByParentDirectoryHashes(hashes);
+    }
+
+    @Override
+    public List<UserDirectory> getTreeByParentDirectoryHashes(Collection<String> parentDirectoryHashes) {
         List<UserDirectory> childDirectories = new ArrayList<>();
-        List<String> hashes = new ArrayList<>();
-        hashes.add(parentDirectoryHash);
+        List<String> hashes = new ArrayList<>(parentDirectoryHashes);
         while (hashes.size() > 0) {
             List<UserDirectory> directories = getAllByParentDirectoryHashes(hashes);
-            hashes = directories.stream().map(UserDirectory::getHashName).collect(Collectors.toList());
+            hashes = extractHashes(directories);
             childDirectories.addAll(directories);
         }
         return childDirectories;
+    }
+
+    private List<String> extractHashes(Collection<UserDirectory> directories) {
+        return directories.stream().map(UserDirectory::getHashName).collect(Collectors.toList());
     }
 
     @Override
@@ -311,7 +320,7 @@ public class UserDirectoryServiceImpl implements UserDirectoryService {
                 d.setDocumentAttribute(directory == null ? DocumentAttribute.PRIVATE : directory.getDocumentAttribute());
                 update(d);
             });
-            parentDirHashList = childDirectories.stream().map(UserDirectory::getHashName).collect(Collectors.toList());
+            parentDirHashList = extractHashes(childDirectories);
         }
         parentDirHashList.add(dirHashName);
         List<UserDocument> childDocuments = userDocumentService.getAllByParentDirectoryHashes(parentDirHashList);
@@ -354,7 +363,7 @@ public class UserDirectoryServiceImpl implements UserDirectoryService {
     private void canCopyOrReplace(String destinationDirectoryHash, UserDirectory dir, List<UserDirectory> childDirectories)
             throws FileOperationException {
 
-        List<String> childHashes = childDirectories.stream().map(UserDirectory::getHashName).collect(Collectors.toList());
+        List<String> childHashes = extractHashes(childDirectories);
         childHashes.add(dir.getHashName());
         if (childHashes.contains(destinationDirectoryHash)) {
             throw new FileOperationException("You cannot copy/replace directory to itself");
@@ -470,6 +479,43 @@ public class UserDirectoryServiceImpl implements UserDirectoryService {
                 friendGroupToDirectoryRelationService.getAllByDirectory(directory)
         );
         return directoryWrapper;
+    }
+
+    @Override
+    public ZipDto packDirectoriesToZIP(List<Long> docIds, List<Long> dirIds) {
+        Set<UserDirectory> rootDirectories = getAllByIds(dirIds);
+        Set<UserDocument> documents = userDocumentService.getAllByIds(docIds);
+        checkFilesDownloadOperation(documents, rootDirectories);
+
+        Map<String, List<UserDocument>> documentMap = new HashMap<>();
+        documentMap.put("", documents.stream().collect(Collectors.toList()));
+
+        Set<String> dirHashes = new HashSet<>(extractHashes(rootDirectories));
+        List<UserDirectory> childDirectories = getTreeByParentDirectoryHashes(dirHashes);
+        dirHashes.addAll(extractHashes(childDirectories));
+        List<UserDocument> childDocuments = userDocumentService.getAllByParentDirectoryHashes(dirHashes);
+
+        while (childDocuments.size() > 0) {
+            UserDocument doc = childDocuments.stream().findFirst().get();
+            List<UserDocument> docInSameDir = childDocuments.stream()
+                    .filter(d -> d.getParentDirectoryHash().equals(doc.getParentDirectoryHash()))
+                    .collect(Collectors.toList());
+            String location = userDocumentService.getLocation(doc);
+
+            documentMap.put(location, docInSameDir);
+            childDocuments.removeAll(docInSameDir);
+        }
+
+        documentMap.size();
+        return null;
+    }
+
+    private void checkFilesDownloadOperation(Set<UserDocument> documents, Set<UserDirectory> directories) {
+        String parentDirectoryHash = documents.stream().findFirst().get().getParentDirectoryHash();
+        if (!documents.stream().allMatch(d -> d.getParentDirectoryHash().equals(parentDirectoryHash))
+                && !directories.stream().allMatch(d -> d.getParentDirectoryHash().endsWith(parentDirectoryHash))) {
+            throw new FileOperationException("Files and folders must be in one folder");
+        }
     }
 
     @Override

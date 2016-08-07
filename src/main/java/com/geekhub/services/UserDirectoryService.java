@@ -1,8 +1,6 @@
 package com.geekhub.services;
 
-import com.geekhub.dto.DirectoryContentDto;
-import com.geekhub.dto.FileAccessDto;
-import com.geekhub.dto.SharedDto;
+import com.geekhub.dto.*;
 import com.geekhub.entities.User;
 import com.geekhub.entities.UserDirectory;
 import com.geekhub.entities.enums.DocumentAttribute;
@@ -52,7 +50,9 @@ public interface UserDirectoryService extends EntityService<UserDirectory, Long>
 
     List<UserDirectory> getAllByParentDirectoryHashes(List<String> parentDirectoryHashes);
 
-    List<UserDirectory> getTreeByParentDirectoryHash(String parentDirectoryHash);
+    List<UserDirectory> getTreeByParentDirectoryHashes(Collection<String> parentDirectoryHashes);
+
+    List<UserDirectory> getTreeByParentDirectoryHash(String parentDirectoryHashes);
 
     List<UserDirectory> getAllByParentDirectoryHashAndStatus(String parentDirectoryHash, DocumentStatus status);
 
@@ -81,4 +81,6 @@ public interface UserDirectoryService extends EntityService<UserDirectory, Long>
     List<String> getSimilarDirectoryNamesInDirectory(String directoryHash, Collection<UserDirectory> directories);
 
     DirectoryWrapper getAllDirectoryRelations(UserDirectory directory);
+
+    ZipDto packDirectoriesToZIP(List<Long> docIds, List<Long> dirIds);
 }

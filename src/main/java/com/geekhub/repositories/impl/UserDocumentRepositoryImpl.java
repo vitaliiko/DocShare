@@ -109,7 +109,7 @@ public class UserDocumentRepositoryImpl implements UserDocumentRepository {
     }
 
     @Override
-    public <T> List<UserDocument> getList(String propertyName, List<T> values) {
+    public <T> List<UserDocument> getList(String propertyName, Collection<T> values) {
         return sessionFactory.getCurrentSession()
                 .createCriteria(clazz)
                 .add(Restrictions.in(propertyName, values))

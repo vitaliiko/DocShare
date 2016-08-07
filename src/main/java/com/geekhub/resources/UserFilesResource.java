@@ -19,6 +19,7 @@ import java.util.TreeSet;
 import java.util.stream.Collectors;
 import javax.inject.Inject;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.FileCopyUtils;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
@@ -132,7 +133,13 @@ public class UserFilesResource {
                                              @RequestParam(value = "docIds[]", required = false) List<Long> docIds,
                                              HttpServletResponse response) throws IOException {
 
-        ZipDto zip = userDocumentService.packDocumentsToZIP(docIds);
+        ZipDto zip = null;
+        if (CollectionUtils.isEmpty(dirIds) && !CollectionUtils.isEmpty(docIds)) {
+            zip = userDocumentService.packDocumentsToZIP(docIds);
+        }
+        if (!CollectionUtils.isEmpty(dirIds)) {
+            zip = userDirectoryService.packDirectoriesToZIP(docIds, dirIds);
+        }
         openOutputStream(zip, response);
         return ResponseEntity.ok().build();
     }
