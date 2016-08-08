@@ -1,7 +1,7 @@
 package com.geekhub.repositories.impl;
 
-import com.geekhub.entities.DocumentStatistic;
-import com.geekhub.repositories.DocumentStatisticRepository;
+import com.geekhub.entities.UserDocumentStatistic;
+import com.geekhub.repositories.UserDocumentStatisticRepository;
 import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
@@ -12,36 +12,36 @@ import java.util.List;
 
 @Repository
 @SuppressWarnings("unchecked")
-public class DocumentStatisticRepositoryImpl implements DocumentStatisticRepository {
+public class UserDocumentStatisticRepositoryImpl implements UserDocumentStatisticRepository {
 
     @Inject
     private SessionFactory sessionFactory;
 
-    private Class<DocumentStatistic> clazz = DocumentStatistic.class;
+    private Class<UserDocumentStatistic> clazz = UserDocumentStatistic.class;
 
     @Override
-    public List<DocumentStatistic> getAll(String orderParameter) {
-        return (List<DocumentStatistic>) sessionFactory.getCurrentSession()
+    public List<UserDocumentStatistic> getAll(String orderParameter) {
+        return (List<UserDocumentStatistic>) sessionFactory.getCurrentSession()
                 .createCriteria(clazz)
                 .addOrder(Order.asc(orderParameter))
                 .list();
     }
 
     @Override
-    public DocumentStatistic getById(Long id) {
-        return (DocumentStatistic) sessionFactory.getCurrentSession().get(clazz, id);
+    public UserDocumentStatistic getById(Long id) {
+        return (UserDocumentStatistic) sessionFactory.getCurrentSession().get(clazz, id);
     }
 
     @Override
-    public DocumentStatistic get(String propertyName, Object value) {
-        return (DocumentStatistic) sessionFactory.getCurrentSession()
+    public UserDocumentStatistic get(String propertyName, Object value) {
+        return (UserDocumentStatistic) sessionFactory.getCurrentSession()
                 .createCriteria(clazz)
                 .add(Restrictions.eq(propertyName, value))
                 .uniqueResult();
     }
 
     @Override
-    public List<DocumentStatistic> getList(String propertyName, Object value) {
+    public List<UserDocumentStatistic> getList(String propertyName, Object value) {
         return sessionFactory.getCurrentSession()
                 .createCriteria(clazz)
                 .add(Restrictions.eq(propertyName, value))
@@ -49,34 +49,34 @@ public class DocumentStatisticRepositoryImpl implements DocumentStatisticReposit
     }
 
     @Override
-    public Long save(DocumentStatistic entity) {
+    public Long save(UserDocumentStatistic entity) {
         return (Long) sessionFactory.getCurrentSession().save(entity);
     }
 
     @Override
-    public void update(DocumentStatistic entity) {
+    public void update(UserDocumentStatistic entity) {
         sessionFactory.getCurrentSession().update(entity);
     }
 
     @Override
-    public void saveOrUpdate(DocumentStatistic entity) {
+    public void saveOrUpdate(UserDocumentStatistic entity) {
         sessionFactory.getCurrentSession().saveOrUpdate(entity);
     }
 
     @Override
-    public void delete(DocumentStatistic entity) {
+    public void delete(UserDocumentStatistic entity) {
         sessionFactory.getCurrentSession().delete(entity);
     }
 
     @Override
     public void deleteById(Long entityId) {
-        DocumentStatistic comment = getById(entityId);
+        UserDocumentStatistic comment = getById(entityId);
         sessionFactory.getCurrentSession().update(comment);
     }
 
     @Override
-    public DocumentStatistic getByUserDocumentId(Long documentId) {
-        return (DocumentStatistic) sessionFactory.getCurrentSession()
+    public UserDocumentStatistic getByUserDocumentId(Long documentId) {
+        return (UserDocumentStatistic) sessionFactory.getCurrentSession()
                 .createCriteria(clazz, "stat")
                 .createAlias("stat.userDocument", "doc")
                 .add(Restrictions.eq("doc.id", documentId))
