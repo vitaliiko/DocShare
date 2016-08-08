@@ -10,10 +10,7 @@ import com.geekhub.entities.enums.DocumentAttribute;
 import com.geekhub.entities.enums.DocumentStatus;
 import com.geekhub.services.*;
 import com.geekhub.services.enams.FileType;
-import com.geekhub.utils.DirectoryWrapper;
-import com.geekhub.utils.CollectionTools;
-import com.geekhub.utils.LocationObject;
-import com.geekhub.utils.UserFileUtil;
+import com.geekhub.utils.*;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -486,6 +483,7 @@ public class UserDirectoryServiceImpl implements UserDirectoryService {
     public ZipDto packDirectoriesToZIP(List<Long> docIds, List<Long> dirIds) {
         Set<UserDirectory> rootDirectories = getAllByIds(dirIds);
         Set<UserDocument> documents = userDocumentService.getAllByIds(docIds);
+        User owner = userToDirectoryRelationService.getDirectoryOwner(rootDirectories.stream().findAny().get());
         String mainDirectoryHash = checkFilesDownloadOperation(documents, rootDirectories);
         UserDirectory mainDirectory = getByHashName(mainDirectoryHash);
 
@@ -504,14 +502,15 @@ public class UserDirectoryServiceImpl implements UserDirectoryService {
                     .collect(Collectors.toList());
             LocationObject locationObject = userDocumentService.getLocation(doc);
             String location = locationObject.getLocation();
-            if (mainDirectory != null && locationObject.containHash(mainDirectoryHash)) {
-                String rootDirName = mainDirectory.getName();
+            if (locationObject.containHash(mainDirectoryHash)) {
+                String rootDirName = mainDirectory == null ? owner.getLogin() : mainDirectory.getName();
                 location = location.substring(location.indexOf(rootDirName) + rootDirName.length() + 1);
             } else {
                 for (UserDirectory rootDir : rootDirectories) {
                     if (locationObject.containHash(rootDir.getHashName())) {
                         String rootDirName = rootDir.getName();
                         location = location.substring(location.indexOf(rootDirName) + rootDirName.length() + 1);
+                        break;
                     }
                 }
             }
@@ -519,8 +518,9 @@ public class UserDirectoryServiceImpl implements UserDirectoryService {
             childDocuments.removeAll(docInSameDir);
         }
 
-        documentMap.size();
-        return null;
+        String zipName = mainDirectory == null ? ZIPUtil.DEFAULT_ZIP_NAME : mainDirectory.getName();
+        byte[] zip = ZIPUtil.createZIP(documentMap);
+        return new ZipDto(zip, zipName);
     }
 
     private String checkFilesDownloadOperation(Set<UserDocument> documents, Set<UserDirectory> directories) {

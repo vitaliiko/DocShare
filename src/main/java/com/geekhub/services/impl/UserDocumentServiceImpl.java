@@ -226,6 +226,7 @@ public class UserDocumentServiceImpl implements UserDocumentService {
             location.addDirectory(directory);
             patentDirectoryHash = directory.getParentDirectoryHash();
         }
+        location.addHash(rootDirectoryHashName);
 
         return location;
     }

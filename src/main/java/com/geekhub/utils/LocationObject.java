@@ -20,6 +20,10 @@ public class LocationObject {
         dirHashes.add(directory.getHashName());
     }
 
+    public void addHash(String dirHash) {
+        dirHashes.add(dirHash);
+    }
+
     public String getLocation() {
         String location = "";
         for (String name : dirNames) {
