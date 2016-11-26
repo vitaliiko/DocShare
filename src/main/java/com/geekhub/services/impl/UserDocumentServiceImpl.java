@@ -63,6 +63,9 @@ public class UserDocumentServiceImpl implements UserDocumentService {
     @Inject
     private FileSharedLinkTokenService fileSharedLinkTokenService;
 
+    @Inject
+    private UserDocumentStatisticService statisticService;
+
     @Override
     public List<UserDocument> getAll(String orderParameter) {
         return repository.getAll(orderParameter);

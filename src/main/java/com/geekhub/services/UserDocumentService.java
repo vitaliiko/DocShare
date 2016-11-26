@@ -1,9 +1,6 @@
 package com.geekhub.services;
 
-import com.geekhub.dto.DocumentWithLinkDto;
-import com.geekhub.dto.FileAccessDto;
-import com.geekhub.dto.SharedDto;
-import com.geekhub.dto.ZipDto;
+import com.geekhub.dto.*;
 import com.geekhub.entities.*;
 import com.geekhub.entities.enums.DocumentAttribute;
 
@@ -71,9 +68,11 @@ public interface UserDocumentService extends EntityService<UserDocument, Long> {
 
     Set<UserDocument> searchByName(User owner, String name);
 
-    List<UserDocument> saveOrUpdateDocument(MultipartFile[] files, String parentDirHashName, User user) throws IOException;
+    List<UserDocument> saveOrUpdateDocument(MultipartFile[] files, String parentDirHashName, User user)
+            throws IOException;
 
-    UserDocument updateDocument(UserDocument document, User user, MultipartFile multipartFile) throws IOException;
+    UserDocument updateDocument(UserDocument document, User user, MultipartFile multipartFile)
+            throws IOException;
 
     void changeAbilityToComment(Long documentId, boolean abilityToComment);
 

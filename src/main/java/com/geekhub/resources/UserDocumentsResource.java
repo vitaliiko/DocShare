@@ -129,7 +129,7 @@ public class UserDocumentsResource {
     }
 
     @RequestMapping(value = "/documents/{docId}/access", method = RequestMethod.GET)
-    public ResponseEntity<FileAccessDto> getUserDocument(@PathVariable Long docId) {
+    public ResponseEntity<FileAccessDto> getUserDocumentAccessInfo(@PathVariable Long docId) {
         FileAccessDto accessDto = userDocumentService.findAllRelations(docId);
         return ResponseEntity.ok().body(accessDto);
     }
