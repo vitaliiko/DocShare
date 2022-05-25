@@ -11,7 +11,7 @@
         <spring.version>4.2.2.RELEASE</spring.version>
         <hibernate.version>4.3.5.Final</hibernate.version>
         <jackson.version>2.6.5</jackson.version>
-        <security.version>4.0.4.RELEASE</security.version>
+        <security.version>5.5.7</security.version>
         <log4j.version>1.2.17</log4j.version>
     </properties>
 
