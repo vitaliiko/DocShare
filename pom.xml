@@ -8,7 +8,7 @@
     <name>HibernateExample</name>
 
     <properties>
-        <spring.version>4.2.2.RELEASE</spring.version>
+        <spring.version>6.0.0</spring.version>
         <hibernate.version>4.3.5.Final</hibernate.version>
         <jackson.version>2.6.5</jackson.version>
         <security.version>4.0.4.RELEASE</security.version>
